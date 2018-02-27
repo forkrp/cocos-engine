@@ -54,10 +54,6 @@ cc.js.mixin(cc.path, {
     }
 });
 
-// Node
-var nodeProto = cc.Node.prototype;
-cc.defineGetterSetter(nodeProto, "_parent", nodeProto.getParent, nodeProto.setParent);
-
 // View
 cc.view.isViewReady = cc.view.isOpenGLReady;
 cc.view.setOrientation = function () {};
@@ -142,28 +138,6 @@ if (window.SocketIO) {
         this._jsbEmit(uri, delegate);
     };
 }
-
-cc.Node.prototype.setIgnoreAnchorPointForPosition = cc.Node.prototype.ignoreAnchorPointForPosition;
-
-// ccsg
-window._ccsg = {
-    Node: cc.Node,
-    Scene: cc.Scene,
-    Sprite: cc.Sprite,
-    ParticleSystem: cc.ParticleSystem,
-    Label: cc.Label,
-    EditBox: cc.EditBox,
-    VideoPlayer: cc.VideoPlayer,
-    WebView: cc.WebView,
-    TMXTiledMap: cc.TMXTiledMap,
-    TMXObjectGroup: cc.TMXObjectGroup,
-    TMXObject: cc.TMXObject,
-    TMXObjectImage: cc.TMXObjetImage,
-    TMXObjectShape: cc.TMXObjectShape,
-    TMXLayer: cc.TMXLayer,
-    MotionStreak: cc.MotionStreak,
-    CameraNode: cc.CameraNode
-};
 
 // fix cc.formatStr (#2630)
 cc.formatStr = cc.js.formatStr;

@@ -86,22 +86,12 @@ if (window.__ENABLE_GC_FOR_NATIVE_OBJECTS__ !== undefined) {
 
 require('./jsb-game');
 require('./jsb-loader');
-require('./jsb-director');
-require('./jsb-tex-sprite-frame');
-require('./jsb-scale9sprite');
-require('./jsb-label');
 require('./jsb-editbox');
 require('./jsb-videoplayer');
 require('./jsb-webview');
-require('./jsb-particle');
-require('./jsb-spine');
 require('./jsb-enums');
-require('./jsb-event');
-require('./jsb-action');
 require('./jsb-etc');
 require('./jsb-audio');
-require('./jsb-tiledmap');
 require('./jsb-box2d');
-require('./jsb-dragonbones');
 
 require('../extends');

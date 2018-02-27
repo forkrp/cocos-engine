@@ -51,10 +51,10 @@ var jsbSkipModules = [
     '../../cocos2d/core/platform/CCInputManager.js',
     '../../cocos2d/core/platform/CCVisibleRect.js',
     '../../cocos2d/core/graphics/helper.js',
-    '../../cocos2d/actions/index.js',
+    // '../../cocos2d/actions/index.js',
     '../../cocos2d/audio/CCAudio',
-    '../../extensions/spine/lib/spine',
-    '../../extensions/dragonbones/lib/dragonBones',
+    // '../../extensions/spine/lib/spine',
+    // '../../extensions/dragonbones/lib/dragonBones',
     '../../external/box2d/box2d.js',
     '../../external/chipmunk/chipmunk.js',
 ];
