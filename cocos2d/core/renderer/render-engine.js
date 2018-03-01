@@ -14597,6 +14597,7 @@ module.exports = (function () {
   const Device = gfx.Device;
   const Model = renderer.Model;
   const InputAssembler = renderer.InputAssembler;
+  const ForwardRenderer = renderer.ForwardRenderer;
   
   let renderEngine = {
     // core classes

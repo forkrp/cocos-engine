@@ -30,30 +30,30 @@ const math = renderEngine.math;
 let _pos = math.vec3.create();
 
 function _initBuiltins(device) {
-    let canvas = document.createElement('canvas');
-    let context = canvas.getContext('2d');
+    //cjh let canvas = document.createElement('canvas');
+    // let context = canvas.getContext('2d');
   
-    // default texture
-    canvas.width = canvas.height = 128;
-    context.fillStyle = '#ddd';
-    context.fillRect(0, 0, 128, 128);
-    context.fillStyle = '#555';
-    context.fillRect(0, 0, 64, 64);
-    context.fillStyle = '#555';
-    context.fillRect(64, 64, 64, 64);
+    // // default texture
+    // canvas.width = canvas.height = 128;
+    // context.fillStyle = '#ddd';
+    // context.fillRect(0, 0, 128, 128);
+    // context.fillStyle = '#555';
+    // context.fillRect(0, 0, 64, 64);
+    // context.fillStyle = '#555';
+    // context.fillRect(64, 64, 64, 64);
   
-    let defaultTexture = new renderEngine.Texture2D(device, {
-        images: [canvas],
-        width: 128,
-        height: 128,
-        wrapS: renderEngine.gfx.WRAP_REPEAT,
-        wrapT: renderEngine.gfx.WRAP_REPEAT,
-        format: renderEngine.gfx.TEXTURE_FMT_RGB8,
-        mipmap: true,
-    });
+    // let defaultTexture = new renderEngine.Texture2D(device, {
+    //     images: [canvas],
+    //     width: 128,
+    //     height: 128,
+    //     wrapS: renderEngine.gfx.WRAP_REPEAT,
+    //     wrapT: renderEngine.gfx.WRAP_REPEAT,
+    //     format: renderEngine.gfx.TEXTURE_FMT_RGB8,
+    //     mipmap: true,
+    // });
   
     return {
-        defaultTexture: defaultTexture,
+        defaultTexture: null,//cjh defaultTexture,
         programTemplates: renderEngine.shaders.templates,
         programChunks: renderEngine.shaders.chunks,
     };
@@ -73,7 +73,11 @@ module.exports = {
 
     init (canvas, opts) {
         this.canvas = canvas;
-        this.device = new renderEngine.Device(canvas, opts);
+        if (CC_JSB) {
+            this.device = renderEngine.Device.getInstance();
+        } else {
+            this.device = new renderEngine.Device(canvas, opts);
+        }
         this.scene = new renderEngine.Scene();
         this.materialUtil = new renderEngine.MaterialUtil();
 

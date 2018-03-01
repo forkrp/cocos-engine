@@ -17,13 +17,13 @@ var Stage = cc.Enum({
 });
 
 let _passPool = new RecyclePool(function () {
-    return new renderer.Pass();
+    return new renderer.Pass("");
 }, 16);
 let _techPool = new RecyclePool(function () {
     return new renderer.Technique([], null, []);
 }, 16);
 let _effectPool = new RecyclePool(function () {
-    return new renderer.Effect([]);
+    return new renderer.Effect([], {}, []);
 }, 16);
 
 function clonePass (from) {

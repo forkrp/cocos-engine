@@ -27,7 +27,6 @@ const EventTarget = require('../event/event-target');
 const sys = require('../platform/CCSys');
 const JS = require('../platform/js');
 const misc = require('../utils/misc');
-const game = require('../CCGame');
 const renderEngine = require('../renderer/render-engine');
 const renderer = require('../renderer');
 require('../platform/CCClass');

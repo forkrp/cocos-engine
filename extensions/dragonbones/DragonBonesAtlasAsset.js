@@ -118,7 +118,7 @@ var DragonBonesAtlasAsset = cc.Class({
     },
 
     destroy () {
-        var useGlobalFactory = !CC_JSB;
+        var useGlobalFactory = !/*cjh CC_JSB */false;
         if (useGlobalFactory && this._textureAtlasData) {
             var factory = dragonBones.CCFactory.getFactory();
             // If the texture still referenced by any DragonBonesData in the factory,

@@ -33,7 +33,7 @@ var downloadText = require('./text-downloader');
 var urlAppendTimestamp = require('./utils').urlAppendTimestamp;
 
 var downloadAudio;
-if (!CC_EDITOR || !Editor.isMainProcess) {
+if ((!CC_EDITOR || !Editor.isMainProcess) && !CC_JSB) {
     downloadAudio = require('./audio-downloader');
 }
 else {

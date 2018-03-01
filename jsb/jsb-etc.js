@@ -55,8 +55,8 @@ cc.js.mixin(cc.path, {
 });
 
 // View
-cc.view.isViewReady = cc.view.isOpenGLReady;
-cc.view.setOrientation = function () {};
+//cjh cc.view.isViewReady = cc.view.isOpenGLReady;
+//cc.view.setOrientation = function () {};
 
 // setTimeout, setInterval, clearTimeout, clearInteval
 var _windowTimeIntervalId = 0;

@@ -36,10 +36,8 @@ else {
     require('./cocos2d/motion-streak/CCMotionStreak');
     require('./cocos2d/core/components/CCStudioComponent');
     require('./extensions/ccpool/CCNodePool');
-    if (!CC_JSB) {
-        require('./cocos2d/actions');
-        require('./external/chipmunk/chipmunk');
-    }
+    require('./cocos2d/actions');
+    //cjh require('./external/chipmunk/chipmunk');
 }
 
 require('./extensions/spine');

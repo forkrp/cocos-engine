@@ -24,16 +24,9 @@
  ****************************************************************************/
 
 require('./CCEvent');
-
-var eventManager;
-if (CC_JSB) {
-    eventManager = cc.eventManager;
-}
-else {
-    require('./CCTouch');
-    require('./CCEventListener');
-    eventManager = require('./CCEventManager');
-}
+require('./CCTouch');
+require('./CCEventListener');
+var eventManager = require('./CCEventManager');
 
 module.exports = eventManager;
 

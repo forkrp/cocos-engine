@@ -25,8 +25,13 @@
 
 'use strict';
 
+var EventTarget = require('../cocos2d/core/event/event-target');
+var View = require('../cocos2d/core/platform/CCView');
+var renderer = require('../cocos2d/core/renderer');
+var inputManager = require('../cocos2d/core/platform/CCInputManager');
+
 // cc.game
-cc.game = {
+var game = cc.game = {
 
     EVENT_HIDE: "game_on_hide",
     EVENT_SHOW: "game_on_show",
@@ -36,9 +41,10 @@ cc.game = {
     _onHideListener: null,
 
     // states
-    _paused: false, //whether the game is paused
+    _paused: true, //whether the game is paused
     _prepareCalled: false,//whether the prepare function has been called
     _prepared: false,//whether the engine has prepared
+    _rendererInitialized: false,
 
     /**
      * Config of game
@@ -54,6 +60,29 @@ cc.game = {
 
     // Scenes list
     _sceneInfos: [],
+
+
+    /**
+     * !#en The outer frame of the game canvas, parent of game container.
+     * !#zh 游戏画布的外框，container 的父容器。
+     * @property frame
+     * @type {Object}
+     */
+    frame: null,
+    /**
+     * !#en The container of game canvas.
+     * !#zh 游戏画布的容器。
+     * @property container
+     * @type {HTMLDivElement}
+     */
+    container: null,
+    /**
+     * !#en The canvas of the game.
+     * !#zh 游戏的画布。
+     * @property canvas
+     * @type {HTMLCanvasElement}
+     */
+    canvas: null,
 
     _persistRootNodes: {},
     _ignoreRemovePersistNode: null,
@@ -155,10 +184,45 @@ cc.game = {
         
         // Prepare never called and engine ready
         this._prepareCalled = true;
+        this._initRenderer(config[CONFIG_KEY.width], config[CONFIG_KEY.height]);
 
         // Additional step in JSB
         cc.game.renderType = cc.game.RENDER_TYPE_OPENGL;
-        cc.director.sharedInit();
+
+        /**
+         * @module cc
+         */
+
+        /**
+         * !#en cc.view is the shared view object.
+         * !#zh cc.view 是全局的视图对象。
+         * @property view
+         * @type {View}
+         */
+        cc.view = View ? View._getInstance() : null;
+
+        /**
+         * !#en Director
+         * !#zh 导演类。
+         * @property director
+         * @type {Director}
+         */
+        cc.director = cc.Director._getInstance();
+
+        /**
+         * !#en cc.winSize is the alias object for the size of the current game window.
+         * !#zh cc.winSize 为当前的游戏窗口的大小。
+         * @property winSize
+         * @type Size
+         */
+        cc.winSize = cc.director.getWinSize();
+
+        if (!CC_EDITOR) {
+            this._initEvents();
+        }
+
+        this._setAnimFrame();
+        this._runMainLoop();
 
         // Load game scripts
         var jsList = config[CONFIG_KEY.jsList];
@@ -193,7 +257,7 @@ cc.game = {
                 cc.game.onStart = onStart;
             }
         }
-        cc.director.startAnimation();
+
         this.prepare(cc.game.onStart && cc.game.onStart.bind(cc.game));
     },
 
@@ -260,6 +324,69 @@ cc.game = {
     },
 
 //@Private Methods
+    //  @Time ticker section
+    _setAnimFrame: function () {
+//cjh        this._lastTime = new Date();
+//        var frameRate = game.config[game.CONFIG_KEY.frameRate];
+//        this._frameTime = 1000 / frameRate;
+//        if (frameRate !== 60 && frameRate !== 30) {
+//            window.requestAnimFrame = this._stTime;
+//            window.cancelAnimFrame = this._ctTime;
+//        }
+//        else {
+//            window.requestAnimFrame = window.requestAnimationFrame ||
+//            window.webkitRequestAnimationFrame ||
+//            window.mozRequestAnimationFrame ||
+//            window.oRequestAnimationFrame ||
+//            window.msRequestAnimationFrame ||
+//            this._stTime;
+//            window.cancelAnimFrame = window.cancelAnimationFrame ||
+//            window.cancelRequestAnimationFrame ||
+//            window.msCancelRequestAnimationFrame ||
+//            window.mozCancelRequestAnimationFrame ||
+//            window.oCancelRequestAnimationFrame ||
+//            window.webkitCancelRequestAnimationFrame ||
+//            window.msCancelAnimationFrame ||
+//            window.mozCancelAnimationFrame ||
+//            window.webkitCancelAnimationFrame ||
+//            window.oCancelAnimationFrame ||
+//            this._ctTime;
+//        }
+    },
+    _stTime: function(callback){
+//cjh        var currTime = new Date().getTime();
+//        var timeToCall = Math.max(0, game._frameTime - (currTime - game._lastTime));
+//        var id = window.setTimeout(function() { callback(); },
+//                                   timeToCall);
+//        game._lastTime = currTime + timeToCall;
+//        return id;
+    },
+    _ctTime: function(id){
+//cjh        window.clearTimeout(id);
+    },
+        //Run game.
+    _runMainLoop: function () {
+        var self = this, callback, config = self.config, CONFIG_KEY = self.CONFIG_KEY,
+        director = cc.director,
+        skip = true, frameRate = config[CONFIG_KEY.frameRate];
+
+        director.setDisplayStats(config[CONFIG_KEY.showFPS]);
+
+        callback = function () {
+            if (!self._paused) {
+                // self._intervalId = window.requestAnimFrame(callback);
+                if (frameRate === 30) {
+                    if (skip = !skip) {
+                        return;
+                    }
+                }
+                director.mainLoop();
+            }
+        };
+
+        self._paused = false;
+        self._intervalId = window.requestAnimFrame(callback);
+    },
 
     _loadConfig: function () {
         // Load config
@@ -303,20 +430,121 @@ cc.game = {
         // Scene parser
         this._sceneInfos = config[CONFIG_KEY.scenes] || [];
 
-        cc.director.setDisplayStats(config[CONFIG_KEY.showFPS]);
-        cc.director.setAnimationInterval(1.0/config[CONFIG_KEY.frameRate]);
         cc._initDebugSetting(config[CONFIG_KEY.debugMode]);
 
         this.config = config;
+    },
+
+    _initRenderer: function (width, height) {
+        // Avoid setup to be called twice.
+        if (this._rendererInitialized) return;
+
+        var localCanvas;
+        this.container = { style: {} };
+        this.canvas = localCanvas = canvas;
+
+        var opts = {
+            'stencil': true,
+            'alpha': cc.macro.ENABLE_TRANSPARENT_CANVAS
+        };
+
+        renderer.init(localCanvas, opts);
+        this._renderContext = renderer.device._gl;
+        cc.renderer = renderer;
+
+        this.emit(this.EVENT_RENDERER_INITED, true);
+
+        this._rendererInitialized = true;
+    },
+
+    _initEvents: function () {
+        var win = window, hiddenPropName;
+
+        // register system events
+        if (this.config[this.CONFIG_KEY.registerSystemEvent])
+            inputManager.registerSystemEvent(this.canvas);
+
+        // if (typeof document.hidden !== 'undefined') {
+        //     hiddenPropName = "hidden";
+        // } else if (typeof document.mozHidden !== 'undefined') {
+        //     hiddenPropName = "mozHidden";
+        // } else if (typeof document.msHidden !== 'undefined') {
+        //     hiddenPropName = "msHidden";
+        // } else if (typeof document.webkitHidden !== 'undefined') {
+        //     hiddenPropName = "webkitHidden";
+        // }
+
+        var hidden = false;
+
+        function onHidden () {
+            if (!hidden) {
+                hidden = true;
+                game.emit(game.EVENT_HIDE, game);
+            }
+        }
+        function onShown () {
+            if (hidden) {
+                hidden = false;
+                game.emit(game.EVENT_SHOW, game);
+            }
+        }
+
+        // if (hiddenPropName) {
+        //     var changeList = [
+        //         "visibilitychange",
+        //         "mozvisibilitychange",
+        //         "msvisibilitychange",
+        //         "webkitvisibilitychange",
+        //         "qbrowserVisibilityChange"
+        //     ];
+        //     for (var i = 0; i < changeList.length; i++) {
+        //         document.addEventListener(changeList[i], function (event) {
+        //             var visible = document[hiddenPropName];
+        //             // QQ App
+        //             visible = visible || event["hidden"];
+        //             if (visible)
+        //                 onHidden();
+        //             else
+        //                 onShown();
+        //         });
+        //     }
+        // } else {
+        //     win.addEventListener("blur", onHidden);
+        //     win.addEventListener("focus", onShown);
+        // }
+
+        // if (navigator.userAgent.indexOf("MicroMessenger") > -1) {
+        //     win.onfocus = onShown;
+        // }
+
+        // if (CC_WECHATGAME) {
+        //     wx.onShow(onShown);
+        //     wx.onHide(onHidden);
+        // }
+
+        // if ("onpageshow" in window && "onpagehide" in window) {
+        //     win.addEventListener("pagehide", onHidden);
+        //     win.addEventListener("pageshow", onShown);
+        //     // Taobao UIWebKit
+        //     document.addEventListener("pagehide", onHidden);
+        //     document.addEventListener("pageshow", onShown);
+        // }
+
+        this.on(game.EVENT_HIDE, function () {
+            game.pause();
+        });
+        this.on(game.EVENT_SHOW, function () {
+            game.resume();
+        });
     }
 };
 
 cc.EventTarget.call(cc.game);
 cc.js.addon(cc.game, cc.EventTarget.prototype);
 
-cc.game._onHideListener = cc.eventManager.addCustomListener(cc.game.EVENT_HIDE, function () {
-    cc.game.emit(cc.game.EVENT_HIDE, cc.game);
-});
-cc.game._onShowListener = cc.eventManager.addCustomListener(cc.game.EVENT_SHOW, function () {
-    cc.game.emit(cc.game.EVENT_SHOW, cc.game);
-});
+//cjh cc.game._onHideListener = cc.eventManager.addCustomListener(cc.game.EVENT_HIDE, function () {
+//     cc.game.emit(cc.game.EVENT_HIDE, cc.game);
+// });
+// cc.game._onShowListener = cc.eventManager.addCustomListener(cc.game.EVENT_SHOW, function () {
+//     cc.game.emit(cc.game.EVENT_SHOW, cc.game);
+// });

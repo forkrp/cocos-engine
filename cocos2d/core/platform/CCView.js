@@ -35,7 +35,7 @@ function isWeChatGame () {
 
 var __BrowserGetter = {
     init: function(){
-        if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+        if (cc.sys.platform !== cc.sys.WECHAT_GAME && !CC_JSB) {
             this.html = document.getElementsByTagName("html")[0];
         }
     },

@@ -467,35 +467,35 @@ VideoPlayerImpl._polyfill = {
  * But native does not support this encode,
  * so it is best to provide mp4 and webm or ogv file
  */
-let dom = document.createElement("video");
-if (sys.platform !== sys.WECHAT_GAME) {
-    if (dom.canPlayType("video/ogg")) {
-        VideoPlayerImpl._polyfill.canPlayType.push(".ogg");
-        VideoPlayerImpl._polyfill.canPlayType.push(".ogv");
-    }
-    if (dom.canPlayType("video/mp4"))
-        VideoPlayerImpl._polyfill.canPlayType.push(".mp4");
-    if (dom.canPlayType("video/webm"))
-        VideoPlayerImpl._polyfill.canPlayType.push(".webm");
-}
+//cjh let dom = document.createElement("video");
+// if (sys.platform !== sys.WECHAT_GAME) {
+//     if (dom.canPlayType("video/ogg")) {
+//         VideoPlayerImpl._polyfill.canPlayType.push(".ogg");
+//         VideoPlayerImpl._polyfill.canPlayType.push(".ogv");
+//     }
+//     if (dom.canPlayType("video/mp4"))
+//         VideoPlayerImpl._polyfill.canPlayType.push(".mp4");
+//     if (dom.canPlayType("video/webm"))
+//         VideoPlayerImpl._polyfill.canPlayType.push(".webm");
+// }
 
-if (sys.browserType === sys.BROWSER_TYPE_FIREFOX) {
-    VideoPlayerImpl._polyfill.autoplayAfterOperation = true;
-}
+// if (sys.browserType === sys.BROWSER_TYPE_FIREFOX) {
+//     VideoPlayerImpl._polyfill.autoplayAfterOperation = true;
+// }
 
-if (
-    sys.OS_ANDROID === sys.os && (
-    sys.browserType === sys.BROWSER_TYPE_SOUGOU ||
-    sys.browserType === sys.BROWSER_TYPE_360
-)
-) {
-    VideoPlayerImpl._polyfill.zoomInvalid = true;
-}
+// if (
+//     sys.OS_ANDROID === sys.os && (
+//     sys.browserType === sys.BROWSER_TYPE_SOUGOU ||
+//     sys.browserType === sys.BROWSER_TYPE_360
+// )
+// ) {
+//     VideoPlayerImpl._polyfill.zoomInvalid = true;
+// }
 
-let style = document.createElement("style");
-style.innerHTML = ".cocosVideo:-moz-full-screen{transform:matrix(1,0,0,1,0,0) !important;}" +
-    ".cocosVideo:full-screen{transform:matrix(1,0,0,1,0,0) !important;}" +
-    ".cocosVideo:-webkit-full-screen{transform:matrix(1,0,0,1,0,0) !important;}";
-document.head.appendChild(style);
+// let style = document.createElement("style");
+// style.innerHTML = ".cocosVideo:-moz-full-screen{transform:matrix(1,0,0,1,0,0) !important;}" +
+//     ".cocosVideo:full-screen{transform:matrix(1,0,0,1,0,0) !important;}" +
+//     ".cocosVideo:-webkit-full-screen{transform:matrix(1,0,0,1,0,0) !important;}";
+// document.head.appendChild(style);
 
 module.exports = VideoPlayerImpl;

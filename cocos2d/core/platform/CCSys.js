@@ -497,7 +497,7 @@ function initSys () {
      * Is web browser ?
      * @property {Boolean} isBrowser
      */
-    sys.isBrowser = typeof window === 'object' && typeof document === 'object' && !CC_WECHATGAME;
+    sys.isBrowser = typeof window === 'object' && typeof document === 'object' && !CC_WECHATGAME && !CC_JSB;
 
     if (CC_EDITOR && Editor.isMainProcess) {
         sys.isMobile = false;
@@ -515,6 +515,199 @@ function initSys () {
             height: 0
         };
         sys.__audioSupport = {};
+    }
+    else if (CC_JSB) {
+        /**
+         * Is native ? This is set to be true in jsb auto.
+         * @constant
+         * @default
+         * @type {Boolean}
+         */
+        sys.isNative = true;
+
+        var platform = sys.platform = __getPlatform();
+
+        /**
+         * Indicate whether system is mobile system
+         * @memberof cc.sys
+         * @name isMobile
+         * @type {Boolean}
+         */
+        sys.isMobile = (platform === sys.ANDROID || 
+                        platform === sys.IPAD || 
+                        platform === sys.IPHONE || 
+                        platform === sys.WP8 || 
+                        platform === sys.TIZEN ||
+                        platform === sys.BLACKBERRY) ? true : false;
+        
+        sys._application = //cjh cc.Application.getInstance();
+
+        /**
+         * Indicate the current language of the running system
+         * @memberof cc.sys
+         * @name language
+         * @type {String}
+         */
+        sys.language = (function(){
+            // var language = sys._application.getCurrentLanguage();
+            // switch(language){
+            //     case 0: return sys.LANGUAGE_ENGLISH;
+            //     case 1: return sys.LANGUAGE_CHINESE;
+            //     case 2: return sys.LANGUAGE_FRENCH;
+            //     case 3: return sys.LANGUAGE_ITALIAN;
+            //     case 4: return sys.LANGUAGE_GERMAN;
+            //     case 5: return sys.LANGUAGE_SPANISH;
+            //     case 6: return sys.LANGUAGE_DUTCH;
+            //     case 7: return sys.LANGUAGE_RUSSIAN;
+            //     case 8: return sys.LANGUAGE_KOREAN;
+            //     case 9: return sys.LANGUAGE_JAPANESE;
+            //     case 10: return sys.LANGUAGE_HUNGARIAN;
+            //     case 11: return sys.LANGUAGE_PORTUGUESE;
+            //     case 12: return sys.LANGUAGE_ARABIC;
+            //     case 13: return sys.LANGUAGE_NORWEGIAN;
+            //     case 14: return sys.LANGUAGE_POLISH;
+            //     case 15: return sys.LANGUAGE_TURKISH;
+            //     case 16: return sys.LANGUAGE_UKRAINIAN;
+            //     case 17: return sys.LANGUAGE_ROMANIAN;
+            //     case 18: return sys.LANGUAGE_BULGARIAN;
+            //     default: return sys.LANGUAGE_ENGLISH;
+            // }
+
+            return sys.LANGUAGE_CHINESE;
+        })();
+
+        sys.os = __getOS();
+
+        sys.browserType = null; //null in jsb
+
+        sys.browserVersion = null; //null in jsb
+
+        sys.windowPixelResolution = { width: 960, height: 640 }//cjh cc.view.getFrameSize();
+
+        var capabilities = sys.capabilities = {
+            "canvas": false,
+            "opengl": true
+        };
+        if( sys.isMobile ) {
+            capabilities["accelerometer"] = true;
+            capabilities["touches"] = true;
+            if (platform === sys.WINRT || platform === sys.WP8) {
+                capabilities["keyboard"] = true;
+            }
+        } else {
+            // desktop
+            capabilities["keyboard"] = true;
+            capabilities["mouse"] = true;
+            // winrt can't suppot mouse in current version
+            if (platform === sys.WINRT || platform === sys.WP8)
+            {
+                capabilities["touches"] = true;
+                capabilities["mouse"] = false;
+            }
+        }
+
+        sys.__audioSupport = { 
+            ONLY_ONE: false, 
+            WEB_AUDIO: false, 
+            DELAY_CREATE_CTX: false,
+            format: ['.mp3']
+        }; 
+
+        /**
+         * Forces the garbage collection, only available in JSB
+         * @memberof cc.sys
+         * @name garbageCollect
+         * @function
+         */
+        sys.garbageCollect = function() {
+            __jsc__.garbageCollect();
+        };
+
+        /**
+         * Dumps rooted objects, only available in JSB
+         * @memberof cc.sys
+         * @name dumpRoot
+         * @function
+         */
+        sys.dumpRoot = function() {
+            __jsc__.dumpRoot();
+        };
+
+        /**
+         * Restart the JS VM, only available in JSB
+         * @memberof cc.sys
+         * @name restartVM
+         * @function
+         */
+        sys.restartVM = function() {
+            __restartVM();
+        };
+
+        /**
+         * Clean a script in the JS VM, only available in JSB
+         * @memberof cc.sys
+         * @name cleanScript
+         * @param {String} jsfile
+         * @function
+         */
+        sys.cleanScript = function(jsFile) {
+            __cleanScript(jsFile);
+        };
+
+        /**
+         * Check whether an object is valid,
+         * In web engine, it will return true if the object exist
+         * In native engine, it will return true if the JS object and the correspond native object are both valid
+         * @memberof cc.sys
+         * @name isObjectValid
+         * @param {Object} obj
+         * @return {boolean} Validity of the object
+         * @function
+         */
+        sys.isObjectValid = function(obj) {
+            return __isObjectValid(obj);
+        };
+
+        /**
+         * Dump system informations
+         * @memberof cc.sys
+         * @name dump
+         * @function
+         */
+        sys.dump = function () {
+            var self = this;
+            var str = "";
+            str += "isMobile : " + self.isMobile + "\r\n";
+            str += "language : " + self.language + "\r\n";
+            str += "browserType : " + self.browserType + "\r\n";
+            str += "capabilities : " + JSON.stringify(self.capabilities) + "\r\n";
+            str += "os : " + self.os + "\r\n";
+            str += "platform : " + self.platform + "\r\n";
+            cc.log(str);
+        };
+
+        /**
+         * Open a url in browser
+         * @memberof cc.sys
+         * @name openURL
+         * @param {String} url
+         */
+        sys.openURL = function(url){
+            sys._application.openURL(url);
+        };
+
+        sys.now = function () {
+            return Date.now();
+        };
+
+        // JS to Native bridges
+        if(window.JavascriptJavaBridge && cc.sys.os == cc.sys.OS_ANDROID){
+            jsb.reflection = new JavascriptJavaBridge();
+            cc.sys.capabilities["keyboard"] = true;
+        }
+        else if(window.JavaScriptObjCBridge && (cc.sys.os == cc.sys.OS_IOS || cc.sys.os == cc.sys.OS_OSX)){
+            jsb.reflection = new JavaScriptObjCBridge();
+        }
     }
     else if (CC_WECHATGAME) {
         var env = wx.getSystemInfoSync();

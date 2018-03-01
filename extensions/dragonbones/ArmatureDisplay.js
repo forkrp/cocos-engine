@@ -285,7 +285,7 @@ let ArmatureDisplay = cc.Class({
 
     ctor () {
         this._inited = false;
-        if (CC_JSB) {
+        if (/*cjh CC_JSB */false) {
             // TODO Fix me
             // If using the getFactory in JSB.
             // There may be throw errors when close the application.

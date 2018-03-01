@@ -101,7 +101,7 @@ var DragonBonesAsset = cc.Class({
             }
         }
         else {
-            if (CC_JSB) {
+            if (/*cjh CC_JSB */false) {
                 // The 'factory' create a new one every time in JSB, they can't use getDragonBonesData
                 // to get cached data, and don't need to merge armatures.
                 this._dragonBonesData = factory.parseDragonBonesData(this._dragonBonesJson);
@@ -173,7 +173,7 @@ var DragonBonesAsset = cc.Class({
     },
 
     destroy () {
-        var useGlobalFactory = !CC_JSB;
+        var useGlobalFactory = !/*cjh CC_JSB */false;
         if (useGlobalFactory && this._dragonBonesData) {
             var factory = dragonBones.CCFactory.getFactory();
             factory.removeDragonBonesData(this._dragonBonesData.name, true);

@@ -39,7 +39,7 @@
  */
 
 var _global = typeof window === 'undefined' ? global : window;
-_global.dragonBones = CC_JSB ? dragonBones : require('./lib/dragonBones');
+_global.dragonBones = /*cjh CC_JSB */false ? dragonBones : require('./lib/dragonBones');
 
 dragonBones.DisplayType = {
     Image : 0,
@@ -123,7 +123,7 @@ dragonBones.BoneType = {
 
 if (!CC_EDITOR || !Editor.isMainProcess) {
 
-    if (!CC_JSB) {
+    if (!/*cjh CC_JSB */false) {
         require('./CCFactory');
         require('./CCSlot');
         require('./CCTextureData');
@@ -134,7 +134,7 @@ if (!CC_EDITOR || !Editor.isMainProcess) {
     require('./DragonBonesAtlasAsset');
     require('./ArmatureDisplay')
 
-    if (!CC_JSB) {
+    if (!/*cjh CC_JSB */false) {
         require('./dragonblones-assembler');
     }
 } else {

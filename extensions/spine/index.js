@@ -41,7 +41,7 @@
  */
 
 var _global = typeof window === 'undefined' ? global : window;
-_global.sp = CC_JSB ? sp : {};
+_global.sp = /*cjh CC_JSB */false ? sp : {};
 
 // The attachment type of spine. It contains three type: REGION(0), BOUNDING_BOX(1), MESH(2) and SKINNED_MESH.
 sp.ATTACHMENT_TYPE = {
@@ -98,7 +98,7 @@ sp.AnimationEventType = cc.Enum({
  */
 if (!CC_EDITOR || !Editor.isMainProcess) {
     
-    if (!CC_JSB) {
+    if (!/*cjh CC_JSB */false) {
         sp.spine = require('./lib/spine');
     }
     
