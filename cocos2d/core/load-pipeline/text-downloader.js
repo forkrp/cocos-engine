@@ -1,6 +1,6 @@
 var sys = require('../platform/CCSys');
 
-if (CC_JSB) {
+if (CC_JSB || window.jsb) {
     module.exports = function (item, callback) {
         var url = item.url;
 

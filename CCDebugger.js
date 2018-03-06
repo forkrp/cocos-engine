@@ -322,7 +322,7 @@ cc._initDebugSetting = function (mode) {
 cc._throw = CC_EDITOR ? Editor.error : function (error) {
     var stack = error.stack;
     if (stack) {
-        cc.error(CC_JSB ? (error + '\n' + stack) : stack);
+        cc.error((CC_JSB || CC_RUNTIME) ? (error + '\n' + stack) : stack);
     }
     else {
         cc.error(error);
