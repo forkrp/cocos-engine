@@ -95,10 +95,15 @@
     proto._getLineHeight = function () {
         var nodeSpacingY = this._node.getLineHeight();
         var node = this._node;
+        var fontHeight = node._fontSize;
+        if (node._fontSize === nodeSpacingY) {
+            fontHeight = node._fontHeight;
+        }
+
         if (nodeSpacingY === 0) {
-            nodeSpacingY = node._fontSize;
+            nodeSpacingY = fontHeight;
         } else {
-            nodeSpacingY = nodeSpacingY * node._fontSize / this._drawFontsize;
+            nodeSpacingY = fontHeight * node._fontSize / this._drawFontsize;
         }
 
         var lineHeight = nodeSpacingY | 0;
@@ -225,9 +230,13 @@
 
     proto._calculateParagraphLength = function(paragraphedStrings, ctx) {
         var paragraphLength = [];
-
+        var fontHeight = null;
         for (var i = 0; i < paragraphedStrings.length; ++i) {
             var textMetric = ctx.measureText(paragraphedStrings[i]);
+            if (!fontHeight && textMetric.height) {
+                fontHeight = textMetric.height;
+                this._node._fontHeight = fontHeight;
+            }
             paragraphLength.push(textMetric.width);
         }
 
