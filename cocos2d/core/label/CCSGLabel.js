@@ -111,7 +111,6 @@ _ccsg.Label = _ccsg.Node.extend({
     _string: "",
     _fontSize: 40,
     _drawFontsize: 40,
-    _fontHeight: null,
     _overFlow: 0, //see _ccsg.Label.Overflow
     _isWrapText: true,
     _spacingX: 0,
