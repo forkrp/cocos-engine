@@ -24,7 +24,7 @@
  ****************************************************************************/
  
 require('./CCPath');
-if (!CC_EDITOR && !window.jsb) {
+if (!CC_EDITOR && !CC_JSB) {
     require('./CCProfiler');
 }
 require('./find');

@@ -151,41 +151,22 @@ var _touchStartHandler = function (touch, event) {
     var node = this.owner;
 
     if (node._hitTest(pos, this)) {
-        if (CC_JSB) {
-            event = Event.EventTouch.pool.get(event);
-        }
         event.type = EventType.TOUCH_START;
         event.touch = touch;
         event.bubbles = true;
         node.dispatchEvent(event);
-        if (CC_JSB) {
-            event.touch = null;
-            event._touches = null;
-            Event.EventTouch.pool.put(event);
-        }
         return true;
     }
     return false;
 };
 var _touchMoveHandler = function (touch, event) {
-    if (CC_JSB) {
-        event = Event.EventTouch.pool.get(event);
-    }
     var node = this.owner;
     event.type = EventType.TOUCH_MOVE;
     event.touch = touch;
     event.bubbles = true;
     node.dispatchEvent(event);
-    if (CC_JSB) {
-        event.touch = null;
-        event._touches = null;
-        Event.EventTouch.pool.put(event);
-    }
 };
 var _touchEndHandler = function (touch, event) {
-    if (CC_JSB) {
-        event = Event.EventTouch.pool.get(event);
-    }
     var pos = touch.getLocation();
     var node = this.owner;
 
@@ -198,16 +179,8 @@ var _touchEndHandler = function (touch, event) {
     event.touch = touch;
     event.bubbles = true;
     node.dispatchEvent(event);
-    if (CC_JSB) {
-        event.touch = null;
-        event._touches = null;
-        Event.EventTouch.pool.put(event);
-    }
 };
 var _touchCancelHandler = function (touch, event) {
-    if (CC_JSB) {
-        event = Event.EventTouch.pool.get(event);
-    }
     var pos = touch.getLocation();
     var node = this.owner;
 
@@ -215,11 +188,6 @@ var _touchCancelHandler = function (touch, event) {
     event.touch = touch;
     event.bubbles = true;
     node.dispatchEvent(event);
-    if (CC_JSB) {
-        event.touch = null;
-        event._touches = null;
-        Event.EventTouch.pool.put(event);
-    }
 };
 
 var _mouseDownHandler = function (event) {
@@ -227,31 +195,17 @@ var _mouseDownHandler = function (event) {
     var node = this.owner;
 
     if (node._hitTest(pos, this)) {
-        if (CC_JSB) {
-            // jsb event will be replaced so can be stopped immediately
-            event.stopPropagation();
-            event = Event.EventMouse.pool.get(event);
-        }
         event.type = EventType.MOUSE_DOWN;
         event.bubbles = true;
         node.dispatchEvent(event);
-        if (CC_JSB) {
-            Event.EventMouse.pool.put(event);
-        }
-        else {
-            event.stopPropagation();
-        }
+        event.stopPropagation();
     }
 };
 var _mouseMoveHandler = function (event) {
     var pos = event.getLocation();
     var node = this.owner;
     var hit = node._hitTest(pos, this);
-    if (CC_JSB && (hit || this._previousIn)) {
-        // jsb event will be replaced so can be stopped immediately
-        event.stopPropagation();
-        event = Event.EventMouse.pool.get(event);
-    }
+
     if (hit) {
         if (!this._previousIn) {
             // Fix issue when hover node switched, previous hovered node won't get MOUSE_LEAVE notification
@@ -281,32 +235,17 @@ var _mouseMoveHandler = function (event) {
     }
 
     // Event processed, cleanup
-    if (CC_JSB) {
-        Event.EventMouse.pool.put(event);
-    }
-    else {
-        event.stopPropagation();
-    }
+    event.stopPropagation();
 };
 var _mouseUpHandler = function (event) {
     var pos = event.getLocation();
     var node = this.owner;
 
     if (node._hitTest(pos, this)) {
-        if (CC_JSB) {
-            // jsb event will be replaced so can be stopped immediately
-            event.stopPropagation();
-            event = Event.EventMouse.pool.get(event);
-        }
         event.type = EventType.MOUSE_UP;
         event.bubbles = true;
         node.dispatchEvent(event);
-        if (CC_JSB) {
-            Event.EventMouse.pool.put(event);
-        }
-        else {
-            event.stopPropagation();
-        }
+        event.stopPropagation();
     }
 };
 var _mouseWheelHandler = function (event) {
@@ -315,20 +254,10 @@ var _mouseWheelHandler = function (event) {
 
     if (node._hitTest(pos, this)) {
         //FIXME: separate wheel event and other mouse event.
-        if (CC_JSB) {
-            // jsb event will be replaced so can be stopped immediately
-            event.stopPropagation();
-            event = Event.EventMouse.pool.get(event);
-        }
         event.type = EventType.MOUSE_WHEEL;
         event.bubbles = true;
         node.dispatchEvent(event);
-        if (CC_JSB) {
-            Event.EventMouse.pool.put(event);
-        }
-        else {
-            event.stopPropagation();
-        }
+        event.stopPropagation();
     }
 };
 
@@ -351,9 +280,7 @@ function _searchMaskInParent (node) {
 
 function updateOrder (node) {
     node._parent._delaySort();
-    if (!CC_JSB) {
-        eventManager._setDirtyForNode(node);
-    }
+    eventManager._setDirtyForNode(node);
 }
 
 /**
@@ -944,17 +871,6 @@ var Node = cc.Class({
          * @private
          */
         var sgNode = this._sgNode = new _ccsg.Node();
-        if (CC_JSB) {
-            sgNode.retain();
-            sgNode._entity = this;
-            sgNode.onEnter = function () {
-                _ccsg.Node.prototype.onEnter.call(this);
-                if (this._entity && !this._entity._active) {
-                    ActionManagerExist && cc.director.getActionManager().pauseTarget(this);
-                    eventManager.pauseTarget(this);
-                }
-            };
-        }
         if (!cc.game._isCloning) {
             sgNode.cascadeOpacity = true;
         }
@@ -979,11 +895,6 @@ var Node = cc.Class({
 
         // Mouse event listener
         this._mouseListener = null;
-
-        // Retained actions for JSB
-        if (CC_JSB) {
-            this._retainedActions = [];
-        }
     },
 
     statics: {
@@ -1011,41 +922,15 @@ var Node = cc.Class({
         var parent = this._parent;
         var siblings = parent._children;
         var i = 0, len = siblings.length, sibling;
-        if (CC_JSB) {
-            if (cc.runtime) {
-                for (; i < len; i++) {
-                    sibling = siblings[i]._sgNode;
-                    // Reset zorder to update their arrival order
-                    var zOrder = sibling.getLocalZOrder();
-                    sibling.setLocalZOrder(zOrder + 1);
-                    sibling.setLocalZOrder(zOrder);
-                }
-            }
-            else {
-                parent._sgNode.removeChild(this._sgNode, false);
-                if (index + 1 < siblings.length) {
-                    var nextSibling = siblings[index + 1];
-                    var oldZOrder = this._sgNode.getLocalZOrder();
-                    parent._sgNode.insertChildBefore(this._sgNode, nextSibling._sgNode);
-                    if (oldZOrder !== this._sgNode.getLocalZOrder()) {
-                        this._sgNode.setLocalZOrder(oldZOrder);
-                    }
-                }
-                else {
-                    parent._sgNode.addChild(this._sgNode);
-                }
-            }
+
+        for (; i < len; i++) {
+            sibling = siblings[i]._sgNode;
+            sibling._arrivalOrder = i;
+            eventManager._setDirtyForNode(sibling);
         }
-        else {
-            for (; i < len; i++) {
-                sibling = siblings[i]._sgNode;
-                sibling._arrivalOrder = i;
-                eventManager._setDirtyForNode(sibling);
-            }
-            cc.renderer.childrenOrderDirty = true;
-            parent._sgNode._reorderChildDirty = true;
-            parent._delaySort();
-        }
+        cc.renderer.childrenOrderDirty = true;
+        parent._sgNode._reorderChildDirty = true;
+        parent._delaySort();
     },
 
     _onPreDestroy () {
@@ -1061,24 +946,6 @@ var Node = cc.Class({
             _currentHovered = null;
         }
 
-        if (CC_JSB) {
-            if (!cc.macro.ENABLE_GC_FOR_NATIVE_OBJECTS) {
-                this._releaseAllActions();
-            }
-            if (this._touchListener) {
-                this._touchListener.release();
-                this._touchListener.owner = null;
-                this._touchListener.mask = null;
-                this._touchListener = null;
-            }
-            if (this._mouseListener) {
-                this._mouseListener.release();
-                this._mouseListener.owner = null;
-                this._mouseListener.mask = null;
-                this._mouseListener = null;
-            }
-        }
-
         if (this._reorderChildDirty) {
             cc.director.__fastOff(cc.Director.EVENT_AFTER_UPDATE, this.sortAllChildren, this);
         }
@@ -1092,10 +959,6 @@ var Node = cc.Class({
                 // ensure this node can reattach to scene by undo system
                 this._parent = null;
             }
-        }
-        else if (CC_JSB) {
-            this._sgNode._entity = null;
-            this._sgNode = null;
         }
     },
 
@@ -1211,9 +1074,7 @@ var Node = cc.Class({
                     onTouchEnded: _touchEndHandler,
                     onTouchCancelled: _touchCancelHandler
                 });
-                if (CC_JSB) {
-                    this._touchListener.retain();
-                }
+
                 eventManager.addListener(this._touchListener, this);
                 newAdded = true;
             }
@@ -1230,9 +1091,7 @@ var Node = cc.Class({
                     onMouseUp: _mouseUpHandler,
                     onMouseScroll: _mouseWheelHandler,
                 });
-                if (CC_JSB) {
-                    this._mouseListener.retain();
-                }
+
                 eventManager.addListener(this._mouseListener, this);
                 newAdded = true;
             }
@@ -1474,9 +1333,6 @@ var Node = cc.Class({
         if (!cc.macro.ENABLE_GC_FOR_NATIVE_OBJECTS) {
             this._retainAction(action);
         }
-        if (CC_JSB) {
-            this._sgNode._owner = this;
-        }
         cc.director.getActionManager().addAction(action, this, false);
         return action;
     } : emptyFunc,
@@ -1588,19 +1444,11 @@ var Node = cc.Class({
     },
 
     _retainAction (action) {
-        if (CC_JSB && action instanceof cc.Action && this._retainedActions.indexOf(action) === -1) {
-            this._retainedActions.push(action);
-            action.retain();
-        }
+
     },
 
     _releaseAllActions () {
-        if (CC_JSB) {
-            for (var i = 0; i < this._retainedActions.length; ++i) {
-                this._retainedActions[i].release();
-            }
-            this._retainedActions.length = 0;
-        }
+
     },
 
     setTag (value) {
@@ -2473,10 +2321,6 @@ var Node = cc.Class({
 
         sgNode.setGlobalZOrder(self._globalZOrder);
 
-        if (CC_JSB) {
-            // fix tintTo and tintBy action for jsb displays err for fireball/issues/4137
-            sgNode.setColor(this._color);
-        }
         sgNode.setOpacity(self._opacity);
         sgNode.setOpacityModifyRGB(self._opacityModifyRGB);
         sgNode.setCascadeOpacityEnabled(self._cascadeOpacityEnabled);
@@ -2548,41 +2392,6 @@ var Node = cc.Class({
     //functions moved from base node end
 
 });
-
-// In JSB, when inner sg node being replaced, the system event listeners will be cleared.
-// We need a mechanisme to guarentee the persistence of system event listeners.
-if (CC_JSB) {
-    var updateListeners = function () {
-        if (!this._activeInHierarchy) {
-            eventManager.pauseTarget(this);
-        }
-    };
-
-    cc.js.getset(Node.prototype, '_sgNode',
-        function () {
-            return this.__sgNode;
-        },
-        function (value) {
-            this.__sgNode = value;
-            if (this._touchListener || this._mouseListener) {
-                if (this._touchListener) {
-                    this._touchListener.retain();
-                    eventManager.removeListener(this._touchListener);
-                    eventManager.addListener(this._touchListener, this);
-                    this._touchListener.release();
-                }
-                if (this._mouseListener) {
-                    this._mouseListener.retain();
-                    eventManager.removeListener(this._mouseListener);
-                    eventManager.addListener(this._mouseListener, this);
-                    this._mouseListener.release();
-                }
-                cc.director.once(cc.Director.EVENT_BEFORE_UPDATE, updateListeners, this);
-            }
-        },
-        true
-    );
-}
 
 /**
  * @event position-changed

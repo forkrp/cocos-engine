@@ -284,14 +284,7 @@ dragonBones.ArmatureDisplay = cc.Class({
 
     // IMPLEMENT
     ctor: function () {
-        if (CC_JSB) {
-            // TODO Fix me
-            // If using the getFactory in JSB.
-            // There may be throw errors when close the application.
-            this._factory = new dragonBones.CCFactory();
-        } else {
-            this._factory = dragonBones.CCFactory.getInstance();
-        }
+        this._factory = dragonBones.CCFactory.getInstance();
     },
 
     __preload: function () {
@@ -331,64 +324,51 @@ dragonBones.ArmatureDisplay = cc.Class({
 
     _parseDragonAsset: function () {
         if (this.dragonAsset) {
-            if (CC_JSB) {
-                // The '_factory' create a new one every time in JSB, they can't use getDragonBonesData
-                // to get cached data, and only parse data every time
-                this._dragonBonesData = this._factory.parseDragonBonesData(this.dragonAsset.dragonBonesJson);
-            }
-            else {
-                var jsonObj = JSON.parse(this.dragonAsset.dragonBonesJson);
-                var data = this._factory.getDragonBonesData(jsonObj.name);
-                if (data) {
-                    // already added asset
-                    var armature, dragonBonesData;
-                    for (var i = 0, len = jsonObj.armature.length; i < len; i++) {
-                        armature = jsonObj.armature[i];
-                        if (!data.armatures[armature.name]) {
-                            //add new armature
-                            if (!dragonBonesData) {
-                                dragonBonesData = this._factory._dataParser.parseDragonBonesData(jsonObj);
-                            }
-                            data.addArmature(dragonBonesData.armatures[armature.name]);
+            var jsonObj = JSON.parse(this.dragonAsset.dragonBonesJson);
+            var data = this._factory.getDragonBonesData(jsonObj.name);
+            if (data) {
+                // already added asset
+                var armature, dragonBonesData;
+                for (var i = 0, len = jsonObj.armature.length; i < len; i++) {
+                    armature = jsonObj.armature[i];
+                    if (!data.armatures[armature.name]) {
+                        //add new armature
+                        if (!dragonBonesData) {
+                            dragonBonesData = this._factory._dataParser.parseDragonBonesData(jsonObj);
                         }
+                        data.addArmature(dragonBonesData.armatures[armature.name]);
                     }
-                    this._dragonBonesData = data;
-                    return;
                 }
-                this._dragonBonesData = this._factory.parseDragonBonesData(jsonObj);
+                this._dragonBonesData = data;
+                return;
             }
+            this._dragonBonesData = this._factory.parseDragonBonesData(jsonObj);
         }
     },
 
     _parseDragonAtlasAsset: function () {
         if (this.dragonAtlasAsset) {
-            if (CC_JSB) {
-                // TODO parse the texture atlas data from json string & texture path
-                this._factory.parseTextureAtlasData(this.dragonAtlasAsset.atlasJson, this.dragonAtlasAsset.texture);
-            }
-            else {
-                var atlasJsonObj = JSON.parse(this.dragonAtlasAsset.atlasJson);
-                var atlasName = atlasJsonObj.name;
-                var existedAtlasData = null;
-                var atlasDataList = this._factory.getTextureAtlasData(atlasName);
-                var texturePath = this.dragonAtlasAsset.texture;
-                if (atlasDataList && atlasDataList.length > 0) {
-                    for (var idx in atlasDataList) {
-                        var data = atlasDataList[idx];
-                        if (data && data.texture && data.texture.url === texturePath) {
-                            existedAtlasData = data;
-                            break;
-                        }
+            var atlasJsonObj = JSON.parse(this.dragonAtlasAsset.atlasJson);
+            var atlasName = atlasJsonObj.name;
+            var existedAtlasData = null;
+            var atlasDataList = this._factory.getTextureAtlasData(atlasName);
+            var texturePath = this.dragonAtlasAsset.texture;
+            if (atlasDataList && atlasDataList.length > 0) {
+                for (var idx in atlasDataList) {
+                    var data = atlasDataList[idx];
+                    if (data && data.texture && data.texture.url === texturePath) {
+                        existedAtlasData = data;
+                        break;
                     }
                 }
+            }
 
-                var texture = cc.textureCache.getTextureForKey(texturePath);
-                if (existedAtlasData) {
-                    existedAtlasData.texture = texture;
-                }
-                else {
-                    this._factory.parseTextureAtlasData(atlasJsonObj, texture);
-                }
+            var texture = cc.textureCache.getTextureForKey(texturePath);
+            if (existedAtlasData) {
+                existedAtlasData.texture = texture;
+            }
+            else {
+                this._factory.parseTextureAtlasData(atlasJsonObj, texture);
             }
         }
     },
@@ -411,9 +391,6 @@ dragonBones.ArmatureDisplay = cc.Class({
         // recreate sgNode...
         var sgNode = self._sgNode = self._createSgNode();
         if (sgNode) {
-            if (CC_JSB) {
-                sgNode.retain();
-            }
             if (!self.enabledInHierarchy) {
                 sgNode.setVisible(false);
             }
@@ -421,13 +398,6 @@ dragonBones.ArmatureDisplay = cc.Class({
             if (listenersBefore) {
                 sgNode._bubblingListeners = listenersBefore; // using the listeners added before
                 sgNode._hasListenerCache = listenersCacheBefore;
-                if (CC_JSB && !sgNode.hasEventCallback()) {
-                    // In JSB, should set event callback of the new sgNode
-                    // to make the listeners work well.
-                    sgNode.setEventCallback(function (eventObject) {
-                        sgNode.emit(eventObject.type, eventObject);
-                    });
-                }
             }
 
             self._initSgNode();

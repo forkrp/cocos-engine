@@ -402,36 +402,13 @@ sp.Skeleton = cc.Class({
 
     _createSgNode: function () {
         if (this.skeletonData/* && self.atlasFile*/) {
-            if (CC_JSB) {
-                var uuid = this.skeletonData._uuid;
-                if ( !uuid ) {
-                    cc.errorID(7504);
-                    return null;
+            var data = this.skeletonData.getRuntimeData();
+            if (data) {
+                try {
+                    return new sp._SGSkeletonAnimation(data, null, this.skeletonData.scale);
                 }
-                var jsonFile = this.skeletonData.rawUrl;
-                var atlasFile = this.skeletonData.atlasUrl;
-                if (atlasFile) {
-                    if (typeof atlasFile !== 'string') {
-                        cc.errorID(7505);
-                        return null;
-                    }
-                    try {
-                        return new sp._SGSkeletonAnimation(jsonFile, atlasFile, this.skeletonData.scale);
-                    }
-                    catch (e) {
-                        cc._throw(e);
-                    }
-                }
-            }
-            else {
-                var data = this.skeletonData.getRuntimeData();
-                if (data) {
-                    try {
-                        return new sp._SGSkeletonAnimation(data, null, this.skeletonData.scale);
-                    }
-                    catch (e) {
-                        cc._throw(e);
-                    }
+                catch (e) {
+                    cc._throw(e);
                 }
             }
         }
@@ -1046,9 +1023,6 @@ sp.Skeleton = cc.Class({
         // recreate sgNode...
         var sgNode = self._sgNode = self._createSgNode();
         if (sgNode) {
-            if (CC_JSB) {
-                sgNode.retain();
-            }
             if ( !self.enabledInHierarchy ) {
                 sgNode.setVisible(false);
             }

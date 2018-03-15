@@ -46,17 +46,9 @@ var RendererInSG = cc.Class({
         if (CC_EDITOR && !sgNode) {
             cc.errorID(1627);
         }
-        if (CC_JSB) {
-            // retain immediately
-            // will be released in onDestroy
-            sgNode.retain();
-        }
 
         // The replacement node used when this component disabled
         this._plainNode = new _ccsg.Node();
-        if (CC_JSB) {
-            this._plainNode.retain();
-        }
     },
 
     __preload: function () {
@@ -71,11 +63,6 @@ var RendererInSG = cc.Class({
     },
 
     onEnable: function () {
-        if (CC_JSB && cc.director._actionManager && cc.director._actionManager.getNumberOfRunningActionsInTarget(this.node) > 0) {
-            cc.errorID(1629, this.node.name);
-            cc.errorID(1630);
-            cc.errorID(1631);
-        }
         this._replaceSgNode(this._sgNode);
     },
 
@@ -85,13 +72,6 @@ var RendererInSG = cc.Class({
 
     onDestroy: function () {
         this._removeSgNode();
-        if (CC_JSB) {
-            var releasedByNode = this.node._sgNode;
-            if (this._plainNode !== releasedByNode) {
-                this._plainNode.release();
-                this._plainNode = null;
-            }
-        }
     },
 
     _replaceSgNode: function (sgNode) {
@@ -126,21 +106,10 @@ var RendererInSG = cc.Class({
         // replace parent
         var parentNode = replaced.getParent();
         if (parentNode) {
-            if ( !CC_JSB ) {
-                parentNode.removeChild(replaced, false);
-                parentNode.addChild(sgNode);
-                sgNode._arrivalOrder = replaced._arrivalOrder;
-                cc.renderer.childrenOrderDirty = parentNode._reorderChildDirty = true;
-            } else {
-                if (cc.runtime) {
-                    parentNode.removeChild(replaced, false);
-                    parentNode.addChild(sgNode);
-                    sgNode.arrivalOrder = replaced.arrivalOrder;
-                } else {
-                    parentNode.insertChildBefore(sgNode, replaced);
-                    parentNode.removeChild(replaced, false);
-                }
-            }
+            parentNode.removeChild(replaced, false);
+            parentNode.addChild(sgNode);
+            sgNode._arrivalOrder = replaced._arrivalOrder;
+            cc.renderer.childrenOrderDirty = parentNode._reorderChildDirty = true;
         }
         // replaced.release();
 

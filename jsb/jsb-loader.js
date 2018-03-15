@@ -39,21 +39,29 @@ function downloadAudio (item, callback) {
     return item.url;
 }
 
+function downloadImage(item, callback) {
+    let img = new Image();
+    img.src = item.url;
+    img.complete = true;
+    img.crossOrigin = 'anonymous';
+    return img;
+}
+
 cc.loader.addDownloadHandlers({
     // JS
     'js' : downloadScript,
     'jsc' : downloadScript,
 
     // Images
-    'png' : empty,
-    'jpg' : empty,
-    'bmp' : empty,
-    'jpeg' : empty,
-    'gif' : empty,
-    'ico' : empty,
-    'tiff' : empty,
-    'webp' : empty,
-    'image' : empty,
+    'png' : downloadImage,
+    'jpg' : downloadImage,
+    'bmp' : downloadImage,
+    'jpeg' : downloadImage,
+    'gif' : downloadImage,
+    'ico' : downloadImage,
+    'tiff' : downloadImage,
+    'webp' : downloadImage,
+    'image' : downloadImage,
 
     // Audio
     'mp3' : downloadAudio,
@@ -71,50 +79,52 @@ cc.loader.addDownloadHandlers({
     'ttc' : empty,
 });
 
+//cjh FIXME: remote image should still use jsb.loadRemoteImage.
 
-function loadImage (item, callback) {
-    var url = item.url;
+//function loadImage (item, callback) {
+//    var url = item.url;
+//
+//    var cachedTex = cc.textureCache.getTextureForKey(url);
+//    if (cachedTex) {
+//        return cachedTex;
+//    }
+//    else if (url.match(jsb.urlRegExp)) {
+//        jsb.loadRemoteImg(url, function(succeed, tex) {
+//            if (succeed) {
+//                tex.url = url;
+//                callback && callback(null, tex);
+//            }
+//            else {
+//                callback && callback(new Error('Load image failed: ' + url));
+//            }
+//        });
+//    }
+//    else {
+//        var addImageCallback = function (tex) {
+//            if (tex instanceof cc.Texture2D) {
+//                tex.url = url;
+//                callback && callback(null, tex);
+//            }
+//            else {
+//                callback && callback(new Error('Load image failed: ' + url));
+//            }
+//        };
+//        cc.textureCache._addImageAsync(url, addImageCallback);
+//    }
+//}
 
-    var cachedTex = cc.textureCache.getTextureForKey(url);
-    if (cachedTex) {
-        return cachedTex;
-    }
-    else if (url.match(jsb.urlRegExp)) {
-        jsb.loadRemoteImg(url, function(succeed, tex) {
-            if (succeed) {
-                tex.url = url;
-                callback && callback(null, tex);
-            }
-            else {
-                callback && callback(new Error('Load image failed: ' + url));
-            }
-        });
-    }
-    else {
-        var addImageCallback = function (tex) {
-            if (tex instanceof cc.Texture2D) {
-                tex.url = url;
-                callback && callback(null, tex);
-            }
-            else {
-                callback && callback(new Error('Load image failed: ' + url));
-            }
-        };
-        cc.textureCache._addImageAsync(url, addImageCallback);
-    }
-}
+//cc.loader.addLoadHandlers({
+//    // Images
+//    'png' : loadImage,
+//    'jpg' : loadImage,
+//    'bmp' : loadImage,
+//    'jpeg' : loadImage,
+//    'gif' : loadImage,
+//    'ico' : loadImage,
+//    'tiff' : loadImage,
+//    'webp' : loadImage,
+//    'image' : loadImage,
+//
+//    'default' : empty
+//});
 
-cc.loader.addLoadHandlers({
-    // Images
-    'png' : loadImage,
-    'jpg' : loadImage,
-    'bmp' : loadImage,
-    'jpeg' : loadImage,
-    'gif' : loadImage,
-    'ico' : loadImage,
-    'tiff' : loadImage,
-    'webp' : loadImage,
-    'image' : loadImage,
-
-    'default' : empty
-});

@@ -766,10 +766,6 @@ proto.release = function (asset) {
             asset = item.content;
             // TODO: AUDIO
             if (asset instanceof cc.Asset) {
-                if (CC_JSB && asset instanceof cc.SpriteFrame && removed) {
-                    // for the "Temporary solution" in deserialize.js
-                    asset.release();
-                }
                 var urls = asset.rawUrls;
                 for (let i = 0; i < urls.length; i++) {
                     this.release(urls[i]);

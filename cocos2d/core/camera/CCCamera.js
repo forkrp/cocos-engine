@@ -23,12 +23,9 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var cullingDirtyFlag;
+var cullingDirtyFlag = _ccsg.Node._dirtyFlags.cullingDirty;
+require('./CCSGCameraNode');
 
-if (!CC_JSB) {
-    cullingDirtyFlag = _ccsg.Node._dirtyFlags.cullingDirty;
-    require('./CCSGCameraNode');
-}
 
 /**
  * !#en
@@ -133,13 +130,11 @@ let Camera = cc.Class({
 
         this._sgTarges.push(sgNode);
 
-        if (!CC_JSB) {
-            var cmd = sgNode._renderCmd;
-            cmd.setDirtyFlag(cullingDirtyFlag);
-            cmd._cameraFlag = Camera.flags.InCamera;
+        var cmd = sgNode._renderCmd;
+        cmd.setDirtyFlag(cullingDirtyFlag);
+        cmd._cameraFlag = Camera.flags.InCamera;
 
-            cc.renderer.childrenOrderDirty = true;
-        }
+        cc.renderer.childrenOrderDirty = true;
     },
 
     _removeTargetInSg: function (target) {
@@ -158,13 +153,11 @@ let Camera = cc.Class({
         
         cc.js.array.remove(this._sgTarges, sgNode);
         
-        if (!CC_JSB) {
-            var cmd = sgNode._renderCmd;
-            cmd.setDirtyFlag(cullingDirtyFlag);
-            cmd._cameraFlag = 0;
+        var cmd = sgNode._renderCmd;
+        cmd.setDirtyFlag(cullingDirtyFlag);
+        cmd._cameraFlag = 0;
 
-            cc.renderer.childrenOrderDirty = true;
-        }
+        cc.renderer.childrenOrderDirty = true;
     },
 
     onEnable: function () {
@@ -174,9 +167,6 @@ let Camera = cc.Class({
         }
 
         Camera.main = this;
-        if (CC_JSB) {
-            this._sgNode.setEnable(true);
-        }
 
         let targets = this._targets;
         for (let i = 0, l = targets.length; i < l; i++) {
@@ -190,9 +180,6 @@ let Camera = cc.Class({
         }
         
         Camera.main = null;
-        if (CC_JSB) {
-            this._sgNode.setEnable(false);
-        }
 
         // target sgNode may changed, so directly remove sgTargets here.
         let sgTargets = this._sgTarges;
@@ -308,12 +295,7 @@ let Camera = cc.Class({
     _setSgNodesCullingDirty: function () {
         let sgTarges = this._sgTarges;
         for (let i = 0; i < sgTarges.length; i++) {
-            if (CC_JSB) {
-                sgTarges[i].markCullingDirty();
-            }
-            else {
-                sgTarges[i]._renderCmd.setDirtyFlag(cullingDirtyFlag);
-            }
+            sgTarges[i]._renderCmd.setDirtyFlag(cullingDirtyFlag);
         }
     },
 

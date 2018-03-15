@@ -25,13 +25,7 @@
 
 'use strict';
 
-var GraphicsNode;
-if (!CC_JSB) {
-    GraphicsNode = _ccsg.GraphicsNode = require('./graphics-node');
-}
-else {
-    GraphicsNode = _ccsg.GraphicsNode = cc.GraphicsNode;
-}
+var GraphicsNode = _ccsg.GraphicsNode = require('./graphics-node');
 
 if (GraphicsNode) {
     var misc = require('../utils/misc');

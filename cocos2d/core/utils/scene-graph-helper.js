@@ -35,12 +35,7 @@ var SceneGraphUtils = {
             }
             else {
                 // cleanup was skipped when its node was detaching
-                if (CC_JSB) {
-                    sgNode.cleanup();
-                }
-                else {
-                    sgNode.performRecursive(_ccsg.Node.performType.cleanup);
-                }
+                sgNode.performRecursive(_ccsg.Node.performType.cleanup);
             }
             if (sgNode._entity) {
                 sgNode._entity = null;

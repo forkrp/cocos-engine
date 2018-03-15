@@ -38,7 +38,7 @@
  * http://dragonbones.com/cn/index.html
  */
 
-dragonBones = CC_JSB ? dragonBones : require('./lib/dragonBones');
+dragonBones = require('./lib/dragonBones');
 
 dragonBones.DisplayType = {
     Image : 0,
@@ -87,12 +87,10 @@ dragonBones.AnimationFadeOutMode = {
 
 if (!CC_EDITOR || !Editor.isMainProcess) {
 
-    if (!CC_JSB) {
-        require('./CCFactory');
-        require('./CCSlot');
-        require('./CCTextureData');
-        require('./CCArmatureDisplay');
-    }
+    require('./CCFactory');
+    require('./CCSlot');
+    require('./CCTextureData');
+    require('./CCArmatureDisplay');
 
     // require the component for dragonbones
     require('./DragonBonesAsset');

@@ -365,9 +365,7 @@ var BaseNode = cc.Class({
         this._onSetParent(value);
 
         if (value) {
-            if (!CC_JSB) {
-                eventManager._setDirtyForNode(this);
-            }
+            eventManager._setDirtyForNode(this);
             value._children.push(this);
             value.emit(CHILD_ADDED, this);
         }

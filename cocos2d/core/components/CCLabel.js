@@ -393,17 +393,7 @@ var Label = cc.Class({
                     var font = this.font;
                     if (font instanceof cc.BitmapFont) {
                         if (font.spriteFrame) {
-                            if (!CC_JSB) {
-                                this._sgNode.setFontAsset(font);
-                            } else {
-                                if (font.spriteFrame.textureLoaded()) {
-                                    this._sgNode.setFontAsset(font);
-                                }
-                                else {
-                                    cc.warnID(4012, font.name);
-                                    this._sgNode.setFontFamily('');
-                                }
-                            }
+                            this._sgNode.setFontAsset(font);
                         } else {
                             cc.warnID(4011, font.name);
                             this._sgNode.setFontFamily('');
@@ -490,9 +480,7 @@ var Label = cc.Class({
         this._super();
 
         // node should be resize whenever font changed, needed only on web
-        if (!CC_JSB) {
-            this._sgNode.on('load', this._updateNodeSize, this);
-        }
+        this._sgNode.on('load', this._updateNodeSize, this);
 
         this._updateNodeSize();
     },
@@ -510,26 +498,13 @@ var Label = cc.Class({
         var sgNode;
         if (font instanceof cc.BitmapFont) {
             if (font.spriteFrame) {
-                if (CC_JSB) {
-                    if (font.spriteFrame.textureLoaded()) {
-                        sgNode = this._sgNode = new _ccsg.Label(this.string, JSON.stringify(font._fntConfig), font.spriteFrame);
-                    } else {
-                        cc.warnID(4012, font.name);
-                        sgNode = this._sgNode = new _ccsg.Label(this.string, null, null, this._fontSize);
-                    }
-                } else {
-                    sgNode = this._sgNode = _ccsg.Label.pool.get(this.string, font);
-                }
+                sgNode = this._sgNode = _ccsg.Label.pool.get(this.string, font);
             } else {
                 cc.warnID(4011, font.name);
                 sgNode = this._sgNode = _ccsg.Label.pool.get(this.string);
             }
         } else {
             sgNode = this._sgNode = _ccsg.Label.pool.get(this.string, font, null, this._fontSize);
-        }
-
-        if (CC_JSB) {
-            sgNode.retain();
         }
 
         if (font instanceof cc.BitmapFont) {

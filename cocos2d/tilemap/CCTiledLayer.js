@@ -81,11 +81,6 @@ var TiledLayer = cc.Class({
 
         if (sgNode && sgNode instanceof _ccsg.TMXLayer) {
             this._sgNode = sgNode;
-            if (CC_JSB) {
-                // retain the new sgNode, it will be released in _removeSgNode
-                sgNode.retain();
-            }
-
             this._initSgNode();
         } else {
             this._sgNode = null;
@@ -362,11 +357,7 @@ var TiledLayer = cc.Class({
      */
     setTileOpacity: function(opacity) {
         if (this._sgNode) {
-            if (CC_JSB) {
-                this._sgNode.setTileOpacity(opacity);
-            } else {
-                this._sgNode._opacity = opacity;
-            }
+            this._sgNode._opacity = opacity;
         }
     },
 

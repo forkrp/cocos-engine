@@ -500,7 +500,7 @@ sys.isNative = false;
  * Is web browser ?
  * @property {Boolean} isBrowser
  */
-sys.isBrowser = typeof window === 'object' && typeof document === 'object' && !CC_WECHATGAME;
+sys.isBrowser = typeof window === 'object' && typeof document === 'object' && !CC_WECHATGAME && !CC_JSB;
 
 cc.create3DContext = function (canvas, opt_attribs, opt_contextType) {
     if (opt_contextType) {
@@ -536,7 +536,7 @@ if (CC_EDITOR && Editor.isMainProcess) {
     };
     sys.__audioSupport = {};
 }
-else if (CC_RUNTIME) {
+else if (CC_JSB) {
     var env = wx.getSystemInfoSync();
     sys.isMobile = false; //FIXME:
     sys.platform = sys.WECHAT_GAME;

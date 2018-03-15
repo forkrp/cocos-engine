@@ -379,11 +379,6 @@ var PhysicsManager = cc.Class({
         if (!world || !node) return;
 
         body._b2Body = world.CreateBody(bodyDef);
-
-        if (CC_JSB) {
-            body._b2Body.SetUserData( node._sgNode );
-        }
-
         body._b2Body.body = body;
 
         this._utils.addB2Body(body._b2Body);
@@ -394,9 +389,6 @@ var PhysicsManager = cc.Class({
         var world = this._world;
         if (!world) return;
 
-        if (CC_JSB) {
-            body._b2Body.SetUserData(null);
-        }
         body._b2Body.body = null;
         this._utils.removeB2Body(body._b2Body);
 
@@ -445,13 +437,7 @@ var PhysicsManager = cc.Class({
         var bodies = this._bodies;
         for (var i = 0, l = bodies.length; i < l; i++) {
             var body = bodies[i];
-            if (CC_JSB) {
-                var node = body.node;
-                node._position.x = node._sgNode.getPositionX();
-                node._position.y = node._sgNode.getPositionY();
-                node._rotationX = node._rotationY = node._sgNode.getRotation();
-            }
-            
+          
             if (body.type === BodyType.Animated) {
                 body.resetVelocity();
             }

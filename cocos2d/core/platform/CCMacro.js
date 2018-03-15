@@ -1209,7 +1209,7 @@ cc.macro = {
      * @property REPEAT_FOREVER
      * @type {Number}
      */
-    REPEAT_FOREVER: CC_JSB ? 0xffffffff : (Number.MAX_VALUE - 1),
+    REPEAT_FOREVER: (Number.MAX_VALUE - 1),
 
     /**
      * @property FLT_EPSILON
@@ -1940,14 +1940,8 @@ cc.defineGetterSetter(cc.macro, 'ENABLE_CULLING',
         var scene = cc.director.getScene();
         if (!scene) return;
 
-        if (CC_JSB) {
-            scene._sgNode.markCullingDirty();
-            cc.director.setCullingEnabled(val);
-        }
-        else {
-            scene._sgNode._renderCmd.setDirtyFlag(_ccsg.Node._dirtyFlags.cullingDirty);
-            cc.renderer.childrenOrderDirty = true;
-        }
+        scene._sgNode._renderCmd.setDirtyFlag(_ccsg.Node._dirtyFlags.cullingDirty);
+        cc.renderer.childrenOrderDirty = true;
     }
 )
 

@@ -263,9 +263,8 @@ if (CC_DEV) {
     }
     // deprecateEnum(cc.ProgressTimer, 'cc.ProgressTimer.TYPE', 'cc.ProgressTimer.Type');
     deprecateEnum(cc.game, 'cc.game.DEBUG_MODE', 'cc.DebugMode');
-    if (!CC_JSB) {
-        deprecateEnum(cc, 'cc', 'cc.Texture2D.WrapMode', false);
-    }
+    deprecateEnum(cc, 'cc', 'cc.Texture2D.WrapMode', false);
+
     if (_ccsg.EditBox) {
         deprecateEnum(cc, 'cc.KEYBOARD_RETURNTYPE', '_ccsg.EditBox.KeyboardReturnType');
         deprecateEnum(cc, 'cc.EDITBOX_INPUT_MODE', '_ccsg.EditBox.InputMode');
@@ -556,34 +555,32 @@ if (CC_DEV) {
         });
     }
 
-    if (!CC_JSB) {
-        // _ccsg.Node
-        markAsRemoved(_ccsg.Node, [
-            '_normalizedPositionDirty',
-            '_normalizedPosition',
-            '_usingNormalizedPosition',
-            'grid',
-            'userData',
-            'userObject',
-            'actionManager',
-            'getActionManager',
-            'setActionManager',
-            'getNormalizedPosition',
-            'setNormalizedPosition',
-            'getCamera',
-            'getUserData',
-            'setUserData',
-            'getUserObject',
-            'setUserObject',
-            'getComponent',
-            'addComponent',
-            'removeComponent',
-            'removeAllComponents',
-            'enumerateChildren',
-            'setCameraMask',
-            'getCameraMask'
-        ], '_ccsg.Node');
-    }
+    // _ccsg.Node
+    markAsRemoved(_ccsg.Node, [
+        '_normalizedPositionDirty',
+        '_normalizedPosition',
+        '_usingNormalizedPosition',
+        'grid',
+        'userData',
+        'userObject',
+        'actionManager',
+        'getActionManager',
+        'setActionManager',
+        'getNormalizedPosition',
+        'setNormalizedPosition',
+        'getCamera',
+        'getUserData',
+        'setUserData',
+        'getUserObject',
+        'setUserObject',
+        'getComponent',
+        'addComponent',
+        'removeComponent',
+        'removeAllComponents',
+        'enumerateChildren',
+        'setCameraMask',
+        'getCameraMask'
+    ], '_ccsg.Node');
 
     js.obsolete(_ccsg.Node.prototype, '_ccsg.Node.ignoreAnchorPointForPosition', 'setIgnoreAnchorPointForPosition');
 

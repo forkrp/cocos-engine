@@ -142,7 +142,7 @@ var RichText = cc.Class({
                 if (this.font === oldValue) return;
 
                 this._layoutDirty = true;
-                if (!CC_JSB && this.font) {
+                if (this.font) {
                     this._onTTFLoaded();
                 }
                 this._updateRichTextStatus();
@@ -269,9 +269,7 @@ var RichText = cc.Class({
 
     _initSgNode: function () {
         this._updateRichText();
-        if (!CC_JSB) {
-            this._onTTFLoaded();
-        }
+        this._onTTFLoaded();
     },
 
     _createFontLabel: function (string) {
@@ -379,17 +377,6 @@ var RichText = cc.Class({
         labelSegment.setAnchorPoint(0, 0);
         this._sgNode.addChild(labelSegment);
         this._labelSegments.push(labelSegment);
-
-        //when lineHeight is less than the content size of labelSize
-        //in Web platform, the extra pixels will be trimed.
-        //so we need to set the overflow to clamp in JSB
-        //FIXME: label in jsb should be refactored to keep the behavior the same as web platform.
-        if (CC_JSB) {
-            labelSegment.setOverflow(1);
-            var size = labelSegment.getContentSize();
-            labelSegment.enableWrap(false);
-            labelSegment.setDimensions(size.width, this.lineHeight);
-        }
 
         return labelSegment;
     },
