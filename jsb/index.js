@@ -47,11 +47,14 @@ function tick(nowMilliSeconds) {
 let _timeoutIDIndex = 0;
 
 class TimeoutInfo {
-    constructor(cb, delay) {
+    constructor(cb, delay, isRepeat, target, args) {
         this.cb = cb;
         this.id = ++_timeoutIDIndex;
         this.start = performance.now();
         this.delay = delay;
+        this.isRepeat = isRepeat;
+        this.target = target;
+        this.args = args;
     }
 }
 
@@ -64,26 +67,63 @@ function fireTimeout(nowMilliSeconds) {
         if (info && info.cb) {
             if ((nowMilliSeconds - info.start) >= info.delay) {
 //                console.log(`fireTimeout: id ${id}, start: ${info.start}, delay: ${info.delay}, now: ${nowMilliSeconds}`);
-                info.cb();
-                delete _timeoutInfos[id];
+                info.cb.apply(info.target, info.args);
+                if (info.isRepeat) {
+                    info.start = nowMilliSeconds;
+                } 
+                else {
+                    delete _timeoutInfos[id];
+                }
             }
         }
     }
 }
 
-//TODO: window.setInterval
-
-window.setTimeout = (cb, delay) => {
+window.setTimeout = function(cb) {
     // console.log("window.setTimeout: cb: " + cb + ", delay: " + delay);
-    let info = new TimeoutInfo(cb, delay);
+    if (!cb) {
+        console.error("setTimeout doesn't pass a callback ...");
+        return;
+    }
+
+    let delay = arguments.length > 1 ? arguments[1] : 0;
+    let args;
+
+    if (arguments.length > 2) {
+        args = Array.prototype.slice.call(arguments, 2);
+    }
+
+    let info = new TimeoutInfo(cb, delay, false, this, args);
     _timeoutInfos[info.id] = info;
     return info.id;
 };
 
-window.clearTimeout = (id) => {
+window.clearTimeout = function(id) {
     // console.log("window.clearTimeout: cb: " + cb);
     delete _timeoutInfos[id];
 };
+
+window.setInterval = function(cb) {
+    if (!cb) {
+        console.error("setInterval doesn't pass a callback ...");
+        return;
+    }
+
+    let delay = arguments.length > 1 ? arguments[1] : 0;
+
+    let args;
+    if (arguments.length > 2) {
+        args = Array.prototype.slice.call(arguments, 2);
+    }
+
+    let info = new TimeoutInfo(cb, delay, true, this, args);
+    _timeoutInfos[info.id] = info;
+    return info.id;
+}
+
+window.clearInterval = function(id) {
+    delete _timeoutInfos[id];
+}
 
 window.alert = console.error.bind(console);
 
