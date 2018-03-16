@@ -128,8 +128,6 @@ require('./jsb_prepare');
 require('./jsb_opengl');
 window.DOMParser = require('./xmldom/dom-parser').DOMParser;
 
-// cc.plistParser = cc.PlistParser.getInstance();
-
 // File utils (Temporary, won't be accessible)
 cc.fileUtils = cc.FileUtils.getInstance();
 cc.fileUtils.setPopupNotify(false);
@@ -238,11 +236,9 @@ window.canvas.getContext = function(name) {
     }
 };
 
-//require('./sample-7');
-require('../index');
-// require('src/jsb_polyfill.dev.js');
+window.localStorage = sys.localStorage;
 
-// require('./jsb-loader');
+require('../index');
 
 /**
  * @type {Object}
@@ -266,7 +262,17 @@ else if(window.JavaScriptObjCBridge && (cc.sys.os == cc.sys.OS_IOS || cc.sys.os 
     jsb.reflection = new JavaScriptObjCBridge();
 }
 
-window.io = window.SocketIO;
+// SocketIO
+if (window.SocketIO) {
+    window.io = window.SocketIO;
+    SocketIO.prototype._jsbEmit = SocketIO.prototype.emit;
+    SocketIO.prototype.emit = function (uri, delegate) {
+        if (typeof delegate === 'object') {
+            delegate = JSON.stringify(delegate);
+        }
+        this._jsbEmit(uri, delegate);
+    };
+}
 
 window.gameTick = tick;
 
