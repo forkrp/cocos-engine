@@ -79,51 +79,38 @@ function fireTimeout(nowMilliSeconds) {
     }
 }
 
-window.setTimeout = function(cb) {
-    // console.log("window.setTimeout: cb: " + cb + ", delay: " + delay);
+function createTimeoutInfo(prevFuncArgs, isRepeat) {
+    let cb = prevFuncArgs[0];
     if (!cb) {
-        console.error("setTimeout doesn't pass a callback ...");
+        console.error("createTimeoutInfo doesn't pass a callback ...");
         return;
     }
 
-    let delay = arguments.length > 1 ? arguments[1] : 0;
+    let delay = prevFuncArgs.length > 1 ? prevFuncArgs[1] : 0;
     let args;
 
-    if (arguments.length > 2) {
-        args = Array.prototype.slice.call(arguments, 2);
+    if (prevFuncArgs.length > 2) {
+        args = Array.prototype.slice.call(prevFuncArgs, 2);
     }
 
-    let info = new TimeoutInfo(cb, delay, false, this, args);
+    let info = new TimeoutInfo(cb, delay, isRepeat, this, args);
     _timeoutInfos[info.id] = info;
     return info.id;
+}
+
+window.setTimeout = function(cb) {
+    return createTimeoutInfo(arguments, false);
 };
 
 window.clearTimeout = function(id) {
-    // console.log("window.clearTimeout: cb: " + cb);
     delete _timeoutInfos[id];
 };
 
 window.setInterval = function(cb) {
-    if (!cb) {
-        console.error("setInterval doesn't pass a callback ...");
-        return;
-    }
-
-    let delay = arguments.length > 1 ? arguments[1] : 0;
-
-    let args;
-    if (arguments.length > 2) {
-        args = Array.prototype.slice.call(arguments, 2);
-    }
-
-    let info = new TimeoutInfo(cb, delay, true, this, args);
-    _timeoutInfos[info.id] = info;
-    return info.id;
+    return createTimeoutInfo(arguments, true);
 }
 
-window.clearInterval = function(id) {
-    delete _timeoutInfos[id];
-}
+window.clearInterval = window.clearTimeout;
 
 window.alert = console.error.bind(console);
 
