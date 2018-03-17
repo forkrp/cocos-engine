@@ -42,9 +42,10 @@ function downloadAudio (item, callback) {
 function downloadImage(item, callback) {
     let img = new Image();
     img.src = item.url;
-    img.complete = true;
-    img.crossOrigin = 'anonymous';
-    return img;
+    img.onload = function(info) {
+        callback(null, img);
+    }
+    // Don't return anything to use async loading.
 }
 
 cc.loader.addDownloadHandlers({
