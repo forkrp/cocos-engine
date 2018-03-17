@@ -9,6 +9,7 @@ window.Image = require('./Image');
 window.Audio = require('./Audio');
 window.FileReader = require('./FileReader');
 window.location = require('./location');
+window.FontFace = require('./FontFace');
 
 function inject () {
   window.addEventListener = (type, listener) => {
