@@ -161,7 +161,9 @@ function equalsToDefault (def, value) {
             (def.constructor === Object && value.constructor === Object)
         ) {
             try {
-                return JSON.stringify(def) === JSON.stringify(value);
+                //FIXME:cjh: This will take lots of time for compare object at runtime.
+                // return JSON.stringify(def) === JSON.stringify(value);
+                return false;
             }
             catch (e) {
             }
