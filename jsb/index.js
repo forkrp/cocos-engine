@@ -239,6 +239,8 @@ window.canvas.getContext = function(name) {
 window.localStorage = sys.localStorage;
 
 require('../index');
+require('./jsb_audioengine');
+require('./jsb-audio');
 
 /**
  * @type {Object}
@@ -253,14 +255,15 @@ jsb.reflection = {
     }
 };
 
+//NOTE: Runtime API should not private Javascript bridge functionality for security issues.
 // JS to Native bridges
-if(window.JavascriptJavaBridge && cc.sys.os == cc.sys.OS_ANDROID){
-    jsb.reflection = new JavascriptJavaBridge();
-    cc.sys.capabilities["keyboard"] = true;
-}
-else if(window.JavaScriptObjCBridge && (cc.sys.os == cc.sys.OS_IOS || cc.sys.os == cc.sys.OS_OSX)){
-    jsb.reflection = new JavaScriptObjCBridge();
-}
+// if(window.JavascriptJavaBridge && cc.sys.os == cc.sys.OS_ANDROID){
+//     jsb.reflection = new JavascriptJavaBridge();
+//     cc.sys.capabilities["keyboard"] = true;
+// }
+// else if(window.JavaScriptObjCBridge && (cc.sys.os == cc.sys.OS_IOS || cc.sys.os == cc.sys.OS_OSX)){
+//     jsb.reflection = new JavaScriptObjCBridge();
+// }
 
 // SocketIO
 if (window.SocketIO) {
