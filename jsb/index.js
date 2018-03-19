@@ -27,20 +27,29 @@ window.wx = {
 
 'use strict'
 
-let requestFrameCallback = null;
 let oldRequestFrameCallback = null;
+let requestAnimationFrameID = 0;
+let requestAnimationFrameCallbacks = {};
 
 window.requestAnimationFrame = function(cb) {
-    requestFrameCallback = cb;
+    let id = ++requestAnimationFrameID;
+    requestAnimationFrameCallbacks[id] = cb;
+    return id;
+};
+
+window.cancelAnimationFrame = function(id) {
+    delete requestAnimationFrameCallbacks[id];
 };
 
 function tick(nowMilliSeconds) {
     fireTimeout(nowMilliSeconds);
 
-    oldRequestFrameCallback = requestFrameCallback;
-    if (oldRequestFrameCallback) {
-        requestFrameCallback = null;
-        oldRequestFrameCallback(nowMilliSeconds);
+    for (let id in requestAnimationFrameCallbacks) {
+        oldRequestFrameCallback = requestAnimationFrameCallbacks[id];
+        if (oldRequestFrameCallback) {
+            delete requestAnimationFrameCallbacks[id];
+            oldRequestFrameCallback(nowMilliSeconds);
+        }
     }
 }
 
