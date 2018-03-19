@@ -1,55 +1,348 @@
-const _events = new WeakMap()
+/**
+ * @typedef {object} ListenerNode
+ * @property {Function} listener
+ * @property {1|2|3} listenerType
+ * @property {boolean} passive
+ * @property {boolean} once
+ * @property {ListenerNode|null} next
+ * @private
+ */
 
-class EventTarget {
-  constructor() {
-    _events.set(this, {})
-  }
+/**
+ * @type {WeakMap<object, Map<string, ListenerNode>>}
+ * @private
+ */
+const listenersMap = new WeakMap()
 
-  addEventListener(type, listener, options = {}) {
-    let events = _events.get(this)
+// Listener types
+const CAPTURE = 1
+const BUBBLE = 2
+const ATTRIBUTE = 3
 
-    if (!events) {
-      events = {}
-      _events.set(this, events)
-    }
-    if (!events[type]) {
-      events[type] = []
-    }
-    events[type].push(listener)
-
-    if (options.capture) {
-      console.warn('EventTarget.addEventListener: options.capture is not implemented.')
-    }
-    if (options.once) {
-      console.warn('EventTarget.addEventListener: options.once is not implemented.')
-    }
-    if (options.passive) {
-      console.warn('EventTarget.addEventListener: options.passive is not implemented.')
-    }
-  }
-
-  removeEventListener(type, listener) {
-    const listeners = _events.get(this)[type]
-
-    if (listeners && listeners.length > 0) {
-      for (let i = listeners.length; i--; i > 0) {
-        if (listeners[i] === listener) {
-          listeners.splice(i, 1)
-          break
-        }
-      }
-    }
-  }
-
-  dispatchEvent(event = {}) {
-    const listeners = _events.get(this)[event.type]
-
-    if (listeners) {
-      for (let i = 0; i < listeners.length; i++) {
-        listeners[i](event)
-      }
-    }
-  }
+/**
+ * Check whether a given value is an object or not.
+ * @param {any} x The value to check.
+ * @returns {boolean} `true` if the value is an object.
+ */
+function isObject(x) {
+    return x !== null && typeof x === "object" //eslint-disable-line no-restricted-syntax
 }
 
-module.exports = EventTarget;
+/**
+ * Get listeners.
+ * @param {EventTarget} eventTarget The event target to get.
+ * @returns {Map<string, ListenerNode>} The listeners.
+ * @private
+ */
+function getListeners(eventTarget) {
+    const listeners = listenersMap.get(eventTarget)
+    if (listeners == null) {
+        throw new TypeError("'this' is expected an EventTarget object, but got another value.")
+    }
+    return listeners
+}
+
+/**
+ * Get the property descriptor for the event attribute of a given event.
+ * @param {string} eventName The event name to get property descriptor.
+ * @returns {PropertyDescriptor} The property descriptor.
+ * @private
+ */
+function defineEventAttributeDescriptor(eventName) {
+    return {
+        get() {
+            const listeners = getListeners(this)
+            let node = listeners.get(eventName)
+            while (node != null) {
+                if (node.listenerType === ATTRIBUTE) {
+                    return node.listener
+                }
+                node = node.next
+            }
+            return null
+        },
+
+        set(listener) {
+            if (typeof listener !== "function" && !isObject(listener)) {
+                listener = null // eslint-disable-line no-param-reassign
+            }
+            const listeners = getListeners(this)
+
+            // Traverse to the tail while removing old value.
+            let prev = null
+            let node = listeners.get(eventName)
+            while (node != null) {
+                if (node.listenerType === ATTRIBUTE) {
+                    // Remove old value.
+                    if (prev !== null) {
+                        prev.next = node.next
+                    }
+                    else if (node.next !== null) {
+                        listeners.set(eventName, node.next)
+                    }
+                    else {
+                        listeners.delete(eventName)
+                    }
+                }
+                else {
+                    prev = node
+                }
+
+                node = node.next
+            }
+
+            // Add new value.
+            if (listener !== null) {
+                const newNode = {
+                    listener,
+                    listenerType: ATTRIBUTE,
+                    passive: false,
+                    once: false,
+                    next: null,
+                }
+                if (prev === null) {
+                    listeners.set(eventName, newNode)
+                }
+                else {
+                    prev.next = newNode
+                }
+            }
+        },
+        configurable: true,
+        enumerable: true,
+    }
+}
+
+/**
+ * Define an event attribute (e.g. `eventTarget.onclick`).
+ * @param {Object} eventTargetPrototype The event target prototype to define an event attrbite.
+ * @param {string} eventName The event name to define.
+ * @returns {void}
+ */
+function defineEventAttribute(eventTargetPrototype, eventName) {
+    Object.defineProperty(eventTargetPrototype, `on${eventName}`, defineEventAttributeDescriptor(eventName))
+}
+
+/**
+ * Define a custom EventTarget with event attributes.
+ * @param {string[]} eventNames Event names for event attributes.
+ * @returns {EventTarget} The custom EventTarget.
+ * @private
+ */
+function defineCustomEventTarget(eventNames) {
+    /** CustomEventTarget */
+    function CustomEventTarget() {
+        EventTarget.call(this)
+    }
+
+    CustomEventTarget.prototype = Object.create(EventTarget.prototype, {
+        constructor: { value: CustomEventTarget, configurable: true, writable: true },
+    })
+
+    for (let i = 0; i < eventNames.length; ++i) {
+        defineEventAttribute(CustomEventTarget.prototype, eventNames[i])
+    }
+
+    return CustomEventTarget
+}
+
+/**
+ * EventTarget.
+ * 
+ * - This is constructor if no arguments.
+ * - This is a function which returns a CustomEventTarget constructor if there are arguments.
+ * 
+ * For example:
+ * 
+ *     class A extends EventTarget {}
+ *     class B extends EventTarget("message") {}
+ *     class C extends EventTarget("message", "error") {}
+ *     class D extends EventTarget(["message", "error"]) {}
+ */
+function EventTarget() {
+    /*eslint-disable consistent-return */
+    if (this instanceof EventTarget) {
+        listenersMap.set(this, new Map())
+        return
+    }
+    if (arguments.length === 1 && Array.isArray(arguments[0])) {
+        return defineCustomEventTarget(arguments[0])
+    }
+    if (arguments.length > 0) {
+        const types = new Array(arguments.length)
+        for (let i = 0; i < arguments.length; ++i) {
+            types[i] = arguments[i]
+        }
+        return defineCustomEventTarget(types)
+    }
+    throw new TypeError("Cannot call a class as a function")
+    /*eslint-enable consistent-return */
+}
+
+// Should be enumerable, but class methods are not enumerable.
+EventTarget.prototype = {
+    /**
+     * Add a given listener to this event target.
+     * @param {string} eventName The event name to add.
+     * @param {Function} listener The listener to add.
+     * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
+     * @returns {boolean} `true` if the listener was added actually.
+     */
+    addEventListener(eventName, listener, options) {
+        if (listener == null) {
+            return false
+        }
+        if (typeof listener !== "function" && !isObject(listener)) {
+            throw new TypeError("'listener' should be a function or an object.")
+        }
+
+        const listeners = getListeners(this)
+        const optionsIsObj = isObject(options)
+        const capture = optionsIsObj ? Boolean(options.capture) : Boolean(options)
+        const listenerType = (capture ? CAPTURE : BUBBLE)
+        const newNode = {
+            listener,
+            listenerType,
+            passive: optionsIsObj && Boolean(options.passive),
+            once: optionsIsObj && Boolean(options.once),
+            next: null,
+        }
+
+        // Set it as the first node if the first node is null.
+        let node = listeners.get(eventName)
+        if (node === undefined) {
+            listeners.set(eventName, newNode)
+            return true
+        }
+
+        // Traverse to the tail while checking duplication..
+        let prev = null
+        while (node != null) {
+            if (node.listener === listener && node.listenerType === listenerType) {
+                // Should ignore duplication.
+                return false
+            }
+            prev = node
+            node = node.next
+        }
+
+        // Add it.
+        prev.next = newNode
+        return true
+    },
+
+    /**
+     * Remove a given listener from this event target.
+     * @param {string} eventName The event name to remove.
+     * @param {Function} listener The listener to remove.
+     * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
+     * @returns {boolean} `true` if the listener was removed actually.
+     */
+    removeEventListener(eventName, listener, options) {
+        if (listener == null) {
+            return false
+        }
+
+        const listeners = getListeners(this)
+        const capture = isObject(options) ? Boolean(options.capture) : Boolean(options)
+        const listenerType = (capture ? CAPTURE : BUBBLE)
+
+        let prev = null
+        let node = listeners.get(eventName)
+        while (node != null) {
+            if (node.listener === listener && node.listenerType === listenerType) {
+                if (prev !== null) {
+                    prev.next = node.next
+                }
+                else if (node.next !== null) {
+                    listeners.set(eventName, node.next)
+                }
+                else {
+                    listeners.delete(eventName)
+                }
+                return true
+            }
+
+            prev = node
+            node = node.next
+        }
+
+        return false
+    },
+
+    /**
+     * Dispatch a given event.
+     * @param {Event|{type:string}} event The event to dispatch.
+     * @returns {boolean} `false` if canceled.
+     */
+    dispatchEvent(event) {
+        if (event == null || typeof event.type !== "string") {
+            throw new TypeError("\"event.type\" should be a string.")
+        }
+
+        // If listeners aren't registered, terminate.
+        const listeners = getListeners(this)
+        const eventName = event.type
+        let node = listeners.get(eventName)
+        if (node == null) {
+            console.log("Couldn't found listeners on " + this);
+            return true
+        }
+
+        event._target = event._currentTarget = this;
+        // This doesn't process capturing phase and bubbling phase.
+        // This isn't participating in a tree.
+        let prev = null
+        while (node != null) {
+            // Remove this listener if it's once
+            if (node.once) {
+                if (prev !== null) {
+                    prev.next = node.next
+                }
+                else if (node.next !== null) {
+                    listeners.set(eventName, node.next)
+                }
+                else {
+                    listeners.delete(eventName)
+                }
+            }
+            else {
+                prev = node
+            }
+
+            // Call this listener
+            event._passiveListener = node.passive ? node.listener : null
+            if (typeof node.listener === "function") {
+                node.listener.call(this, event)
+            }
+            else if (node.listenerType !== ATTRIBUTE && typeof node.listener.handleEvent === "function") {
+                node.listener.handleEvent(event)
+            }
+
+            // Break if `event.stopImmediatePropagation` was called.
+            if (event._stopped) {
+                break
+            }
+
+            node = node.next
+        }
+        event._target = event._currentTarget = null
+        event._eventPhase = 0
+        event._passiveListener = null
+
+        return !event.defaultPrevented
+    },
+}
+
+// `constructor` is not enumerable.
+Object.defineProperty(EventTarget.prototype, "constructor", { value: EventTarget, configurable: true, writable: true })
+
+// Ensure `eventTarget instanceof window.EventTarget` is `true`.
+if (typeof window !== "undefined" && typeof window.EventTarget !== "undefined") {
+    Object.setPrototypeOf(EventTarget.prototype, window.EventTarget.prototype)
+}
+
+// export { defineEventAttribute, EventTarget }
+// export default EventTarget
+module.exports = EventTarget
+

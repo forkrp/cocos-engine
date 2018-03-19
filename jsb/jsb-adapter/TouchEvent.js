@@ -1,20 +1,12 @@
-class TouchEvent {
+let Event = require('./Event')
 
-  constructor(type) {
-    this.target = window.canvas
-    this.currentTarget = window.canvas
-    this.touches = []
-    this.targetTouches = []
+class TouchEvent extends Event {
+
+  constructor(type, touchEventInit) {
+    super(type)
+    // this.touches = []
+    // this.targetTouches = []
     this.changedTouches = []
-    this.type = type
-  }
-
-  stopPropagation() {
-
-  }
-
-  preventDefault() {
-
   }
 }
 
@@ -26,7 +18,7 @@ function touchEventHandlerFactory(type) {
     // touchEvent.targetTouches = Array.prototype.slice.call(event.touches)
     touchEvent.changedTouches = touches;//event.changedTouches
     // touchEvent.timeStamp = event.timeStamp
-    document.dispatchEvent(touchEvent)
+    window.canvas.dispatchEvent(touchEvent);
   }
 }
 
@@ -34,3 +26,5 @@ jsb.onTouchStart = touchEventHandlerFactory('touchstart');
 jsb.onTouchMove = touchEventHandlerFactory('touchmove');
 jsb.onTouchEnd = touchEventHandlerFactory('touchend');
 jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
+
+module.exports = TouchEvent

@@ -1,28 +1,40 @@
-// let Canvas = require('./Canvas');
-// let document = require('./document');
 
-// // export document from './document'
-// // export navigator from './navigator'
-// // export XMLHttpRequest from './XMLHttpRequest'
-// // export WebSocket from './WebSocket'
-// // export Image from './Image'
-// // export Audio from './Audio'
-// // export FileReader from './FileReader'
-// // export HTMLElement from './HTMLElement'
-// // export localStorage from './localStorage'
-// // export location from './location'
-// // export * from './WindowProperties'
-// // export * from './constructor'
+function inject () {
+    window.top = window.parent = window
 
-// // 暴露全局的 canvas
-// const canvas = new Canvas();
+    window.document = require('./document');
+    window.HTMLElement = require('./HTMLElement');
+    window.HTMLCanvasElement = require('./HTMLCanvasElement');
+    window.HTMLImageElement = require('./HTMLImageElement');
+    window.HTMLMediaElement = require('./HTMLMediaElement');
+    window.HTMLAudioElement = require('./HTMLAudioElement');
+    window.canvas = new HTMLCanvasElement();
+    window.gl.canvas = window.canvas;
+    window.navigator = require('./navigator');
+    window.Image = require('./Image');
+    window.Audio = require('./Audio');
+    window.FileReader = require('./FileReader');
+    window.location = require('./location');
+    window.FontFace = require('./FontFace');
+    window.EventTarget = require('./EventTarget');
+    window.Event = require('./Event');
+    window.TouchEvent = require('./TouchEvent');
 
-// // export { canvas }
-// // export { setTimeout }
-// // export { setInterval }
-// // export { clearTimeout }
-// // export { clearInterval }
-// // export { requestAnimationFrame }
-// // export { cancelAnimationFrame }
+    window.addEventListener = function(eventName, listener, options) {
+        window.canvas.addEventListener(eventName, listener, options);
+    }
 
-module.exports = {};
+    window.removeEventListener = function(eventName, listener, options) {
+        window.canvas.removeEventListener(eventName, listener, options);
+    }
+
+    window.dispatchEvent = function(event) {
+        window.canvas.dispatchEvent(event);
+    }
+
+    window._isInjected = true;
+}
+
+if (!window._isInjected) {
+    inject();
+}

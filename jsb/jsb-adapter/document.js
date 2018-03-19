@@ -2,23 +2,22 @@ let HTMLElement = require('./HTMLElement');
 let Image = require('./Image');
 let Audio = require('./Audio');
 let HTMLCanvasElement = require('./HTMLCanvasElement');
-require('./EventIniter')
+let Node = require('./Node');
 
-const events = {}
+class Document extends Node {
 
-const document = {
-  readyState: 'complete',
-  visibilityState: 'visible',
-  documentElement: window,
-  hidden: false,
-  style: {},
-  location: window.location,
-  ontouchstart: null,
-  ontouchmove: null,
-  ontouchend: null,
+  constructor() {
+    super()
+    this.readyState = 'complete'
+    this.visibilityState = 'visible'
+    this.documentElement = window
+    this.hidden = false
+    this.style = {}
+    this.location = window.location
 
-  head: new HTMLElement('head'),
-  body: new HTMLElement('body'),
+    this.head = new HTMLElement('head')
+    this.body = new HTMLElement('body')
+  }
 
   createElement(tagName) {
     if (tagName === 'canvas') {
@@ -36,14 +35,14 @@ const document = {
     }
 
     return new HTMLElement(tagName)
-  },
+  }
 
   getElementById(id) {
     if (id === window.canvas.id) {
       return window.canvas
     }
     return null
-  },
+  }
 
   getElementsByTagName(tagName) {
     if (tagName === 'head') {
@@ -54,7 +53,7 @@ const document = {
       return [window.canvas]
     }
     return []
-  },
+  }
 
   getElementsByName(tagName) {
     if (tagName === 'head') {
@@ -65,7 +64,7 @@ const document = {
       return [window.canvas]
     }
     return []
-  },
+  }
 
   querySelector(query) {
     if (query === 'head') {
@@ -78,7 +77,7 @@ const document = {
       return window.canvas
     }
     return null
-  },
+  }
 
   querySelectorAll(query) {
     if (query === 'head') {
@@ -89,41 +88,13 @@ const document = {
       return [window.canvas]
     }
     return []
-  },
+  }
 
-  addEventListener(type, listener) {
-    if (!events[type]) {
-      events[type] = []
-    }
-    events[type].push(listener)
-  },
-
-  removeEventListener(type, listener) {
-    const listeners = events[type]
-
-    if (listeners && listeners.length > 0) {
-      for (let i = listeners.length; i--; i > 0) {
-        if (listeners[i] === listener) {
-          listeners.splice(i, 1)
-          break
-        }
-      }
-    }
-  },
-
-  dispatchEvent(event) {
-    const listeners = events[event.type]
-
-    if (listeners) {
-      for (let i = 0; i < listeners.length; i++) {
-        listeners[i](event)
-      }
-    }
-  },
-
-    createTextNode() {
-        return new HTMLElement('text');
-    }
+  createTextNode() {
+      return new HTMLElement('text');
+  }
 }
 
-module.exports = document;
+let document = new Document()
+
+module.exports = document
