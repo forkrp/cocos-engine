@@ -3,6 +3,7 @@ let Image = require('./Image');
 let Audio = require('./Audio');
 let HTMLCanvasElement = require('./HTMLCanvasElement');
 let Node = require('./Node');
+let FontFaceSet = require('./FontFaceSet')
 
 class Document extends Node {
 
@@ -17,6 +18,8 @@ class Document extends Node {
 
     this.head = new HTMLElement('head')
     this.body = new HTMLElement('body')
+
+    this.fonts = new FontFaceSet()
   }
 
   createElement(tagName) {

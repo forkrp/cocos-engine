@@ -132,7 +132,6 @@ EventTarget.prototype = {
         const eventName = event.type
         let node = listeners.get(eventName)
         if (node == null) {
-            console.log("Couldn't found listeners on " + this);
             return true
         }
 

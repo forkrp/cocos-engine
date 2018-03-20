@@ -16,6 +16,7 @@ function inject () {
     window.FileReader = require('./FileReader');
     window.location = require('./location');
     window.FontFace = require('./FontFace');
+    window.FontFaceSet = require('./FontFaceSet');
     window.EventTarget = require('./EventTarget');
     window.Event = require('./Event');
     window.TouchEvent = require('./TouchEvent');
