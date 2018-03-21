@@ -1,0 +1,2 @@
+requireModule('./window')
+

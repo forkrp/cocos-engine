@@ -36,7 +36,7 @@ EventTarget.prototype = {
      * @returns {boolean} `true` if the listener was added actually.
      */
     addEventListener(eventName, listener, options) {
-        if (listener == null) {
+        if (!listener) {
             return false
         }
         if (typeof listener !== "function" && !isObject(listener)) {
@@ -64,7 +64,7 @@ EventTarget.prototype = {
 
         // Traverse to the tail while checking duplication..
         let prev = null
-        while (node != null) {
+        while (node !== null) {
             if (node.listener === listener && node.listenerType === listenerType) {
                 // Should ignore duplication.
                 return false
@@ -86,7 +86,7 @@ EventTarget.prototype = {
      * @returns {boolean} `true` if the listener was removed actually.
      */
     removeEventListener(eventName, listener, options) {
-        if (listener == null) {
+        if (!listener) {
             return false
         }
 
@@ -96,7 +96,7 @@ EventTarget.prototype = {
 
         let prev = null
         let node = listeners.get(eventName)
-        while (node != null) {
+        while (node !== null) {
             if (node.listener === listener && node.listenerType === listenerType) {
                 if (prev !== null) {
                     prev.next = node.next
@@ -123,7 +123,7 @@ EventTarget.prototype = {
      * @returns {boolean} `false` if canceled.
      */
     dispatchEvent(event) {
-        if (event == null || typeof event.type !== "string") {
+        if (!event || typeof event.type !== "string") {
             throw new TypeError("\"event.type\" should be a string.")
         }
 
@@ -131,7 +131,7 @@ EventTarget.prototype = {
         const listeners = this._listeners
         const eventName = event.type
         let node = listeners.get(eventName)
-        if (node == null) {
+        if (!node) {
             return true
         }
 
@@ -139,7 +139,7 @@ EventTarget.prototype = {
         // This doesn't process capturing phase and bubbling phase.
         // This isn't participating in a tree.
         let prev = null
-        while (node != null) {
+        while (node !== null) {
             // Remove this listener if it's once
             if (node.once) {
                 if (prev !== null) {

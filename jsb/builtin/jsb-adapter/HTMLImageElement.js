@@ -1,4 +1,4 @@
-let HTMLElement = require('./HTMLElement');
+const HTMLElement = requireModule('./HTMLElement');
 
 class HTMLImageElement extends HTMLElement {
     constructor(width, height) {
@@ -34,9 +34,9 @@ class HTMLImageElement extends HTMLElement {
                 let bytesPerRow = self.width * self._bpp / 8;
                 if (bytesPerRow % 8 == 0)
                     _alignment = 8;
-                else if(bytesPerRow % 4 == 0)
+                else if (bytesPerRow % 4 == 0)
                     _alignment = 4;
-                else if(bytesPerRow % 2 == 0)
+                else if (bytesPerRow % 2 == 0)
                     _alignment = 2;
             }
 

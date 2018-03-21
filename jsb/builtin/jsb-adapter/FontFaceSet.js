@@ -1,5 +1,5 @@
-let EventTarget = require('./EventTarget')
-let Event = require('./Event')
+let EventTarget = requireModule('./EventTarget')
+let Event = requireModule('./Event')
 
 class FontFaceSet extends EventTarget {
     constructor() {
@@ -28,7 +28,7 @@ class FontFaceSet extends EventTarget {
         this.dispatchEvent(new Event('loading'))
         // Call native binding method to set the ttf font to native platform.
         let family = jsb.loadFont(fontFace.family, fontFace.source)
-        setTimeout(()=> {
+        setTimeout(() => {
             if (family) {
                 fontFace._status = this._status = 'loaded'
                 fontFace._resolveCB()

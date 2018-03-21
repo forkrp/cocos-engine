@@ -1,5 +1,5 @@
-let HTMLElement = require('./HTMLElement');
-let ImageData = require('./ImageData');
+const HTMLElement = requireModule('./HTMLElement');
+const ImageData = requireModule('./ImageData');
 
 class CanvasGradient {
     constructor() {
@@ -198,6 +198,7 @@ class HTMLCanvasElement extends HTMLElement {
 
     //TODO: implement opts.
     getContext(name, opts) {
+        var self = this;
         console.log(`==> Canvas getContext(${name})`);
         if (name === 'webgl' || name === 'experimental-webgl') {
             return window.gl;
@@ -205,7 +206,6 @@ class HTMLCanvasElement extends HTMLElement {
             if (!this._context2D) {
                 this._context2D = new CanvasRenderingContext2D(this._width, this._height);
                 this._context2D._canvas = this;
-                var self = this;
                 this._context2D.setCanvasBufferUpdatedCallback(function(data) {
                     console.log('setCanvasBufferUpdatedCallback: dataLen: ' + data.length);
                     self._data = data;
@@ -224,10 +224,11 @@ class HTMLCanvasElement extends HTMLElement {
 
     set width(width) {
         console.log(`==> HTMLCanvasElement.width = ${width}`);
-        if (this._width != width) {
+        if (this._width !== width) {
             this._width = width;
-            if (this._context2D)
+            if (this._context2D) {
                 this._context2D._width = width;
+            }
         }
     }
 
@@ -237,10 +238,11 @@ class HTMLCanvasElement extends HTMLElement {
 
     set height(height) {
         console.log(`==> HTMLCanvasElement.height = ${height}`);
-        if (this._height != height) {
+        if (this._height !== height) {
             this._height = height;
-            if (this._context2D)
+            if (this._context2D) {
                 this._context2D._height = height;
+            }
         }
     }
 
@@ -256,6 +258,15 @@ ctx2DProto.createImageData = function(width, height) {
 
 ctx2DProto.putImageData = function(imagedata, dx, dy) {
     this._canvas._data = imagedata.data; //TODO: consider dx, dy?
+}
+
+ctx2DProto.getImageData = function(sx, sy, sw, sh) {
+    //TODO:cjh
+    return null;
+}
+
+ctx2DProto.drawImage = function(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
+    //TODO:cjh
 }
 
 module.exports = HTMLCanvasElement;

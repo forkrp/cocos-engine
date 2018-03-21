@@ -28,34 +28,34 @@
 
 if (window.scriptEngineType == "JavaScriptCore") {
     window.__jsc_createArrayBufferObject = function(arr) {
-        var len = arr.length;
-        var buffer = new ArrayBuffer(len);
-        var typedArr = new Uint8Array(buffer);
-        for (var i = 0; i < len; ++i) {
+        let len = arr.length;
+        let buffer = new ArrayBuffer(len);
+        let typedArr = new Uint8Array(buffer);
+        for (let i = 0; i < len; ++i) {
             typedArr[i] = arr[i];
         }
         return buffer;
     };
 
     window.__jsc_getArrayBufferData = function(arrBuf) {
-        var typedArr = new Uint8Array(arrBuf);
-        var len = typedArr.length;
-        var arr = new Array(len);
-        for (var i = 0; i < len; ++i) {
+        let typedArr = new Uint8Array(arrBuf);
+        let len = typedArr.length;
+        let arr = new Array(len);
+        for (let i = 0; i < len; ++i) {
             arr[i] = typedArr[i];
         }
         return arr;
     };
 
     window.__jsc_getTypedArrayData = function(typedArr) {
-        var length = typedArr.byteLength;
-        var offset = typedArr.byteOffset;
-        var buf = typedArr.buffer;
-        var uint8Arr = new Uint8Array(buf);
-        var retArr = new Array(length);
-        var arrIndex = 0;
-        var bufIndex = offset;
-        var bufEnd = offset + length;
+        let length = typedArr.byteLength;
+        let offset = typedArr.byteOffset;
+        let buf = typedArr.buffer;
+        let uint8Arr = new Uint8Array(buf);
+        let retArr = new Array(length);
+        let arrIndex = 0;
+        let bufIndex = offset;
+        let bufEnd = offset + length;
         for (; bufIndex < bufEnd; ++bufIndex, ++arrIndex) {
             retArr[arrIndex] = uint8Arr[bufIndex];
         }
@@ -84,7 +84,7 @@ window.jsb = window.jsb || {};
  * @param {function} setter     Setter function for the property
  */
 cc.defineGetterSetter = function (proto, prop, getter, setter){
-    var desc = { enumerable: false, configurable: true };
+    let desc = { enumerable: false, configurable: true };
     getter && (desc.get = getter);
     setter && (desc.set = setter);
     Object.defineProperty(proto, prop, desc);
@@ -114,15 +114,15 @@ cc.clone = function (obj) {
     // derived class forgets to set "constructor" on the prototype. We ignore
     // these possibities for and the ultimate solution is a standardized
     // Object.clone(<object>).
-    var newObj = (obj.constructor) ? new obj.constructor : {};
+    let newObj = (obj.constructor) ? new obj.constructor : {};
     
     // Assuming that the constuctor above initialized all properies on obj, the
     // following keyed assignments won't turn newObj into dictionary mode
     // becasue they're not *appending new properties* but *assigning existing
     // ones* (note that appending indexed properties is another story). See
     // CCClass.js for a link to the devils when the assumption fails.
-    for (var key in obj) {
-        var copy = obj[key];
+    for (let key in obj) {
+        let copy = obj[key];
         // Beware that typeof null == "object" !
         if (typeof copy === "object" &&
             copy &&
@@ -137,7 +137,7 @@ cc.clone = function (obj) {
 };
 
 
-var ClassManager = {
+let ClassManager = {
     id : (0|(Math.random()*998)),
 
     instanceId : (0|(Math.random()*998)),
@@ -156,7 +156,7 @@ var ClassManager = {
 //
 cc.Class = function(){};
 cc.Class.extend = function (prop) {
-    var _super = this.prototype,
+    let _super = this.prototype,
         prototype, Class, classId,
         className = prop._className || "",
         name, desc;
@@ -175,7 +175,7 @@ cc.Class.extend = function (prop) {
             typeof _super[name] == "function" && fnTest.test(prop[name]) ?
             (function (name, fn) {
                 return function () {
-                    var tmp = this._super;
+                    let tmp = this._super;
 
                     // Add a new ._super() method that is the same method
                     // but on the super-class
@@ -183,7 +183,7 @@ cc.Class.extend = function (prop) {
 
                     // The method only need to be bound temporarily, so we
                     // remove it when we're done executing
-                    var ret = fn.apply(this, arguments);
+                    let ret = fn.apply(this, arguments);
                     this._super = tmp;
 
                     return ret;
@@ -231,11 +231,11 @@ jsb.__obj_ref_id = 0;
 
 jsb.registerNativeRef = function (owner, target) {
     if (owner && target && owner !== target) {
-        var targetID = target.__jsb_ref_id;
+        let targetID = target.__jsb_ref_id;
         if (targetID === undefined)
             targetID = target.__jsb_ref_id = jsb.__obj_ref_id++;
 
-        var refs = owner.__nativeRefs;
+        let refs = owner.__nativeRefs;
         if (!refs) {
             refs = owner.__nativeRefs = {};
         }
@@ -246,11 +246,11 @@ jsb.registerNativeRef = function (owner, target) {
 
 jsb.unregisterNativeRef = function (owner, target) {
     if (owner && target && owner !== target) {
-        var targetID = target.__jsb_ref_id;
+        let targetID = target.__jsb_ref_id;
         if (targetID === undefined)
             return;
 
-        var refs = owner.__nativeRefs;
+        let refs = owner.__nativeRefs;
         if (!refs) {
             return;
         }
@@ -267,7 +267,7 @@ jsb.unregisterAllNativeRefs = function (owner) {
 jsb.unregisterChildRefsForNode = function (node, recursive) {
     if (!(node instanceof cc.Node)) return;
     recursive = !!recursive;
-    var children = node.getChildren(), i, l, child;
+    let children = node.getChildren(), i, l, child;
     for (i = 0, l = children.length; i < l; ++i) {
         child = children[i];
         jsb.unregisterNativeRef(node, child);

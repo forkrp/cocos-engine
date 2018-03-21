@@ -1,4 +1,4 @@
-let Event = require('./Event')
+let Event = requireModule('./Event')
 
 class TouchEvent extends Event {
 

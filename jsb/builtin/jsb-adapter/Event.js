@@ -51,7 +51,7 @@ class Event {
     }
 
     get timeStamp() {
-        return this._timeStamp;
+        return this._timeStamp
     }
 
     /**
@@ -59,7 +59,7 @@ class Event {
      */
     composedPath() {
         const currentTarget = this._currentTarget
-        if (currentTarget == null) {
+        if (currentTarget === null) {
             return []
         }
         return [currentTarget]
@@ -110,7 +110,7 @@ class Event {
      * @returns {void}
      */
     preventDefault() {
-        if (this._passiveListener != null) {
+        if (this._passiveListener !== null) {
             console.warn("Event#preventDefault() was called from a passive listener:", this._passiveListener)
             return
         }

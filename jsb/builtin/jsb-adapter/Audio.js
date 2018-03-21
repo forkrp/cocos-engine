@@ -1,4 +1,4 @@
-let HTMLAudioElement = require('./HTMLAudioElement');
+let HTMLAudioElement = requireModule('./HTMLAudioElement');
 
 const HAVE_NOTHING = 0
 const HAVE_METADATA = 1
