@@ -9,7 +9,7 @@ const ATTRIBUTE = 3
  * @returns {boolean} `true` if the value is an object.
  */
 function isObject(x) {
-    return x !== null && typeof x === "object" //eslint-disable-line no-restricted-syntax
+    return x && typeof x === "object" //eslint-disable-line no-restricted-syntax
 }
 
 /**
@@ -64,7 +64,7 @@ EventTarget.prototype = {
 
         // Traverse to the tail while checking duplication..
         let prev = null
-        while (node !== null) {
+        while (node) {
             if (node.listener === listener && node.listenerType === listenerType) {
                 // Should ignore duplication.
                 return false
@@ -96,12 +96,12 @@ EventTarget.prototype = {
 
         let prev = null
         let node = listeners.get(eventName)
-        while (node !== null) {
+        while (node) {
             if (node.listener === listener && node.listenerType === listenerType) {
-                if (prev !== null) {
+                if (prev) {
                     prev.next = node.next
                 }
-                else if (node.next !== null) {
+                else if (node.next) {
                     listeners.set(eventName, node.next)
                 }
                 else {
@@ -139,13 +139,13 @@ EventTarget.prototype = {
         // This doesn't process capturing phase and bubbling phase.
         // This isn't participating in a tree.
         let prev = null
-        while (node !== null) {
+        while (node) {
             // Remove this listener if it's once
             if (node.once) {
-                if (prev !== null) {
+                if (prev) {
                     prev.next = node.next
                 }
-                else if (node.next !== null) {
+                else if (node.next) {
                     listeners.set(eventName, node.next)
                 }
                 else {

@@ -160,6 +160,14 @@ jsb.reflection = {
     }
 };
 
+XMLHttpRequest.prototype.addEventListener = function(eventName, listener, options) {
+    this['on' + eventName] = listener;
+}
+
+XMLHttpRequest.prototype.removeEventListener = function(eventName, listener, options) {
+    this['on' + eventName] = null;
+}
+
 //NOTE: Runtime API should not private Javascript bridge functionality for security issues.
 // JS to Native bridges
 // if(window.JavascriptJavaBridge && cc.sys.os == cc.sys.OS_ANDROID){

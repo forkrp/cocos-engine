@@ -105,11 +105,11 @@ gl.deleteRenderbuffer = function(buffer) {
 };
 
 gl.deleteFramebuffer = function(buffer) {
-    var buffer_id = buffer.framebuffer_id;
-    // Accept numbers too. eg: gl.deleteFramebuffer(0)
-    if (typeof buffer === 'number')
-        buffer_id = buffer;
-
+    var buffer_id;
+    if (buffer)
+        buffer_id = buffer.framebuffer_id;
+    else
+        buffer_id = null;
     gl._deleteFramebuffer(buffer_id);
 };
 
@@ -186,12 +186,16 @@ gl.bindFramebuffer = function(target, buffer) {
     if (typeof buffer === 'number')
         buffer_id = buffer;
     else if( buffer === null )
-        buffer_id = 0;
+        buffer_id = null;
     else
         buffer_id = buffer.buffer_id;
 
     gl._bindFramebuffer(target, buffer_id);
 };
+
+gl.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
+    gl._framebufferTexture2D(target, attachment, textarget, texture.texture_id, level);
+}
 
 //
 // Uniform related
@@ -390,6 +394,7 @@ gl.getExtension = function(extension) {
 
 let HTMLCanvasElement = requireModule('./jsb-adapter/HTMLCanvasElement');
 let HTMLImageElement = requireModule('./jsb-adapter/HTMLImageElement');
+let ImageData = requireModule('./jsb-adapter/ImageData');
 
 let _glTexImage2D = gl.texImage2D;
 
@@ -409,25 +414,28 @@ gl.texImage2D = function(target, level, internalformat, width, height, border, f
         type = height;
         format = width;
 
-        //TODO: ImageData
         if (image instanceof HTMLImageElement) {
-            console.log(`==> texImage2D internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
+            console.log(`==> texImage2D HTMLImageElement internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
        
             _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
         }
         else if (image instanceof HTMLCanvasElement) {
-            console.log(`==> texImage2D internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
+            console.log(`==> texImage2D HTMLCanvasElement internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
+            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+        }
+        else if (image instanceof ImageData) {
+            console.log(`==> texImage2D ImageData internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);
             _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data);
         }
         else {
-            console.error((new Error("Invalid pixel argument passed to gl.texImage2D!").stack));
+            console.error("Invalid pixel argument passed to gl.texImage2D!");
         } 
     }
     else if (argCount == 9) {
         _glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
     } else {
-        console.error((new Error("gl.texImage2D: invalid argument count!").stack));
+        console.error("gl.texImage2D: invalid argument count!");
     }
 }
 
@@ -455,10 +463,13 @@ gl.texSubImage2D = function(target, level, xoffset, yoffset, width, height, form
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
         }
         else if (image instanceof HTMLCanvasElement) {
+            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+        }
+        else if (image instanceof ImageData) {
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data);
         }
         else {
-            console.error((new Error("Invalid pixel argument passed to gl.texImage2D!").stack));
+            console.error("Invalid pixel argument passed to gl.texImage2D!");
         }
     }
     else if (argCount == 9) {

@@ -18,6 +18,7 @@ class HTMLElement extends Element {
     this.insertBefore = noop
 
     this.innerHTML = ''
+    this.parentElement = window.canvas
   }
 
   setAttribute(name, value) {

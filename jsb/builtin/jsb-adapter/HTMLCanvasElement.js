@@ -181,6 +181,8 @@ class TextMetrics {
 //     }
 // }
 
+const __listenTouchEventCanvasMap = {};
+
 class HTMLCanvasElement extends HTMLElement {
     constructor(width, height) {
         super('canvas')
@@ -208,7 +210,7 @@ class HTMLCanvasElement extends HTMLElement {
                 this._context2D._canvas = this;
                 this._context2D.setCanvasBufferUpdatedCallback(function(data) {
                     console.log('setCanvasBufferUpdatedCallback: dataLen: ' + data.length);
-                    self._data = data;
+                    self._data = new ImageData(data, self._width, self._height);
                 });
             }
             return this._context2D;
@@ -249,6 +251,28 @@ class HTMLCanvasElement extends HTMLElement {
     get height() {
         return this._height;
     }
+
+    addEventListener(eventName, listener, options) {
+        let ret = super.addEventListener(eventName, listener, options);
+        if (ret) {
+            if (eventName === 'touchstart') {
+                __listenTouchEventCanvasMap[this._index] = this;
+            }
+        }
+
+        return ret;
+    }
+
+    removeEventListener(eventName, listener, options) {
+        let ret = super.removeEventListener(eventName, listener, options);
+        if (ret) {
+            if (eventName === 'touchstart') {
+                delete __listenTouchEventCanvasMap[this._index];
+            }
+        }
+
+        return ret;
+    }
 }
 
 var ctx2DProto = CanvasRenderingContext2D.prototype;
@@ -257,17 +281,37 @@ ctx2DProto.createImageData = function(width, height) {
 }
 
 ctx2DProto.putImageData = function(imagedata, dx, dy) {
-    this._canvas._data = imagedata.data; //TODO: consider dx, dy?
+    this._canvas._data = imagedata; //TODO: consider dx, dy?
 }
 
 ctx2DProto.getImageData = function(sx, sy, sw, sh) {
     //TODO:cjh
-    return null;
+    return this._canvas._data;
 }
 
 ctx2DProto.drawImage = function(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
     //TODO:cjh
 }
+
+function touchEventHandlerFactory(type) {
+    return (touches) => {
+        const touchEvent = new TouchEvent(type)
+
+        touchEvent.touches = touches;
+        // touchEvent.targetTouches = Array.prototype.slice.call(event.touches)
+        touchEvent.changedTouches = touches;//event.changedTouches
+        // touchEvent.timeStamp = event.timeStamp
+
+        for (let key in __listenTouchEventCanvasMap) {
+            __listenTouchEventCanvasMap[key].dispatchEvent(touchEvent);
+        }
+    }
+}
+
+jsb.onTouchStart = touchEventHandlerFactory('touchstart');
+jsb.onTouchMove = touchEventHandlerFactory('touchmove');
+jsb.onTouchEnd = touchEventHandlerFactory('touchend');
+jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 module.exports = HTMLCanvasElement;
 

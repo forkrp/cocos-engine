@@ -1,6 +1,19 @@
 class ImageData {
-    constructor(width, height) {
-        this._data = new Uint8ClampedArray(width * height * 4);
+
+    // var imageData = new ImageData(array, width, height);
+    // var imageData = new ImageData(width, height);
+    constructor(array, width, height) {
+        if (typeof array === 'number' && typeof width == 'number') {
+            height = width;
+            width = array;
+            array = null;
+        }
+        if (array === null) {
+            this._data = new Uint8ClampedArray(width * height * 4);
+        }
+        else {
+            this._data = array;
+        }
         this._width = width;
         this._height = height;
     }

@@ -22,6 +22,11 @@ function inject () {
     window.Event = requireModule('./Event');
     window.TouchEvent = requireModule('./TouchEvent');
 
+    window.ontouchstart = null;
+    window.ontouchmove = null;
+    window.ontouchend = null;
+    window.ontouchcancel = null;
+
     window.addEventListener = function(eventName, listener, options) {
         window.canvas.addEventListener(eventName, listener, options);
     }
