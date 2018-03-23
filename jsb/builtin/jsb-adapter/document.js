@@ -1,9 +1,9 @@
-let HTMLElement = requireModule('./HTMLElement');
-let Image = requireModule('./Image');
-let Audio = requireModule('./Audio');
-let HTMLCanvasElement = requireModule('./HTMLCanvasElement');
-let Node = requireModule('./Node');
-let FontFaceSet = requireModule('./FontFaceSet')
+let HTMLElement = require('./HTMLElement');
+let Image = require('./Image');
+let Audio = require('./Audio');
+let HTMLCanvasElement = require('./HTMLCanvasElement');
+let Node = require('./Node');
+let FontFaceSet = require('./FontFaceSet')
 
 class Document extends Node {
 

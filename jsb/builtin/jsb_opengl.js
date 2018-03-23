@@ -27,7 +27,7 @@
  * THE SOFTWARE.
  */
 
-requireModule('./jsb_opengl_constants');
+require('./jsb_opengl_constants');
 window.gl = window.gl || {};
 
 gl.canvas = {
@@ -392,9 +392,9 @@ gl.getExtension = function(extension) {
     return null;
 };
 
-let HTMLCanvasElement = requireModule('./jsb-adapter/HTMLCanvasElement');
-let HTMLImageElement = requireModule('./jsb-adapter/HTMLImageElement');
-let ImageData = requireModule('./jsb-adapter/ImageData');
+let HTMLCanvasElement = require('./jsb-adapter/HTMLCanvasElement');
+let HTMLImageElement = require('./jsb-adapter/HTMLImageElement');
+let ImageData = require('./jsb-adapter/ImageData');
 
 let _glTexImage2D = gl.texImage2D;
 

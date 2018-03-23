@@ -1,4 +1,4 @@
-let Node = requireModule('./Node');
+let Node = require('./Node');
 
 class Element extends Node {
   constructor() {

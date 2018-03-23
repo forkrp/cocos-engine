@@ -1,5 +1,5 @@
-let EventTarget = requireModule('./EventTarget')
-let Event = requireModule('./Event')
+let EventTarget = require('./EventTarget')
+let Event = require('./Event')
 
 class FontFaceSet extends EventTarget {
     constructor() {

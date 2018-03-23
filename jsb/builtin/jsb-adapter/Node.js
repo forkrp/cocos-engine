@@ -1,4 +1,4 @@
-let EventTarget = requireModule('./EventTarget');
+let EventTarget = require('./EventTarget');
 
 class Node extends EventTarget {
   constructor() {

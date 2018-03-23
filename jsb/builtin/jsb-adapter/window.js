@@ -2,25 +2,25 @@
 function inject () {
     window.top = window.parent = window
 
-    window.document = requireModule('./document');
-    window.HTMLElement = requireModule('./HTMLElement');
-    window.HTMLCanvasElement = requireModule('./HTMLCanvasElement');
-    window.HTMLImageElement = requireModule('./HTMLImageElement');
-    window.HTMLMediaElement = requireModule('./HTMLMediaElement');
-    window.HTMLAudioElement = requireModule('./HTMLAudioElement');
+    window.document = require('./document');
+    window.HTMLElement = require('./HTMLElement');
+    window.HTMLCanvasElement = require('./HTMLCanvasElement');
+    window.HTMLImageElement = require('./HTMLImageElement');
+    window.HTMLMediaElement = require('./HTMLMediaElement');
+    window.HTMLAudioElement = require('./HTMLAudioElement');
     window.canvas = new HTMLCanvasElement();
     window.gl.canvas = window.canvas;
     window.WebGLRenderingContext = window.gl;
-    window.navigator = requireModule('./navigator');
-    window.Image = requireModule('./Image');
-    window.Audio = requireModule('./Audio');
-    window.FileReader = requireModule('./FileReader');
-    window.location = requireModule('./location');
-    window.FontFace = requireModule('./FontFace');
-    window.FontFaceSet = requireModule('./FontFaceSet');
-    window.EventTarget = requireModule('./EventTarget');
-    window.Event = requireModule('./Event');
-    window.TouchEvent = requireModule('./TouchEvent');
+    window.navigator = require('./navigator');
+    window.Image = require('./Image');
+    window.Audio = require('./Audio');
+    window.FileReader = require('./FileReader');
+    window.location = require('./location');
+    window.FontFace = require('./FontFace');
+    window.FontFaceSet = require('./FontFaceSet');
+    window.EventTarget = require('./EventTarget');
+    window.Event = require('./Event');
+    window.TouchEvent = require('./TouchEvent');
 
     window.ontouchstart = null;
     window.ontouchmove = null;

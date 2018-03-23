@@ -141,11 +141,11 @@ delete cc.CanvasRenderingContext2D;
 
 jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
 
-requireModule('./jsb_prepare');
-requireModule('./jsb_opengl');
-window.DOMParser = requireModule('./xmldom/dom-parser').DOMParser;
-requireModule('./jsb-adapter');
-requireModule('./jsb_audioengine');
+require('./jsb_prepare');
+require('./jsb_opengl');
+window.DOMParser = require('./xmldom/dom-parser').DOMParser;
+require('./jsb-adapter');
+require('./jsb_audioengine');
 
 /**
  * @type {Object}

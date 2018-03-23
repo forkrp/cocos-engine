@@ -1,4 +1,4 @@
-let HTMLElement = requireModule('./HTMLElement');
+let HTMLElement = require('./HTMLElement');
 
 class HTMLMediaElement extends HTMLElement {
   constructor(type) {

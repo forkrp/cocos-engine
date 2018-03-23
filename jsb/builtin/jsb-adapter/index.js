@@ -1,2 +1,2 @@
-requireModule('./window')
+require('./window')
 

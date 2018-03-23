@@ -1,4 +1,4 @@
-let HTMLImageElement = requireModule('./HTMLImageElement');
+let HTMLImageElement = require('./HTMLImageElement');
 
 function Image (width, height) {
     return new HTMLImageElement(width, height);

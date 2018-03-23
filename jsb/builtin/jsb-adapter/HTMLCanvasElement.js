@@ -1,5 +1,5 @@
-const HTMLElement = requireModule('./HTMLElement');
-const ImageData = requireModule('./ImageData');
+const HTMLElement = require('./HTMLElement');
+const ImageData = require('./ImageData');
 
 class CanvasGradient {
     constructor() {

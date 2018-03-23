@@ -1,5 +1,5 @@
-const HTMLElement = requireModule('./HTMLElement');
-const Event = requireModule('./Event');
+const HTMLElement = require('./HTMLElement');
+const Event = require('./Event');
 
 class HTMLImageElement extends HTMLElement {
     constructor(width, height) {

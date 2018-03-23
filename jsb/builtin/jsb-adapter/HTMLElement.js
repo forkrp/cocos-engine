@@ -1,6 +1,6 @@
-const Element = requireModule('./Element');
-const { noop } = requireModule('./util');
-const { innerWidth, innerHeight } = requireModule('./WindowProperties');
+const Element = require('./Element');
+const { noop } = require('./util');
+const { innerWidth, innerHeight } = require('./WindowProperties');
 
 class HTMLElement extends Element {
 

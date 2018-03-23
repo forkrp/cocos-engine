@@ -1,4 +1,4 @@
-let { noop } = requireModule('./util');
+let { noop } = require('./util');
 
 // TODO 需要 wx.getSystemInfo 获取更详细信息
 // cjh const { platform } = wx.getSystemInfoSync()
