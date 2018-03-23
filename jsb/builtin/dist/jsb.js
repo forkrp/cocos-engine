@@ -1343,7 +1343,7 @@ var HTMLImageElement = function (_HTMLElement) {
             var _this2 = this;
 
             this._src = src;
-            getImageInfo(src, function (info) {
+            jsb.loadImage(src, function (info) {
                 _this2.width = _this2.naturalWidth = info.width;
                 _this2.height = _this2.naturalHeight = info.height;
                 _this2._data = info.data;

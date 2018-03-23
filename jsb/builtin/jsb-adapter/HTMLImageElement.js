@@ -16,7 +16,7 @@ class HTMLImageElement extends HTMLElement {
 
     set src(src) {
         this._src = src;
-        getImageInfo(src, (info) => {
+        jsb.loadImage(src, (info) => {
             this.width = this.naturalWidth = info.width;
             this.height = this.naturalHeight = info.height;
             this._data = info.data;
