@@ -22,52 +22,6 @@
  */
 
 // Prepare JSB environment
-
-// Hack JavaScriptCore begin
-
-
-if (window.scriptEngineType == "JavaScriptCore") {
-    window.__jsc_createArrayBufferObject = function(arr) {
-        let len = arr.length;
-        let buffer = new ArrayBuffer(len);
-        let typedArr = new Uint8Array(buffer);
-        for (let i = 0; i < len; ++i) {
-            typedArr[i] = arr[i];
-        }
-        return buffer;
-    };
-
-    window.__jsc_getArrayBufferData = function(arrBuf) {
-        let typedArr = new Uint8Array(arrBuf);
-        let len = typedArr.length;
-        let arr = new Array(len);
-        for (let i = 0; i < len; ++i) {
-            arr[i] = typedArr[i];
-        }
-        return arr;
-    };
-
-    window.__jsc_getTypedArrayData = function(typedArr) {
-        let length = typedArr.byteLength;
-        let offset = typedArr.byteOffset;
-        let buf = typedArr.buffer;
-        let uint8Arr = new Uint8Array(buf);
-        let retArr = new Array(length);
-        let arrIndex = 0;
-        let bufIndex = offset;
-        let bufEnd = offset + length;
-        for (; bufIndex < bufEnd; ++bufIndex, ++arrIndex) {
-            retArr[arrIndex] = uint8Arr[bufIndex];
-        }
-        return retArr;
-    };
-
-    window.__jscTypedArrayConstructor = Object.getPrototypeOf(Uint16Array.prototype).constructor;
-}
-
-
-// Hack JavaScriptCore end
-
 window.cc = window.cc || {};
 /**
  * @namespace jsb
