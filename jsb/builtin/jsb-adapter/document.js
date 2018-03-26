@@ -22,6 +22,10 @@ class Document extends Node {
     this.fonts = new FontFaceSet()
   }
 
+  createElementNS(namespaceURI, qualifiedName, options) {
+    return this.createElement(qualifiedName);
+  }
+
   createElement(tagName) {
     if (tagName === 'canvas') {
       return new HTMLCanvasElement()

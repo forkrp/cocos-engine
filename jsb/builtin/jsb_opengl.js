@@ -52,7 +52,7 @@ gl.createBuffer = function() {
 
 gl.createRenderbuffer = function() {
     // Returns a "WebGLRenderBuffer" object
-    var ret = gl._createRenderuffer();
+    var ret = gl._createRenderbuffer();
     return { renderbuffer_id:ret};
 };
 
@@ -164,7 +164,7 @@ gl.bindBuffer = function(target, buffer) {
 };
 
 // void bindRenderbuffer(GLenum target, WebGLRenderbuffer? renderbuffer);
-gl.bindRenderBuffer = function(target, buffer) {
+gl.bindRenderbuffer = function(target, buffer) {
     var buffer_id;
 
     // Accept numbers too. eg: gl.bindRenderbuffer(0)
@@ -173,7 +173,7 @@ gl.bindRenderBuffer = function(target, buffer) {
     else if (buffer === null)
         buffer_id = 0;
     else
-        buffer_id = buffer.buffer_id;
+        buffer_id = buffer.renderbuffer_id;
 
     gl._bindRenderbuffer(target, buffer_id);
 };
@@ -188,10 +188,14 @@ gl.bindFramebuffer = function(target, buffer) {
     else if( buffer === null )
         buffer_id = null;
     else
-        buffer_id = buffer.buffer_id;
+        buffer_id = buffer.framebuffer_id;
 
     gl._bindFramebuffer(target, buffer_id);
 };
+
+gl.framebufferRenderbuffer = function(target, attachment, renderbuffertarget, renderbuffer) {
+    gl._framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.renderbuffer_id);
+}
 
 gl.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
     gl._framebufferTexture2D(target, attachment, textarget, texture.texture_id, level);

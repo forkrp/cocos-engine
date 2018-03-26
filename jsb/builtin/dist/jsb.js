@@ -1651,6 +1651,11 @@ var Document = function (_Node) {
   }
 
   _createClass(Document, [{
+    key: 'createElementNS',
+    value: function createElementNS(namespaceURI, qualifiedName, options) {
+      return this.createElement(qualifiedName);
+    }
+  }, {
     key: 'createElement',
     value: function createElement(tagName) {
       if (tagName === 'canvas') {
@@ -1947,7 +1952,7 @@ gl.createBuffer = function () {
 
 gl.createRenderbuffer = function () {
     // Returns a "WebGLRenderBuffer" object
-    var ret = gl._createRenderuffer();
+    var ret = gl._createRenderbuffer();
     return { renderbuffer_id: ret };
 };
 
@@ -2041,11 +2046,11 @@ gl.bindBuffer = function (target, buffer) {
 };
 
 // void bindRenderbuffer(GLenum target, WebGLRenderbuffer? renderbuffer);
-gl.bindRenderBuffer = function (target, buffer) {
+gl.bindRenderbuffer = function (target, buffer) {
     var buffer_id;
 
     // Accept numbers too. eg: gl.bindRenderbuffer(0)
-    if (typeof buffer === 'number') buffer_id = buffer;else if (buffer === null) buffer_id = 0;else buffer_id = buffer.buffer_id;
+    if (typeof buffer === 'number') buffer_id = buffer;else if (buffer === null) buffer_id = 0;else buffer_id = buffer.renderbuffer_id;
 
     gl._bindRenderbuffer(target, buffer_id);
 };
@@ -2055,9 +2060,13 @@ gl.bindFramebuffer = function (target, buffer) {
     var buffer_id;
 
     // Accept numbers too. eg: gl.bindFramebuffer(0)
-    if (typeof buffer === 'number') buffer_id = buffer;else if (buffer === null) buffer_id = null;else buffer_id = buffer.buffer_id;
+    if (typeof buffer === 'number') buffer_id = buffer;else if (buffer === null) buffer_id = null;else buffer_id = buffer.framebuffer_id;
 
     gl._bindFramebuffer(target, buffer_id);
+};
+
+gl.framebufferRenderbuffer = function (target, attachment, renderbuffertarget, renderbuffer) {
+    gl._framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.renderbuffer_id);
 };
 
 gl.framebufferTexture2D = function (target, attachment, textarget, texture, level) {
@@ -2582,6 +2591,7 @@ gl.DECR_WRAP = 0x8508;
 gl.DELETE_STATUS = 0x8b80;
 gl.DEPTH24_STENCIL8_OES = 0x88f0;
 gl.DEPTH_ATTACHMENT = 0x8d00;
+gl.DEPTH_STENCIL_ATTACHMENT = 0x821a;
 gl.DEPTH_BITS = 0xd56;
 gl.DEPTH_BUFFER_BIT = 0x100;
 gl.DEPTH_BUFFER_BIT0_QCOM = 0x100;
