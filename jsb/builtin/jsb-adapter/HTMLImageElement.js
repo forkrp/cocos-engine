@@ -53,6 +53,23 @@ class HTMLImageElement extends HTMLElement {
     get src() {
         return this._src;
     }
+
+    get clientWidth() {
+        return this.width;
+    }
+
+    get clientHeight() {
+        return this.height;
+    }
+
+    getBoundingClientRect() {
+        return {
+            x: 0,
+            y: 0,
+            width: this.width,
+            height: this.height
+        }
+    }
 }
 
 module.exports = HTMLImageElement;

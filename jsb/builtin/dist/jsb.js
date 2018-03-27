@@ -192,7 +192,7 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./jsb-adapter":20,"./jsb_audioengine":25,"./jsb_opengl":26,"./jsb_prepare":28,"./xmldom/dom-parser":29}],2:[function(require,module,exports){
+},{"./jsb-adapter":19,"./jsb_audioengine":24,"./jsb_opengl":25,"./jsb_prepare":27,"./xmldom/dom-parser":28}],2:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -231,6 +231,8 @@ module.exports = Audio;
 },{"./HTMLAudioElement":9}],3:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -240,19 +242,43 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Node = require('./Node');
 
 var Element = function (_Node) {
-  _inherits(Element, _Node);
+    _inherits(Element, _Node);
 
-  function Element() {
-    _classCallCheck(this, Element);
+    function Element() {
+        _classCallCheck(this, Element);
 
-    var _this = _possibleConstructorReturn(this, (Element.__proto__ || Object.getPrototypeOf(Element)).call(this));
+        var _this = _possibleConstructorReturn(this, (Element.__proto__ || Object.getPrototypeOf(Element)).call(this));
 
-    _this.className = '';
-    _this.children = [];
-    return _this;
-  }
+        _this.className = '';
+        _this.children = [];
+        _this.clientLeft = 0;
+        _this.clientTop = 0;
+        return _this;
+    }
 
-  return Element;
+    _createClass(Element, [{
+        key: 'getBoundingClientRect',
+        value: function getBoundingClientRect() {
+            return {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            };
+        }
+    }, {
+        key: 'clientWidth',
+        get: function get() {
+            return 0;
+        }
+    }, {
+        key: 'clientHeight',
+        get: function get() {
+            return 0;
+        }
+    }]);
+
+    return Element;
 }(Node);
 
 module.exports = Element;
@@ -1118,6 +1144,16 @@ var HTMLCanvasElement = function (_HTMLElement) {
             return "";
         }
     }, {
+        key: 'getBoundingClientRect',
+        value: function getBoundingClientRect() {
+            return {
+                x: 0,
+                y: 0,
+                width: this._width,
+                height: this._height
+            };
+        }
+    }, {
         key: 'addEventListener',
         value: function addEventListener(eventName, listener, options) {
             var ret = _get(HTMLCanvasElement.prototype.__proto__ || Object.getPrototypeOf(HTMLCanvasElement.prototype), 'addEventListener', this).call(this, eventName, listener, options);
@@ -1166,6 +1202,16 @@ var HTMLCanvasElement = function (_HTMLElement) {
                 }
             }
         },
+        get: function get() {
+            return this._height;
+        }
+    }, {
+        key: 'clientWidth',
+        get: function get() {
+            return this._width;
+        }
+    }, {
+        key: 'clientHeight',
         get: function get() {
             return this._height;
         }
@@ -1230,10 +1276,6 @@ var Element = require('./Element');
 var _require = require('./util'),
     noop = _require.noop;
 
-var _require2 = require('./WindowProperties'),
-    innerWidth = _require2.innerWidth,
-    innerHeight = _require2.innerHeight;
-
 var HTMLElement = function (_Element) {
   _inherits(HTMLElement, _Element);
 
@@ -1249,8 +1291,8 @@ var HTMLElement = function (_Element) {
     _this.className = '';
     _this.children = [];
     _this.style = {
-      width: innerWidth + 'px',
-      height: innerHeight + 'px'
+      width: window.innerWidth + 'px',
+      height: window.innerHeight + 'px'
     };
 
     _this.insertBefore = noop;
@@ -1271,32 +1313,8 @@ var HTMLElement = function (_Element) {
       return this[name];
     }
   }, {
-    key: 'getBoundingClientRect',
-    value: function getBoundingClientRect() {
-      return {
-        top: 0,
-        left: 0,
-        width: innerWidth,
-        height: innerHeight
-      };
-    }
-  }, {
     key: 'focus',
     value: function focus() {}
-  }, {
-    key: 'clientWidth',
-    get: function get() {
-      var ret = parseInt(this.style.fontSize, 10) * this.innerHTML.length;
-
-      return Number.isNaN(ret) ? 0 : ret;
-    }
-  }, {
-    key: 'clientHeight',
-    get: function get() {
-      var ret = parseInt(this.style.fontSize, 10);
-
-      return Number.isNaN(ret) ? 0 : ret;
-    }
   }]);
 
   return HTMLElement;
@@ -1304,7 +1322,7 @@ var HTMLElement = function (_Element) {
 
 module.exports = HTMLElement;
 
-},{"./Element":3,"./WindowProperties":18,"./util":23}],12:[function(require,module,exports){
+},{"./Element":3,"./util":22}],12:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1338,6 +1356,16 @@ var HTMLImageElement = function (_HTMLElement) {
     }
 
     _createClass(HTMLImageElement, [{
+        key: 'getBoundingClientRect',
+        value: function getBoundingClientRect() {
+            return {
+                x: 0,
+                y: 0,
+                width: this.width,
+                height: this.height
+            };
+        }
+    }, {
         key: 'src',
         set: function set(src) {
             var _this2 = this;
@@ -1373,6 +1401,16 @@ var HTMLImageElement = function (_HTMLElement) {
         },
         get: function get() {
             return this._src;
+        }
+    }, {
+        key: 'clientWidth',
+        get: function get() {
+            return this.width;
+        }
+    }, {
+        key: 'clientHeight',
+        get: function get() {
+            return this.height;
         }
     }]);
 
@@ -1581,36 +1619,6 @@ var TouchEvent = function (_Event) {
 module.exports = TouchEvent;
 
 },{"./Event":4}],18:[function(require,module,exports){
-"use strict";
-
-var _screenWidth$screenHe = { screenWidth: window.innerWidth, screenHeight: window.innerHeight, devicePixelRatio: 1 },
-    screenWidth = _screenWidth$screenHe.screenWidth,
-    screenHeight = _screenWidth$screenHe.screenHeight,
-    devicePixelRatio = _screenWidth$screenHe.devicePixelRatio; //cjh wx.getSystemInfoSync()
-
-var innerWidth = screenWidth;
-var innerHeight = screenHeight;
-var screen = {
-    availWidth: innerWidth,
-    availHeight: innerHeight
-};
-var performance = null; //cjh wx.getPerformance()
-var ontouchstart = null;
-var ontouchmove = null;
-var ontouchend = null;
-
-module.exports = {
-    innerWidth: innerWidth,
-    innerHeight: innerHeight,
-    devicePixelRatio: devicePixelRatio,
-    screen: screen,
-    performance: performance,
-    ontouchstart: ontouchstart,
-    ontouchmove: ontouchmove,
-    ontouchend: ontouchend
-};
-
-},{}],19:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1746,12 +1754,12 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":2,"./FontFaceSet":8,"./HTMLCanvasElement":10,"./HTMLElement":11,"./Image":14,"./Node":16}],20:[function(require,module,exports){
+},{"./Audio":2,"./FontFaceSet":8,"./HTMLCanvasElement":10,"./HTMLElement":11,"./Image":14,"./Node":16}],19:[function(require,module,exports){
 'use strict';
 
 require('./window');
 
-},{"./window":24}],21:[function(require,module,exports){
+},{"./window":23}],20:[function(require,module,exports){
 'use strict';
 
 var location = {
@@ -1761,7 +1769,7 @@ var location = {
 
 module.exports = location;
 
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 var _require = require('./util'),
@@ -1788,20 +1796,21 @@ var navigator = {
 
 module.exports = navigator;
 
-},{"./util":23}],23:[function(require,module,exports){
+},{"./util":22}],22:[function(require,module,exports){
 "use strict";
 
 function noop() {}
 
 module.exports = noop;
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 function inject() {
     window.top = window.parent = window;
 
     window.document = require('./document');
+    window.Element = require('./Element');
     window.HTMLElement = require('./HTMLElement');
     window.HTMLCanvasElement = require('./HTMLCanvasElement');
     window.HTMLImageElement = require('./HTMLImageElement');
@@ -1825,6 +1834,24 @@ function inject() {
     window.ontouchmove = null;
     window.ontouchend = null;
     window.ontouchcancel = null;
+
+    window.devicePixelRatio = 1.0;
+    window.screen = {
+        availTop: 0,
+        availLeft: 0,
+        availHeight: window.innerWidth,
+        availWidth: window.innerHeight,
+        colorDepth: 8,
+        pixelDepth: 8,
+        left: 0,
+        top: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        orientation: { //FIXME:cjh
+            type: 'portrait-primary' // portrait-primary, portrait-secondary, landscape-primary, landscape-secondary
+        },
+        onorientationchange: function onorientationchange(event) {}
+    };
 
     window.addEventListener = function (eventName, listener, options) {
         window.canvas.addEventListener(eventName, listener, options);
@@ -1854,7 +1881,7 @@ window.canvas.getContext = function (name) {
 
 window.localStorage = sys.localStorage;
 
-},{"./Audio":2,"./Event":4,"./EventTarget":5,"./FileReader":6,"./FontFace":7,"./FontFaceSet":8,"./HTMLAudioElement":9,"./HTMLCanvasElement":10,"./HTMLElement":11,"./HTMLImageElement":12,"./HTMLMediaElement":13,"./Image":14,"./TouchEvent":17,"./document":19,"./location":21,"./navigator":22}],25:[function(require,module,exports){
+},{"./Audio":2,"./Element":3,"./Event":4,"./EventTarget":5,"./FileReader":6,"./FontFace":7,"./FontFaceSet":8,"./HTMLAudioElement":9,"./HTMLCanvasElement":10,"./HTMLElement":11,"./HTMLImageElement":12,"./HTMLMediaElement":13,"./Image":14,"./TouchEvent":17,"./document":18,"./location":20,"./navigator":21}],24:[function(require,module,exports){
 "use strict";
 
 /*
@@ -1895,7 +1922,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 /*
@@ -1929,11 +1956,6 @@ window.localStorage = sys.localStorage;
 
 require('./jsb_opengl_constants');
 window.gl = window.gl || {};
-
-gl.canvas = {
-    clientWidth: window.innerWidth,
-    clientHeight: window.innerHeight
-};
 
 //
 // Create functions
@@ -2341,7 +2363,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":10,"./jsb-adapter/HTMLImageElement":12,"./jsb-adapter/ImageData":15,"./jsb_opengl_constants":27}],27:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":10,"./jsb-adapter/HTMLImageElement":12,"./jsb-adapter/ImageData":15,"./jsb_opengl_constants":26}],26:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -3203,13 +3225,14 @@ gl.WRITE_ONLY_OES = 0x88b9;
 gl.Z400_BINARY_AMD = 0x8740;
 gl.ZERO = 0x0;
 
+gl.RASTERIZER_DISCARD = 0x8C89;
 gl.UNPACK_FLIP_Y_WEBGL = 0x9240;
 gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
 gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -3453,7 +3476,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -3710,7 +3733,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":30,"./entities":31,"./sax":32}],30:[function(require,module,exports){
+},{"./dom":29,"./entities":30,"./sax":31}],29:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -4930,7 +4953,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -5178,7 +5201,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]

@@ -3,6 +3,7 @@ function inject () {
     window.top = window.parent = window
 
     window.document = require('./document');
+    window.Element = require('./Element');
     window.HTMLElement = require('./HTMLElement');
     window.HTMLCanvasElement = require('./HTMLCanvasElement');
     window.HTMLImageElement = require('./HTMLImageElement');
@@ -26,6 +27,24 @@ function inject () {
     window.ontouchmove = null;
     window.ontouchend = null;
     window.ontouchcancel = null;
+
+    window.devicePixelRatio = 1.0;
+    window.screen = {
+        availTop: 0,
+        availLeft: 0,
+        availHeight: window.innerWidth,
+        availWidth: window.innerHeight,
+        colorDepth: 8,
+        pixelDepth: 8,
+        left: 0,
+        top: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        orientation: { //FIXME:cjh
+            type: 'portrait-primary' // portrait-primary, portrait-secondary, landscape-primary, landscape-secondary
+        }, 
+        onorientationchange: function(event) {}
+    };
 
     window.addEventListener = function(eventName, listener, options) {
         window.canvas.addEventListener(eventName, listener, options);

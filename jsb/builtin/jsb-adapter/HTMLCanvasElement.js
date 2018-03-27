@@ -252,6 +252,23 @@ class HTMLCanvasElement extends HTMLElement {
         return this._height;
     }
 
+    get clientWidth() {
+        return this._width;
+    }
+
+    get clientHeight() {
+        return this._height;
+    }
+
+    getBoundingClientRect() {
+        return {
+            x: 0,
+            y: 0,
+            width: this._width,
+            height: this._height
+        }
+    }
+
     addEventListener(eventName, listener, options) {
         let ret = super.addEventListener(eventName, listener, options);
         if (ret) {

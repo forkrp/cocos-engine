@@ -30,11 +30,6 @@
 require('./jsb_opengl_constants');
 window.gl = window.gl || {};
 
-gl.canvas = {
-    clientWidth: window.innerWidth,
-    clientHeight: window.innerHeight
-};
-
 //
 // Create functions
 //
