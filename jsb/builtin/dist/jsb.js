@@ -1,4 +1,22 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+"use strict";
+
+!function () {
+  function e(e) {
+    this.message = e;
+  }var t = "undefined" != typeof exports ? exports : "undefined" != typeof self ? self : $.global,
+      r = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";e.prototype = new Error(), e.prototype.name = "InvalidCharacterError", t.btoa || (t.btoa = function (t) {
+    for (var o, n, a = String(t), i = 0, f = r, c = ""; a.charAt(0 | i) || (f = "=", i % 1); c += f.charAt(63 & o >> 8 - i % 1 * 8)) {
+      if (n = a.charCodeAt(i += .75), n > 255) throw new e("'btoa' failed: The string to be encoded contains characters outside of the Latin1 range.");o = o << 8 | n;
+    }return c;
+  }), t.atob || (t.atob = function (t) {
+    var o = String(t).replace(/[=]+$/, "");if (o.length % 4 == 1) throw new e("'atob' failed: The string to be decoded is not correctly encoded.");for (var n, a, i = 0, f = 0, c = ""; a = o.charAt(f++); ~a && (n = i % 4 ? 64 * n + a : a, i++ % 4) ? c += String.fromCharCode(255 & n >> (-2 * i & 6)) : 0) {
+      a = r.indexOf(a);
+    }return c;
+  });
+}();
+
+},{}],2:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -143,6 +161,13 @@ jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
 
 require('./jsb_prepare');
 require('./jsb_opengl');
+
+var _require = require('./base64/base64.min'),
+    btoa = _require.btoa,
+    atob = _require.atob;
+
+window.btoa = btoa;
+window.atob = atob;
 window.DOMParser = require('./xmldom/dom-parser').DOMParser;
 require('./jsb-adapter');
 require('./jsb_audioengine');
@@ -192,7 +217,7 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./jsb-adapter":19,"./jsb_audioengine":24,"./jsb_opengl":25,"./jsb_prepare":27,"./xmldom/dom-parser":28}],2:[function(require,module,exports){
+},{"./base64/base64.min":1,"./jsb-adapter":21,"./jsb_audioengine":26,"./jsb_opengl":27,"./jsb_prepare":29,"./xmldom/dom-parser":30}],3:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -228,7 +253,27 @@ var Audio = function (_HTMLAudioElement) {
 
 module.exports = Audio;
 
-},{"./HTMLAudioElement":9}],3:[function(require,module,exports){
+},{"./HTMLAudioElement":11}],4:[function(require,module,exports){
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var DOMRect = function DOMRect(x, y, width, height) {
+	_classCallCheck(this, DOMRect);
+
+	this.x = x ? x : 0;
+	this.y = y ? y : 0;
+	this.width = width ? width : 0;
+	this.height = height ? height : 0;
+	this.left = this.x;
+	this.top = this.y;
+	this.right = this.x + this.width;
+	this.bottom = this.y + this.height;
+};
+
+module.exports = DOMRect;
+
+},{}],5:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -240,6 +285,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var Node = require('./Node');
+var DOMRect = require('./DOMRect');
 
 var Element = function (_Node) {
     _inherits(Element, _Node);
@@ -259,12 +305,7 @@ var Element = function (_Node) {
     _createClass(Element, [{
         key: 'getBoundingClientRect',
         value: function getBoundingClientRect() {
-            return {
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0
-            };
+            return new DOMRect();
         }
     }, {
         key: 'clientWidth',
@@ -283,7 +324,7 @@ var Element = function (_Node) {
 
 module.exports = Element;
 
-},{"./Node":16}],4:[function(require,module,exports){
+},{"./DOMRect":4,"./Node":18}],6:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -505,7 +546,7 @@ Event.BUBBLING_PHASE = 3;
 
 module.exports = Event;
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -699,7 +740,7 @@ if (typeof window !== "undefined" && typeof window.EventTarget !== "undefined") 
 // export default EventTarget
 module.exports = EventTarget;
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -724,7 +765,7 @@ var FileReader = function () {
 
 module.exports = FileReader;
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -770,7 +811,7 @@ var FontFace = function () {
 
 module.exports = FontFace;
 
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -856,7 +897,7 @@ var FontFaceSet = function (_EventTarget) {
 
 module.exports = FontFaceSet;
 
-},{"./Event":4,"./EventTarget":5}],9:[function(require,module,exports){
+},{"./Event":6,"./EventTarget":7}],11:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -881,7 +922,7 @@ var HTMLAudioElement = function (_HTMLMediaElement) {
 
 module.exports = HTMLAudioElement;
 
-},{"./HTMLMediaElement":13}],10:[function(require,module,exports){
+},{"./HTMLMediaElement":15}],12:[function(require,module,exports){
 'use strict';
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -896,6 +937,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var HTMLElement = require('./HTMLElement');
 var ImageData = require('./ImageData');
+var DOMRect = require('./DOMRect');
 
 var CanvasGradient = function () {
     function CanvasGradient() {
@@ -1146,12 +1188,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
     }, {
         key: 'getBoundingClientRect',
         value: function getBoundingClientRect() {
-            return {
-                x: 0,
-                y: 0,
-                width: this._width,
-                height: this._height
-            };
+            return new DOMRect(0, 0, this._width, this._height);
         }
     }, {
         key: 'addEventListener',
@@ -1234,9 +1271,13 @@ ctx2DProto.getImageData = function (sx, sy, sw, sh) {
     return this._canvas._data;
 };
 
-ctx2DProto.drawImage = function (image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
-    //TODO:cjh
-};
+ctx2DProto.drawImage = function (image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {}
+//TODO:cjh
+
+
+//TODO:cjh
+;ctx2DProto.bezierCurveTo = function () {};
+ctx2DProto.fill = function () {};
 
 function touchEventHandlerFactory(type) {
     return function (touches) {
@@ -1260,7 +1301,7 @@ jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 module.exports = HTMLCanvasElement;
 
-},{"./HTMLElement":11,"./ImageData":15}],11:[function(require,module,exports){
+},{"./DOMRect":4,"./HTMLElement":13,"./ImageData":17}],13:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1322,7 +1363,7 @@ var HTMLElement = function (_Element) {
 
 module.exports = HTMLElement;
 
-},{"./Element":3,"./util":22}],12:[function(require,module,exports){
+},{"./Element":5,"./util":24}],14:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1358,12 +1399,7 @@ var HTMLImageElement = function (_HTMLElement) {
     _createClass(HTMLImageElement, [{
         key: 'getBoundingClientRect',
         value: function getBoundingClientRect() {
-            return {
-                x: 0,
-                y: 0,
-                width: this.width,
-                height: this.height
-            };
+            return new DOMRect(0, 0, this.width, this.height);
         }
     }, {
         key: 'src',
@@ -1419,7 +1455,7 @@ var HTMLImageElement = function (_HTMLElement) {
 
 module.exports = HTMLImageElement;
 
-},{"./Event":4,"./HTMLElement":11}],13:[function(require,module,exports){
+},{"./Event":6,"./HTMLElement":13}],15:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1466,7 +1502,7 @@ var HTMLMediaElement = function (_HTMLElement) {
 
 module.exports = HTMLMediaElement;
 
-},{"./HTMLElement":11}],14:[function(require,module,exports){
+},{"./HTMLElement":13}],16:[function(require,module,exports){
 'use strict';
 
 var HTMLImageElement = require('./HTMLImageElement');
@@ -1477,7 +1513,7 @@ function Image(width, height) {
 
 module.exports = Image;
 
-},{"./HTMLImageElement":12}],15:[function(require,module,exports){
+},{"./HTMLImageElement":14}],17:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1527,7 +1563,7 @@ var ImageData = function () {
 
 module.exports = ImageData;
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1588,7 +1624,7 @@ var Node = function (_EventTarget) {
 
 module.exports = Node;
 
-},{"./EventTarget":5}],17:[function(require,module,exports){
+},{"./EventTarget":7}],19:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1618,7 +1654,7 @@ var TouchEvent = function (_Event) {
 
 module.exports = TouchEvent;
 
-},{"./Event":4}],18:[function(require,module,exports){
+},{"./Event":6}],20:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1649,7 +1685,7 @@ var Document = function (_Node) {
     _this.documentElement = window;
     _this.hidden = false;
     _this.style = {};
-    _this.location = window.location;
+    _this.location = require('./location');
 
     _this.head = new HTMLElement('head');
     _this.body = new HTMLElement('body');
@@ -1754,22 +1790,23 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":2,"./FontFaceSet":8,"./HTMLCanvasElement":10,"./HTMLElement":11,"./Image":14,"./Node":16}],19:[function(require,module,exports){
+},{"./Audio":3,"./FontFaceSet":10,"./HTMLCanvasElement":12,"./HTMLElement":13,"./Image":16,"./Node":18,"./location":22}],21:[function(require,module,exports){
 'use strict';
 
 require('./window');
 
-},{"./window":23}],20:[function(require,module,exports){
+},{"./window":25}],22:[function(require,module,exports){
 'use strict';
 
 var location = {
   href: 'game.js',
+  hash: '',
   reload: function reload() {}
 };
 
 module.exports = location;
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 var _require = require('./util'),
@@ -1796,19 +1833,20 @@ var navigator = {
 
 module.exports = navigator;
 
-},{"./util":22}],22:[function(require,module,exports){
+},{"./util":24}],24:[function(require,module,exports){
 "use strict";
 
 function noop() {}
 
 module.exports = noop;
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 function inject() {
     window.top = window.parent = window;
 
+    window.location = require('./location');
     window.document = require('./document');
     window.Element = require('./Element');
     window.HTMLElement = require('./HTMLElement');
@@ -1823,7 +1861,6 @@ function inject() {
     window.Image = require('./Image');
     window.Audio = require('./Audio');
     window.FileReader = require('./FileReader');
-    window.location = require('./location');
     window.FontFace = require('./FontFace');
     window.FontFaceSet = require('./FontFaceSet');
     window.EventTarget = require('./EventTarget');
@@ -1881,7 +1918,7 @@ window.canvas.getContext = function (name) {
 
 window.localStorage = sys.localStorage;
 
-},{"./Audio":2,"./Element":3,"./Event":4,"./EventTarget":5,"./FileReader":6,"./FontFace":7,"./FontFaceSet":8,"./HTMLAudioElement":9,"./HTMLCanvasElement":10,"./HTMLElement":11,"./HTMLImageElement":12,"./HTMLMediaElement":13,"./Image":14,"./TouchEvent":17,"./document":18,"./location":20,"./navigator":21}],24:[function(require,module,exports){
+},{"./Audio":3,"./Element":5,"./Event":6,"./EventTarget":7,"./FileReader":8,"./FontFace":9,"./FontFaceSet":10,"./HTMLAudioElement":11,"./HTMLCanvasElement":12,"./HTMLElement":13,"./HTMLImageElement":14,"./HTMLMediaElement":15,"./Image":16,"./TouchEvent":19,"./document":20,"./location":22,"./navigator":23}],26:[function(require,module,exports){
 "use strict";
 
 /*
@@ -1922,7 +1959,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 /*
@@ -2291,15 +2328,17 @@ gl.texImage2D = function (target, level, internalformat, width, height, border, 
         format = width;
 
         if (image instanceof HTMLImageElement) {
-            console.log('==> texImage2D HTMLImageElement internalformat: ' + image._glInternalFormat + ', format: ' + image._glFormat + ', image: w:' + image.width + ', h:' + image.height + ', dataLen:' + image._data.length);
+            // console.log(`==> texImage2D HTMLImageElement internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
 
             _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
-            console.log('==> texImage2D HTMLCanvasElement internalformat: ' + internalformat + ', format: ' + format + ', image: w:' + image.width + ', h:' + image.height); //, dataLen:${image._data.length}`);
-            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+            // console.log(`==> texImage2D HTMLCanvasElement internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
+            if (image._data) {
+                _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+            }
         } else if (image instanceof ImageData) {
-            console.log('==> texImage2D ImageData internalformat: ' + internalformat + ', format: ' + format + ', image: w:' + image.width + ', h:' + image.height);
+            // console.log(`==> texImage2D ImageData internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);
             _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data);
         } else {
             console.error("Invalid pixel argument passed to gl.texImage2D!");
@@ -2333,7 +2372,9 @@ gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, for
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
-            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+            if (image._data) {
+                _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+            }
         } else if (image instanceof ImageData) {
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data);
         } else {
@@ -2363,7 +2404,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":10,"./jsb-adapter/HTMLImageElement":12,"./jsb-adapter/ImageData":15,"./jsb_opengl_constants":26}],26:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":12,"./jsb-adapter/HTMLImageElement":14,"./jsb-adapter/ImageData":17,"./jsb_opengl_constants":28}],28:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -3232,7 +3273,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],27:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -3476,7 +3517,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -3733,7 +3774,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":29,"./entities":30,"./sax":31}],29:[function(require,module,exports){
+},{"./dom":31,"./entities":32,"./sax":33}],31:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -4953,7 +4994,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -5201,7 +5242,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -5831,4 +5872,4 @@ function split(source, start) {
 
 exports.XMLReader = XMLReader;
 
-},{}]},{},[1]);
+},{}]},{},[2]);

@@ -2,6 +2,7 @@
 function inject () {
     window.top = window.parent = window
 
+    window.location = require('./location');
     window.document = require('./document');
     window.Element = require('./Element');
     window.HTMLElement = require('./HTMLElement');
@@ -16,7 +17,6 @@ function inject () {
     window.Image = require('./Image');
     window.Audio = require('./Audio');
     window.FileReader = require('./FileReader');
-    window.location = require('./location');
     window.FontFace = require('./FontFace');
     window.FontFaceSet = require('./FontFaceSet');
     window.EventTarget = require('./EventTarget');

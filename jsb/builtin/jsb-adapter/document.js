@@ -14,7 +14,7 @@ class Document extends Node {
     this.documentElement = window
     this.hidden = false
     this.style = {}
-    this.location = window.location
+    this.location = require('./location')
 
     this.head = new HTMLElement('head')
     this.body = new HTMLElement('body')

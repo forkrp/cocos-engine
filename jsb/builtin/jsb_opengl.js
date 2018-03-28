@@ -414,17 +414,19 @@ gl.texImage2D = function(target, level, internalformat, width, height, border, f
         format = width;
 
         if (image instanceof HTMLImageElement) {
-            console.log(`==> texImage2D HTMLImageElement internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
+            // console.log(`==> texImage2D HTMLImageElement internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
        
             _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
         }
         else if (image instanceof HTMLCanvasElement) {
-            console.log(`==> texImage2D HTMLCanvasElement internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
-            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+            // console.log(`==> texImage2D HTMLCanvasElement internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
+            if (image._data) {
+                _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+            }
         }
         else if (image instanceof ImageData) {
-            console.log(`==> texImage2D ImageData internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);
+            // console.log(`==> texImage2D ImageData internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);
             _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data);
         }
         else {
@@ -462,7 +464,9 @@ gl.texSubImage2D = function(target, level, xoffset, yoffset, width, height, form
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
         }
         else if (image instanceof HTMLCanvasElement) {
-            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+            if (image._data) {
+                _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+            }
         }
         else if (image instanceof ImageData) {
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data);

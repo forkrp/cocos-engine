@@ -63,12 +63,7 @@ class HTMLImageElement extends HTMLElement {
     }
 
     getBoundingClientRect() {
-        return {
-            x: 0,
-            y: 0,
-            width: this.width,
-            height: this.height
-        }
+        return new DOMRect(0, 0, this.width, this.height);
     }
 }
 

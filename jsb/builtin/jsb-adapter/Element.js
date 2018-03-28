@@ -1,4 +1,5 @@
-let Node = require('./Node');
+const Node = require('./Node');
+const DOMRect = require('./DOMRect');
 
 class Element extends Node {
     constructor() {
@@ -18,12 +19,7 @@ class Element extends Node {
     }
 
     getBoundingClientRect() {
-        return {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0
-        }
+        return new DOMRect();
     }
 }
 

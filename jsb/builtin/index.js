@@ -143,6 +143,9 @@ jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
 
 require('./jsb_prepare');
 require('./jsb_opengl');
+let { btoa, atob } = require('./base64/base64.min');
+window.btoa = btoa;
+window.atob = atob;
 window.DOMParser = require('./xmldom/dom-parser').DOMParser;
 require('./jsb-adapter');
 require('./jsb_audioengine');
