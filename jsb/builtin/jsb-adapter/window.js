@@ -2,6 +2,13 @@
 function inject () {
     window.top = window.parent = window
 
+    window.ontouchstart = null;
+    window.ontouchmove = null;
+    window.ontouchend = null;
+    window.ontouchcancel = null;
+
+    window.pageXOffset = window.pageYOffset = window.clientTop = window.clientLeft = 0;
+
     window.location = require('./location');
     window.document = require('./document');
     window.Element = require('./Element');
@@ -22,11 +29,6 @@ function inject () {
     window.EventTarget = require('./EventTarget');
     window.Event = require('./Event');
     window.TouchEvent = require('./TouchEvent');
-
-    window.ontouchstart = null;
-    window.ontouchmove = null;
-    window.ontouchend = null;
-    window.ontouchcancel = null;
 
     window.devicePixelRatio = 1.0;
     window.screen = {

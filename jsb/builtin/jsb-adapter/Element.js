@@ -21,6 +21,11 @@ class Element extends Node {
     getBoundingClientRect() {
         return new DOMRect();
     }
+
+    // attrName is a string that names the attribute to be removed from element.
+    removeAttribute(attrName) {
+
+    }
 }
 
 module.exports = Element;

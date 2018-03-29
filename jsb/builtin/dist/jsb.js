@@ -1,4 +1,218 @@
 (function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function (global){
+"use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/* Blob.js
+ * A Blob implementation.
+ * 2017-11-15
+ *
+ * By Eli Grey, http://eligrey.com
+ * By Devin Samarin, https://github.com/dsamarin
+ * License: MIT
+ *   See https://github.com/eligrey/Blob.js/blob/master/LICENSE.md
+ */
+
+/*global self, unescape */
+/*jslint bitwise: true, regexp: true, confusion: true, es5: true, vars: true, white: true,
+  plusplus: true */
+
+/*! @source http://purl.eligrey.com/github/Blob.js/blob/master/Blob.js */
+
+(function (global) {
+	(function (factory) {
+		if (typeof define === "function" && define.amd) {
+			// AMD. Register as an anonymous module.
+			define(["exports"], factory);
+		} else if ((typeof exports === "undefined" ? "undefined" : _typeof(exports)) === "object" && typeof exports.nodeName !== "string") {
+			// CommonJS
+			factory(exports);
+		} else {
+			// Browser globals
+			factory(global);
+		}
+	})(function (exports) {
+		"use strict";
+
+		exports.URL = global.URL || global.webkitURL;
+
+		if (global.Blob && global.URL) {
+			try {
+				new Blob();
+				return;
+			} catch (e) {}
+		}
+
+		// Internally we use a BlobBuilder implementation to base Blob off of
+		// in order to support older browsers that only have BlobBuilder
+		var BlobBuilder = global.BlobBuilder || global.WebKitBlobBuilder || global.MozBlobBuilder || function () {
+			var get_class = function get_class(object) {
+				return Object.prototype.toString.call(object).match(/^\[object\s(.*)\]$/)[1];
+			},
+			    FakeBlobBuilder = function BlobBuilder() {
+				this.data = [];
+			},
+			    FakeBlob = function Blob(data, type, encoding) {
+				this.data = data;
+				this.size = data.length;
+				this.type = type;
+				this.encoding = encoding;
+			},
+			    FBB_proto = FakeBlobBuilder.prototype,
+			    FB_proto = FakeBlob.prototype,
+			    FileReaderSync = global.FileReaderSync,
+			    FileException = function FileException(type) {
+				this.code = this[this.name = type];
+			},
+			    file_ex_codes = ("NOT_FOUND_ERR SECURITY_ERR ABORT_ERR NOT_READABLE_ERR ENCODING_ERR " + "NO_MODIFICATION_ALLOWED_ERR INVALID_STATE_ERR SYNTAX_ERR").split(" "),
+			    file_ex_code = file_ex_codes.length,
+			    real_URL = global.URL || global.webkitURL || exports,
+			    real_create_object_URL = real_URL.createObjectURL,
+			    real_revoke_object_URL = real_URL.revokeObjectURL,
+			    URL = real_URL,
+			    btoa = global.btoa,
+			    atob = global.atob,
+			    ArrayBuffer = global.ArrayBuffer,
+			    Uint8Array = global.Uint8Array,
+			    origin = /^[\w-]+:\/*\[?[\w\.:-]+\]?(?::[0-9]+)?/;
+			FakeBlob.fake = FB_proto.fake = true;
+			while (file_ex_code--) {
+				FileException.prototype[file_ex_codes[file_ex_code]] = file_ex_code + 1;
+			}
+			// Polyfill URL
+			if (!real_URL.createObjectURL) {
+				URL = exports.URL = function (uri) {
+					var uri_info = document.createElementNS("http://www.w3.org/1999/xhtml", "a"),
+					    uri_origin;
+					uri_info.href = uri;
+					if (!("origin" in uri_info)) {
+						if (uri_info.protocol.toLowerCase() === "data:") {
+							uri_info.origin = null;
+						} else {
+							uri_origin = uri.match(origin);
+							uri_info.origin = uri_origin && uri_origin[1];
+						}
+					}
+					return uri_info;
+				};
+			}
+			URL.createObjectURL = function (blob) {
+				var type = blob.type,
+				    data_URI_header;
+				if (type === null) {
+					type = "application/octet-stream";
+				}
+				if (blob instanceof FakeBlob) {
+					data_URI_header = "data:" + type;
+					if (blob.encoding === "base64") {
+						return data_URI_header + ";base64," + blob.data;
+					} else if (blob.encoding === "URI") {
+						return data_URI_header + "," + decodeURIComponent(blob.data);
+					}if (btoa) {
+						return data_URI_header + ";base64," + btoa(blob.data);
+					} else {
+						return data_URI_header + "," + encodeURIComponent(blob.data);
+					}
+				} else if (real_create_object_URL) {
+					return real_create_object_URL.call(real_URL, blob);
+				}
+			};
+			URL.revokeObjectURL = function (object_URL) {
+				if (object_URL.substring(0, 5) !== "data:" && real_revoke_object_URL) {
+					real_revoke_object_URL.call(real_URL, object_URL);
+				}
+			};
+			FBB_proto.append = function (data /*, endings*/) {
+				var bb = this.data;
+				// decode data to a binary string
+				if (Uint8Array && (data instanceof ArrayBuffer || data instanceof Uint8Array)) {
+					var str = "",
+					    buf = new Uint8Array(data),
+					    i = 0,
+					    buf_len = buf.length;
+					for (; i < buf_len; i++) {
+						str += String.fromCharCode(buf[i]);
+					}
+					bb.push(str);
+				} else if (get_class(data) === "Blob" || get_class(data) === "File") {
+					if (FileReaderSync) {
+						var fr = new FileReaderSync();
+						bb.push(fr.readAsBinaryString(data));
+					} else {
+						// async FileReader won't work as BlobBuilder is sync
+						throw new FileException("NOT_READABLE_ERR");
+					}
+				} else if (data instanceof FakeBlob) {
+					if (data.encoding === "base64" && atob) {
+						bb.push(atob(data.data));
+					} else if (data.encoding === "URI") {
+						bb.push(decodeURIComponent(data.data));
+					} else if (data.encoding === "raw") {
+						bb.push(data.data);
+					}
+				} else {
+					if (typeof data !== "string") {
+						data += ""; // convert unsupported types to strings
+					}
+					// decode UTF-16 to binary string
+					bb.push(unescape(encodeURIComponent(data)));
+				}
+			};
+			FBB_proto.getBlob = function (type) {
+				if (!arguments.length) {
+					type = null;
+				}
+				return new FakeBlob(this.data.join(""), type, "raw");
+			};
+			FBB_proto.toString = function () {
+				return "[object BlobBuilder]";
+			};
+			FB_proto.slice = function (start, end, type) {
+				var args = arguments.length;
+				if (args < 3) {
+					type = null;
+				}
+				return new FakeBlob(this.data.slice(start, args > 1 ? end : this.data.length), type, this.encoding);
+			};
+			FB_proto.toString = function () {
+				return "[object Blob]";
+			};
+			FB_proto.close = function () {
+				this.size = 0;
+				delete this.data;
+			};
+			return FakeBlobBuilder;
+		}();
+
+		exports.Blob = function (blobParts, options) {
+			var type = options ? options.type || "" : "";
+			var builder = new BlobBuilder();
+			if (blobParts) {
+				for (var i = 0, len = blobParts.length; i < len; i++) {
+					if (Uint8Array && blobParts[i] instanceof Uint8Array) {
+						builder.append(blobParts[i].buffer);
+					} else {
+						builder.append(blobParts[i]);
+					}
+				}
+			}
+			var blob = builder.getBlob(type);
+			if (!blob.slice && blob.webkitSlice) {
+				blob.slice = blob.webkitSlice;
+			}
+			return blob;
+		};
+
+		var getPrototypeOf = Object.getPrototypeOf || function (object) {
+			return object.__proto__;
+		};
+		exports.Blob.prototype = getPrototypeOf(new exports.Blob());
+	});
+})(typeof self !== "undefined" && self || typeof window !== "undefined" && window || typeof global !== "undefined" && global || undefined.content || undefined);
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],2:[function(require,module,exports){
 "use strict";
 
 !function () {
@@ -16,7 +230,7 @@
   });
 }();
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -168,6 +382,13 @@ var _require = require('./base64/base64.min'),
 
 window.btoa = btoa;
 window.atob = atob;
+
+var _require2 = require('./Blob'),
+    Blob = _require2.Blob,
+    URL = _require2.URL;
+
+window.Blob = Blob;
+window.URL = URL;
 window.DOMParser = require('./xmldom/dom-parser').DOMParser;
 require('./jsb-adapter');
 require('./jsb_audioengine');
@@ -217,7 +438,7 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./base64/base64.min":1,"./jsb-adapter":21,"./jsb_audioengine":26,"./jsb_opengl":27,"./jsb_prepare":29,"./xmldom/dom-parser":30}],3:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./jsb-adapter":22,"./jsb_audioengine":27,"./jsb_opengl":28,"./jsb_prepare":30,"./xmldom/dom-parser":31}],4:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -253,7 +474,7 @@ var Audio = function (_HTMLAudioElement) {
 
 module.exports = Audio;
 
-},{"./HTMLAudioElement":11}],4:[function(require,module,exports){
+},{"./HTMLAudioElement":12}],5:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -273,7 +494,7 @@ var DOMRect = function DOMRect(x, y, width, height) {
 
 module.exports = DOMRect;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -307,6 +528,12 @@ var Element = function (_Node) {
         value: function getBoundingClientRect() {
             return new DOMRect();
         }
+
+        // attrName is a string that names the attribute to be removed from element.
+
+    }, {
+        key: 'removeAttribute',
+        value: function removeAttribute(attrName) {}
     }, {
         key: 'clientWidth',
         get: function get() {
@@ -324,7 +551,7 @@ var Element = function (_Node) {
 
 module.exports = Element;
 
-},{"./DOMRect":4,"./Node":18}],6:[function(require,module,exports){
+},{"./DOMRect":5,"./Node":19}],7:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -546,7 +773,7 @@ Event.BUBBLING_PHASE = 3;
 
 module.exports = Event;
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -740,32 +967,68 @@ if (typeof window !== "undefined" && typeof window.EventTarget !== "undefined") 
 // export default EventTarget
 module.exports = EventTarget;
 
-},{}],8:[function(require,module,exports){
-"use strict";
+},{}],9:[function(require,module,exports){
+'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
- * TODO 使用 wx.readFile 来封装 FileReader
- */
-var FileReader = function () {
-  function FileReader() {
-    _classCallCheck(this, FileReader);
-  }
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-  _createClass(FileReader, [{
-    key: "construct",
-    value: function construct() {}
-  }]);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-  return FileReader;
-}();
+var EventTarget = require('./EventTarget');
+
+var FileReader = function (_EventTarget) {
+	_inherits(FileReader, _EventTarget);
+
+	function FileReader() {
+		_classCallCheck(this, FileReader);
+
+		return _possibleConstructorReturn(this, (FileReader.__proto__ || Object.getPrototypeOf(FileReader)).apply(this, arguments));
+	}
+
+	_createClass(FileReader, [{
+		key: 'construct',
+		value: function construct() {
+			this.result = null;
+		}
+
+		// Aborts the read operation. Upon return, the readyState will be DONE.
+
+	}, {
+		key: 'abort',
+		value: function abort() {}
+
+		// Starts reading the contents of the specified Blob, once finished, the result attribute contains an ArrayBuffer representing the file's data.
+
+	}, {
+		key: 'readAsArrayBuffer',
+		value: function readAsArrayBuffer() {}
+
+		// Starts reading the contents of the specified Blob, once finished, the result attribute contains a data: URL representing the file's data.
+
+	}, {
+		key: 'readAsDataURL',
+		value: function readAsDataURL(blob) {
+			this.result = 'data:image/png;base64,' + window.btoa(blob);
+			this.onload();
+		}
+
+		// Starts reading the contents of the specified Blob, once finished, the result attribute contains the contents of the file as a text string.
+
+	}, {
+		key: 'readAsText',
+		value: function readAsText() {}
+	}]);
+
+	return FileReader;
+}(EventTarget);
 
 module.exports = FileReader;
 
-},{}],9:[function(require,module,exports){
+},{"./EventTarget":8}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -811,7 +1074,7 @@ var FontFace = function () {
 
 module.exports = FontFace;
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -897,7 +1160,7 @@ var FontFaceSet = function (_EventTarget) {
 
 module.exports = FontFaceSet;
 
-},{"./Event":6,"./EventTarget":7}],11:[function(require,module,exports){
+},{"./Event":7,"./EventTarget":8}],12:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -922,7 +1185,7 @@ var HTMLAudioElement = function (_HTMLMediaElement) {
 
 module.exports = HTMLAudioElement;
 
-},{"./HTMLMediaElement":15}],12:[function(require,module,exports){
+},{"./HTMLMediaElement":16}],13:[function(require,module,exports){
 'use strict';
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -1301,7 +1564,7 @@ jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 module.exports = HTMLCanvasElement;
 
-},{"./DOMRect":4,"./HTMLElement":13,"./ImageData":17}],13:[function(require,module,exports){
+},{"./DOMRect":5,"./HTMLElement":14,"./ImageData":18}],14:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1363,7 +1626,7 @@ var HTMLElement = function (_Element) {
 
 module.exports = HTMLElement;
 
-},{"./Element":5,"./util":24}],14:[function(require,module,exports){
+},{"./Element":6,"./util":25}],15:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1455,7 +1718,7 @@ var HTMLImageElement = function (_HTMLElement) {
 
 module.exports = HTMLImageElement;
 
-},{"./Event":6,"./HTMLElement":13}],15:[function(require,module,exports){
+},{"./Event":7,"./HTMLElement":14}],16:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1502,7 +1765,7 @@ var HTMLMediaElement = function (_HTMLElement) {
 
 module.exports = HTMLMediaElement;
 
-},{"./HTMLElement":13}],16:[function(require,module,exports){
+},{"./HTMLElement":14}],17:[function(require,module,exports){
 'use strict';
 
 var HTMLImageElement = require('./HTMLImageElement');
@@ -1513,7 +1776,7 @@ function Image(width, height) {
 
 module.exports = Image;
 
-},{"./HTMLImageElement":14}],17:[function(require,module,exports){
+},{"./HTMLImageElement":15}],18:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1563,7 +1826,7 @@ var ImageData = function () {
 
 module.exports = ImageData;
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1624,7 +1887,7 @@ var Node = function (_EventTarget) {
 
 module.exports = Node;
 
-},{"./EventTarget":7}],19:[function(require,module,exports){
+},{"./EventTarget":8}],20:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1654,7 +1917,7 @@ var TouchEvent = function (_Event) {
 
 module.exports = TouchEvent;
 
-},{"./Event":6}],20:[function(require,module,exports){
+},{"./Event":7}],21:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1790,12 +2053,12 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":3,"./FontFaceSet":10,"./HTMLCanvasElement":12,"./HTMLElement":13,"./Image":16,"./Node":18,"./location":22}],21:[function(require,module,exports){
+},{"./Audio":4,"./FontFaceSet":11,"./HTMLCanvasElement":13,"./HTMLElement":14,"./Image":17,"./Node":19,"./location":23}],22:[function(require,module,exports){
 'use strict';
 
 require('./window');
 
-},{"./window":25}],22:[function(require,module,exports){
+},{"./window":26}],23:[function(require,module,exports){
 'use strict';
 
 var location = {
@@ -1806,7 +2069,7 @@ var location = {
 
 module.exports = location;
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 var _require = require('./util'),
@@ -1828,23 +2091,32 @@ var navigator = {
     getCurrentPosition: noop,
     watchPosition: noop,
     clearWatch: noop
-  }
+  },
+
+  maxTouchPoints: 10
 };
 
 module.exports = navigator;
 
-},{"./util":24}],24:[function(require,module,exports){
+},{"./util":25}],25:[function(require,module,exports){
 "use strict";
 
 function noop() {}
 
 module.exports = noop;
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 function inject() {
     window.top = window.parent = window;
+
+    window.ontouchstart = null;
+    window.ontouchmove = null;
+    window.ontouchend = null;
+    window.ontouchcancel = null;
+
+    window.pageXOffset = window.pageYOffset = window.clientTop = window.clientLeft = 0;
 
     window.location = require('./location');
     window.document = require('./document');
@@ -1866,11 +2138,6 @@ function inject() {
     window.EventTarget = require('./EventTarget');
     window.Event = require('./Event');
     window.TouchEvent = require('./TouchEvent');
-
-    window.ontouchstart = null;
-    window.ontouchmove = null;
-    window.ontouchend = null;
-    window.ontouchcancel = null;
 
     window.devicePixelRatio = 1.0;
     window.screen = {
@@ -1918,7 +2185,7 @@ window.canvas.getContext = function (name) {
 
 window.localStorage = sys.localStorage;
 
-},{"./Audio":3,"./Element":5,"./Event":6,"./EventTarget":7,"./FileReader":8,"./FontFace":9,"./FontFaceSet":10,"./HTMLAudioElement":11,"./HTMLCanvasElement":12,"./HTMLElement":13,"./HTMLImageElement":14,"./HTMLMediaElement":15,"./Image":16,"./TouchEvent":19,"./document":20,"./location":22,"./navigator":23}],26:[function(require,module,exports){
+},{"./Audio":4,"./Element":6,"./Event":7,"./EventTarget":8,"./FileReader":9,"./FontFace":10,"./FontFaceSet":11,"./HTMLAudioElement":12,"./HTMLCanvasElement":13,"./HTMLElement":14,"./HTMLImageElement":15,"./HTMLMediaElement":16,"./Image":17,"./TouchEvent":20,"./document":21,"./location":23,"./navigator":24}],27:[function(require,module,exports){
 "use strict";
 
 /*
@@ -1959,7 +2226,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 /*
@@ -2404,7 +2671,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":12,"./jsb-adapter/HTMLImageElement":14,"./jsb-adapter/ImageData":17,"./jsb_opengl_constants":28}],28:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":13,"./jsb-adapter/HTMLImageElement":15,"./jsb-adapter/ImageData":18,"./jsb_opengl_constants":29}],29:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -3273,7 +3540,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -3517,7 +3784,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -3774,7 +4041,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":31,"./entities":32,"./sax":33}],31:[function(require,module,exports){
+},{"./dom":32,"./entities":33,"./sax":34}],32:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -4994,7 +5261,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -5242,7 +5509,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -5872,4 +6139,4 @@ function split(source, start) {
 
 exports.XMLReader = XMLReader;
 
-},{}]},{},[2]);
+},{}]},{},[3]);

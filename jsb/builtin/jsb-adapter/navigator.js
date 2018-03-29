@@ -14,7 +14,9 @@ const navigator = {
     getCurrentPosition: noop,
     watchPosition: noop,
     clearWatch: noop
-  }
+  },
+
+  maxTouchPoints: 10
 }
 
 module.exports = navigator;
