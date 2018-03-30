@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -2397,6 +2397,41 @@ gl.framebufferRenderbuffer = function (target, attachment, renderbuffertarget, r
 
 gl.framebufferTexture2D = function (target, attachment, textarget, texture, level) {
     gl._framebufferTexture2D(target, attachment, textarget, texture.texture_id, level);
+};
+
+gl.isFramebuffer = function (buffer) {
+    if (buffer && buffer.framebuffer_id) {
+        return gl._isFramebuffer(buffer.framebuffer_id);
+    }
+    return false;
+};
+
+gl.isProgram = function (program) {
+    if (program && program.program_id) {
+        return gl._isProgram(program.program_id);
+    }
+    return false;
+};
+
+gl.isRenderbuffer = function (buffer) {
+    if (buffer && buffer.renderbuffer_id) {
+        return gl._isRenderbuffer(buffer.renderbuffer_id);
+    }
+    return false;
+};
+
+gl.isShader = function (shader) {
+    if (shader && shader.shader_id) {
+        return gl._isShader(shader.shader_id);
+    }
+    return false;
+};
+
+gl.isTexture = function (texture) {
+    if (texture && texture.texture_id) {
+        return gl._isTexture(texture.texture_id);
+    }
+    return false;
 };
 
 //

@@ -190,11 +190,46 @@ gl.bindFramebuffer = function(target, buffer) {
 
 gl.framebufferRenderbuffer = function(target, attachment, renderbuffertarget, renderbuffer) {
     gl._framebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer.renderbuffer_id);
-}
+};
 
 gl.framebufferTexture2D = function(target, attachment, textarget, texture, level) {
     gl._framebufferTexture2D(target, attachment, textarget, texture.texture_id, level);
-}
+};
+
+gl.isFramebuffer = function(buffer) {
+    if (buffer && buffer.framebuffer_id) {
+        return gl._isFramebuffer(buffer.framebuffer_id);
+    }
+    return false;
+};
+
+gl.isProgram = function(program) {
+    if (program && program.program_id) {
+        return gl._isProgram(program.program_id);
+    }
+    return false;
+};
+
+gl.isRenderbuffer = function(buffer) {
+    if (buffer && buffer.renderbuffer_id) {
+        return gl._isRenderbuffer(buffer.renderbuffer_id);
+    }
+    return false;
+};
+
+gl.isShader = function(shader) {
+    if (shader && shader.shader_id) {
+        return gl._isShader(shader.shader_id);
+    }
+    return false;
+};
+
+gl.isTexture = function(texture) {
+    if (texture && texture.texture_id) {
+        return gl._isTexture(texture.texture_id);
+    }
+    return false;
+};
 
 //
 // Uniform related
