@@ -60,6 +60,15 @@ function inject () {
         window.canvas.dispatchEvent(event);
     }
 
+    window.getComputedStyle = function(element) {
+        return {
+           position: 'absolute',
+           left:     '0px',
+           top:      '0px',
+           height:   '0px'
+        };
+    }
+
     window._isInjected = true;
 }
 
@@ -67,11 +76,5 @@ if (!window._isInjected) {
     inject();
 }
 
-window.canvas.getContext = function(name) {
-    if (name === 'webgl' || name === 'experimental-webgl') {
-        return window.gl;
-    }
-    return null;
-};
 
 window.localStorage = sys.localStorage;

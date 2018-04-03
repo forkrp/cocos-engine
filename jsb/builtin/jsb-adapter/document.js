@@ -20,6 +20,8 @@ class Document extends Node {
     this.body = new HTMLElement('body')
 
     this.fonts = new FontFaceSet()
+
+    this.scripts = []
   }
 
   createElementNS(namespaceURI, qualifiedName, options) {

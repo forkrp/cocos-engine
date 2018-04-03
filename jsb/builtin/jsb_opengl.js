@@ -30,6 +30,9 @@
 require('./jsb_opengl_constants');
 window.gl = window.gl || {};
 
+gl.drawingBufferWidth = window.innerWidth;
+gl.drawingBufferHeight = window.innerHeight;
+
 //
 // Create functions
 //
