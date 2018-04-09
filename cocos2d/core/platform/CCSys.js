@@ -23,8 +23,6 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-if (cc.sys) return;
-
 /**
  * System variables
  * @class sys
