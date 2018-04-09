@@ -218,8 +218,8 @@ class HTMLCanvasElement extends HTMLElement {
 
         this.top = 0;
         this.left = 0;
-        this._width = width ? width : window.innerWidth;
-        this._height = height ? height : window.innerHeight;
+        this._width = width ? Math.ceil(width) : 1;
+        this._height = height ? Math.ceil(height) : 1;
         this._context2D = null;
         this._data = null;
     }
@@ -234,8 +234,7 @@ class HTMLCanvasElement extends HTMLElement {
             if (!this._context2D) {
                 this._context2D = new CanvasRenderingContext2D(this._width, this._height);
                 this._context2D._canvas = this;
-                this._context2D.setCanvasBufferUpdatedCallback(function(data) {
-                    console.log('setCanvasBufferUpdatedCallback: dataLen: ' + data.length);
+                this._context2D._setCanvasBufferUpdatedCallback(function(data) {
                     self._data = new ImageData(data, self._width, self._height);
                 });
             }
@@ -251,6 +250,7 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     set width(width) {
+        width = Math.ceil(width);
         console.log(`==> HTMLCanvasElement.width = ${width}`);
         if (this._width !== width) {
             this._width = width;
@@ -265,6 +265,7 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     set height(height) {
+        height = Math.ceil(height);
         console.log(`==> HTMLCanvasElement.height = ${height}`);
         if (this._height !== height) {
             this._height = height;
