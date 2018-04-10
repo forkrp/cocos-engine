@@ -48,6 +48,8 @@ window.wx = {
     }
 }
 
+const glOptMode = require('./glOptMode');
+
 let oldRequestFrameCallback = null;
 let requestAnimationFrameID = 0;
 let requestAnimationFrameCallbacks = {};
@@ -72,6 +74,7 @@ function tick(nowMilliSeconds) {
             oldRequestFrameCallback(nowMilliSeconds);
         }
     }
+    glOptMode.flushCommand();
 }
 
 let _timeoutIDIndex = 0;
@@ -166,6 +169,7 @@ jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
 
 require('./jsb_prepare');
 require('./jsb_opengl');
+require('./glOptMode');
 const { btoa, atob } = require('./base64/base64.min');
 window.btoa = btoa;
 window.atob = atob;

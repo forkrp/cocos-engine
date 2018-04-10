@@ -227,7 +227,7 @@ class HTMLCanvasElement extends HTMLElement {
     //TODO: implement opts.
     getContext(name, opts) {
         var self = this;
-        console.log(`==> Canvas getContext(${name})`);
+        // console.log(`==> Canvas getContext(${name})`);
         if (name === 'webgl' || name === 'experimental-webgl') {
             return window.gl;
         } else if (name === '2d') {
@@ -251,7 +251,7 @@ class HTMLCanvasElement extends HTMLElement {
 
     set width(width) {
         width = Math.ceil(width);
-        console.log(`==> HTMLCanvasElement.width = ${width}`);
+        // console.log(`==> HTMLCanvasElement.width = ${width}`);
         if (this._width !== width) {
             this._width = width;
             if (this._context2D) {
@@ -266,7 +266,7 @@ class HTMLCanvasElement extends HTMLElement {
 
     set height(height) {
         height = Math.ceil(height);
-        console.log(`==> HTMLCanvasElement.height = ${height}`);
+        // console.log(`==> HTMLCanvasElement.height = ${height}`);
         if (this._height !== height) {
             this._height = height;
             if (this._context2D) {
