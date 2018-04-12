@@ -75,15 +75,15 @@ function inject () {
 
     window.addEventListener = function(eventName, listener, options) {
         window.canvas.addEventListener(eventName, listener, options);
-    }
+    };
 
     window.removeEventListener = function(eventName, listener, options) {
         window.canvas.removeEventListener(eventName, listener, options);
-    }
+    };
 
     window.dispatchEvent = function(event) {
         window.canvas.dispatchEvent(event);
-    }
+    };
 
     window.getComputedStyle = function(element) {
         return {
@@ -92,7 +92,9 @@ function inject () {
            top:      '0px',
            height:   '0px'
         };
-    }
+    };
+
+    window.focus = function() {};
 
     window._isInjected = true;
 }

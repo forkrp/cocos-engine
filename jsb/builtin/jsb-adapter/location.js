@@ -24,10 +24,11 @@
  ****************************************************************************/
  
 const location = {
-  href: 'game.js',
-  hash: '',
-  reload() {
-  }
+    href: 'game.js',
+    pathname: 'game.js',
+    hash: '',
+    reload() {
+    }
 }
 
 module.exports = location;
