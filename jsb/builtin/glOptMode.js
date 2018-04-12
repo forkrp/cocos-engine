@@ -801,27 +801,9 @@ function stencilOpSeparateOpt(face, fail, zfail, zpass) {
     buffer_data[next_index + 4] = zpass;
     next_index += 5;
 }
-function texImage2DOpt(target, level, internalformat) {
+function texImage2DOpt(target, level, internalformat, width, height, border, format, type, pixels) {
     flushCommand();
-    switch (arguments.length) {
-    case 6: {
-            var format = arguments[3];
-            var type = arguments[4];
-            var source = arguments[5];
-            _gl.texImage2D(target, level, internalformat, format, type, source);
-            break;
-        }
-    case 9: {
-            var width = arguments[3];
-            var height = arguments[4];
-            var border = arguments[5];
-            var format = arguments[6];
-            var type = arguments[7];
-            var pixels = arguments[8];
-            _gl.texImage2D(target, level, internalformat, width, height, border, format, type, pixels);
-            break;
-        }
-    }
+    _gl.texImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 }
 function texParameterfOpt(target, pname, param) {
     if (next_index + 4 >= total_size) {
@@ -847,10 +829,7 @@ function texSubImage2DOpt(target, level, xoffset, yoffset, width, height, format
     flushCommand();
     _gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
 }
-function texSubImage2DOpt(target, level, xoffset, yoffset, format, type, source) {
-    flushCommand();
-    _gl.texSubImage2D(target, level, xoffset, yoffset, format, type, source);
-}
+
 function uniform1fOpt(location, x) {
     if (next_index + 3 >= total_size) {
         flushCommand();
@@ -1282,10 +1261,8 @@ function attachMethodOpt() {
     gl.stencilOp = stencilOpOpt;
     gl.stencilOpSeparate = stencilOpSeparateOpt;
     gl.texImage2D = texImage2DOpt;
-    gl.texImage2D = texImage2DOpt;
     gl.texParameterf = texParameterfOpt;
     gl.texParameteri = texParameteriOpt;
-    gl.texSubImage2D = texSubImage2DOpt;
     gl.texSubImage2D = texSubImage2DOpt;
     gl.uniform1f = uniform1fOpt;
     gl.uniform2f = uniform2fOpt;
