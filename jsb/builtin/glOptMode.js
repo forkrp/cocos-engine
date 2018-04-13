@@ -707,7 +707,7 @@ function readPixelsOpt(x, y, width, height, format, type, pixels) {
     flushCommand();
     _gl.readPixels(x, y, width, height, format, type, pixels);
 }
-function renderbufferStorageOpt(target, internalformat, width, height) {
+function renderbufferStorageOpt(target, internalFormat, width, height) {
     if (next_index + 5 >= total_size) {
         flushCommand();
     }
@@ -1174,7 +1174,6 @@ function attachMethodOpt() {
     gl.blendEquationSeparate = blendEquationSeparateOpt;
     gl.blendFunc = blendFuncOpt;
     gl.blendFuncSeparate = blendFuncSeparateOpt;
-    gl.bufferData = bufferDataOpt;
     gl.bufferData = bufferDataOpt;
     gl.bufferSubData = bufferSubDataOpt;
     gl.checkFramebufferStatus = checkFramebufferStatusOpt;
