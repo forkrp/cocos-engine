@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -231,6 +231,1314 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 }();
 
 },{}],3:[function(require,module,exports){
+"use strict";
+
+var GL_COMMAND_ACTIVE_TEXTURE = 0;
+var GL_COMMAND_ATTACH_SHADER = 1;
+var GL_COMMAND_BIND_ATTRIB_LOCATION = 2;
+var GL_COMMAND_BIND_BUFFER = 3;
+var GL_COMMAND_BIND_FRAME_BUFFER = 4;
+var GL_COMMAND_BIND_RENDER_BUFFER = 5;
+var GL_COMMAND_BIND_TEXTURE = 6;
+var GL_COMMAND_BLEND_COLOR = 7;
+var GL_COMMAND_BLEND_EQUATION = 8;
+var GL_COMMAND_BLEND_EQUATION_SEPARATE = 9;
+var GL_COMMAND_BLEND_FUNC = 10;
+var GL_COMMAND_BLEND_FUNC_SEPARATE = 11;
+var GL_COMMAND_BUFFER_DATA = 12;
+var GL_COMMAND_BUFFER_SUB_DATA = 13;
+var GL_COMMAND_CLEAR = 14;
+var GL_COMMAND_CLEAR_COLOR = 15;
+var GL_COMMAND_CLEAR_DEPTH = 16;
+var GL_COMMAND_CLEAR_STENCIL = 17;
+var GL_COMMAND_COLOR_MASK = 18;
+var GL_COMMAND_COMMIT = 19;
+var GL_COMMAND_COMPILE_SHADER = 20;
+var GL_COMMAND_COMPRESSED_TEX_IMAGE_2D = 21;
+var GL_COMMAND_COMPRESSED_TEX_SUB_IMAGE_2D = 22;
+var GL_COMMAND_COPY_TEX_IMAGE_2D = 23;
+var GL_COMMAND_COPY_TEX_SUB_IMAGE_2D = 24;
+var GL_COMMAND_CULL_FACE = 25;
+var GL_COMMAND_DELETE_BUFFER = 26;
+var GL_COMMAND_DELETE_FRAME_BUFFER = 27;
+var GL_COMMAND_DELETE_PROGRAM = 28;
+var GL_COMMAND_DELETE_RENDER_BUFFER = 29;
+var GL_COMMAND_DELETE_SHADER = 30;
+var GL_COMMAND_DELETE_TEXTURE = 31;
+var GL_COMMAND_DEPTH_FUNC = 32;
+var GL_COMMAND_DEPTH_MASK = 33;
+var GL_COMMAND_DEPTH_RANGE = 34;
+var GL_COMMAND_DETACH_SHADER = 35;
+var GL_COMMAND_DISABLE = 36;
+var GL_COMMAND_DISABLE_VERTEX_ATTRIB_ARRAY = 37;
+var GL_COMMAND_DRAW_ARRAYS = 38;
+var GL_COMMAND_DRAW_ELEMENTS = 39;
+var GL_COMMAND_ENABLE = 40;
+var GL_COMMAND_ENABLE_VERTEX_ATTRIB_ARRAY = 41;
+var GL_COMMAND_FINISH = 42;
+var GL_COMMAND_FLUSH = 43;
+var GL_COMMAND_FRAME_BUFFER_RENDER_BUFFER = 44;
+var GL_COMMAND_FRAME_BUFFER_TEXTURE_2D = 45;
+var GL_COMMAND_FRONT_FACE = 46;
+var GL_COMMAND_GENERATE_MIPMAP = 47;
+var GL_COMMAND_HINT = 48;
+var GL_COMMAND_LINE_WIDTH = 49;
+var GL_COMMAND_LINK_PROGRAM = 50;
+var GL_COMMAND_PIXEL_STOREI = 51;
+var GL_COMMAND_POLYGON_OFFSET = 52;
+var GL_COMMAND_RENDER_BUFFER_STORAGE = 53;
+var GL_COMMAND_SAMPLE_COVERAGE = 54;
+var GL_COMMAND_SCISSOR = 55;
+var GL_COMMAND_SHADER_SOURCE = 56;
+var GL_COMMAND_STENCIL_FUNC = 57;
+var GL_COMMAND_STENCIL_FUNC_SEPARATE = 58;
+var GL_COMMAND_STENCIL_MASK = 59;
+var GL_COMMAND_STENCIL_MASK_SEPARATE = 60;
+var GL_COMMAND_STENCIL_OP = 61;
+var GL_COMMAND_STENCIL_OP_SEPARATE = 62;
+var GL_COMMAND_TEX_IMAGE_2D = 63;
+var GL_COMMAND_TEX_PARAMETER_F = 64;
+var GL_COMMAND_TEX_PARAMETER_I = 65;
+var GL_COMMAND_TEX_SUB_IMAGE_2D = 66;
+var GL_COMMAND_UNIFORM_1F = 67;
+var GL_COMMAND_UNIFORM_1FV = 68;
+var GL_COMMAND_UNIFORM_1I = 69;
+var GL_COMMAND_UNIFORM_1IV = 70;
+var GL_COMMAND_UNIFORM_2F = 71;
+var GL_COMMAND_UNIFORM_2FV = 72;
+var GL_COMMAND_UNIFORM_2I = 73;
+var GL_COMMAND_UNIFORM_2IV = 74;
+var GL_COMMAND_UNIFORM_3F = 75;
+var GL_COMMAND_UNIFORM_3FV = 76;
+var GL_COMMAND_UNIFORM_3I = 77;
+var GL_COMMAND_UNIFORM_3IV = 78;
+var GL_COMMAND_UNIFORM_4F = 79;
+var GL_COMMAND_UNIFORM_4FV = 80;
+var GL_COMMAND_UNIFORM_4I = 81;
+var GL_COMMAND_UNIFORM_4IV = 82;
+var GL_COMMAND_UNIFORM_MATRIX_2FV = 83;
+var GL_COMMAND_UNIFORM_MATRIX_3FV = 84;
+var GL_COMMAND_UNIFORM_MATRIX_4FV = 85;
+var GL_COMMAND_USE_PROGRAM = 86;
+var GL_COMMAND_VALIDATE_PROGRAM = 87;
+var GL_COMMAND_VERTEX_ATTRIB_1F = 88;
+var GL_COMMAND_VERTEX_ATTRIB_2F = 89;
+var GL_COMMAND_VERTEX_ATTRIB_3F = 90;
+var GL_COMMAND_VERTEX_ATTRIB_4F = 91;
+var GL_COMMAND_VERTEX_ATTRIB_1FV = 92;
+var GL_COMMAND_VERTEX_ATTRIB_2FV = 93;
+var GL_COMMAND_VERTEX_ATTRIB_3FV = 94;
+var GL_COMMAND_VERTEX_ATTRIB_4FV = 95;
+var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
+var GL_COMMAND_VIEW_PORT = 97;
+
+var _gl = {};
+for (var k in gl) {
+    _gl[k] = gl[k];
+}
+
+var total_size = 100000;
+var next_index = 0;
+var buffer_data;
+
+function OpenOptMode() {
+    if (gl.flushCommand && isSupportTypeArray()) {
+        attachMethodOpt();
+    }
+    buffer_data = new Float32Array(total_size);
+}
+function flushCommand() {
+    if (next_index > 0) {
+        gl.flushCommand(next_index, buffer_data);
+        next_index = 0;
+    }
+}
+function glCommitOpt() {
+    flushCommand();
+    _gl.commit();
+}
+function activeTextureOpt(texture) {
+    if (next_index + 2 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_ACTIVE_TEXTURE;
+    buffer_data[next_index + 1] = texture;
+    next_index += 2;
+}
+function attachShaderOpt(program, shader) {
+    if (next_index + 3 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_ATTACH_SHADER;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    buffer_data[next_index + 2] = shader ? shader._id : 0;
+    next_index += 3;
+}
+function bindAttribLocationOpt(program, index, name) {
+    flushCommand();
+    _gl.bindAttribLocation(program, index, name);
+}
+function bindBufferOpt(target, buffer) {
+    if (next_index + 3 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = buffer ? buffer._id : 0;
+    next_index += 3;
+}
+function bindFramebufferOpt(target, framebuffer) {
+    if (next_index + 3 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_FRAME_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = framebuffer ? framebuffer._id : 0;
+    next_index += 3;
+}
+function bindRenderbufferOpt(target, renderbuffer) {
+    if (next_index + 3 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_RENDER_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = renderbuffer ? renderbuffer._id : 0;
+    next_index += 3;
+}
+function bindTextureOpt(target, texture) {
+    if (next_index + 3 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_TEXTURE;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = texture ? texture._id : 0;
+    next_index += 3;
+}
+function blendColorOpt(red, green, blue, alpha) {
+    if (next_index + 5 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_COLOR;
+    buffer_data[next_index + 1] = red;
+    buffer_data[next_index + 2] = green;
+    buffer_data[next_index + 3] = blue;
+    buffer_data[next_index + 4] = alpha;
+    next_index += 5;
+}
+function blendEquationOpt(mode) {
+    if (next_index + 2 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_EQUATION;
+    buffer_data[next_index + 1] = mode;
+    next_index += 2;
+}
+function blendEquationSeparateOpt(modeRGB, modeAlpha) {
+    if (next_index + 3 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_EQUATION_SEPARATE;
+    buffer_data[next_index + 1] = modeRGB;
+    buffer_data[next_index + 2] = modeAlpha;
+    next_index += 3;
+}
+function blendFuncOpt(sfactor, dfactor) {
+    if (next_index + 3 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_FUNC;
+    buffer_data[next_index + 1] = sfactor;
+    buffer_data[next_index + 2] = dfactor;
+    next_index += 3;
+}
+function blendFuncSeparateOpt(srcRGB, dstRGB, srcAlpha, dstAlpha) {
+    if (next_index + 5 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_FUNC_SEPARATE;
+    buffer_data[next_index + 1] = srcRGB;
+    buffer_data[next_index + 2] = dstRGB;
+    buffer_data[next_index + 3] = srcAlpha;
+    buffer_data[next_index + 4] = dstAlpha;
+    next_index += 5;
+}
+function bufferDataOpt(target, data, usage) {
+    flushCommand();
+    _gl.bufferData(target, data, usage);
+}
+function bufferSubDataOpt(target, offset, data) {
+    flushCommand();
+    _gl.bufferSubData(target, offset, data);
+}
+function checkFramebufferStatusOpt(target) {
+    flushCommand();
+    _gl.checkFramebufferStatus(target);
+}
+function clearOpt(mask) {
+    if (next_index + 2 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR;
+    buffer_data[next_index + 1] = mask;
+    next_index += 2;
+}
+function clearColorOpt(red, green, blue, alpha) {
+    if (next_index + 5 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR_COLOR;
+    buffer_data[next_index + 1] = red;
+    buffer_data[next_index + 2] = green;
+    buffer_data[next_index + 3] = blue;
+    buffer_data[next_index + 4] = alpha;
+    next_index += 5;
+}
+function clearDepthOpt(depth) {
+    if (next_index + 2 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR_DEPTH;
+    buffer_data[next_index + 1] = depth;
+    next_index += 2;
+}
+function clearStencilOpt(s) {
+    if (next_index + 2 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR_STENCIL;
+    buffer_data[next_index + 1] = s;
+    next_index += 2;
+}
+function colorMaskOpt(red, green, blue, alpha) {
+    if (next_index + 5 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_COLOR_MASK;
+    buffer_data[next_index + 1] = red ? 1 : 0;
+    buffer_data[next_index + 2] = green ? 1 : 0;
+    buffer_data[next_index + 3] = blue ? 1 : 0;
+    buffer_data[next_index + 4] = alpha ? 1 : 0;
+    next_index += 5;
+}
+function compileShaderOpt(shader) {
+    if (next_index + 2 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_COMPILE_SHADER;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    next_index += 2;
+}
+function compressedTexImage2DOpt(target, level, internalformat, width, height, border, data) {
+    flushCommand();
+    _gl.compressedTexImage2D(target, level, internalformat, width, height, border, data);
+}
+function compressedTexSubImage2DOpt(target, level, xoffset, yoffset, width, height, format, data) {
+    flushCommand();
+    _gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data);
+}
+function copyTexImage2DOpt(target, level, internalformat, x, y, width, height, border) {
+    if (next_index + 9 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_COPY_TEX_IMAGE_2D;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = level;
+    buffer_data[next_index + 3] = internalformat;
+    buffer_data[next_index + 4] = x;
+    buffer_data[next_index + 5] = y;
+    buffer_data[next_index + 6] = width;
+    buffer_data[next_index + 7] = height;
+    buffer_data[next_index + 8] = border;
+    next_index += 9;
+}
+function copyTexSubImage2DOpt(target, level, xoffset, yoffset, x, y, width, height) {
+    if (next_index + 9 > total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_COPY_TEX_SUB_IMAGE_2D;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = level;
+    buffer_data[next_index + 3] = xoffset;
+    buffer_data[next_index + 4] = yoffset;
+    buffer_data[next_index + 5] = x;
+    buffer_data[next_index + 6] = y;
+    buffer_data[next_index + 7] = width;
+    buffer_data[next_index + 8] = height;
+    next_index += 9;
+}
+function createBufferOpt() {
+    flushCommand();
+    return _gl.createBuffer();
+}
+function createFramebufferOpt() {
+    flushCommand();
+    return _gl.createFramebuffer();
+}
+function createProgramOpt() {
+    flushCommand();
+    return _gl.createProgram();
+}
+function createRenderbufferOpt() {
+    flushCommand();
+    return _gl.createRenderbuffer();
+}
+function createShaderOpt(type) {
+    flushCommand();
+    return _gl.createShader(type);
+}
+function createTextureOpt() {
+    flushCommand();
+    return _gl.createTexture();
+}
+function cullFaceOpt(mode) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_CULL_FACE;
+    buffer_data[next_index + 1] = mode;
+    next_index += 2;
+}
+function deleteBufferOpt(buffer) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_BUFFER;
+    buffer_data[next_index + 1] = buffer ? buffer._id : 0;
+    next_index += 2;
+}
+function deleteFramebufferOpt(framebuffer) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_FRAME_BUFFER;
+    buffer_data[next_index + 1] = framebuffer ? framebuffer._id : 0;
+    next_index += 2;
+}
+function deleteProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+function deleteRenderbufferOpt(renderbuffer) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_RENDER_BUFFER;
+    buffer_data[next_index + 1] = renderbuffer ? renderbuffer._id : 0;
+    next_index += 2;
+}
+function deleteShaderOpt(shader) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_SHADER;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    next_index += 2;
+}
+function deleteTextureOpt(texture) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_TEXTURE;
+    buffer_data[next_index + 1] = texture ? texture._id : 0;
+    next_index += 2;
+}
+function depthFuncOpt(func) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DEPTH_FUNC;
+    buffer_data[next_index + 1] = func;
+    next_index += 2;
+}
+function depthMaskOpt(flag) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DEPTH_MASK;
+    buffer_data[next_index + 1] = flag ? 1 : 0;
+    next_index += 2;
+}
+function depthRangeOpt(zNear, zFar) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DEPTH_RANGE;
+    buffer_data[next_index + 1] = zNear;
+    buffer_data[next_index + 1] = zFar;
+    next_index += 3;
+}
+function detachShaderOpt(program, shader) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DETACH_SHADER;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    next_index += 3;
+}
+function disableOpt(cap) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DISABLE;
+    buffer_data[next_index + 1] = cap;
+    next_index += 2;
+}
+function disableVertexAttribArrayOpt(index) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DISABLE_VERTEX_ATTRIB_ARRAY;
+    buffer_data[next_index + 1] = index;
+    next_index += 2;
+}
+function drawArraysOpt(mode, first, count) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DRAW_ARRAYS;
+    buffer_data[next_index + 1] = mode;
+    buffer_data[next_index + 2] = first;
+    buffer_data[next_index + 3] = count;
+    next_index += 4;
+}
+function drawElementsOpt(mode, count, type, offset) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_DRAW_ELEMENTS;
+    buffer_data[next_index + 1] = mode;
+    buffer_data[next_index + 2] = count;
+    buffer_data[next_index + 3] = type;
+    buffer_data[next_index + 4] = offset ? offset : 0;
+    next_index += 5;
+}
+function enableOpt(cap) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_ENABLE;
+    buffer_data[next_index + 1] = cap;
+    next_index += 2;
+}
+function enableVertexAttribArrayOpt(index) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_ENABLE_VERTEX_ATTRIB_ARRAY;
+    buffer_data[next_index + 1] = index;
+    next_index += 2;
+}
+function finishOpt() {
+    if (next_index + 1 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_FINISH;
+    next_index += 1;
+}
+function flushOpt() {
+    if (next_index + 1 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_FLUSH;
+    next_index += 1;
+}
+function framebufferRenderbufferOpt(target, attachment, renderbuffertarget, renderbuffer) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_FRAME_BUFFER_RENDER_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = attachment;
+    buffer_data[next_index + 3] = renderbuffertarget;
+    buffer_data[next_index + 4] = renderbuffer ? renderbuffer._id : 0;
+    next_index += 5;
+}
+function framebufferTexture2DOpt(target, attachment, textarget, texture, level) {
+    if (next_index + 6 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_FRAME_BUFFER_TEXTURE_2D;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = attachment;
+    buffer_data[next_index + 3] = textarget;
+    buffer_data[next_index + 4] = texture ? texture._id : 0;
+    buffer_data[next_index + 5] = level;
+    next_index += 6;
+}
+function frontFaceOpt(mode) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_FRONT_FACE;
+    buffer_data[next_index + 1] = mode;
+    next_index += 2;
+}
+function generateMipmapOpt(target) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_GENERATE_MIPMAP;
+    buffer_data[next_index + 1] = target;
+    next_index += 2;
+}
+function getActiveAttribOpt(program, index) {
+    flushCommand();
+    return _gl.getActiveAttrib(program, index);
+}
+function getActiveUniformOpt(program, index) {
+    flushCommand();
+    return _gl.getActiveUniform(program, index);
+}
+function getAttachedShadersOpt(program) {
+    flushCommand();
+    return _gl.getAttachedShaders(program);
+}
+function getAttribLocationOpt(program, name) {
+    flushCommand();
+    return _gl.getAttribLocation(program, name);
+}
+function getBufferParameterOpt(target, pname) {
+    flushCommand();
+    return _gl.getBufferParameter(target, pname);
+}
+function getParameterOpt(pname) {
+    flushCommand();
+    return _gl.getParameter(pname);
+}
+function getErrorOpt() {
+    flushCommand();
+    return _gl.getError();
+}
+function getFramebufferAttachmentParameterOpt(target, attachment, pname) {
+    flushCommand();
+    return _gl.getFramebufferAttachmentParameter(target, attachment, pname);
+}
+function getProgramParameterOpt(program, pname) {
+    flushCommand();
+    return _gl.getProgramParameter(program, pname);
+}
+function getProgramInfoLogOpt(program) {
+    flushCommand();
+    return _gl.getProgramInfoLog(program);
+}
+function getRenderbufferParameterOpt(target, pname) {
+    flushCommand();
+    return _gl.getRenderbufferParameter(target, pname);
+}
+function getShaderParameterOpt(shader, pname) {
+    flushCommand();
+    return _gl.getShaderParameter(shader, pname);
+}
+function getShaderPrecisionFormatOpt(shadertype, precisiontype) {
+    flushCommand();
+    return _gl.getShaderPrecisionFormat(shadertype, precisiontype);
+}
+function getShaderInfoLogOpt(shader) {
+    flushCommand();
+    return _gl.getShaderInfoLog(shader);
+}
+function getShaderSourceOpt(shader) {
+    flushCommand();
+    return _gl.getShaderSource(shader);
+}
+function getTexParameterOpt(target, pname) {
+    flushCommand();
+    return _gl.getTexParameter(target, pname);
+}
+function getUniformOpt(program, location) {
+    flushCommand();
+    return _gl.getUniform(program, location);
+}
+function getUniformLocationOpt(program, name) {
+    flushCommand();
+    return _gl.getUniformLocation(program, name);
+}
+function getVertexAttribOpt(index, pname) {
+    flushCommand();
+    return _gl.getVertexAttrib(index, pname);
+}
+function getVertexAttribOffsetOpt(index, pname) {
+    flushCommand();
+    return _gl.getVertexAttribOffset(index, pname);
+}
+function hintOpt(target, mode) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_HINT;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = mode;
+    next_index += 3;
+}
+function isBufferOpt(buffer) {
+    flushCommand();
+    return _gl.isBuffer(buffer);
+}
+function isEnabledOpt(cap) {
+    flushCommand();
+    return _gl.isEnabled(cap);
+}
+function isFramebufferOpt(framebuffer) {
+    flushCommand();
+    return _gl.isFramebuffer(framebuffer);
+}
+function isProgramOpt(program) {
+    flushCommand();
+    return _gl.isProgram(program);
+}
+function isRenderbufferOpt(renderbuffer) {
+    flushCommand();
+    return _gl.isRenderbuffer(renderbuffer);
+}
+function isShaderOpt(shader) {
+    flushCommand();
+    return _gl.isShader(shader);
+}
+function isTextureOpt(texture) {
+    flushCommand();
+    return _gl.isTexture(texture);
+}
+function lineWidthOpt(width) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_LINE_WIDTH;
+    buffer_data[next_index + 1] = width;
+    next_index += 2;
+}
+function linkProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_LINK_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+function pixelStoreiOpt(pname, param) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_PIXEL_STOREI;
+    buffer_data[next_index + 1] = pname;
+    buffer_data[next_index + 2] = param;
+    next_index += 3;
+}
+function polygonOffsetOpt(factor, units) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_POLYGON_OFFSET;
+    buffer_data[next_index + 1] = factor;
+    buffer_data[next_index + 2] = units;
+    next_index += 3;
+}
+function readPixelsOpt(x, y, width, height, format, type, pixels) {
+    flushCommand();
+    _gl.readPixels(x, y, width, height, format, type, pixels);
+}
+function renderbufferStorageOpt(target, internalFormat, width, height) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_RENDER_BUFFER_STORAGE;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = internalFormat;
+    buffer_data[next_index + 3] = width;
+    buffer_data[next_index + 4] = height;
+    next_index += 5;
+}
+function sampleCoverageOpt(value, invert) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_SAMPLE_COVERAGE;
+    buffer_data[next_index + 1] = value;
+    buffer_data[next_index + 2] = invert ? 1 : 0;
+    next_index += 3;
+}
+function scissorOpt(x, y, width, height) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_SCISSOR;
+    buffer_data[next_index + 1] = x;
+    buffer_data[next_index + 2] = y;
+    buffer_data[next_index + 3] = width;
+    buffer_data[next_index + 4] = height;
+    next_index += 5;
+}
+function shaderSourceOpt(shader, source) {
+    flushCommand();
+    _gl.shaderSource(shader, source);
+}
+function stencilFuncOpt(func, ref, mask) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_FUNC;
+    buffer_data[next_index + 1] = func;
+    buffer_data[next_index + 2] = ref;
+    buffer_data[next_index + 3] = mask;
+    next_index += 4;
+}
+function stencilFuncSeparateOpt(face, func, ref, mask) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_FUNC_SEPARATE;
+    buffer_data[next_index + 1] = face;
+    buffer_data[next_index + 2] = func;
+    buffer_data[next_index + 3] = ref;
+    buffer_data[next_index + 4] = mask;
+    next_index += 5;
+}
+function stencilMaskOpt(mask) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_MASK;
+    buffer_data[next_index + 1] = mask;
+    next_index += 2;
+}
+function stencilMaskSeparateOpt(face, mask) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_MASK_SEPARATE;
+    buffer_data[next_index + 1] = face;
+    buffer_data[next_index + 2] = mask;
+    next_index += 3;
+}
+function stencilOpOpt(fail, zfail, zpass) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_OP;
+    buffer_data[next_index + 1] = fail;
+    buffer_data[next_index + 2] = zfail;
+    buffer_data[next_index + 3] = zpass;
+    next_index += 4;
+}
+function stencilOpSeparateOpt(face, fail, zfail, zpass) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_OP_SEPARATE;
+    buffer_data[next_index + 1] = face;
+    buffer_data[next_index + 2] = fail;
+    buffer_data[next_index + 3] = zfail;
+    buffer_data[next_index + 4] = zpass;
+    next_index += 5;
+}
+function texImage2DOpt(target, level, internalformat, width, height, border, format, type, pixels) {
+    flushCommand();
+    _gl.texImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+}
+function texParameterfOpt(target, pname, param) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_TEX_PARAMETER_F;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = pname;
+    buffer_data[next_index + 3] = param;
+    next_index += 4;
+}
+function texParameteriOpt(target, pname, param) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_TEX_PARAMETER_I;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = pname;
+    buffer_data[next_index + 3] = param;
+    next_index += 4;
+}
+function texSubImage2DOpt(target, level, xoffset, yoffset, width, height, format, type, pixels) {
+    flushCommand();
+    _gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+}
+
+function uniform1fOpt(location, x) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    next_index += 3;
+}
+function uniform2fOpt(location, x, y) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    next_index += 4;
+}
+function uniform3fOpt(location, x, y, z) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    next_index += 5;
+}
+function uniform4fOpt(location, x, y, z, w) {
+    if (next_index + 6 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    buffer_data[next_index + 5] = w;
+    next_index += 6;
+}
+function uniform1iOpt(location, x) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    next_index += 3;
+}
+function uniform2iOpt(location, x, y) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    next_index += 4;
+}
+function uniform3iOpt(location, x, y, z) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    next_index += 5;
+}
+function uniform4iOpt(location, x, y, z, w) {
+    if (next_index + 6 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    buffer_data[next_index + 5] = w;
+    next_index += 6;
+}
+function uniform1fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniform2fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniform3fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniform4fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniform1ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniform2ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniform3ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniform4ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function uniformMatrix2fvOpt(location, transpose, value) {
+    if (next_index + 4 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_MATRIX_2FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = transpose;
+    buffer_data[next_index + 3] = value.length;
+    buffer_data.set(value, next_index + 4);
+    next_index += 4 + value.length;
+}
+function uniformMatrix3fvOpt(location, transpose, value) {
+    if (next_index + 4 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_MATRIX_3FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = transpose;
+    buffer_data[next_index + 3] = value.length;
+    buffer_data.set(value, next_index + 4);
+    next_index += 4 + value.length;
+}
+function uniformMatrix4fvOpt(location, transpose, value) {
+    if (next_index + 4 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_MATRIX_4FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = transpose;
+    buffer_data[next_index + 3] = value.length;
+    buffer_data.set(value, next_index + 4);
+    next_index += 4 + value.length;
+}
+function useProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_USE_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+function validateProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VALIDATE_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+function vertexAttrib1fOpt(index, x) {
+    if (next_index + 3 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_1F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    next_index += 3;
+}
+function vertexAttrib2fOpt(index, x, y) {
+    if (next_index + 4 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_2F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    next_index += 4;
+}
+function vertexAttrib3fOpt(index, x, y, z) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_3F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    next_index += 5;
+}
+function vertexAttrib4fOpt(index, x, y, z, w) {
+    if (next_index + 6 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_4F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    buffer_data[next_index + 5] = w;
+    next_index += 6;
+}
+function vertexAttrib1fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_1FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function vertexAttrib2fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_2FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function vertexAttrib3fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_3FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function vertexAttrib4fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_4FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+function vertexAttribPointerOpt(index, size, type, normalized, stride, offset) {
+    if (next_index + 7 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_POINTER;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = size;
+    buffer_data[next_index + 3] = type;
+    buffer_data[next_index + 4] = normalized ? 1 : 0;
+    buffer_data[next_index + 5] = stride;
+    buffer_data[next_index + 6] = offset;
+    next_index += 7;
+}
+function viewportOpt(x, y, width, height) {
+    if (next_index + 5 >= total_size) {
+        flushCommand();
+    }
+    buffer_data[next_index] = GL_COMMAND_VIEW_PORT;
+    buffer_data[next_index + 1] = x;
+    buffer_data[next_index + 2] = y;
+    buffer_data[next_index + 3] = width;
+    buffer_data[next_index + 4] = height;
+    next_index += 5;
+}
+function isSupportTypeArray() {
+    //FIXME:
+    // if (GameStatusInfo.platform == 'android') {
+    return true;
+    // }
+    // var info = BK.Director.queryDeviceInfo();
+    // var vers = info.version.split('.');
+    // if (info.platform == 'ios' && Number(vers[0]) >= 10) {
+    //     return true;
+    // }
+    // return false;
+}
+function attachMethodOpt() {
+    gl.activeTexture = activeTextureOpt;
+    gl.attachShader = attachShaderOpt;
+    gl.bindAttribLocation = bindAttribLocationOpt;
+    gl.bindBuffer = bindBufferOpt;
+    gl.bindFramebuffer = bindFramebufferOpt;
+    gl.bindRenderbuffer = bindRenderbufferOpt;
+    gl.bindTexture = bindTextureOpt;
+    gl.blendColor = blendColorOpt;
+    gl.blendEquation = blendEquationOpt;
+    gl.blendEquationSeparate = blendEquationSeparateOpt;
+    gl.blendFunc = blendFuncOpt;
+    gl.blendFuncSeparate = blendFuncSeparateOpt;
+    gl.bufferData = bufferDataOpt;
+    gl.bufferSubData = bufferSubDataOpt;
+    gl.checkFramebufferStatus = checkFramebufferStatusOpt;
+    gl.clear = clearOpt;
+    gl.clearColor = clearColorOpt;
+    gl.clearDepth = clearDepthOpt;
+    gl.clearStencil = clearStencilOpt;
+    gl.colorMask = colorMaskOpt;
+    gl.compileShader = compileShaderOpt;
+    gl.compressedTexImage2D = compressedTexImage2DOpt;
+    gl.compressedTexSubImage2D = compressedTexSubImage2DOpt;
+    gl.copyTexImage2D = copyTexImage2DOpt;
+    gl.copyTexSubImage2D = copyTexSubImage2DOpt;
+    gl.createBuffer = createBufferOpt;
+    gl.createFramebuffer = createFramebufferOpt;
+    gl.createProgram = createProgramOpt;
+    gl.createRenderbuffer = createRenderbufferOpt;
+    gl.createShader = createShaderOpt;
+    gl.createTexture = createTextureOpt;
+    gl.cullFace = cullFaceOpt;
+    gl.deleteBuffer = deleteBufferOpt;
+    gl.deleteFramebuffer = deleteFramebufferOpt;
+    gl.deleteProgram = deleteProgramOpt;
+    gl.deleteRenderbuffer = deleteRenderbufferOpt;
+    gl.deleteShader = deleteShaderOpt;
+    gl.deleteTexture = deleteTextureOpt;
+    gl.depthFunc = depthFuncOpt;
+    gl.depthMask = depthMaskOpt;
+    gl.depthRange = depthRangeOpt;
+    gl.detachShader = detachShaderOpt;
+    gl.disable = disableOpt;
+    gl.disableVertexAttribArray = disableVertexAttribArrayOpt;
+    gl.drawArrays = drawArraysOpt;
+    gl.drawElements = drawElementsOpt;
+    gl.enable = enableOpt;
+    gl.enableVertexAttribArray = enableVertexAttribArrayOpt;
+    gl.finish = finishOpt;
+    gl.flush = flushOpt;
+    gl.framebufferRenderbuffer = framebufferRenderbufferOpt;
+    gl.framebufferTexture2D = framebufferTexture2DOpt;
+    gl.frontFace = frontFaceOpt;
+    gl.generateMipmap = generateMipmapOpt;
+    gl.getActiveAttrib = getActiveAttribOpt;
+    gl.getActiveUniform = getActiveUniformOpt;
+    gl.getAttachedShaders = getAttachedShadersOpt;
+    gl.getAttribLocation = getAttribLocationOpt;
+    gl.getBufferParameter = getBufferParameterOpt;
+    gl.getParameter = getParameterOpt;
+    gl.getError = getErrorOpt;
+    gl.getFramebufferAttachmentParameter = getFramebufferAttachmentParameterOpt;
+    gl.getProgramParameter = getProgramParameterOpt;
+    gl.getProgramInfoLog = getProgramInfoLogOpt;
+    gl.getRenderbufferParameter = getRenderbufferParameterOpt;
+    gl.getShaderParameter = getShaderParameterOpt;
+    gl.getShaderPrecisionFormat = getShaderPrecisionFormatOpt;
+    gl.getShaderInfoLog = getShaderInfoLogOpt;
+    gl.getShaderSource = getShaderSourceOpt;
+    gl.getTexParameter = getTexParameterOpt;
+    gl.getUniform = getUniformOpt;
+    gl.getUniformLocation = getUniformLocationOpt;
+    gl.getVertexAttrib = getVertexAttribOpt;
+    gl.getVertexAttribOffset = getVertexAttribOffsetOpt;
+    gl.hint = hintOpt;
+    gl.isBuffer = isBufferOpt;
+    gl.isEnabled = isEnabledOpt;
+    gl.isFramebuffer = isFramebufferOpt;
+    gl.isProgram = isProgramOpt;
+    gl.isRenderbuffer = isRenderbufferOpt;
+    gl.isShader = isShaderOpt;
+    gl.isTexture = isTextureOpt;
+    gl.lineWidth = lineWidthOpt;
+    gl.linkProgram = linkProgramOpt;
+    gl.pixelStorei = pixelStoreiOpt;
+    gl.polygonOffset = polygonOffsetOpt;
+    gl.readPixels = readPixelsOpt;
+    gl.renderbufferStorage = renderbufferStorageOpt;
+    gl.sampleCoverage = sampleCoverageOpt;
+    gl.scissor = scissorOpt;
+    gl.shaderSource = shaderSourceOpt;
+    gl.stencilFunc = stencilFuncOpt;
+    gl.stencilFuncSeparate = stencilFuncSeparateOpt;
+    gl.stencilMask = stencilMaskOpt;
+    gl.stencilMaskSeparate = stencilMaskSeparateOpt;
+    gl.stencilOp = stencilOpOpt;
+    gl.stencilOpSeparate = stencilOpSeparateOpt;
+    gl.texImage2D = texImage2DOpt;
+    gl.texParameterf = texParameterfOpt;
+    gl.texParameteri = texParameteriOpt;
+    gl.texSubImage2D = texSubImage2DOpt;
+    gl.uniform1f = uniform1fOpt;
+    gl.uniform2f = uniform2fOpt;
+    gl.uniform3f = uniform3fOpt;
+    gl.uniform4f = uniform4fOpt;
+    gl.uniform1i = uniform1iOpt;
+    gl.uniform2i = uniform2iOpt;
+    gl.uniform3i = uniform3iOpt;
+    gl.uniform4i = uniform4iOpt;
+    gl.uniform1fv = uniform1fvOpt;
+    gl.uniform2fv = uniform2fvOpt;
+    gl.uniform3fv = uniform3fvOpt;
+    gl.uniform4fv = uniform4fvOpt;
+    gl.uniform1iv = uniform1ivOpt;
+    gl.uniform2iv = uniform2ivOpt;
+    gl.uniform3iv = uniform3ivOpt;
+    gl.uniform4iv = uniform4ivOpt;
+    gl.uniformMatrix2fv = uniformMatrix2fvOpt;
+    gl.uniformMatrix3fv = uniformMatrix3fvOpt;
+    gl.uniformMatrix4fv = uniformMatrix4fvOpt;
+    gl.useProgram = useProgramOpt;
+    gl.validateProgram = validateProgramOpt;
+    gl.vertexAttrib1f = vertexAttrib1fOpt;
+    gl.vertexAttrib2f = vertexAttrib2fOpt;
+    gl.vertexAttrib3f = vertexAttrib3fOpt;
+    gl.vertexAttrib4f = vertexAttrib4fOpt;
+    gl.vertexAttrib1fv = vertexAttrib1fvOpt;
+    gl.vertexAttrib2fv = vertexAttrib2fvOpt;
+    gl.vertexAttrib3fv = vertexAttrib3fvOpt;
+    gl.vertexAttrib4fv = vertexAttrib4fvOpt;
+    gl.vertexAttribPointer = vertexAttribPointerOpt;
+    gl.viewport = viewportOpt;
+    gl.glCommit = glCommitOpt;
+}
+
+//FIXME:
+OpenOptMode();
+
+module.exports = {
+    flushCommand: flushCommand
+};
+
+},{}],4:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -281,6 +1589,8 @@ window.wx = {
     onHide: function onHide() {}
 };
 
+var glOptMode = require('./glOptMode');
+
 var oldRequestFrameCallback = null;
 var requestAnimationFrameID = 0;
 var requestAnimationFrameCallbacks = {};
@@ -305,6 +1615,7 @@ function tick(nowMilliSeconds) {
             oldRequestFrameCallback(nowMilliSeconds);
         }
     }
+    glOptMode.flushCommand();
 }
 
 var _timeoutIDIndex = 0;
@@ -398,6 +1709,7 @@ jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
 
 require('./jsb_prepare');
 require('./jsb_opengl');
+require('./glOptMode');
 
 var _require = require('./base64/base64.min'),
     btoa = _require.btoa,
@@ -461,7 +1773,7 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./jsb-adapter":22,"./jsb_audioengine":27,"./jsb_opengl":28,"./jsb_prepare":30,"./xmldom/dom-parser":31}],4:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":24,"./jsb_audioengine":29,"./jsb_opengl":30,"./jsb_prepare":32,"./xmldom/dom-parser":33}],5:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -522,7 +1834,7 @@ var Audio = function (_HTMLAudioElement) {
 
 module.exports = Audio;
 
-},{"./HTMLAudioElement":12}],5:[function(require,module,exports){
+},{"./HTMLAudioElement":13}],6:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -567,7 +1879,7 @@ var DOMRect = function DOMRect(x, y, width, height) {
 
 module.exports = DOMRect;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -624,7 +1936,7 @@ var Element = function (_Node) {
     _createClass(Element, [{
         key: 'getBoundingClientRect',
         value: function getBoundingClientRect() {
-            return new DOMRect();
+            return new DOMRect(0, 0, window.innerWidth, window.innerHeight);
         }
 
         // attrName is a string that names the attribute to be removed from element.
@@ -649,7 +1961,7 @@ var Element = function (_Node) {
 
 module.exports = Element;
 
-},{"./DOMRect":5,"./Node":19}],7:[function(require,module,exports){
+},{"./DOMRect":6,"./Node":21}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -696,7 +2008,7 @@ var Event = function () {
     _classCallCheck(this, Event);
 
     this._type = type;
-    this._eventTarget = null;
+    this._target = null;
     this._eventPhase = 2;
     this._currentTarget = null;
     this._canceled = false;
@@ -796,7 +2108,7 @@ var Event = function () {
   }, {
     key: "target",
     get: function get() {
-      return this._eventTarget;
+      return this._target;
     }
 
     /**
@@ -896,7 +2208,7 @@ Event.BUBBLING_PHASE = 3;
 
 module.exports = Event;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -1054,15 +2366,28 @@ EventTarget.prototype = {
             throw new TypeError("\"event.type\" should be a string.");
         }
 
+        var eventName = event.type;
+        var onFunc = this['on' + eventName];
+        if (onFunc && typeof onFunc === 'function') {
+            event._target = event._currentTarget = this;
+            onFunc.call(this, event);
+            event._target = event._currentTarget = null;
+            event._eventPhase = 0;
+            event._passiveListener = null;
+
+            if (event.defaultPrevented) return false;
+        }
+
         // If listeners aren't registered, terminate.
         var listeners = this._listeners;
-        var eventName = event.type;
+
         var node = listeners.get(eventName);
         if (!node) {
             return true;
         }
 
         event._target = event._currentTarget = this;
+
         // This doesn't process capturing phase and bubbling phase.
         // This isn't participating in a tree.
         var prev = null;
@@ -1084,8 +2409,6 @@ EventTarget.prototype = {
             event._passiveListener = node.passive ? node.listener : null;
             if (typeof node.listener === "function") {
                 node.listener.call(this, event);
-            } else if (node.listenerType !== ATTRIBUTE && typeof node.listener.handleEvent === "function") {
-                node.listener.handleEvent(event);
             }
 
             // Break if `event.stopImmediatePropagation` was called.
@@ -1115,7 +2438,7 @@ if (typeof window !== "undefined" && typeof window.EventTarget !== "undefined") 
 // export default EventTarget
 module.exports = EventTarget;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1186,7 +2509,8 @@ var FileReader = function (_EventTarget) {
     key: 'readAsDataURL',
     value: function readAsDataURL(blob) {
       this.result = 'data:image/png;base64,' + window.btoa(blob);
-      this.onload();
+      var event = new Event('load');
+      this.dispatchEvent(event);
     }
 
     // Starts reading the contents of the specified Blob, once finished, the result attribute contains the contents of the file as a text string.
@@ -1201,7 +2525,7 @@ var FileReader = function (_EventTarget) {
 
 module.exports = FileReader;
 
-},{"./EventTarget":8}],10:[function(require,module,exports){
+},{"./EventTarget":9}],11:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1271,7 +2595,7 @@ var FontFace = function () {
 
 module.exports = FontFace;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1382,7 +2706,7 @@ var FontFaceSet = function (_EventTarget) {
 
 module.exports = FontFaceSet;
 
-},{"./Event":7,"./EventTarget":8}],12:[function(require,module,exports){
+},{"./Event":8,"./EventTarget":9}],13:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1432,7 +2756,7 @@ var HTMLAudioElement = function (_HTMLMediaElement) {
 
 module.exports = HTMLAudioElement;
 
-},{"./HTMLMediaElement":16}],13:[function(require,module,exports){
+},{"./HTMLMediaElement":17}],14:[function(require,module,exports){
 'use strict';
 
 var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
@@ -1697,7 +3021,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
         key: 'getContext',
         value: function getContext(name, opts) {
             var self = this;
-            console.log('==> Canvas getContext(' + name + ')');
+            // console.log(`==> Canvas getContext(${name})`);
             if (name === 'webgl' || name === 'experimental-webgl') {
                 return window.gl;
             } else if (name === '2d') {
@@ -1752,7 +3076,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
         key: 'width',
         set: function set(width) {
             width = Math.ceil(width);
-            console.log('==> HTMLCanvasElement.width = ' + width);
+            // console.log(`==> HTMLCanvasElement.width = ${width}`);
             if (this._width !== width) {
                 this._width = width;
                 if (this._context2D) {
@@ -1767,7 +3091,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
         key: 'height',
         set: function set(height) {
             height = Math.ceil(height);
-            console.log('==> HTMLCanvasElement.height = ' + height);
+            // console.log(`==> HTMLCanvasElement.height = ${height}`);
             if (this._height !== height) {
                 this._height = height;
                 if (this._context2D) {
@@ -1820,7 +3144,7 @@ function touchEventHandlerFactory(type) {
         var touchEvent = new TouchEvent(type);
 
         touchEvent.touches = touches;
-        // touchEvent.targetTouches = Array.prototype.slice.call(event.touches)
+        touchEvent.targetTouches = Array.prototype.slice.call(touchEvent.touches);
         touchEvent.changedTouches = touches; //event.changedTouches
         // touchEvent.timeStamp = event.timeStamp
 
@@ -1837,7 +3161,7 @@ jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 module.exports = HTMLCanvasElement;
 
-},{"./DOMRect":5,"./HTMLElement":14,"./ImageData":18}],14:[function(require,module,exports){
+},{"./DOMRect":6,"./HTMLElement":15,"./ImageData":20}],15:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1924,7 +3248,7 @@ var HTMLElement = function (_Element) {
 
 module.exports = HTMLElement;
 
-},{"./Element":6,"./util":25}],15:[function(require,module,exports){
+},{"./Element":7,"./util":27}],16:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1974,7 +3298,6 @@ var HTMLImageElement = function (_HTMLElement) {
         _this.width = width;
         _this.height = height;
         _this._data = null;
-        _this.onload = null;
         _this._src = null;
         _this.complete = false;
         _this._glFormat = _this._glInternalFormat = gl.RGBA;
@@ -2014,11 +3337,8 @@ var HTMLImageElement = function (_HTMLElement) {
 
                 _this2.complete = true;
 
-                _this2.dispatchEvent(new Event('load'));
-
-                if (_this2.onload) {
-                    _this2.onload();
-                }
+                var event = new Event('load');
+                _this2.dispatchEvent(event);
             });
         },
         get: function get() {
@@ -2041,7 +3361,7 @@ var HTMLImageElement = function (_HTMLElement) {
 
 module.exports = HTMLImageElement;
 
-},{"./Event":7,"./HTMLElement":14}],16:[function(require,module,exports){
+},{"./Event":8,"./HTMLElement":15}],17:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2113,7 +3433,57 @@ var HTMLMediaElement = function (_HTMLElement) {
 
 module.exports = HTMLMediaElement;
 
-},{"./HTMLElement":14}],17:[function(require,module,exports){
+},{"./HTMLElement":15}],18:[function(require,module,exports){
+'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/****************************************************************************
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+
+ http://www.cocos.com
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated engine source code (the "Software"), a limited,
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
+ to use Cocos Creator solely to develop games on your target platforms. You shall
+  not use Cocos Creator software for developing other software or tools that's
+  used for developing games. You are not granted to publish, distribute,
+  sublicense, and/or sell copies of Cocos Creator.
+
+ The software or tools in this License Agreement are licensed, not sold.
+ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
+
+var HTMLMediaElement = require('./HTMLMediaElement');
+
+var HTMLVideoElement = function (_HTMLMediaElement) {
+  _inherits(HTMLVideoElement, _HTMLMediaElement);
+
+  function HTMLVideoElement() {
+    _classCallCheck(this, HTMLVideoElement);
+
+    return _possibleConstructorReturn(this, (HTMLVideoElement.__proto__ || Object.getPrototypeOf(HTMLVideoElement)).call(this, 'video'));
+  }
+
+  return HTMLVideoElement;
+}(HTMLMediaElement);
+
+module.exports = HTMLVideoElement;
+
+},{"./HTMLMediaElement":17}],19:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2149,7 +3519,7 @@ function Image(width, height) {
 
 module.exports = Image;
 
-},{"./HTMLImageElement":15}],18:[function(require,module,exports){
+},{"./HTMLImageElement":16}],20:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2224,7 +3594,7 @@ var ImageData = function () {
 
 module.exports = ImageData;
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2310,7 +3680,7 @@ var Node = function (_EventTarget) {
 
 module.exports = Node;
 
-},{"./EventTarget":8}],20:[function(require,module,exports){
+},{"./EventTarget":9}],22:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2364,7 +3734,7 @@ var TouchEvent = function (_Event) {
 
 module.exports = TouchEvent;
 
-},{"./Event":7}],21:[function(require,module,exports){
+},{"./Event":8}],23:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2511,7 +3881,7 @@ var Document = function (_Node) {
       } else if (query === 'canvas') {
         return [window.canvas];
       }
-      return [];
+      return [new HTMLElement(query)];
     }
   }, {
     key: 'createTextNode',
@@ -2527,7 +3897,7 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":4,"./FontFaceSet":11,"./HTMLCanvasElement":13,"./HTMLElement":14,"./Image":17,"./Node":19,"./location":23}],22:[function(require,module,exports){
+},{"./Audio":5,"./FontFaceSet":12,"./HTMLCanvasElement":14,"./HTMLElement":15,"./Image":19,"./Node":21,"./location":25}],24:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2556,7 +3926,7 @@ module.exports = document;
  ****************************************************************************/
 require('./window');
 
-},{"./window":26}],23:[function(require,module,exports){
+},{"./window":28}],25:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2586,13 +3956,14 @@ require('./window');
 
 var location = {
   href: 'game.js',
+  pathname: 'game.js',
   hash: '',
   reload: function reload() {}
 };
 
 module.exports = location;
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2631,7 +4002,7 @@ var navigator = {
   platform: 'wx', //cjh added wx
   language: 'zh-cn',
   appVersion: '5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
-  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Mobile/14E8301 MicroMessenger/6.6.0 MiniGame NetType/WIFI Language/zh_CN',
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Mobile/14E8301 NetType/WIFI Language/zh_CN',
   onLine: true, // TODO 用 wx.getNetworkStateChange 和 wx.onNetworkStateChange 来返回真实的状态
 
   // TODO 用 wx.getLocation 来封装 geolocation
@@ -2646,14 +4017,14 @@ var navigator = {
 
 module.exports = navigator;
 
-},{"./util":25}],25:[function(require,module,exports){
+},{"./util":27}],27:[function(require,module,exports){
 "use strict";
 
 function noop() {}
 
 module.exports = noop;
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2699,6 +4070,7 @@ function inject() {
     window.HTMLImageElement = require('./HTMLImageElement');
     window.HTMLMediaElement = require('./HTMLMediaElement');
     window.HTMLAudioElement = require('./HTMLAudioElement');
+    window.HTMLVideoElement = require('./HTMLVideoElement');
     window.canvas = new HTMLCanvasElement();
     window.gl.canvas = window.canvas;
     window.WebGLRenderingContext = window.gl;
@@ -2751,6 +4123,8 @@ function inject() {
         };
     };
 
+    window.focus = function () {};
+
     window._isInjected = true;
 }
 
@@ -2760,7 +4134,7 @@ if (!window._isInjected) {
 
 window.localStorage = sys.localStorage;
 
-},{"./Audio":4,"./Element":6,"./Event":7,"./EventTarget":8,"./FileReader":9,"./FontFace":10,"./FontFaceSet":11,"./HTMLAudioElement":12,"./HTMLCanvasElement":13,"./HTMLElement":14,"./HTMLImageElement":15,"./HTMLMediaElement":16,"./Image":17,"./TouchEvent":20,"./document":21,"./location":23,"./navigator":24}],27:[function(require,module,exports){
+},{"./Audio":5,"./Element":7,"./Event":8,"./EventTarget":9,"./FileReader":10,"./FontFace":11,"./FontFaceSet":12,"./HTMLAudioElement":13,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLImageElement":16,"./HTMLMediaElement":17,"./HTMLVideoElement":18,"./Image":19,"./TouchEvent":22,"./document":23,"./location":25,"./navigator":26}],29:[function(require,module,exports){
 "use strict";
 
 /*
@@ -2801,7 +4175,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 /*
@@ -2952,7 +4326,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":13,"./jsb-adapter/HTMLImageElement":15,"./jsb-adapter/ImageData":18,"./jsb_opengl_constants":29}],29:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":14,"./jsb-adapter/HTMLImageElement":16,"./jsb-adapter/ImageData":20,"./jsb_opengl_constants":31}],31:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -3819,7 +5193,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -4063,7 +5437,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -4320,7 +5694,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":32,"./entities":33,"./sax":34}],32:[function(require,module,exports){
+},{"./dom":34,"./entities":35,"./sax":36}],34:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -5540,7 +6914,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -5788,7 +7162,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -6418,4 +7792,4 @@ function split(source, start) {
 
 exports.XMLReader = XMLReader;
 
-},{}]},{},[3]);
+},{}]},{},[4]);

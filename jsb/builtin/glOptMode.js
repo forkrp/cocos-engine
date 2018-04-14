@@ -136,8 +136,8 @@ function attachShaderOpt(program, shader) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_ATTACH_SHADER;
-    buffer_data[next_index + 1] = program._id;
-    buffer_data[next_index + 2] = shader._id;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    buffer_data[next_index + 2] = shader ? shader._id : 0;
     next_index += 3;
 }
 function bindAttribLocationOpt(program, index, name) {
@@ -291,7 +291,7 @@ function compileShaderOpt(shader) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_COMPILE_SHADER;
-    buffer_data[next_index + 1] = shader._id;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
     next_index += 2;
 }
 function compressedTexImage2DOpt(target, level, internalformat, width, height, border, data) {
@@ -369,7 +369,7 @@ function deleteBufferOpt(buffer) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_DELETE_BUFFER;
-    buffer_data[next_index + 1] = buffer._id;
+    buffer_data[next_index + 1] = buffer ? buffer._id : 0;
     next_index += 2;
 }
 function deleteFramebufferOpt(framebuffer) {
@@ -377,7 +377,7 @@ function deleteFramebufferOpt(framebuffer) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_DELETE_FRAME_BUFFER;
-    buffer_data[next_index + 1] = framebuffer._id;
+    buffer_data[next_index + 1] = framebuffer ? framebuffer._id : 0;
     next_index += 2;
 }
 function deleteProgramOpt(program) {
@@ -385,7 +385,7 @@ function deleteProgramOpt(program) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_DELETE_PROGRAM;
-    buffer_data[next_index + 1] = program._id;
+    buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
 function deleteRenderbufferOpt(renderbuffer) {
@@ -393,7 +393,7 @@ function deleteRenderbufferOpt(renderbuffer) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_DELETE_RENDER_BUFFER;
-    buffer_data[next_index + 1] = renderbuffer._id;
+    buffer_data[next_index + 1] = renderbuffer ? renderbuffer._id : 0;
     next_index += 2;
 }
 function deleteShaderOpt(shader) {
@@ -401,7 +401,7 @@ function deleteShaderOpt(shader) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_DELETE_SHADER;
-    buffer_data[next_index + 1] = shader._id;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
     next_index += 2;
 }
 function deleteTextureOpt(texture) {
@@ -409,7 +409,7 @@ function deleteTextureOpt(texture) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_DELETE_TEXTURE;
-    buffer_data[next_index + 1] = texture._id;
+    buffer_data[next_index + 1] = texture ? texture._id : 0;
     next_index += 2;
 }
 function depthFuncOpt(func) {
@@ -442,8 +442,8 @@ function detachShaderOpt(program, shader) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_DETACH_SHADER;
-    buffer_data[next_index + 1] = program._id;
-    buffer_data[next_index + 1] = shader._id;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
     next_index += 3;
 }
 function disableOpt(cap) {
@@ -521,7 +521,7 @@ function framebufferRenderbufferOpt(target, attachment, renderbuffertarget, rend
     buffer_data[next_index + 1] = target;
     buffer_data[next_index + 2] = attachment;
     buffer_data[next_index + 3] = renderbuffertarget;
-    buffer_data[next_index + 4] = renderbuffer._id;
+    buffer_data[next_index + 4] = renderbuffer ? renderbuffer._id : 0;
     next_index += 5;
 }
 function framebufferTexture2DOpt(target, attachment, textarget, texture, level) {
@@ -532,7 +532,7 @@ function framebufferTexture2DOpt(target, attachment, textarget, texture, level) 
     buffer_data[next_index + 1] = target;
     buffer_data[next_index + 2] = attachment;
     buffer_data[next_index + 3] = textarget;
-    buffer_data[next_index + 4] = texture._id;
+    buffer_data[next_index + 4] = texture ? texture._id : 0;
     buffer_data[next_index + 5] = level;
     next_index += 6;
 }
@@ -682,7 +682,7 @@ function linkProgramOpt(program) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_LINK_PROGRAM;
-    buffer_data[next_index + 1] = program._id;
+    buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
 function pixelStoreiOpt(pname, param) {
@@ -1032,7 +1032,7 @@ function useProgramOpt(program) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_USE_PROGRAM;
-    buffer_data[next_index + 1] = program._id;
+    buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
 function validateProgramOpt(program) {
@@ -1040,7 +1040,7 @@ function validateProgramOpt(program) {
         flushCommand();
     }
     buffer_data[next_index] = GL_COMMAND_VALIDATE_PROGRAM;
-    buffer_data[next_index + 1] = program._id;
+    buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
 function vertexAttrib1fOpt(index, x) {
