@@ -43,8 +43,7 @@ function inject () {
     window.HTMLAudioElement = require('./HTMLAudioElement');
     window.HTMLVideoElement = require('./HTMLVideoElement');
     window.canvas = new HTMLCanvasElement();
-    window.gl.canvas = window.canvas;
-    window.WebGLRenderingContext = window.gl;
+    window.__gl.canvas = window.canvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
     window.Audio = require('./Audio');

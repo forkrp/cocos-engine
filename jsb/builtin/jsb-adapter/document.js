@@ -72,10 +72,10 @@ class Document extends Node {
   }
 
   getElementById(id) {
-    if (id === window.canvas.id) {
+    if (id === window.canvas.id || id === 'canvas') {
       return window.canvas
     }
-    return null
+    return {}
   }
 
   getElementsByTagName(tagName) {
@@ -86,7 +86,7 @@ class Document extends Node {
     } else if (tagName === 'canvas') {
       return [window.canvas]
     }
-    return []
+    return [{}]
   }
 
   getElementsByName(tagName) {
@@ -97,7 +97,7 @@ class Document extends Node {
     } else if (tagName === 'canvas') {
       return [window.canvas]
     }
-    return []
+    return [{}]
   }
 
   querySelector(query) {
@@ -110,7 +110,7 @@ class Document extends Node {
     } else if (query === `#${window.canvas.id}`) {
       return window.canvas
     }
-    return null
+    return {}
   }
 
   querySelectorAll(query) {

@@ -29,6 +29,8 @@
 
 require('./jsb_opengl_constants');
 
+const gl = __gl;
+
 gl.drawingBufferWidth = window.innerWidth;
 gl.drawingBufferHeight = window.innerHeight;
 

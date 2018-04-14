@@ -229,7 +229,7 @@ class HTMLCanvasElement extends HTMLElement {
         var self = this;
         // console.log(`==> Canvas getContext(${name})`);
         if (name === 'webgl' || name === 'experimental-webgl') {
-            return window.gl;
+            return window.__gl;
         } else if (name === '2d') {
             if (!this._context2D) {
                 this._context2D = new CanvasRenderingContext2D(this._width, this._height);

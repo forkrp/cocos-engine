@@ -48,33 +48,40 @@ window.wx = {
     }
 }
 
-const glOptMode = require('./glOptMode');
+const _glOptMode = require('./glOptMode');
 
-let oldRequestFrameCallback = null;
-let requestAnimationFrameID = 0;
-let requestAnimationFrameCallbacks = {};
+let _oldRequestFrameCallback = null;
+let _requestAnimationFrameID = 0;
+let _requestAnimationFrameCallbacks = {};
+let _firstTick = true;
 
 window.requestAnimationFrame = function(cb) {
-    let id = ++requestAnimationFrameID;
-    requestAnimationFrameCallbacks[id] = cb;
+    let id = ++_requestAnimationFrameID;
+    _requestAnimationFrameCallbacks[id] = cb;
     return id;
 };
 
 window.cancelAnimationFrame = function(id) {
-    delete requestAnimationFrameCallbacks[id];
+    delete _requestAnimationFrameCallbacks[id];
 };
 
 function tick(nowMilliSeconds) {
-    fireTimeout(nowMilliSeconds);
-
-    for (let id in requestAnimationFrameCallbacks) {
-        oldRequestFrameCallback = requestAnimationFrameCallbacks[id];
-        if (oldRequestFrameCallback) {
-            delete requestAnimationFrameCallbacks[id];
-            oldRequestFrameCallback(nowMilliSeconds);
+    if (_firstTick) {
+        _firstTick = false;
+        if (window.onload) {
+            window.onload();
         }
     }
-    glOptMode.flushCommands();
+    fireTimeout(nowMilliSeconds);
+
+    for (let id in _requestAnimationFrameCallbacks) {
+        _oldRequestFrameCallback = _requestAnimationFrameCallbacks[id];
+        if (_oldRequestFrameCallback) {
+            delete _requestAnimationFrameCallbacks[id];
+            _oldRequestFrameCallback(nowMilliSeconds);
+        }
+    }
+    _glOptMode.flushCommands();
 }
 
 let _timeoutIDIndex = 0;
