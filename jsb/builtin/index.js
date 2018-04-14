@@ -74,7 +74,7 @@ function tick(nowMilliSeconds) {
             oldRequestFrameCallback(nowMilliSeconds);
         }
     }
-    glOptMode.flushCommand();
+    glOptMode.flushCommands();
 }
 
 let _timeoutIDIndex = 0;
