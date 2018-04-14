@@ -121,7 +121,7 @@ class Document extends Node {
     } else if (query === 'canvas') {
       return [window.canvas]
     }
-    return []
+    return [new HTMLElement(query)];
   }
 
   createTextNode() {

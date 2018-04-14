@@ -341,7 +341,7 @@ function touchEventHandlerFactory(type) {
         const touchEvent = new TouchEvent(type)
 
         touchEvent.touches = touches;
-        // touchEvent.targetTouches = Array.prototype.slice.call(event.touches)
+        touchEvent.targetTouches = Array.prototype.slice.call(touchEvent.touches)
         touchEvent.changedTouches = touches;//event.changedTouches
         // touchEvent.timeStamp = event.timeStamp
 
