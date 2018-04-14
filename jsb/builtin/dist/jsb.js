@@ -3291,6 +3291,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var HTMLElement = require('./HTMLElement');
 var Event = require('./Event');
+var gl = window.__gl;
 
 var HTMLImageElement = function (_HTMLElement) {
     _inherits(HTMLImageElement, _HTMLElement);
