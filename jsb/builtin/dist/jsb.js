@@ -344,14 +344,14 @@ var next_index = 0;
 var buffer_data;
 
 function OpenOptMode() {
-    if (gl.flushCommands && isSupportTypeArray()) {
+    if (gl._flushCommands && isSupportTypeArray()) {
         attachMethodOpt();
     }
     buffer_data = new Float32Array(total_size);
 }
 function flushCommands() {
     if (next_index > 0) {
-        gl.flushCommands(next_index, buffer_data);
+        gl._flushCommands(next_index, buffer_data);
         next_index = 0;
     }
 }
@@ -471,7 +471,7 @@ function bufferSubDataOpt(target, offset, data) {
 }
 function checkFramebufferStatusOpt(target) {
     flushCommands();
-    _gl.checkFramebufferStatus(target);
+    return _gl.checkFramebufferStatus(target);
 }
 function clearOpt(mask) {
     if (next_index + 2 > total_size) {
