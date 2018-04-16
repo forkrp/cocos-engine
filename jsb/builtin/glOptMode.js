@@ -98,9 +98,10 @@ var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
 var GL_COMMAND_VIEW_PORT = 97;
 
 const gl = __gl;
+
+// _gl save the orignal gl functions.
 var _gl = {};
-for (var k in gl)
-{
+for (var k in gl) {
     _gl[k] = gl[k];
 }
 
@@ -128,7 +129,9 @@ function batchGLCommandsToNative() {
 function disableBatchGLCommandsToNative() {
     // Reset __gl variable to the default one.
     flushCommands();
-    window.__gl = _gl;
+    for (var k in _gl) {
+        __gl[k] = _gl[k];
+    }
     console.log('Disable batch GL commands optimization！');
 }
 
