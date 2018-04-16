@@ -24,10 +24,11 @@
  ****************************************************************************/
 
 window.CC_JSB = true;
-window.CC_WECHATGAME = true;
+window.CC_WECHATGAME = true; //FIXME: remove CC_WECHATGAME
 
 // Simulate wechat game API:
 
+//FIXME: remove wx
 window.wx = {
     getSystemInfoSync() {
         return {
@@ -48,7 +49,21 @@ window.wx = {
     }
 }
 
-const _glOptMode = require('./glOptMode');
+window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
+delete cc.CanvasRenderingContext2D;
+
+const { btoa, atob } = require('./base64/base64.min');
+window.btoa = btoa;
+window.atob = atob;
+const { Blob, URL } = require('./Blob');
+window.Blob = Blob;
+window.URL = URL;
+window.DOMParser = require('./xmldom/dom-parser').DOMParser;
+
+require('./jsb_prepare');
+require('./jsb_opengl');
+require('./jsb-adapter');
+require('./jsb_audioengine');
 
 let _oldRequestFrameCallback = null;
 let _requestAnimationFrameID = 0;
@@ -65,11 +80,18 @@ window.cancelAnimationFrame = function(id) {
     delete _requestAnimationFrameCallbacks[id];
 };
 
+const {disableBatchGLCommandsToNative, flushCommands} = require('./glOptMode');
+window.optConfig = {
+    disableBatchGLCommandsToNative: disableBatchGLCommandsToNative
+};
+
 function tick(nowMilliSeconds) {
     if (_firstTick) {
         _firstTick = false;
         if (window.onload) {
-            window.onload();
+            var event = new Event('load');
+            event._target = window;
+            window.onload(event);
         }
     }
     fireTimeout(nowMilliSeconds);
@@ -81,7 +103,7 @@ function tick(nowMilliSeconds) {
             _oldRequestFrameCallback(nowMilliSeconds);
         }
     }
-    _glOptMode.flushCommands();
+    flushCommands();
 }
 
 let _timeoutIDIndex = 0;
@@ -169,23 +191,7 @@ jsb.fileUtils = cc.fileUtils;
 delete cc.FileUtils;
 delete cc.fileUtils;
 
-window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
-delete cc.CanvasRenderingContext2D;
-
 jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
-
-require('./jsb_prepare');
-require('./jsb_opengl');
-require('./glOptMode');
-const { btoa, atob } = require('./base64/base64.min');
-window.btoa = btoa;
-window.atob = atob;
-const { Blob, URL } = require('./Blob');
-window.Blob = Blob;
-window.URL = URL;
-window.DOMParser = require('./xmldom/dom-parser').DOMParser;
-require('./jsb-adapter');
-require('./jsb_audioengine');
 
 /**
  * @type {Object}
