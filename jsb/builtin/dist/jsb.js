@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -231,9 +231,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 }();
 
 },{}],3:[function(require,module,exports){
-"use strict";
-
-var gl = __gl;
+'use strict';
 
 var GL_COMMAND_ACTIVE_TEXTURE = 0;
 var GL_COMMAND_ATTACH_SHADER = 1;
@@ -334,6 +332,9 @@ var GL_COMMAND_VERTEX_ATTRIB_4FV = 95;
 var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
 var GL_COMMAND_VIEW_PORT = 97;
 
+var gl = __gl;
+
+// _gl save the orignal gl functions.
 var _gl = {};
 for (var k in gl) {
     _gl[k] = gl[k];
@@ -343,12 +344,30 @@ var total_size = 100000;
 var next_index = 0;
 var buffer_data;
 
-function OpenOptMode() {
-    if (gl._flushCommands && isSupportTypeArray()) {
-        attachMethodOpt();
+// Batch GL commands is enabled by default.
+function batchGLCommandsToNative() {
+    if (gl._flushCommands) {
+        if (isSupportTypeArray()) {
+            console.log('Enable batch GL commands optimization!');
+            attachMethodOpt();
+            buffer_data = new Float32Array(total_size);
+        } else {
+            console.log('Disable batch GL commands, TypedArray Native API isn\'t supported!');
+        }
+    } else {
+        console.log('Disable batch GL commands, _flushCommands isn\'t binded!');
     }
-    buffer_data = new Float32Array(total_size);
 }
+
+function disableBatchGLCommandsToNative() {
+    // Reset __gl variable to the default one.
+    flushCommands();
+    for (var k in _gl) {
+        __gl[k] = _gl[k];
+    }
+    console.log('Disable batch GL commands optimization！');
+}
+
 function flushCommands() {
     if (next_index > 0) {
         gl._flushCommands(next_index, buffer_data);
@@ -364,6 +383,7 @@ function activeTextureOpt(texture) {
     buffer_data[next_index + 1] = texture;
     next_index += 2;
 }
+
 function attachShaderOpt(program, shader) {
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -373,10 +393,12 @@ function attachShaderOpt(program, shader) {
     buffer_data[next_index + 2] = shader ? shader._id : 0;
     next_index += 3;
 }
+
 function bindAttribLocationOpt(program, index, name) {
     flushCommands();
     _gl.bindAttribLocation(program, index, name);
 }
+
 function bindBufferOpt(target, buffer) {
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -386,6 +408,7 @@ function bindBufferOpt(target, buffer) {
     buffer_data[next_index + 2] = buffer ? buffer._id : 0;
     next_index += 3;
 }
+
 function bindFramebufferOpt(target, framebuffer) {
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -395,6 +418,7 @@ function bindFramebufferOpt(target, framebuffer) {
     buffer_data[next_index + 2] = framebuffer ? framebuffer._id : 0;
     next_index += 3;
 }
+
 function bindRenderbufferOpt(target, renderbuffer) {
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -404,6 +428,7 @@ function bindRenderbufferOpt(target, renderbuffer) {
     buffer_data[next_index + 2] = renderbuffer ? renderbuffer._id : 0;
     next_index += 3;
 }
+
 function bindTextureOpt(target, texture) {
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -413,6 +438,7 @@ function bindTextureOpt(target, texture) {
     buffer_data[next_index + 2] = texture ? texture._id : 0;
     next_index += 3;
 }
+
 function blendColorOpt(red, green, blue, alpha) {
     if (next_index + 5 > total_size) {
         flushCommands();
@@ -424,6 +450,7 @@ function blendColorOpt(red, green, blue, alpha) {
     buffer_data[next_index + 4] = alpha;
     next_index += 5;
 }
+
 function blendEquationOpt(mode) {
     if (next_index + 2 > total_size) {
         flushCommands();
@@ -432,6 +459,7 @@ function blendEquationOpt(mode) {
     buffer_data[next_index + 1] = mode;
     next_index += 2;
 }
+
 function blendEquationSeparateOpt(modeRGB, modeAlpha) {
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -441,6 +469,7 @@ function blendEquationSeparateOpt(modeRGB, modeAlpha) {
     buffer_data[next_index + 2] = modeAlpha;
     next_index += 3;
 }
+
 function blendFuncOpt(sfactor, dfactor) {
     if (next_index + 3 > total_size) {
         flushCommands();
@@ -450,6 +479,7 @@ function blendFuncOpt(sfactor, dfactor) {
     buffer_data[next_index + 2] = dfactor;
     next_index += 3;
 }
+
 function blendFuncSeparateOpt(srcRGB, dstRGB, srcAlpha, dstAlpha) {
     if (next_index + 5 > total_size) {
         flushCommands();
@@ -461,18 +491,22 @@ function blendFuncSeparateOpt(srcRGB, dstRGB, srcAlpha, dstAlpha) {
     buffer_data[next_index + 4] = dstAlpha;
     next_index += 5;
 }
+
 function bufferDataOpt(target, data, usage) {
     flushCommands();
     _gl.bufferData(target, data, usage);
 }
+
 function bufferSubDataOpt(target, offset, data) {
     flushCommands();
     _gl.bufferSubData(target, offset, data);
 }
+
 function checkFramebufferStatusOpt(target) {
     flushCommands();
     return _gl.checkFramebufferStatus(target);
 }
+
 function clearOpt(mask) {
     if (next_index + 2 > total_size) {
         flushCommands();
@@ -481,6 +515,7 @@ function clearOpt(mask) {
     buffer_data[next_index + 1] = mask;
     next_index += 2;
 }
+
 function clearColorOpt(red, green, blue, alpha) {
     if (next_index + 5 > total_size) {
         flushCommands();
@@ -492,6 +527,7 @@ function clearColorOpt(red, green, blue, alpha) {
     buffer_data[next_index + 4] = alpha;
     next_index += 5;
 }
+
 function clearDepthOpt(depth) {
     if (next_index + 2 > total_size) {
         flushCommands();
@@ -500,6 +536,7 @@ function clearDepthOpt(depth) {
     buffer_data[next_index + 1] = depth;
     next_index += 2;
 }
+
 function clearStencilOpt(s) {
     if (next_index + 2 > total_size) {
         flushCommands();
@@ -508,6 +545,7 @@ function clearStencilOpt(s) {
     buffer_data[next_index + 1] = s;
     next_index += 2;
 }
+
 function colorMaskOpt(red, green, blue, alpha) {
     if (next_index + 5 > total_size) {
         flushCommands();
@@ -519,6 +557,7 @@ function colorMaskOpt(red, green, blue, alpha) {
     buffer_data[next_index + 4] = alpha ? 1 : 0;
     next_index += 5;
 }
+
 function compileShaderOpt(shader) {
     if (next_index + 2 > total_size) {
         flushCommands();
@@ -527,14 +566,17 @@ function compileShaderOpt(shader) {
     buffer_data[next_index + 1] = shader ? shader._id : 0;
     next_index += 2;
 }
+
 function compressedTexImage2DOpt(target, level, internalformat, width, height, border, data) {
     flushCommands();
     _gl.compressedTexImage2D(target, level, internalformat, width, height, border, data);
 }
+
 function compressedTexSubImage2DOpt(target, level, xoffset, yoffset, width, height, format, data) {
     flushCommands();
     _gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data);
 }
+
 function copyTexImage2DOpt(target, level, internalformat, x, y, width, height, border) {
     if (next_index + 9 > total_size) {
         flushCommands();
@@ -550,6 +592,7 @@ function copyTexImage2DOpt(target, level, internalformat, x, y, width, height, b
     buffer_data[next_index + 8] = border;
     next_index += 9;
 }
+
 function copyTexSubImage2DOpt(target, level, xoffset, yoffset, x, y, width, height) {
     if (next_index + 9 > total_size) {
         flushCommands();
@@ -565,30 +608,37 @@ function copyTexSubImage2DOpt(target, level, xoffset, yoffset, x, y, width, heig
     buffer_data[next_index + 8] = height;
     next_index += 9;
 }
+
 function createBufferOpt() {
     flushCommands();
     return _gl.createBuffer();
 }
+
 function createFramebufferOpt() {
     flushCommands();
     return _gl.createFramebuffer();
 }
+
 function createProgramOpt() {
     flushCommands();
     return _gl.createProgram();
 }
+
 function createRenderbufferOpt() {
     flushCommands();
     return _gl.createRenderbuffer();
 }
+
 function createShaderOpt(type) {
     flushCommands();
     return _gl.createShader(type);
 }
+
 function createTextureOpt() {
     flushCommands();
     return _gl.createTexture();
 }
+
 function cullFaceOpt(mode) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -597,6 +647,7 @@ function cullFaceOpt(mode) {
     buffer_data[next_index + 1] = mode;
     next_index += 2;
 }
+
 function deleteBufferOpt(buffer) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -605,6 +656,7 @@ function deleteBufferOpt(buffer) {
     buffer_data[next_index + 1] = buffer ? buffer._id : 0;
     next_index += 2;
 }
+
 function deleteFramebufferOpt(framebuffer) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -613,6 +665,7 @@ function deleteFramebufferOpt(framebuffer) {
     buffer_data[next_index + 1] = framebuffer ? framebuffer._id : 0;
     next_index += 2;
 }
+
 function deleteProgramOpt(program) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -621,6 +674,7 @@ function deleteProgramOpt(program) {
     buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
+
 function deleteRenderbufferOpt(renderbuffer) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -629,6 +683,7 @@ function deleteRenderbufferOpt(renderbuffer) {
     buffer_data[next_index + 1] = renderbuffer ? renderbuffer._id : 0;
     next_index += 2;
 }
+
 function deleteShaderOpt(shader) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -637,6 +692,7 @@ function deleteShaderOpt(shader) {
     buffer_data[next_index + 1] = shader ? shader._id : 0;
     next_index += 2;
 }
+
 function deleteTextureOpt(texture) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -645,6 +701,7 @@ function deleteTextureOpt(texture) {
     buffer_data[next_index + 1] = texture ? texture._id : 0;
     next_index += 2;
 }
+
 function depthFuncOpt(func) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -653,6 +710,7 @@ function depthFuncOpt(func) {
     buffer_data[next_index + 1] = func;
     next_index += 2;
 }
+
 function depthMaskOpt(flag) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -661,6 +719,7 @@ function depthMaskOpt(flag) {
     buffer_data[next_index + 1] = flag ? 1 : 0;
     next_index += 2;
 }
+
 function depthRangeOpt(zNear, zFar) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -670,6 +729,7 @@ function depthRangeOpt(zNear, zFar) {
     buffer_data[next_index + 1] = zFar;
     next_index += 3;
 }
+
 function detachShaderOpt(program, shader) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -679,6 +739,7 @@ function detachShaderOpt(program, shader) {
     buffer_data[next_index + 1] = shader ? shader._id : 0;
     next_index += 3;
 }
+
 function disableOpt(cap) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -687,6 +748,7 @@ function disableOpt(cap) {
     buffer_data[next_index + 1] = cap;
     next_index += 2;
 }
+
 function disableVertexAttribArrayOpt(index) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -695,6 +757,7 @@ function disableVertexAttribArrayOpt(index) {
     buffer_data[next_index + 1] = index;
     next_index += 2;
 }
+
 function drawArraysOpt(mode, first, count) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -705,6 +768,7 @@ function drawArraysOpt(mode, first, count) {
     buffer_data[next_index + 3] = count;
     next_index += 4;
 }
+
 function drawElementsOpt(mode, count, type, offset) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -716,6 +780,7 @@ function drawElementsOpt(mode, count, type, offset) {
     buffer_data[next_index + 4] = offset ? offset : 0;
     next_index += 5;
 }
+
 function enableOpt(cap) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -724,6 +789,7 @@ function enableOpt(cap) {
     buffer_data[next_index + 1] = cap;
     next_index += 2;
 }
+
 function enableVertexAttribArrayOpt(index) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -732,6 +798,7 @@ function enableVertexAttribArrayOpt(index) {
     buffer_data[next_index + 1] = index;
     next_index += 2;
 }
+
 function finishOpt() {
     if (next_index + 1 >= total_size) {
         flushCommands();
@@ -739,6 +806,7 @@ function finishOpt() {
     buffer_data[next_index] = GL_COMMAND_FINISH;
     next_index += 1;
 }
+
 function flushOpt() {
     if (next_index + 1 >= total_size) {
         flushCommands();
@@ -746,6 +814,7 @@ function flushOpt() {
     buffer_data[next_index] = GL_COMMAND_FLUSH;
     next_index += 1;
 }
+
 function framebufferRenderbufferOpt(target, attachment, renderbuffertarget, renderbuffer) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -757,6 +826,7 @@ function framebufferRenderbufferOpt(target, attachment, renderbuffertarget, rend
     buffer_data[next_index + 4] = renderbuffer ? renderbuffer._id : 0;
     next_index += 5;
 }
+
 function framebufferTexture2DOpt(target, attachment, textarget, texture, level) {
     if (next_index + 6 >= total_size) {
         flushCommands();
@@ -769,6 +839,7 @@ function framebufferTexture2DOpt(target, attachment, textarget, texture, level) 
     buffer_data[next_index + 5] = level;
     next_index += 6;
 }
+
 function frontFaceOpt(mode) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -777,6 +848,7 @@ function frontFaceOpt(mode) {
     buffer_data[next_index + 1] = mode;
     next_index += 2;
 }
+
 function generateMipmapOpt(target) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -785,86 +857,107 @@ function generateMipmapOpt(target) {
     buffer_data[next_index + 1] = target;
     next_index += 2;
 }
+
 function getActiveAttribOpt(program, index) {
     flushCommands();
     return _gl.getActiveAttrib(program, index);
 }
+
 function getActiveUniformOpt(program, index) {
     flushCommands();
     return _gl.getActiveUniform(program, index);
 }
+
 function getAttachedShadersOpt(program) {
     flushCommands();
     return _gl.getAttachedShaders(program);
 }
+
 function getAttribLocationOpt(program, name) {
     flushCommands();
     return _gl.getAttribLocation(program, name);
 }
+
 function getBufferParameterOpt(target, pname) {
     flushCommands();
     return _gl.getBufferParameter(target, pname);
 }
+
 function getParameterOpt(pname) {
     flushCommands();
     return _gl.getParameter(pname);
 }
+
 function getErrorOpt() {
     flushCommands();
     return _gl.getError();
 }
+
 function getFramebufferAttachmentParameterOpt(target, attachment, pname) {
     flushCommands();
     return _gl.getFramebufferAttachmentParameter(target, attachment, pname);
 }
+
 function getProgramParameterOpt(program, pname) {
     flushCommands();
     return _gl.getProgramParameter(program, pname);
 }
+
 function getProgramInfoLogOpt(program) {
     flushCommands();
     return _gl.getProgramInfoLog(program);
 }
+
 function getRenderbufferParameterOpt(target, pname) {
     flushCommands();
     return _gl.getRenderbufferParameter(target, pname);
 }
+
 function getShaderParameterOpt(shader, pname) {
     flushCommands();
     return _gl.getShaderParameter(shader, pname);
 }
+
 function getShaderPrecisionFormatOpt(shadertype, precisiontype) {
     flushCommands();
     return _gl.getShaderPrecisionFormat(shadertype, precisiontype);
 }
+
 function getShaderInfoLogOpt(shader) {
     flushCommands();
     return _gl.getShaderInfoLog(shader);
 }
+
 function getShaderSourceOpt(shader) {
     flushCommands();
     return _gl.getShaderSource(shader);
 }
+
 function getTexParameterOpt(target, pname) {
     flushCommands();
     return _gl.getTexParameter(target, pname);
 }
+
 function getUniformOpt(program, location) {
     flushCommands();
     return _gl.getUniform(program, location);
 }
+
 function getUniformLocationOpt(program, name) {
     flushCommands();
     return _gl.getUniformLocation(program, name);
 }
+
 function getVertexAttribOpt(index, pname) {
     flushCommands();
     return _gl.getVertexAttrib(index, pname);
 }
+
 function getVertexAttribOffsetOpt(index, pname) {
     flushCommands();
     return _gl.getVertexAttribOffset(index, pname);
 }
+
 function hintOpt(target, mode) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -874,34 +967,42 @@ function hintOpt(target, mode) {
     buffer_data[next_index + 2] = mode;
     next_index += 3;
 }
+
 function isBufferOpt(buffer) {
     flushCommands();
     return _gl.isBuffer(buffer);
 }
+
 function isEnabledOpt(cap) {
     flushCommands();
     return _gl.isEnabled(cap);
 }
+
 function isFramebufferOpt(framebuffer) {
     flushCommands();
     return _gl.isFramebuffer(framebuffer);
 }
+
 function isProgramOpt(program) {
     flushCommands();
     return _gl.isProgram(program);
 }
+
 function isRenderbufferOpt(renderbuffer) {
     flushCommands();
     return _gl.isRenderbuffer(renderbuffer);
 }
+
 function isShaderOpt(shader) {
     flushCommands();
     return _gl.isShader(shader);
 }
+
 function isTextureOpt(texture) {
     flushCommands();
     return _gl.isTexture(texture);
 }
+
 function lineWidthOpt(width) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -910,6 +1011,7 @@ function lineWidthOpt(width) {
     buffer_data[next_index + 1] = width;
     next_index += 2;
 }
+
 function linkProgramOpt(program) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -918,6 +1020,7 @@ function linkProgramOpt(program) {
     buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
+
 function pixelStoreiOpt(pname, param) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -927,6 +1030,7 @@ function pixelStoreiOpt(pname, param) {
     buffer_data[next_index + 2] = param;
     next_index += 3;
 }
+
 function polygonOffsetOpt(factor, units) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -936,10 +1040,12 @@ function polygonOffsetOpt(factor, units) {
     buffer_data[next_index + 2] = units;
     next_index += 3;
 }
+
 function readPixelsOpt(x, y, width, height, format, type, pixels) {
     flushCommands();
     _gl.readPixels(x, y, width, height, format, type, pixels);
 }
+
 function renderbufferStorageOpt(target, internalFormat, width, height) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -951,6 +1057,7 @@ function renderbufferStorageOpt(target, internalFormat, width, height) {
     buffer_data[next_index + 4] = height;
     next_index += 5;
 }
+
 function sampleCoverageOpt(value, invert) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -960,6 +1067,7 @@ function sampleCoverageOpt(value, invert) {
     buffer_data[next_index + 2] = invert ? 1 : 0;
     next_index += 3;
 }
+
 function scissorOpt(x, y, width, height) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -971,10 +1079,12 @@ function scissorOpt(x, y, width, height) {
     buffer_data[next_index + 4] = height;
     next_index += 5;
 }
+
 function shaderSourceOpt(shader, source) {
     flushCommands();
     _gl.shaderSource(shader, source);
 }
+
 function stencilFuncOpt(func, ref, mask) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -985,6 +1095,7 @@ function stencilFuncOpt(func, ref, mask) {
     buffer_data[next_index + 3] = mask;
     next_index += 4;
 }
+
 function stencilFuncSeparateOpt(face, func, ref, mask) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -996,6 +1107,7 @@ function stencilFuncSeparateOpt(face, func, ref, mask) {
     buffer_data[next_index + 4] = mask;
     next_index += 5;
 }
+
 function stencilMaskOpt(mask) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -1004,6 +1116,7 @@ function stencilMaskOpt(mask) {
     buffer_data[next_index + 1] = mask;
     next_index += 2;
 }
+
 function stencilMaskSeparateOpt(face, mask) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -1013,6 +1126,7 @@ function stencilMaskSeparateOpt(face, mask) {
     buffer_data[next_index + 2] = mask;
     next_index += 3;
 }
+
 function stencilOpOpt(fail, zfail, zpass) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -1023,6 +1137,7 @@ function stencilOpOpt(fail, zfail, zpass) {
     buffer_data[next_index + 3] = zpass;
     next_index += 4;
 }
+
 function stencilOpSeparateOpt(face, fail, zfail, zpass) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -1034,10 +1149,19 @@ function stencilOpSeparateOpt(face, fail, zfail, zpass) {
     buffer_data[next_index + 4] = zpass;
     next_index += 5;
 }
-function texImage2DOpt(target, level, internalformat, width, height, border, format, type, pixels) {
+
+function texImage2DOpt() {
     flushCommands();
-    _gl.texImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+    var argCount = arguments.length;
+    if (argCount === 6) {
+        _gl.texImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]);
+    } else if (argCount === 9) {
+        _gl.texImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
+    } else {
+        console.log('texImage2DOpt: Wrong number of arguments, expected 6 or 9 but got ' + argCount);
+    }
 }
+
 function texParameterfOpt(target, pname, param) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -1048,6 +1172,7 @@ function texParameterfOpt(target, pname, param) {
     buffer_data[next_index + 3] = param;
     next_index += 4;
 }
+
 function texParameteriOpt(target, pname, param) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -1058,9 +1183,17 @@ function texParameteriOpt(target, pname, param) {
     buffer_data[next_index + 3] = param;
     next_index += 4;
 }
+
 function texSubImage2DOpt(target, level, xoffset, yoffset, width, height, format, type, pixels) {
     flushCommands();
-    _gl.texSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+    var argCount = arguments.length;
+    if (argCount === 7) {
+        _gl.texSubImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6]);
+    } else if (argCount === 9) {
+        _gl.texSubImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
+    } else {
+        console.log('texSubImage2DOpt: Wrong number of arguments, expected 7 or 9 but got ' + argCount);
+    }
 }
 
 function uniform1fOpt(location, x) {
@@ -1072,6 +1205,7 @@ function uniform1fOpt(location, x) {
     buffer_data[next_index + 2] = x;
     next_index += 3;
 }
+
 function uniform2fOpt(location, x, y) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -1082,6 +1216,7 @@ function uniform2fOpt(location, x, y) {
     buffer_data[next_index + 3] = y;
     next_index += 4;
 }
+
 function uniform3fOpt(location, x, y, z) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -1093,6 +1228,7 @@ function uniform3fOpt(location, x, y, z) {
     buffer_data[next_index + 4] = z;
     next_index += 5;
 }
+
 function uniform4fOpt(location, x, y, z, w) {
     if (next_index + 6 >= total_size) {
         flushCommands();
@@ -1105,6 +1241,7 @@ function uniform4fOpt(location, x, y, z, w) {
     buffer_data[next_index + 5] = w;
     next_index += 6;
 }
+
 function uniform1iOpt(location, x) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -1114,6 +1251,7 @@ function uniform1iOpt(location, x) {
     buffer_data[next_index + 2] = x;
     next_index += 3;
 }
+
 function uniform2iOpt(location, x, y) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -1124,6 +1262,7 @@ function uniform2iOpt(location, x, y) {
     buffer_data[next_index + 3] = y;
     next_index += 4;
 }
+
 function uniform3iOpt(location, x, y, z) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -1135,6 +1274,7 @@ function uniform3iOpt(location, x, y, z) {
     buffer_data[next_index + 4] = z;
     next_index += 5;
 }
+
 function uniform4iOpt(location, x, y, z, w) {
     if (next_index + 6 >= total_size) {
         flushCommands();
@@ -1147,6 +1287,7 @@ function uniform4iOpt(location, x, y, z, w) {
     buffer_data[next_index + 5] = w;
     next_index += 6;
 }
+
 function uniform1fvOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1157,6 +1298,7 @@ function uniform1fvOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniform2fvOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1167,6 +1309,7 @@ function uniform2fvOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniform3fvOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1177,6 +1320,7 @@ function uniform3fvOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniform4fvOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1187,6 +1331,7 @@ function uniform4fvOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniform1ivOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1197,6 +1342,7 @@ function uniform1ivOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniform2ivOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1207,6 +1353,7 @@ function uniform2ivOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniform3ivOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1217,6 +1364,7 @@ function uniform3ivOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniform4ivOpt(location, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1227,6 +1375,7 @@ function uniform4ivOpt(location, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function uniformMatrix2fvOpt(location, transpose, value) {
     if (next_index + 4 + value.length >= total_size) {
         flushCommands();
@@ -1238,6 +1387,7 @@ function uniformMatrix2fvOpt(location, transpose, value) {
     buffer_data.set(value, next_index + 4);
     next_index += 4 + value.length;
 }
+
 function uniformMatrix3fvOpt(location, transpose, value) {
     if (next_index + 4 + value.length >= total_size) {
         flushCommands();
@@ -1249,6 +1399,7 @@ function uniformMatrix3fvOpt(location, transpose, value) {
     buffer_data.set(value, next_index + 4);
     next_index += 4 + value.length;
 }
+
 function uniformMatrix4fvOpt(location, transpose, value) {
     if (next_index + 4 + value.length >= total_size) {
         flushCommands();
@@ -1260,6 +1411,7 @@ function uniformMatrix4fvOpt(location, transpose, value) {
     buffer_data.set(value, next_index + 4);
     next_index += 4 + value.length;
 }
+
 function useProgramOpt(program) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -1268,6 +1420,7 @@ function useProgramOpt(program) {
     buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
+
 function validateProgramOpt(program) {
     if (next_index + 2 >= total_size) {
         flushCommands();
@@ -1276,6 +1429,7 @@ function validateProgramOpt(program) {
     buffer_data[next_index + 1] = program ? program._id : 0;
     next_index += 2;
 }
+
 function vertexAttrib1fOpt(index, x) {
     if (next_index + 3 >= total_size) {
         flushCommands();
@@ -1285,6 +1439,7 @@ function vertexAttrib1fOpt(index, x) {
     buffer_data[next_index + 2] = x;
     next_index += 3;
 }
+
 function vertexAttrib2fOpt(index, x, y) {
     if (next_index + 4 >= total_size) {
         flushCommands();
@@ -1295,6 +1450,7 @@ function vertexAttrib2fOpt(index, x, y) {
     buffer_data[next_index + 3] = y;
     next_index += 4;
 }
+
 function vertexAttrib3fOpt(index, x, y, z) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -1306,6 +1462,7 @@ function vertexAttrib3fOpt(index, x, y, z) {
     buffer_data[next_index + 4] = z;
     next_index += 5;
 }
+
 function vertexAttrib4fOpt(index, x, y, z, w) {
     if (next_index + 6 >= total_size) {
         flushCommands();
@@ -1318,6 +1475,7 @@ function vertexAttrib4fOpt(index, x, y, z, w) {
     buffer_data[next_index + 5] = w;
     next_index += 6;
 }
+
 function vertexAttrib1fvOpt(index, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1328,6 +1486,7 @@ function vertexAttrib1fvOpt(index, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function vertexAttrib2fvOpt(index, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1338,6 +1497,7 @@ function vertexAttrib2fvOpt(index, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function vertexAttrib3fvOpt(index, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1348,6 +1508,7 @@ function vertexAttrib3fvOpt(index, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function vertexAttrib4fvOpt(index, value) {
     if (next_index + 3 + value.length >= total_size) {
         flushCommands();
@@ -1358,6 +1519,7 @@ function vertexAttrib4fvOpt(index, value) {
     buffer_data.set(value, next_index + 3);
     next_index += 3 + value.length;
 }
+
 function vertexAttribPointerOpt(index, size, type, normalized, stride, offset) {
     if (next_index + 7 >= total_size) {
         flushCommands();
@@ -1371,6 +1533,7 @@ function vertexAttribPointerOpt(index, size, type, normalized, stride, offset) {
     buffer_data[next_index + 6] = offset;
     next_index += 7;
 }
+
 function viewportOpt(x, y, width, height) {
     if (next_index + 5 >= total_size) {
         flushCommands();
@@ -1382,6 +1545,7 @@ function viewportOpt(x, y, width, height) {
     buffer_data[next_index + 4] = height;
     next_index += 5;
 }
+
 function isSupportTypeArray() {
     //FIXME:
     // if (GameStatusInfo.platform == 'android') {
@@ -1394,6 +1558,7 @@ function isSupportTypeArray() {
     // }
     // return false;
 }
+
 function attachMethodOpt() {
     gl.activeTexture = activeTextureOpt;
     gl.attachShader = attachShaderOpt;
@@ -1529,10 +1694,10 @@ function attachMethodOpt() {
     gl.viewport = viewportOpt;
 }
 
-//FIXME:
-OpenOptMode();
+batchGLCommandsToNative();
 
 module.exports = {
+    disableBatchGLCommandsToNative: disableBatchGLCommandsToNative,
     flushCommands: flushCommands
 };
 
@@ -1569,10 +1734,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  ****************************************************************************/
 
 window.CC_JSB = true;
-window.CC_WECHATGAME = true;
+window.CC_WECHATGAME = true; //FIXME: remove CC_WECHATGAME
 
 // Simulate wechat game API:
 
+//FIXME: remove wx
 window.wx = {
     getSystemInfoSync: function getSystemInfoSync() {
         return {
@@ -1587,7 +1753,28 @@ window.wx = {
     onHide: function onHide() {}
 };
 
-var _glOptMode = require('./glOptMode');
+window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
+delete cc.CanvasRenderingContext2D;
+
+var _require = require('./base64/base64.min'),
+    btoa = _require.btoa,
+    atob = _require.atob;
+
+window.btoa = btoa;
+window.atob = atob;
+
+var _require2 = require('./Blob'),
+    Blob = _require2.Blob,
+    URL = _require2.URL;
+
+window.Blob = Blob;
+window.URL = URL;
+window.DOMParser = require('./xmldom/dom-parser').DOMParser;
+
+require('./jsb_prepare');
+require('./jsb_opengl');
+require('./jsb-adapter');
+require('./jsb_audioengine');
 
 var _oldRequestFrameCallback = null;
 var _requestAnimationFrameID = 0;
@@ -1604,11 +1791,21 @@ window.cancelAnimationFrame = function (id) {
     delete _requestAnimationFrameCallbacks[id];
 };
 
+var _require3 = require('./glOptMode'),
+    disableBatchGLCommandsToNative = _require3.disableBatchGLCommandsToNative,
+    flushCommands = _require3.flushCommands;
+
+window.optConfig = {
+    disableBatchGLCommandsToNative: disableBatchGLCommandsToNative
+};
+
 function tick(nowMilliSeconds) {
     if (_firstTick) {
         _firstTick = false;
         if (window.onload) {
-            window.onload();
+            var event = new Event('load');
+            event._target = window;
+            window.onload(event);
         }
     }
     fireTimeout(nowMilliSeconds);
@@ -1620,7 +1817,7 @@ function tick(nowMilliSeconds) {
             _oldRequestFrameCallback(nowMilliSeconds);
         }
     }
-    _glOptMode.flushCommands();
+    flushCommands();
 }
 
 var _timeoutIDIndex = 0;
@@ -1707,31 +1904,7 @@ jsb.fileUtils = cc.fileUtils;
 delete cc.FileUtils;
 delete cc.fileUtils;
 
-window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
-delete cc.CanvasRenderingContext2D;
-
 jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
-
-require('./jsb_prepare');
-require('./jsb_opengl');
-require('./glOptMode');
-
-var _require = require('./base64/base64.min'),
-    btoa = _require.btoa,
-    atob = _require.atob;
-
-window.btoa = btoa;
-window.atob = atob;
-
-var _require2 = require('./Blob'),
-    Blob = _require2.Blob,
-    URL = _require2.URL;
-
-window.Blob = Blob;
-window.URL = URL;
-window.DOMParser = require('./xmldom/dom-parser').DOMParser;
-require('./jsb-adapter');
-require('./jsb_audioengine');
 
 /**
  * @type {Object}
@@ -4252,22 +4425,21 @@ void gl.texImage2D(target, level, internalformat, format, type, ImageBitmap? pix
 gl.texImage2D = function (target, level, internalformat, width, height, border, format, type, pixels) {
     var argCount = arguments.length;
     if (argCount == 6) {
+
         var image = border;
         type = height;
         format = width;
 
         if (image instanceof HTMLImageElement) {
-            // console.log(`==> texImage2D HTMLImageElement internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
-
             _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
-            // console.log(`==> texImage2D HTMLCanvasElement internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
-            if (image._data) {
-                _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+            var data = null;
+            if (!image._data) {
+                data = image._data._data;
             }
+            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, data);
         } else if (image instanceof ImageData) {
-            // console.log(`==> texImage2D ImageData internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);
             _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data);
         } else {
             console.error("Invalid pixel argument passed to gl.texImage2D!");
@@ -4296,14 +4468,15 @@ gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, for
         type = height;
         format = width;
 
-        //TODO: ImageData
         if (image instanceof HTMLImageElement) {
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
-            if (image._data) {
-                _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+            var data = null;
+            if (!image._data) {
+                data = image._data._data;
             }
+            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, data);
         } else if (image instanceof ImageData) {
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data);
         } else {
@@ -4360,12 +4533,6 @@ gl.isContextLost = function () {
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
-
-/*
-* AUTOGENERATED FILE. DO NOT EDIT IT
-* Generated by "generate_jsb.py -c opengl_jsb.ini" on 2013-03-18
-* Script version: v0.6
-*/
 
 var gl = __gl;
 
