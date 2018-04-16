@@ -68,24 +68,23 @@ void gl.texImage2D(target, level, internalformat, format, type, ImageBitmap? pix
 gl.texImage2D = function(target, level, internalformat, width, height, border, format, type, pixels) {
     let argCount = arguments.length;
     if (argCount == 6) {
+        
         var image = border;
         type = height;
         format = width;
 
         if (image instanceof HTMLImageElement) {
-            // console.log(`==> texImage2D HTMLImageElement internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
-       
             _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
         }
         else if (image instanceof HTMLCanvasElement) {
-            // console.log(`==> texImage2D HTMLCanvasElement internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
-            if (image._data) {
-                _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+            var data = null;
+            if (!image._data) {
+                data = image._data._data;
             }
+            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, data);
         }
         else if (image instanceof ImageData) {
-            // console.log(`==> texImage2D ImageData internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);
             _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data);
         }
         else {
@@ -94,7 +93,8 @@ gl.texImage2D = function(target, level, internalformat, width, height, border, f
     }
     else if (argCount == 9) {
         _glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
-    } else {
+    }
+    else {
         console.error("gl.texImage2D: invalid argument count!");
     }
 }
@@ -117,15 +117,16 @@ gl.texSubImage2D = function(target, level, xoffset, yoffset, width, height, form
         type = height;
         format = width;
 
-        //TODO: ImageData
         if (image instanceof HTMLImageElement) {
             gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
         }
         else if (image instanceof HTMLCanvasElement) {
-            if (image._data) {
-                _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+            var data = null;
+            if (!image._data) {
+                data = image._data._data;
             }
+            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, data);
         }
         else if (image instanceof ImageData) {
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data);
@@ -136,7 +137,8 @@ gl.texSubImage2D = function(target, level, xoffset, yoffset, width, height, form
     }
     else if (argCount == 9) {
         _glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
-    } else {
+    }
+    else {
         console.error((new Error("gl.texImage2D: invalid argument count!").stack));
     }
 }
