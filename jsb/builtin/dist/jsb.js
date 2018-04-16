@@ -4435,7 +4435,7 @@ gl.texImage2D = function (target, level, internalformat, width, height, border, 
             _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
             var data = null;
-            if (!image._data) {
+            if (image._data) {
                 data = image._data._data;
             }
             _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, data);
@@ -4473,7 +4473,7 @@ gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, for
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
             var data = null;
-            if (!image._data) {
+            if (image._data) {
                 data = image._data._data;
             }
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, data);
