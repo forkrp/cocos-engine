@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -3953,6 +3953,7 @@ var HTMLElement = require('./HTMLElement');
 var Image = require('./Image');
 var Audio = require('./Audio');
 var HTMLCanvasElement = require('./HTMLCanvasElement');
+var HTMLVideoElement = require('./HTMLVideoElement');
 var Node = require('./Node');
 var FontFaceSet = require('./FontFaceSet');
 
@@ -3995,11 +3996,7 @@ var Document = function (_Node) {
       } else if (tagName === 'img') {
         return new Image();
       } else if (tagName === 'video') {
-        return {
-          canPlayType: function canPlayType() {
-            return false;
-          }
-        };
+        return new HTMLVideoElement();
       }
 
       return new HTMLElement(tagName);
@@ -4010,7 +4007,7 @@ var Document = function (_Node) {
       if (id === window.canvas.id || id === 'canvas') {
         return window.canvas;
       }
-      return {};
+      return new HTMLElement(id);
     }
   }, {
     key: 'getElementsByTagName',
@@ -4022,7 +4019,7 @@ var Document = function (_Node) {
       } else if (tagName === 'canvas') {
         return [window.canvas];
       }
-      return [{}];
+      return [new HTMLElement(tagName)];
     }
   }, {
     key: 'getElementsByName',
@@ -4034,7 +4031,7 @@ var Document = function (_Node) {
       } else if (tagName === 'canvas') {
         return [window.canvas];
       }
-      return [{}];
+      return [new HTMLElement(tagName)];
     }
   }, {
     key: 'querySelector',
@@ -4048,7 +4045,7 @@ var Document = function (_Node) {
       } else if (query === '#' + window.canvas.id) {
         return window.canvas;
       }
-      return {};
+      return new HTMLElement(query);
     }
   }, {
     key: 'querySelectorAll',
@@ -4076,7 +4073,7 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":5,"./FontFaceSet":12,"./HTMLCanvasElement":14,"./HTMLElement":15,"./Image":19,"./Node":21,"./location":25}],24:[function(require,module,exports){
+},{"./Audio":5,"./FontFaceSet":12,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLVideoElement":18,"./Image":19,"./Node":21,"./location":25}],24:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -4136,6 +4133,7 @@ require('./window');
 var location = {
   href: 'game.js',
   pathname: 'game.js',
+  search: '',
   hash: '',
   reload: function reload() {}
 };
