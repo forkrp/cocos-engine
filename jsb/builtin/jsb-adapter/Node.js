@@ -23,7 +23,7 @@
  THE SOFTWARE.
  ****************************************************************************/
  
-let EventTarget = require('./EventTarget');
+const EventTarget = require('./EventTarget');
 
 class Node extends EventTarget {
   constructor() {
@@ -53,6 +53,10 @@ class Node extends EventTarget {
       return this.childNodes.splice(index, 1)
     }
     return null
+  }
+
+  contains(node) {
+    return this.childNodes.indexOf(node) > -1;
   }
 }
 
