@@ -392,7 +392,7 @@ var View = cc._Class.extend({
     },
 
     _adjustViewportMeta: function () {
-        if (this._isAdjustViewPort && cc.sys.platform !== cc.sys.WECHAT_GAME) {
+        if (this._isAdjustViewPort && !CC_JSB && cc.sys.platform !== cc.sys.WECHAT_GAME) {
             this._setViewportMeta(__BrowserGetter.meta, false);
             this._isAdjustViewPort = false;
         }
@@ -825,7 +825,7 @@ var View = cc._Class.extend({
      * @param {ResolutionPolicy|Number} resolutionPolicy The resolution policy desired
      */
     setRealPixelResolution: function (width, height, resolutionPolicy) {
-        if (cc.sys.platform !== cc.sys.WECHAT_GAME) {
+        if (!CC_JSB && cc.sys.platform !== cc.sys.WECHAT_GAME) {
             // Set viewport's width
             this._setViewportMeta({"width": width}, true);
 
