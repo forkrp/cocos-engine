@@ -661,7 +661,8 @@ var game = {
         if (isWeChatGame || CC_JSB) {
             this.container = cc.container = localContainer = document.createElement("DIV");
             this.frame = localContainer.parentNode === document.body ? document.documentElement : localContainer.parentNode;
-            this.canvas = cc._canvas = localCanvas = canvas;
+            var c = CC_JSB ? window.__cccanvas : window.canvas;
+            this.canvas = cc._canvas = localCanvas = c;
         }
         else {
             var element = (el instanceof HTMLElement) ? el : (document.querySelector(el) || document.querySelector('#' + el));
