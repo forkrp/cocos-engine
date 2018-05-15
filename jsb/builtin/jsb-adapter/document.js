@@ -23,17 +23,20 @@
  THE SOFTWARE.
  ****************************************************************************/
  
-let HTMLElement = require('./HTMLElement');
-let Image = require('./Image');
-let Audio = require('./Audio');
-let HTMLCanvasElement = require('./HTMLCanvasElement');
-let Node = require('./Node');
-let FontFaceSet = require('./FontFaceSet')
+const HTMLElement = require('./HTMLElement');
+const Image = require('./Image');
+const Audio = require('./Audio');
+const HTMLCanvasElement = require('./HTMLCanvasElement');
+const HTMLVideoElement = require('./HTMLVideoElement');
+const HTMLScriptElement = require('./HTMLScriptElement');
+const Node = require('./Node');
+const FontFaceSet = require('./FontFaceSet')
 
 class Document extends Node {
 
   constructor() {
     super()
+
     this.readyState = 'complete'
     this.visibilityState = 'visible'
     this.documentElement = window
@@ -61,21 +64,19 @@ class Document extends Node {
     } else if (tagName === 'img') {
       return new Image()
     } else if (tagName === 'video') {
-        return {
-            canPlayType: () => {
-                return false;
-            }
-        };
+      return new HTMLVideoElement();
+    } else if (tagName === 'script') {
+      return new HTMLScriptElement();
     }
 
     return new HTMLElement(tagName)
   }
 
   getElementById(id) {
-    if (id === window.canvas.id) {
-      return window.canvas
+    if (id === window.__cccanvas.id || id === 'canvas') {
+      return window.__cccanvas
     }
-    return null
+    return new HTMLElement(id);
   }
 
   getElementsByTagName(tagName) {
@@ -84,9 +85,9 @@ class Document extends Node {
     } else if (tagName === 'body') {
       return [document.body]
     } else if (tagName === 'canvas') {
-      return [window.canvas]
+      return [window.__cccanvas]
     }
-    return []
+    return [new HTMLElement(tagName)]
   }
 
   getElementsByName(tagName) {
@@ -95,9 +96,9 @@ class Document extends Node {
     } else if (tagName === 'body') {
       return [document.body]
     } else if (tagName === 'canvas') {
-      return [window.canvas]
+      return [window.__cccanvas]
     }
-    return []
+    return [new HTMLElement(tagName)]
   }
 
   querySelector(query) {
@@ -106,11 +107,11 @@ class Document extends Node {
     } else if (query === 'body') {
       return document.body
     } else if (query === 'canvas') {
-      return window.canvas
-    } else if (query === `#${window.canvas.id}`) {
-      return window.canvas
+      return window.__cccanvas
+    } else if (query === `#${window.__cccanvas.id}`) {
+      return window.__cccanvas
     }
-    return null
+    return new HTMLElement(query);
   }
 
   querySelectorAll(query) {
@@ -119,13 +120,24 @@ class Document extends Node {
     } else if (query === 'body') {
       return [document.body]
     } else if (query === 'canvas') {
-      return [window.canvas]
+      return [window.__cccanvas]
     }
     return [new HTMLElement(query)];
   }
 
   createTextNode() {
       return new HTMLElement('text');
+  }
+
+  elementFromPoint() {
+      return window.canvas;
+  }
+
+  createEvent(type) {
+      if (window[type]) {
+          return new window[type];
+      }
+      return null;
   }
 }
 

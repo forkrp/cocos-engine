@@ -47,168 +47,6 @@ class TextMetrics {
     }
 }
 
-// class CanvasRenderingContext2D {
-//     constructor() {
-//         console.log("==> CanvasRenderingContext2D constructor");
-
-//         // Line styles
-//         this.lineWidth = 1;
-//         this.lineCap = 'butt';
-//         this.lineJoin = 'miter';
-//         this.miterLimit = 10;
-//         this.lineDashOffset = 0;
-
-//         // Text styles
-//         this.font = '10px sans-serif';
-//         this.textAlign = 'start';
-//         this.textBaseline = 'alphabetic';
-
-//         // Fill and stroke styles
-//         this.fillStyle = '#000';
-//         this.strokeStyle = '#000';
-
-//         // Shadows
-//         this.shadowBlur = 0;
-//         this.shadowColor = 'black';
-//         this.shadowOffsetX = 0;
-//         this.shadowOffsetY = 0;
-
-//         // Compositing
-//         this.globalAlpha = 1;
-//         this.globalCompositeOperation = 'source-over';
-
-//     }
-
-//     clearRect(x, y, width, height) {
-//         console.log(`==> CanvasRenderingContext2D clearRect: [${x}, ${y}, ${width}, ${height}]`);
-//     }
-
-//     fillRect(x, y, width, height) {
-//         console.log(`==> CanvasRenderingContext2D fillRect: [${x}, ${y}, ${width}, ${height}]`);
-//     }
-
-//     strokeRect(x, y, width, height) {
-//         console.log(`==> CanvasRenderingContext2D strokeRect: [${x}, ${y}, ${width}, ${height}]`);
-//     }
-
-//     getLineDash() {
-//         return [];
-//     }
-
-//     setLineDash(segments) {
-
-//     }
-
-//     drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
-//         console.log("==> CanvasRenderingContext2D drawImage");
-//     }
-
-//     getImageData(sx, sy, sw, sh) {
-//         console.log(`==> CanvasRenderingContext2D getImageData(${sx}, ${sy}, ${sw}, ${sh})`);
-//         let data = new Uint8ClampedArray(sw * sh * 4);
-//         for (let i = 0; i < data.length; ++i) {
-//             data[i] = Math.floor(Math.random() * 255);
-//         }
-//         return {
-//             width: sw,
-//             height: sh,
-//             data: data
-//         };
-//     }
-
-//     fillText(text, x, y, maxWidth) {
-//         console.log("==> CanvasRenderingContext2D fillText: " + text 
-//             + ', font: ' + this.font + ', textAlign: ' + this.textAlign
-//             + ', textBaseline: ' + this.textBaseline);
-//     }
-
-//     strokeText(text, x, y, maxWidth) {
-//         console.log("==> CanvasRenderingContext2D strokeText" + text 
-//             + ', font: ' + this.font + ', textAlign: ' + this.textAlign
-//             + ', textBaseline: ' + this.textBaseline);
-//     }
-
-//     measureText(text) {
-//         console.log("==> CanvasRenderingContext2D measureText: " + text 
-//             + ', font: ' + this.font + ', textAlign: ' + this.textAlign
-//             + ', textBaseline: ' + this.textBaseline);
-//         if (text === '') {
-//             new Error("measureText empty");
-//         }
-//         return new TextMetrics(100);
-//     }
-
-//     // Gradients and patterns
-//     createLinearGradient(x0, y0, x1, y1) {
-//         console.log("==> CanvasRenderingContext2D createLinearGradient");
-//         return new CanvasGradient();
-//     }
-
-//     createRadialGradient(x0, y0, r0, x1, y1, r1) {
-//         return null;
-//     }
-
-//     createPattern(image, repetition) {
-//         return null;
-//     }
-
-//     save() {
-//         console.log("==> CanvasRenderingContext2D save");
-//     }
-
-//     // Paths
-//     beginPath() {
-//         console.log("==> CanvasRenderingContext2D beginPath");
-//     }
-
-//     closePath() {
-
-//     }
-
-//     moveTo() {
-//         console.log("==> CanvasRenderingContext2D moveTo");
-//     }
-
-//     lineTo() {
-//         console.log("==> CanvasRenderingContext2D lineTo");
-//     }
-
-//     bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
-
-//     }
-
-//     quadraticCurveTo(cpx, cpy, x, y) {
-
-//     }
-
-//     arc(x, y, radius, startAngle, endAngle, anticlockwise) {
-
-//     }
-
-//     rect(x, y, width, height) {
-
-//     }
-
-//     // Drawing paths
-//     stroke() {
-//         console.log("==> CanvasRenderingContext2D stroke");
-//     }
-
-//     /*
-//     void ctx.fill([fillRule]);
-//     void ctx.fill(path[, fillRule]);
-//     */
-//     fill() {
-
-//     }
-
-//     restore() {
-
-//     }
-// }
-
-const __listenTouchEventCanvasMap = {};
-
 class HTMLCanvasElement extends HTMLElement {
     constructor(width, height) {
         super('canvas')
@@ -218,8 +56,14 @@ class HTMLCanvasElement extends HTMLElement {
 
         this.top = 0;
         this.left = 0;
-        this._width = width ? Math.ceil(width) : 1;
-        this._height = height ? Math.ceil(height) : 1;
+        this._width = width ? width : 0;
+        this._height = height ? height : 0;
+        var w = Math.ceil(this._width);
+        var h = Math.ceil(this._height);
+        w = w <= 0 ? 1 : w;
+        h = h <= 0 ? 1 : h;
+        this._bufferWidth = w % 2 === 0 ? w : ++w;
+        this._bufferHeight = h % 2 === 0 ? h : ++h;
         this._context2D = null;
         this._data = null;
     }
@@ -229,13 +73,15 @@ class HTMLCanvasElement extends HTMLElement {
         var self = this;
         // console.log(`==> Canvas getContext(${name})`);
         if (name === 'webgl' || name === 'experimental-webgl') {
-            return window.gl;
+            return window.__ccgl;
         } else if (name === '2d') {
             if (!this._context2D) {
-                this._context2D = new CanvasRenderingContext2D(this._width, this._height);
+                this._context2D = new CanvasRenderingContext2D(this._bufferWidth, this._bufferHeight);
                 this._context2D._canvas = this;
                 this._context2D._setCanvasBufferUpdatedCallback(function(data) {
-                    self._data = new ImageData(data, self._width, self._height);
+                    // Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
+                    // HOW TO FIX ?
+                    self._data = new ImageData(data, self._bufferWidth, self._bufferHeight);
                 });
             }
             return this._context2D;
@@ -245,15 +91,19 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     toDataURL() {
+        //TODO:
         console.log("==> Canvas toDataURL");
         return "";
     }
 
     set width(width) {
+        this._width = width;
         width = Math.ceil(width);
         // console.log(`==> HTMLCanvasElement.width = ${width}`);
-        if (this._width !== width) {
-            this._width = width;
+        // Make sure width could be divided by 2, otherwise text display may be wrong.
+        width = width % 2 === 0 ? width : ++width;
+        if (this._bufferWidth !== width) {
+            this._bufferWidth = width;
             if (this._context2D) {
                 this._context2D._width = width;
             }
@@ -265,10 +115,13 @@ class HTMLCanvasElement extends HTMLElement {
     }
 
     set height(height) {
+        this._height = height;
         height = Math.ceil(height);
         // console.log(`==> HTMLCanvasElement.height = ${height}`);
-        if (this._height !== height) {
-            this._height = height;
+        // Make sure height could be divided by 2, otherwise text display may be wrong.
+        height = height % 2 === 0 ? height : ++height;
+        if (this._bufferHeight !== height) {
+            this._bufferHeight = height;
             if (this._context2D) {
                 this._context2D._height = height;
             }
@@ -289,28 +142,6 @@ class HTMLCanvasElement extends HTMLElement {
 
     getBoundingClientRect() {
         return new DOMRect(0, 0, this._width, this._height);
-    }
-
-    addEventListener(eventName, listener, options) {
-        let ret = super.addEventListener(eventName, listener, options);
-        if (ret) {
-            if (eventName === 'touchstart') {
-                __listenTouchEventCanvasMap[this._index] = this;
-            }
-        }
-
-        return ret;
-    }
-
-    removeEventListener(eventName, listener, options) {
-        let ret = super.removeEventListener(eventName, listener, options);
-        if (ret) {
-            if (eventName === 'touchstart') {
-                delete __listenTouchEventCanvasMap[this._index];
-            }
-        }
-
-        return ret;
     }
 }
 
@@ -335,26 +166,6 @@ ctx2DProto.drawImage = function(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, 
 //TODO:cjh
 ctx2DProto.bezierCurveTo = function() {}
 ctx2DProto.fill = function() {}
-
-function touchEventHandlerFactory(type) {
-    return (touches) => {
-        const touchEvent = new TouchEvent(type)
-
-        touchEvent.touches = touches;
-        touchEvent.targetTouches = Array.prototype.slice.call(touchEvent.touches)
-        touchEvent.changedTouches = touches;//event.changedTouches
-        // touchEvent.timeStamp = event.timeStamp
-
-        for (let key in __listenTouchEventCanvasMap) {
-            __listenTouchEventCanvasMap[key].dispatchEvent(touchEvent);
-        }
-    }
-}
-
-jsb.onTouchStart = touchEventHandlerFactory('touchstart');
-jsb.onTouchMove = touchEventHandlerFactory('touchmove');
-jsb.onTouchEnd = touchEventHandlerFactory('touchend');
-jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 module.exports = HTMLCanvasElement;
 
