@@ -233,6 +233,1478 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 },{}],3:[function(require,module,exports){
 'use strict';
 
+var GL_COMMAND_ACTIVE_TEXTURE = 0;
+var GL_COMMAND_ATTACH_SHADER = 1;
+var GL_COMMAND_BIND_ATTRIB_LOCATION = 2;
+var GL_COMMAND_BIND_BUFFER = 3;
+var GL_COMMAND_BIND_FRAME_BUFFER = 4;
+var GL_COMMAND_BIND_RENDER_BUFFER = 5;
+var GL_COMMAND_BIND_TEXTURE = 6;
+var GL_COMMAND_BLEND_COLOR = 7;
+var GL_COMMAND_BLEND_EQUATION = 8;
+var GL_COMMAND_BLEND_EQUATION_SEPARATE = 9;
+var GL_COMMAND_BLEND_FUNC = 10;
+var GL_COMMAND_BLEND_FUNC_SEPARATE = 11;
+var GL_COMMAND_BUFFER_DATA = 12;
+var GL_COMMAND_BUFFER_SUB_DATA = 13;
+var GL_COMMAND_CLEAR = 14;
+var GL_COMMAND_CLEAR_COLOR = 15;
+var GL_COMMAND_CLEAR_DEPTH = 16;
+var GL_COMMAND_CLEAR_STENCIL = 17;
+var GL_COMMAND_COLOR_MASK = 18;
+var GL_COMMAND_COMMIT = 19;
+var GL_COMMAND_COMPILE_SHADER = 20;
+var GL_COMMAND_COMPRESSED_TEX_IMAGE_2D = 21;
+var GL_COMMAND_COMPRESSED_TEX_SUB_IMAGE_2D = 22;
+var GL_COMMAND_COPY_TEX_IMAGE_2D = 23;
+var GL_COMMAND_COPY_TEX_SUB_IMAGE_2D = 24;
+var GL_COMMAND_CULL_FACE = 25;
+var GL_COMMAND_DELETE_BUFFER = 26;
+var GL_COMMAND_DELETE_FRAME_BUFFER = 27;
+var GL_COMMAND_DELETE_PROGRAM = 28;
+var GL_COMMAND_DELETE_RENDER_BUFFER = 29;
+var GL_COMMAND_DELETE_SHADER = 30;
+var GL_COMMAND_DELETE_TEXTURE = 31;
+var GL_COMMAND_DEPTH_FUNC = 32;
+var GL_COMMAND_DEPTH_MASK = 33;
+var GL_COMMAND_DEPTH_RANGE = 34;
+var GL_COMMAND_DETACH_SHADER = 35;
+var GL_COMMAND_DISABLE = 36;
+var GL_COMMAND_DISABLE_VERTEX_ATTRIB_ARRAY = 37;
+var GL_COMMAND_DRAW_ARRAYS = 38;
+var GL_COMMAND_DRAW_ELEMENTS = 39;
+var GL_COMMAND_ENABLE = 40;
+var GL_COMMAND_ENABLE_VERTEX_ATTRIB_ARRAY = 41;
+var GL_COMMAND_FINISH = 42;
+var GL_COMMAND_FLUSH = 43;
+var GL_COMMAND_FRAME_BUFFER_RENDER_BUFFER = 44;
+var GL_COMMAND_FRAME_BUFFER_TEXTURE_2D = 45;
+var GL_COMMAND_FRONT_FACE = 46;
+var GL_COMMAND_GENERATE_MIPMAP = 47;
+var GL_COMMAND_HINT = 48;
+var GL_COMMAND_LINE_WIDTH = 49;
+var GL_COMMAND_LINK_PROGRAM = 50;
+var GL_COMMAND_PIXEL_STOREI = 51;
+var GL_COMMAND_POLYGON_OFFSET = 52;
+var GL_COMMAND_RENDER_BUFFER_STORAGE = 53;
+var GL_COMMAND_SAMPLE_COVERAGE = 54;
+var GL_COMMAND_SCISSOR = 55;
+var GL_COMMAND_SHADER_SOURCE = 56;
+var GL_COMMAND_STENCIL_FUNC = 57;
+var GL_COMMAND_STENCIL_FUNC_SEPARATE = 58;
+var GL_COMMAND_STENCIL_MASK = 59;
+var GL_COMMAND_STENCIL_MASK_SEPARATE = 60;
+var GL_COMMAND_STENCIL_OP = 61;
+var GL_COMMAND_STENCIL_OP_SEPARATE = 62;
+var GL_COMMAND_TEX_IMAGE_2D = 63;
+var GL_COMMAND_TEX_PARAMETER_F = 64;
+var GL_COMMAND_TEX_PARAMETER_I = 65;
+var GL_COMMAND_TEX_SUB_IMAGE_2D = 66;
+var GL_COMMAND_UNIFORM_1F = 67;
+var GL_COMMAND_UNIFORM_1FV = 68;
+var GL_COMMAND_UNIFORM_1I = 69;
+var GL_COMMAND_UNIFORM_1IV = 70;
+var GL_COMMAND_UNIFORM_2F = 71;
+var GL_COMMAND_UNIFORM_2FV = 72;
+var GL_COMMAND_UNIFORM_2I = 73;
+var GL_COMMAND_UNIFORM_2IV = 74;
+var GL_COMMAND_UNIFORM_3F = 75;
+var GL_COMMAND_UNIFORM_3FV = 76;
+var GL_COMMAND_UNIFORM_3I = 77;
+var GL_COMMAND_UNIFORM_3IV = 78;
+var GL_COMMAND_UNIFORM_4F = 79;
+var GL_COMMAND_UNIFORM_4FV = 80;
+var GL_COMMAND_UNIFORM_4I = 81;
+var GL_COMMAND_UNIFORM_4IV = 82;
+var GL_COMMAND_UNIFORM_MATRIX_2FV = 83;
+var GL_COMMAND_UNIFORM_MATRIX_3FV = 84;
+var GL_COMMAND_UNIFORM_MATRIX_4FV = 85;
+var GL_COMMAND_USE_PROGRAM = 86;
+var GL_COMMAND_VALIDATE_PROGRAM = 87;
+var GL_COMMAND_VERTEX_ATTRIB_1F = 88;
+var GL_COMMAND_VERTEX_ATTRIB_2F = 89;
+var GL_COMMAND_VERTEX_ATTRIB_3F = 90;
+var GL_COMMAND_VERTEX_ATTRIB_4F = 91;
+var GL_COMMAND_VERTEX_ATTRIB_1FV = 92;
+var GL_COMMAND_VERTEX_ATTRIB_2FV = 93;
+var GL_COMMAND_VERTEX_ATTRIB_3FV = 94;
+var GL_COMMAND_VERTEX_ATTRIB_4FV = 95;
+var GL_COMMAND_VERTEX_ATTRIB_POINTER = 96;
+var GL_COMMAND_VIEW_PORT = 97;
+
+var gl = __ccgl;
+
+// _gl save the orignal gl functions.
+var _gl = {};
+for (var k in gl) {
+    _gl[k] = gl[k];
+}
+
+var total_size = 100000;
+var next_index = 0;
+var buffer_data;
+
+// Batch GL commands is enabled by default.
+function batchGLCommandsToNative() {
+    if (gl._flushCommands) {
+        if (isSupportTypeArray()) {
+            console.log('Enable batch GL commands optimization!');
+            attachMethodOpt();
+            buffer_data = new Float32Array(total_size);
+        } else {
+            console.log('Disable batch GL commands, TypedArray Native API isn\'t supported!');
+        }
+    } else {
+        console.log('Disable batch GL commands, _flushCommands isn\'t binded!');
+    }
+}
+
+function disableBatchGLCommandsToNative() {
+    // Reset __ccgl variable to the default one.
+    flushCommands();
+    for (var k in _gl) {
+        __ccgl[k] = _gl[k];
+    }
+    console.log('Disable batch GL commands optimization！');
+    jsb.disableBatchGLCommandsToNative();
+}
+
+function flushCommands() {
+    if (next_index > 0) {
+        gl._flushCommands(next_index, buffer_data);
+        next_index = 0;
+    }
+}
+
+function activeTextureOpt(texture) {
+    if (next_index + 2 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_ACTIVE_TEXTURE;
+    buffer_data[next_index + 1] = texture;
+    next_index += 2;
+}
+
+function attachShaderOpt(program, shader) {
+    if (next_index + 3 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_ATTACH_SHADER;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    buffer_data[next_index + 2] = shader ? shader._id : 0;
+    next_index += 3;
+}
+
+function bindAttribLocationOpt(program, index, name) {
+    flushCommands();
+    _gl.bindAttribLocation(program, index, name);
+}
+
+function bindBufferOpt(target, buffer) {
+    if (next_index + 3 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = buffer ? buffer._id : 0;
+    next_index += 3;
+}
+
+function bindFramebufferOpt(target, framebuffer) {
+    if (next_index + 3 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_FRAME_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = framebuffer ? framebuffer._id : 0;
+    next_index += 3;
+}
+
+function bindRenderbufferOpt(target, renderbuffer) {
+    if (next_index + 3 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_RENDER_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = renderbuffer ? renderbuffer._id : 0;
+    next_index += 3;
+}
+
+function bindTextureOpt(target, texture) {
+    if (next_index + 3 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BIND_TEXTURE;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = texture ? texture._id : 0;
+    next_index += 3;
+}
+
+function blendColorOpt(red, green, blue, alpha) {
+    if (next_index + 5 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_COLOR;
+    buffer_data[next_index + 1] = red;
+    buffer_data[next_index + 2] = green;
+    buffer_data[next_index + 3] = blue;
+    buffer_data[next_index + 4] = alpha;
+    next_index += 5;
+}
+
+function blendEquationOpt(mode) {
+    if (next_index + 2 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_EQUATION;
+    buffer_data[next_index + 1] = mode;
+    next_index += 2;
+}
+
+function blendEquationSeparateOpt(modeRGB, modeAlpha) {
+    if (next_index + 3 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_EQUATION_SEPARATE;
+    buffer_data[next_index + 1] = modeRGB;
+    buffer_data[next_index + 2] = modeAlpha;
+    next_index += 3;
+}
+
+function blendFuncOpt(sfactor, dfactor) {
+    if (next_index + 3 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_FUNC;
+    buffer_data[next_index + 1] = sfactor;
+    buffer_data[next_index + 2] = dfactor;
+    next_index += 3;
+}
+
+function blendFuncSeparateOpt(srcRGB, dstRGB, srcAlpha, dstAlpha) {
+    if (next_index + 5 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_BLEND_FUNC_SEPARATE;
+    buffer_data[next_index + 1] = srcRGB;
+    buffer_data[next_index + 2] = dstRGB;
+    buffer_data[next_index + 3] = srcAlpha;
+    buffer_data[next_index + 4] = dstAlpha;
+    next_index += 5;
+}
+
+function bufferDataOpt(target, data, usage) {
+    flushCommands();
+    _gl.bufferData(target, data, usage);
+}
+
+function bufferSubDataOpt(target, offset, data) {
+    flushCommands();
+    _gl.bufferSubData(target, offset, data);
+}
+
+function checkFramebufferStatusOpt(target) {
+    flushCommands();
+    return _gl.checkFramebufferStatus(target);
+}
+
+function clearOpt(mask) {
+    if (next_index + 2 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR;
+    buffer_data[next_index + 1] = mask;
+    next_index += 2;
+}
+
+function clearColorOpt(red, green, blue, alpha) {
+    if (next_index + 5 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR_COLOR;
+    buffer_data[next_index + 1] = red;
+    buffer_data[next_index + 2] = green;
+    buffer_data[next_index + 3] = blue;
+    buffer_data[next_index + 4] = alpha;
+    next_index += 5;
+}
+
+function clearDepthOpt(depth) {
+    if (next_index + 2 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR_DEPTH;
+    buffer_data[next_index + 1] = depth;
+    next_index += 2;
+}
+
+function clearStencilOpt(s) {
+    if (next_index + 2 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_CLEAR_STENCIL;
+    buffer_data[next_index + 1] = s;
+    next_index += 2;
+}
+
+function colorMaskOpt(red, green, blue, alpha) {
+    if (next_index + 5 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_COLOR_MASK;
+    buffer_data[next_index + 1] = red ? 1 : 0;
+    buffer_data[next_index + 2] = green ? 1 : 0;
+    buffer_data[next_index + 3] = blue ? 1 : 0;
+    buffer_data[next_index + 4] = alpha ? 1 : 0;
+    next_index += 5;
+}
+
+function compileShaderOpt(shader) {
+    if (next_index + 2 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_COMPILE_SHADER;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    next_index += 2;
+}
+
+function compressedTexImage2DOpt(target, level, internalformat, width, height, border, data) {
+    flushCommands();
+    _gl.compressedTexImage2D(target, level, internalformat, width, height, border, data);
+}
+
+function compressedTexSubImage2DOpt(target, level, xoffset, yoffset, width, height, format, data) {
+    flushCommands();
+    _gl.compressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, data);
+}
+
+function copyTexImage2DOpt(target, level, internalformat, x, y, width, height, border) {
+    if (next_index + 9 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_COPY_TEX_IMAGE_2D;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = level;
+    buffer_data[next_index + 3] = internalformat;
+    buffer_data[next_index + 4] = x;
+    buffer_data[next_index + 5] = y;
+    buffer_data[next_index + 6] = width;
+    buffer_data[next_index + 7] = height;
+    buffer_data[next_index + 8] = border;
+    next_index += 9;
+}
+
+function copyTexSubImage2DOpt(target, level, xoffset, yoffset, x, y, width, height) {
+    if (next_index + 9 > total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_COPY_TEX_SUB_IMAGE_2D;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = level;
+    buffer_data[next_index + 3] = xoffset;
+    buffer_data[next_index + 4] = yoffset;
+    buffer_data[next_index + 5] = x;
+    buffer_data[next_index + 6] = y;
+    buffer_data[next_index + 7] = width;
+    buffer_data[next_index + 8] = height;
+    next_index += 9;
+}
+
+function createBufferOpt() {
+    flushCommands();
+    return _gl.createBuffer();
+}
+
+function createFramebufferOpt() {
+    flushCommands();
+    return _gl.createFramebuffer();
+}
+
+function createProgramOpt() {
+    flushCommands();
+    return _gl.createProgram();
+}
+
+function createRenderbufferOpt() {
+    flushCommands();
+    return _gl.createRenderbuffer();
+}
+
+function createShaderOpt(type) {
+    flushCommands();
+    return _gl.createShader(type);
+}
+
+function createTextureOpt() {
+    flushCommands();
+    return _gl.createTexture();
+}
+
+function cullFaceOpt(mode) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_CULL_FACE;
+    buffer_data[next_index + 1] = mode;
+    next_index += 2;
+}
+
+function deleteBufferOpt(buffer) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_BUFFER;
+    buffer_data[next_index + 1] = buffer ? buffer._id : 0;
+    next_index += 2;
+}
+
+function deleteFramebufferOpt(framebuffer) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_FRAME_BUFFER;
+    buffer_data[next_index + 1] = framebuffer ? framebuffer._id : 0;
+    next_index += 2;
+}
+
+function deleteProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+
+function deleteRenderbufferOpt(renderbuffer) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_RENDER_BUFFER;
+    buffer_data[next_index + 1] = renderbuffer ? renderbuffer._id : 0;
+    next_index += 2;
+}
+
+function deleteShaderOpt(shader) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_SHADER;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    next_index += 2;
+}
+
+function deleteTextureOpt(texture) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DELETE_TEXTURE;
+    buffer_data[next_index + 1] = texture ? texture._id : 0;
+    next_index += 2;
+}
+
+function depthFuncOpt(func) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DEPTH_FUNC;
+    buffer_data[next_index + 1] = func;
+    next_index += 2;
+}
+
+function depthMaskOpt(flag) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DEPTH_MASK;
+    buffer_data[next_index + 1] = flag ? 1 : 0;
+    next_index += 2;
+}
+
+function depthRangeOpt(zNear, zFar) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DEPTH_RANGE;
+    buffer_data[next_index + 1] = zNear;
+    buffer_data[next_index + 1] = zFar;
+    next_index += 3;
+}
+
+function detachShaderOpt(program, shader) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DETACH_SHADER;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    buffer_data[next_index + 1] = shader ? shader._id : 0;
+    next_index += 3;
+}
+
+function disableOpt(cap) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DISABLE;
+    buffer_data[next_index + 1] = cap;
+    next_index += 2;
+}
+
+function disableVertexAttribArrayOpt(index) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DISABLE_VERTEX_ATTRIB_ARRAY;
+    buffer_data[next_index + 1] = index;
+    next_index += 2;
+}
+
+function drawArraysOpt(mode, first, count) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DRAW_ARRAYS;
+    buffer_data[next_index + 1] = mode;
+    buffer_data[next_index + 2] = first;
+    buffer_data[next_index + 3] = count;
+    next_index += 4;
+}
+
+function drawElementsOpt(mode, count, type, offset) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_DRAW_ELEMENTS;
+    buffer_data[next_index + 1] = mode;
+    buffer_data[next_index + 2] = count;
+    buffer_data[next_index + 3] = type;
+    buffer_data[next_index + 4] = offset ? offset : 0;
+    next_index += 5;
+}
+
+function enableOpt(cap) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_ENABLE;
+    buffer_data[next_index + 1] = cap;
+    next_index += 2;
+}
+
+function enableVertexAttribArrayOpt(index) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_ENABLE_VERTEX_ATTRIB_ARRAY;
+    buffer_data[next_index + 1] = index;
+    next_index += 2;
+}
+
+function finishOpt() {
+    if (next_index + 1 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_FINISH;
+    next_index += 1;
+}
+
+function flushOpt() {
+    if (next_index + 1 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_FLUSH;
+    next_index += 1;
+}
+
+function framebufferRenderbufferOpt(target, attachment, renderbuffertarget, renderbuffer) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_FRAME_BUFFER_RENDER_BUFFER;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = attachment;
+    buffer_data[next_index + 3] = renderbuffertarget;
+    buffer_data[next_index + 4] = renderbuffer ? renderbuffer._id : 0;
+    next_index += 5;
+}
+
+function framebufferTexture2DOpt(target, attachment, textarget, texture, level) {
+    if (next_index + 6 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_FRAME_BUFFER_TEXTURE_2D;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = attachment;
+    buffer_data[next_index + 3] = textarget;
+    buffer_data[next_index + 4] = texture ? texture._id : 0;
+    buffer_data[next_index + 5] = level;
+    next_index += 6;
+}
+
+function frontFaceOpt(mode) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_FRONT_FACE;
+    buffer_data[next_index + 1] = mode;
+    next_index += 2;
+}
+
+function generateMipmapOpt(target) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_GENERATE_MIPMAP;
+    buffer_data[next_index + 1] = target;
+    next_index += 2;
+}
+
+function getActiveAttribOpt(program, index) {
+    flushCommands();
+    return _gl.getActiveAttrib(program, index);
+}
+
+function getActiveUniformOpt(program, index) {
+    flushCommands();
+    return _gl.getActiveUniform(program, index);
+}
+
+function getAttachedShadersOpt(program) {
+    flushCommands();
+    return _gl.getAttachedShaders(program);
+}
+
+function getAttribLocationOpt(program, name) {
+    flushCommands();
+    return _gl.getAttribLocation(program, name);
+}
+
+function getBufferParameterOpt(target, pname) {
+    flushCommands();
+    return _gl.getBufferParameter(target, pname);
+}
+
+function getParameterOpt(pname) {
+    flushCommands();
+    return _gl.getParameter(pname);
+}
+
+function getErrorOpt() {
+    flushCommands();
+    return _gl.getError();
+}
+
+function getFramebufferAttachmentParameterOpt(target, attachment, pname) {
+    flushCommands();
+    return _gl.getFramebufferAttachmentParameter(target, attachment, pname);
+}
+
+function getProgramParameterOpt(program, pname) {
+    flushCommands();
+    return _gl.getProgramParameter(program, pname);
+}
+
+function getProgramInfoLogOpt(program) {
+    flushCommands();
+    return _gl.getProgramInfoLog(program);
+}
+
+function getRenderbufferParameterOpt(target, pname) {
+    flushCommands();
+    return _gl.getRenderbufferParameter(target, pname);
+}
+
+function getShaderParameterOpt(shader, pname) {
+    flushCommands();
+    return _gl.getShaderParameter(shader, pname);
+}
+
+function getShaderPrecisionFormatOpt(shadertype, precisiontype) {
+    flushCommands();
+    return _gl.getShaderPrecisionFormat(shadertype, precisiontype);
+}
+
+function getShaderInfoLogOpt(shader) {
+    flushCommands();
+    return _gl.getShaderInfoLog(shader);
+}
+
+function getShaderSourceOpt(shader) {
+    flushCommands();
+    return _gl.getShaderSource(shader);
+}
+
+function getTexParameterOpt(target, pname) {
+    flushCommands();
+    return _gl.getTexParameter(target, pname);
+}
+
+function getUniformOpt(program, location) {
+    flushCommands();
+    return _gl.getUniform(program, location);
+}
+
+function getUniformLocationOpt(program, name) {
+    flushCommands();
+    return _gl.getUniformLocation(program, name);
+}
+
+function getVertexAttribOpt(index, pname) {
+    flushCommands();
+    return _gl.getVertexAttrib(index, pname);
+}
+
+function getVertexAttribOffsetOpt(index, pname) {
+    flushCommands();
+    return _gl.getVertexAttribOffset(index, pname);
+}
+
+function hintOpt(target, mode) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_HINT;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = mode;
+    next_index += 3;
+}
+
+function isBufferOpt(buffer) {
+    flushCommands();
+    return _gl.isBuffer(buffer);
+}
+
+function isEnabledOpt(cap) {
+    flushCommands();
+    return _gl.isEnabled(cap);
+}
+
+function isFramebufferOpt(framebuffer) {
+    flushCommands();
+    return _gl.isFramebuffer(framebuffer);
+}
+
+function isProgramOpt(program) {
+    flushCommands();
+    return _gl.isProgram(program);
+}
+
+function isRenderbufferOpt(renderbuffer) {
+    flushCommands();
+    return _gl.isRenderbuffer(renderbuffer);
+}
+
+function isShaderOpt(shader) {
+    flushCommands();
+    return _gl.isShader(shader);
+}
+
+function isTextureOpt(texture) {
+    flushCommands();
+    return _gl.isTexture(texture);
+}
+
+function lineWidthOpt(width) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_LINE_WIDTH;
+    buffer_data[next_index + 1] = width;
+    next_index += 2;
+}
+
+function linkProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_LINK_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+
+function pixelStoreiOpt(pname, param) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_PIXEL_STOREI;
+    buffer_data[next_index + 1] = pname;
+    buffer_data[next_index + 2] = param;
+    next_index += 3;
+}
+
+function polygonOffsetOpt(factor, units) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_POLYGON_OFFSET;
+    buffer_data[next_index + 1] = factor;
+    buffer_data[next_index + 2] = units;
+    next_index += 3;
+}
+
+function readPixelsOpt(x, y, width, height, format, type, pixels) {
+    flushCommands();
+    _gl.readPixels(x, y, width, height, format, type, pixels);
+}
+
+function renderbufferStorageOpt(target, internalFormat, width, height) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_RENDER_BUFFER_STORAGE;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = internalFormat;
+    buffer_data[next_index + 3] = width;
+    buffer_data[next_index + 4] = height;
+    next_index += 5;
+}
+
+function sampleCoverageOpt(value, invert) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_SAMPLE_COVERAGE;
+    buffer_data[next_index + 1] = value;
+    buffer_data[next_index + 2] = invert ? 1 : 0;
+    next_index += 3;
+}
+
+function scissorOpt(x, y, width, height) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_SCISSOR;
+    buffer_data[next_index + 1] = x;
+    buffer_data[next_index + 2] = y;
+    buffer_data[next_index + 3] = width;
+    buffer_data[next_index + 4] = height;
+    next_index += 5;
+}
+
+function shaderSourceOpt(shader, source) {
+    flushCommands();
+    _gl.shaderSource(shader, source);
+}
+
+function stencilFuncOpt(func, ref, mask) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_FUNC;
+    buffer_data[next_index + 1] = func;
+    buffer_data[next_index + 2] = ref;
+    buffer_data[next_index + 3] = mask;
+    next_index += 4;
+}
+
+function stencilFuncSeparateOpt(face, func, ref, mask) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_FUNC_SEPARATE;
+    buffer_data[next_index + 1] = face;
+    buffer_data[next_index + 2] = func;
+    buffer_data[next_index + 3] = ref;
+    buffer_data[next_index + 4] = mask;
+    next_index += 5;
+}
+
+function stencilMaskOpt(mask) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_MASK;
+    buffer_data[next_index + 1] = mask;
+    next_index += 2;
+}
+
+function stencilMaskSeparateOpt(face, mask) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_MASK_SEPARATE;
+    buffer_data[next_index + 1] = face;
+    buffer_data[next_index + 2] = mask;
+    next_index += 3;
+}
+
+function stencilOpOpt(fail, zfail, zpass) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_OP;
+    buffer_data[next_index + 1] = fail;
+    buffer_data[next_index + 2] = zfail;
+    buffer_data[next_index + 3] = zpass;
+    next_index += 4;
+}
+
+function stencilOpSeparateOpt(face, fail, zfail, zpass) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_STENCIL_OP_SEPARATE;
+    buffer_data[next_index + 1] = face;
+    buffer_data[next_index + 2] = fail;
+    buffer_data[next_index + 3] = zfail;
+    buffer_data[next_index + 4] = zpass;
+    next_index += 5;
+}
+
+function texImage2DOpt() {
+    flushCommands();
+    var argCount = arguments.length;
+    if (argCount === 6) {
+        _gl.texImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5]);
+    } else if (argCount === 9) {
+        _gl.texImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
+    } else {
+        console.log('texImage2DOpt: Wrong number of arguments, expected 6 or 9 but got ' + argCount);
+    }
+}
+
+function texParameterfOpt(target, pname, param) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_TEX_PARAMETER_F;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = pname;
+    buffer_data[next_index + 3] = param;
+    next_index += 4;
+}
+
+function texParameteriOpt(target, pname, param) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_TEX_PARAMETER_I;
+    buffer_data[next_index + 1] = target;
+    buffer_data[next_index + 2] = pname;
+    buffer_data[next_index + 3] = param;
+    next_index += 4;
+}
+
+function texSubImage2DOpt(target, level, xoffset, yoffset, width, height, format, type, pixels) {
+    flushCommands();
+    var argCount = arguments.length;
+    if (argCount === 7) {
+        _gl.texSubImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6]);
+    } else if (argCount === 9) {
+        _gl.texSubImage2D(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6], arguments[7], arguments[8]);
+    } else {
+        console.log('texSubImage2DOpt: Wrong number of arguments, expected 7 or 9 but got ' + argCount);
+    }
+}
+
+function uniform1fOpt(location, x) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    next_index += 3;
+}
+
+function uniform2fOpt(location, x, y) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    next_index += 4;
+}
+
+function uniform3fOpt(location, x, y, z) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    next_index += 5;
+}
+
+function uniform4fOpt(location, x, y, z, w) {
+    if (next_index + 6 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4F;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    buffer_data[next_index + 5] = w;
+    next_index += 6;
+}
+
+function uniform1iOpt(location, x) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    next_index += 3;
+}
+
+function uniform2iOpt(location, x, y) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    next_index += 4;
+}
+
+function uniform3iOpt(location, x, y, z) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    next_index += 5;
+}
+
+function uniform4iOpt(location, x, y, z, w) {
+    if (next_index + 6 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4I;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    buffer_data[next_index + 5] = w;
+    next_index += 6;
+}
+
+function uniform1fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniform2fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniform3fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniform4fvOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniform1ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_1IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniform2ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_2IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniform3ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_3IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniform4ivOpt(location, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_4IV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function uniformMatrix2fvOpt(location, transpose, value) {
+    if (next_index + 4 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_MATRIX_2FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = transpose;
+    buffer_data[next_index + 3] = value.length;
+    buffer_data.set(value, next_index + 4);
+    next_index += 4 + value.length;
+}
+
+function uniformMatrix3fvOpt(location, transpose, value) {
+    if (next_index + 4 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_MATRIX_3FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = transpose;
+    buffer_data[next_index + 3] = value.length;
+    buffer_data.set(value, next_index + 4);
+    next_index += 4 + value.length;
+}
+
+function uniformMatrix4fvOpt(location, transpose, value) {
+    if (next_index + 4 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_UNIFORM_MATRIX_4FV;
+    buffer_data[next_index + 1] = location;
+    buffer_data[next_index + 2] = transpose;
+    buffer_data[next_index + 3] = value.length;
+    buffer_data.set(value, next_index + 4);
+    next_index += 4 + value.length;
+}
+
+function useProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_USE_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+
+function validateProgramOpt(program) {
+    if (next_index + 2 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VALIDATE_PROGRAM;
+    buffer_data[next_index + 1] = program ? program._id : 0;
+    next_index += 2;
+}
+
+function vertexAttrib1fOpt(index, x) {
+    if (next_index + 3 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_1F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    next_index += 3;
+}
+
+function vertexAttrib2fOpt(index, x, y) {
+    if (next_index + 4 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_2F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    next_index += 4;
+}
+
+function vertexAttrib3fOpt(index, x, y, z) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_3F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    next_index += 5;
+}
+
+function vertexAttrib4fOpt(index, x, y, z, w) {
+    if (next_index + 6 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_4F;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = x;
+    buffer_data[next_index + 3] = y;
+    buffer_data[next_index + 4] = z;
+    buffer_data[next_index + 5] = w;
+    next_index += 6;
+}
+
+function vertexAttrib1fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_1FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function vertexAttrib2fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_2FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function vertexAttrib3fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_3FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function vertexAttrib4fvOpt(index, value) {
+    if (next_index + 3 + value.length >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_4FV;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = value.length;
+    buffer_data.set(value, next_index + 3);
+    next_index += 3 + value.length;
+}
+
+function vertexAttribPointerOpt(index, size, type, normalized, stride, offset) {
+    if (next_index + 7 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VERTEX_ATTRIB_POINTER;
+    buffer_data[next_index + 1] = index;
+    buffer_data[next_index + 2] = size;
+    buffer_data[next_index + 3] = type;
+    buffer_data[next_index + 4] = normalized ? 1 : 0;
+    buffer_data[next_index + 5] = stride;
+    buffer_data[next_index + 6] = offset;
+    next_index += 7;
+}
+
+function viewportOpt(x, y, width, height) {
+    if (next_index + 5 >= total_size) {
+        flushCommands();
+    }
+    buffer_data[next_index] = GL_COMMAND_VIEW_PORT;
+    buffer_data[next_index + 1] = x;
+    buffer_data[next_index + 2] = y;
+    buffer_data[next_index + 3] = width;
+    buffer_data[next_index + 4] = height;
+    next_index += 5;
+}
+
+function isSupportTypeArray() {
+    //FIXME:
+    // if (GameStatusInfo.platform == 'android') {
+    return true;
+    // }
+    // var info = BK.Director.queryDeviceInfo();
+    // var vers = info.version.split('.');
+    // if (info.platform == 'ios' && Number(vers[0]) >= 10) {
+    //     return true;
+    // }
+    // return false;
+}
+
+function attachMethodOpt() {
+    gl.activeTexture = activeTextureOpt;
+    gl.attachShader = attachShaderOpt;
+    gl.bindAttribLocation = bindAttribLocationOpt;
+    gl.bindBuffer = bindBufferOpt;
+    gl.bindFramebuffer = bindFramebufferOpt;
+    gl.bindRenderbuffer = bindRenderbufferOpt;
+    gl.bindTexture = bindTextureOpt;
+    gl.blendColor = blendColorOpt;
+    gl.blendEquation = blendEquationOpt;
+    gl.blendEquationSeparate = blendEquationSeparateOpt;
+    gl.blendFunc = blendFuncOpt;
+    gl.blendFuncSeparate = blendFuncSeparateOpt;
+    gl.bufferData = bufferDataOpt;
+    gl.bufferSubData = bufferSubDataOpt;
+    gl.checkFramebufferStatus = checkFramebufferStatusOpt;
+    gl.clear = clearOpt;
+    gl.clearColor = clearColorOpt;
+    gl.clearDepth = clearDepthOpt;
+    gl.clearStencil = clearStencilOpt;
+    gl.colorMask = colorMaskOpt;
+    gl.compileShader = compileShaderOpt;
+    gl.compressedTexImage2D = compressedTexImage2DOpt;
+    gl.compressedTexSubImage2D = compressedTexSubImage2DOpt;
+    gl.copyTexImage2D = copyTexImage2DOpt;
+    gl.copyTexSubImage2D = copyTexSubImage2DOpt;
+    gl.createBuffer = createBufferOpt;
+    gl.createFramebuffer = createFramebufferOpt;
+    gl.createProgram = createProgramOpt;
+    gl.createRenderbuffer = createRenderbufferOpt;
+    gl.createShader = createShaderOpt;
+    gl.createTexture = createTextureOpt;
+    gl.cullFace = cullFaceOpt;
+    gl.deleteBuffer = deleteBufferOpt;
+    gl.deleteFramebuffer = deleteFramebufferOpt;
+    gl.deleteProgram = deleteProgramOpt;
+    gl.deleteRenderbuffer = deleteRenderbufferOpt;
+    gl.deleteShader = deleteShaderOpt;
+    gl.deleteTexture = deleteTextureOpt;
+    gl.depthFunc = depthFuncOpt;
+    gl.depthMask = depthMaskOpt;
+    gl.depthRange = depthRangeOpt;
+    gl.detachShader = detachShaderOpt;
+    gl.disable = disableOpt;
+    gl.disableVertexAttribArray = disableVertexAttribArrayOpt;
+    gl.drawArrays = drawArraysOpt;
+    gl.drawElements = drawElementsOpt;
+    gl.enable = enableOpt;
+    gl.enableVertexAttribArray = enableVertexAttribArrayOpt;
+    gl.finish = finishOpt;
+    gl.flush = flushOpt;
+    gl.framebufferRenderbuffer = framebufferRenderbufferOpt;
+    gl.framebufferTexture2D = framebufferTexture2DOpt;
+    gl.frontFace = frontFaceOpt;
+    gl.generateMipmap = generateMipmapOpt;
+    gl.getActiveAttrib = getActiveAttribOpt;
+    gl.getActiveUniform = getActiveUniformOpt;
+    gl.getAttachedShaders = getAttachedShadersOpt;
+    gl.getAttribLocation = getAttribLocationOpt;
+    gl.getBufferParameter = getBufferParameterOpt;
+    gl.getParameter = getParameterOpt;
+    gl.getError = getErrorOpt;
+    gl.getFramebufferAttachmentParameter = getFramebufferAttachmentParameterOpt;
+    gl.getProgramParameter = getProgramParameterOpt;
+    gl.getProgramInfoLog = getProgramInfoLogOpt;
+    gl.getRenderbufferParameter = getRenderbufferParameterOpt;
+    gl.getShaderParameter = getShaderParameterOpt;
+    gl.getShaderPrecisionFormat = getShaderPrecisionFormatOpt;
+    gl.getShaderInfoLog = getShaderInfoLogOpt;
+    gl.getShaderSource = getShaderSourceOpt;
+    gl.getTexParameter = getTexParameterOpt;
+    gl.getUniform = getUniformOpt;
+    gl.getUniformLocation = getUniformLocationOpt;
+    gl.getVertexAttrib = getVertexAttribOpt;
+    gl.getVertexAttribOffset = getVertexAttribOffsetOpt;
+    gl.hint = hintOpt;
+    gl.isBuffer = isBufferOpt;
+    gl.isEnabled = isEnabledOpt;
+    gl.isFramebuffer = isFramebufferOpt;
+    gl.isProgram = isProgramOpt;
+    gl.isRenderbuffer = isRenderbufferOpt;
+    gl.isShader = isShaderOpt;
+    gl.isTexture = isTextureOpt;
+    gl.lineWidth = lineWidthOpt;
+    gl.linkProgram = linkProgramOpt;
+    gl.pixelStorei = pixelStoreiOpt;
+    gl.polygonOffset = polygonOffsetOpt;
+    gl.readPixels = readPixelsOpt;
+    gl.renderbufferStorage = renderbufferStorageOpt;
+    gl.sampleCoverage = sampleCoverageOpt;
+    gl.scissor = scissorOpt;
+    gl.shaderSource = shaderSourceOpt;
+    gl.stencilFunc = stencilFuncOpt;
+    gl.stencilFuncSeparate = stencilFuncSeparateOpt;
+    gl.stencilMask = stencilMaskOpt;
+    gl.stencilMaskSeparate = stencilMaskSeparateOpt;
+    gl.stencilOp = stencilOpOpt;
+    gl.stencilOpSeparate = stencilOpSeparateOpt;
+    gl.texImage2D = texImage2DOpt;
+    gl.texParameterf = texParameterfOpt;
+    gl.texParameteri = texParameteriOpt;
+    gl.texSubImage2D = texSubImage2DOpt;
+    gl.uniform1f = uniform1fOpt;
+    gl.uniform2f = uniform2fOpt;
+    gl.uniform3f = uniform3fOpt;
+    gl.uniform4f = uniform4fOpt;
+    gl.uniform1i = uniform1iOpt;
+    gl.uniform2i = uniform2iOpt;
+    gl.uniform3i = uniform3iOpt;
+    gl.uniform4i = uniform4iOpt;
+    gl.uniform1fv = uniform1fvOpt;
+    gl.uniform2fv = uniform2fvOpt;
+    gl.uniform3fv = uniform3fvOpt;
+    gl.uniform4fv = uniform4fvOpt;
+    gl.uniform1iv = uniform1ivOpt;
+    gl.uniform2iv = uniform2ivOpt;
+    gl.uniform3iv = uniform3ivOpt;
+    gl.uniform4iv = uniform4ivOpt;
+    gl.uniformMatrix2fv = uniformMatrix2fvOpt;
+    gl.uniformMatrix3fv = uniformMatrix3fvOpt;
+    gl.uniformMatrix4fv = uniformMatrix4fvOpt;
+    gl.useProgram = useProgramOpt;
+    gl.validateProgram = validateProgramOpt;
+    gl.vertexAttrib1f = vertexAttrib1fOpt;
+    gl.vertexAttrib2f = vertexAttrib2fOpt;
+    gl.vertexAttrib3f = vertexAttrib3fOpt;
+    gl.vertexAttrib4f = vertexAttrib4fOpt;
+    gl.vertexAttrib1fv = vertexAttrib1fvOpt;
+    gl.vertexAttrib2fv = vertexAttrib2fvOpt;
+    gl.vertexAttrib3fv = vertexAttrib3fvOpt;
+    gl.vertexAttrib4fv = vertexAttrib4fvOpt;
+    gl.vertexAttribPointer = vertexAttribPointerOpt;
+    gl.viewport = viewportOpt;
+}
+
+batchGLCommandsToNative();
+
+module.exports = {
+    disableBatchGLCommandsToNative: disableBatchGLCommandsToNative,
+    flushCommands: flushCommands
+};
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -263,48 +1735,72 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  ****************************************************************************/
 
 window.CC_JSB = true;
-window.CC_WECHATGAME = true;
 
-// Simulate wechat game API:
+window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
+delete cc.CanvasRenderingContext2D;
 
-window.wx = {
-    getSystemInfoSync: function getSystemInfoSync() {
-        return {
-            platform: 'mac',
-            language: 'CN',
-            system: 1.0,
-            windowWidth: window.innerWidth,
-            windowHeight: window.innerHeight
-        };
-    },
-    onShow: function onShow() {},
-    onHide: function onHide() {}
-};
+var _require = require('./base64/base64.min'),
+    btoa = _require.btoa,
+    atob = _require.atob;
 
-var oldRequestFrameCallback = null;
-var requestAnimationFrameID = 0;
-var requestAnimationFrameCallbacks = {};
+window.btoa = btoa;
+window.atob = atob;
+
+var _require2 = require('./Blob'),
+    Blob = _require2.Blob,
+    URL = _require2.URL;
+
+window.Blob = Blob;
+window.URL = URL;
+window.DOMParser = require('./xmldom/dom-parser').DOMParser;
+
+require('./jsb_prepare');
+require('./jsb_opengl');
+require('./jsb-adapter');
+require('./jsb_audioengine');
+
+var _oldRequestFrameCallback = null;
+var _requestAnimationFrameID = 0;
+var _requestAnimationFrameCallbacks = {};
+var _firstTick = true;
 
 window.requestAnimationFrame = function (cb) {
-    var id = ++requestAnimationFrameID;
-    requestAnimationFrameCallbacks[id] = cb;
+    var id = ++_requestAnimationFrameID;
+    _requestAnimationFrameCallbacks[id] = cb;
     return id;
 };
 
 window.cancelAnimationFrame = function (id) {
-    delete requestAnimationFrameCallbacks[id];
+    delete _requestAnimationFrameCallbacks[id];
+};
+
+var _require3 = require('./glOptMode'),
+    disableBatchGLCommandsToNative = _require3.disableBatchGLCommandsToNative,
+    flushCommands = _require3.flushCommands;
+
+window.optConfig = {
+    disableBatchGLCommandsToNative: disableBatchGLCommandsToNative
 };
 
 function tick(nowMilliSeconds) {
-    fireTimeout(nowMilliSeconds);
-
-    for (var id in requestAnimationFrameCallbacks) {
-        oldRequestFrameCallback = requestAnimationFrameCallbacks[id];
-        if (oldRequestFrameCallback) {
-            delete requestAnimationFrameCallbacks[id];
-            oldRequestFrameCallback(nowMilliSeconds);
+    if (_firstTick) {
+        _firstTick = false;
+        if (window.onload) {
+            var event = new Event('load');
+            event._target = window;
+            window.onload(event);
         }
     }
+    fireTimeout(nowMilliSeconds);
+
+    for (var id in _requestAnimationFrameCallbacks) {
+        _oldRequestFrameCallback = _requestAnimationFrameCallbacks[id];
+        if (_oldRequestFrameCallback) {
+            delete _requestAnimationFrameCallbacks[id];
+            _oldRequestFrameCallback(nowMilliSeconds);
+        }
+    }
+    flushCommands();
 }
 
 var _timeoutIDIndex = 0;
@@ -391,30 +1887,7 @@ jsb.fileUtils = cc.fileUtils;
 delete cc.FileUtils;
 delete cc.fileUtils;
 
-window.CanvasRenderingContext2D = cc.CanvasRenderingContext2D;
-delete cc.CanvasRenderingContext2D;
-
 jsb.urlRegExp = new RegExp("^(?:https?|ftp)://\\S*$", "i");
-
-require('./jsb_prepare');
-require('./jsb_opengl');
-
-var _require = require('./base64/base64.min'),
-    btoa = _require.btoa,
-    atob = _require.atob;
-
-window.btoa = btoa;
-window.atob = atob;
-
-var _require2 = require('./Blob'),
-    Blob = _require2.Blob,
-    URL = _require2.URL;
-
-window.Blob = Blob;
-window.URL = URL;
-window.DOMParser = require('./xmldom/dom-parser').DOMParser;
-require('./jsb-adapter');
-require('./jsb_audioengine');
 
 /**
  * @type {Object}
@@ -461,14 +1934,8 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./jsb-adapter":22,"./jsb_audioengine":27,"./jsb_opengl":28,"./jsb_prepare":30,"./xmldom/dom-parser":31}],4:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":26,"./jsb_audioengine":31,"./jsb_opengl":32,"./jsb_prepare":34,"./xmldom/dom-parser":35}],5:[function(require,module,exports){
 'use strict';
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /****************************************************************************
  Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
@@ -497,32 +1964,13 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var HTMLAudioElement = require('./HTMLAudioElement');
 
-var HAVE_NOTHING = 0;
-var HAVE_METADATA = 1;
-var HAVE_CURRENT_DATA = 2;
-var HAVE_FUTURE_DATA = 3;
-var HAVE_ENOUGH_DATA = 4;
-
-var _innerAudioContext = new WeakMap();
-var _src = new WeakMap();
-var _loop = new WeakMap();
-var _autoplay = new WeakMap();
-
-var Audio = function (_HTMLAudioElement) {
-  _inherits(Audio, _HTMLAudioElement);
-
-  function Audio() {
-    _classCallCheck(this, Audio);
-
-    return _possibleConstructorReturn(this, (Audio.__proto__ || Object.getPrototypeOf(Audio)).apply(this, arguments));
-  }
-
-  return Audio;
-}(HTMLAudioElement);
+function Audio(url) {
+  return new HTMLAudioElement(url);
+}
 
 module.exports = Audio;
 
-},{"./HTMLAudioElement":12}],5:[function(require,module,exports){
+},{"./HTMLAudioElement":13}],6:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -567,7 +2015,7 @@ var DOMRect = function DOMRect(x, y, width, height) {
 
 module.exports = DOMRect;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -624,7 +2072,7 @@ var Element = function (_Node) {
     _createClass(Element, [{
         key: 'getBoundingClientRect',
         value: function getBoundingClientRect() {
-            return new DOMRect();
+            return new DOMRect(0, 0, window.innerWidth, window.innerHeight);
         }
 
         // attrName is a string that names the attribute to be removed from element.
@@ -649,7 +2097,7 @@ var Element = function (_Node) {
 
 module.exports = Element;
 
-},{"./DOMRect":5,"./Node":19}],7:[function(require,module,exports){
+},{"./DOMRect":6,"./Node":23}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -696,7 +2144,7 @@ var Event = function () {
     _classCallCheck(this, Event);
 
     this._type = type;
-    this._eventTarget = null;
+    this._target = null;
     this._eventPhase = 2;
     this._currentTarget = null;
     this._canceled = false;
@@ -796,7 +2244,7 @@ var Event = function () {
   }, {
     key: "target",
     get: function get() {
-      return this._eventTarget;
+      return this._target;
     }
 
     /**
@@ -896,10 +2344,14 @@ Event.BUBBLING_PHASE = 3;
 
 module.exports = Event;
 
-},{}],8:[function(require,module,exports){
-"use strict";
+},{}],9:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /****************************************************************************
  Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
@@ -926,6 +2378,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  THE SOFTWARE.
  ****************************************************************************/
 
+var __targetID = 0;
+var __listenTouchEventMap = {};
+
+var __touchEventNames = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+
 // Listener types
 var CAPTURE = 1;
 var BUBBLE = 2;
@@ -937,7 +2394,7 @@ var ATTRIBUTE = 3;
  * @returns {boolean} `true` if the value is an object.
  */
 function isObject(x) {
-    return x && (typeof x === "undefined" ? "undefined" : _typeof(x)) === "object"; //eslint-disable-line no-restricted-syntax
+    return x && (typeof x === 'undefined' ? 'undefined' : _typeof(x)) === "object"; //eslint-disable-line no-restricted-syntax
 }
 
 /**
@@ -950,12 +2407,16 @@ function isObject(x) {
  * 
  *     class A extends EventTarget {}
  */
-function EventTarget() {
-    this._listeners = new Map();
-}
 
-// Should be enumerable, but class methods are not enumerable.
-EventTarget.prototype = {
+var EventTarget = function () {
+    function EventTarget() {
+        _classCallCheck(this, EventTarget);
+
+        this._targetID = ++__targetID;
+        this._touchListenerCount = 0;
+        this._listeners = new Map();
+    }
+
     /**
      * Add a given listener to this event target.
      * @param {string} eventName The event name to add.
@@ -963,159 +2424,214 @@ EventTarget.prototype = {
      * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
      * @returns {boolean} `true` if the listener was added actually.
      */
-    addEventListener: function addEventListener(eventName, listener, options) {
-        if (!listener) {
-            return false;
-        }
-        if (typeof listener !== "function" && !isObject(listener)) {
-            throw new TypeError("'listener' should be a function or an object.");
-        }
 
-        var listeners = this._listeners;
-        var optionsIsObj = isObject(options);
-        var capture = optionsIsObj ? Boolean(options.capture) : Boolean(options);
-        var listenerType = capture ? CAPTURE : BUBBLE;
-        var newNode = {
-            listener: listener,
-            listenerType: listenerType,
-            passive: optionsIsObj && Boolean(options.passive),
-            once: optionsIsObj && Boolean(options.once),
-            next: null
 
-            // Set it as the first node if the first node is null.
-        };var node = listeners.get(eventName);
-        if (node === undefined) {
-            listeners.set(eventName, newNode);
-            return true;
-        }
-
-        // Traverse to the tail while checking duplication..
-        var prev = null;
-        while (node) {
-            if (node.listener === listener && node.listenerType === listenerType) {
-                // Should ignore duplication.
+    _createClass(EventTarget, [{
+        key: 'addEventListener',
+        value: function addEventListener(eventName, listener, options) {
+            if (!listener) {
                 return false;
             }
-            prev = node;
-            node = node.next;
-        }
+            if (typeof listener !== "function" && !isObject(listener)) {
+                throw new TypeError("'listener' should be a function or an object.");
+            }
 
-        // Add it.
-        prev.next = newNode;
-        return true;
-    },
+            var listeners = this._listeners;
+            var optionsIsObj = isObject(options);
+            var capture = optionsIsObj ? Boolean(options.capture) : Boolean(options);
+            var listenerType = capture ? CAPTURE : BUBBLE;
+            var newNode = {
+                listener: listener,
+                listenerType: listenerType,
+                passive: optionsIsObj && Boolean(options.passive),
+                once: optionsIsObj && Boolean(options.once),
+                next: null
 
-
-    /**
-     * Remove a given listener from this event target.
-     * @param {string} eventName The event name to remove.
-     * @param {Function} listener The listener to remove.
-     * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
-     * @returns {boolean} `true` if the listener was removed actually.
-     */
-    removeEventListener: function removeEventListener(eventName, listener, options) {
-        if (!listener) {
-            return false;
-        }
-
-        var listeners = this._listeners;
-        var capture = isObject(options) ? Boolean(options.capture) : Boolean(options);
-        var listenerType = capture ? CAPTURE : BUBBLE;
-
-        var prev = null;
-        var node = listeners.get(eventName);
-        while (node) {
-            if (node.listener === listener && node.listenerType === listenerType) {
-                if (prev) {
-                    prev.next = node.next;
-                } else if (node.next) {
-                    listeners.set(eventName, node.next);
-                } else {
-                    listeners.delete(eventName);
+                // Set it as the first node if the first node is null.
+            };var node = listeners.get(eventName);
+            if (node === undefined) {
+                listeners.set(eventName, newNode);
+                if (__touchEventNames.indexOf(eventName) > -1) {
+                    if (this._touchListenerCount === 0) __listenTouchEventMap[this._targetID] = this;
+                    ++this._touchListenerCount;
                 }
                 return true;
             }
 
-            prev = node;
-            node = node.next;
-        }
+            // Traverse to the tail while checking duplication..
+            var prev = null;
+            while (node) {
+                if (node.listener === listener && node.listenerType === listenerType) {
+                    // Should ignore duplication.
+                    return false;
+                }
+                prev = node;
+                node = node.next;
+            }
 
-        return false;
-    },
-
-
-    /**
-     * Dispatch a given event.
-     * @param {Event|{type:string}} event The event to dispatch.
-     * @returns {boolean} `false` if canceled.
-     */
-    dispatchEvent: function dispatchEvent(event) {
-        if (!event || typeof event.type !== "string") {
-            throw new TypeError("\"event.type\" should be a string.");
-        }
-
-        // If listeners aren't registered, terminate.
-        var listeners = this._listeners;
-        var eventName = event.type;
-        var node = listeners.get(eventName);
-        if (!node) {
+            // Add it.
+            prev.next = newNode;
+            if (__touchEventNames.indexOf(eventName) > -1) {
+                if (this._touchListenerCount === 0) __listenTouchEventMap[this._targetID] = this;
+                ++this._touchListenerCount;
+            }
             return true;
         }
 
-        event._target = event._currentTarget = this;
-        // This doesn't process capturing phase and bubbling phase.
-        // This isn't participating in a tree.
-        var prev = null;
-        while (node) {
-            // Remove this listener if it's once
-            if (node.once) {
-                if (prev) {
-                    prev.next = node.next;
-                } else if (node.next) {
-                    listeners.set(eventName, node.next);
-                } else {
-                    listeners.delete(eventName);
+        /**
+         * Remove a given listener from this event target.
+         * @param {string} eventName The event name to remove.
+         * @param {Function} listener The listener to remove.
+         * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
+         * @returns {boolean} `true` if the listener was removed actually.
+         */
+
+    }, {
+        key: 'removeEventListener',
+        value: function removeEventListener(eventName, listener, options) {
+            if (!listener) {
+                return false;
+            }
+
+            var listeners = this._listeners;
+            var capture = isObject(options) ? Boolean(options.capture) : Boolean(options);
+            var listenerType = capture ? CAPTURE : BUBBLE;
+
+            var prev = null;
+            var node = listeners.get(eventName);
+            while (node) {
+                if (node.listener === listener && node.listenerType === listenerType) {
+                    if (prev) {
+                        prev.next = node.next;
+                    } else if (node.next) {
+                        listeners.set(eventName, node.next);
+                    } else {
+                        listeners.delete(eventName);
+                    }
+
+                    if (__touchEventNames.indexOf(eventName) > -1) {
+                        --this._touchListenerCount;
+                        if (this._touchListenerCount <= 0) delete __listenTouchEventMap[this._targetID];
+                    }
+
+                    return true;
                 }
-            } else {
+
                 prev = node;
+                node = node.next;
             }
 
-            // Call this listener
-            event._passiveListener = node.passive ? node.listener : null;
-            if (typeof node.listener === "function") {
-                node.listener.call(this, event);
-            } else if (node.listenerType !== ATTRIBUTE && typeof node.listener.handleEvent === "function") {
-                node.listener.handleEvent(event);
-            }
-
-            // Break if `event.stopImmediatePropagation` was called.
-            if (event._stopped) {
-                break;
-            }
-
-            node = node.next;
+            return false;
         }
-        event._target = event._currentTarget = null;
-        event._eventPhase = 0;
-        event._passiveListener = null;
 
-        return !event.defaultPrevented;
-    }
-};
+        /**
+         * Dispatch a given event.
+         * @param {Event|{type:string}} event The event to dispatch.
+         * @returns {boolean} `false` if canceled.
+         */
 
-// `constructor` is not enumerable.
-Object.defineProperty(EventTarget.prototype, "constructor", { value: EventTarget, configurable: true, writable: true });
+    }, {
+        key: 'dispatchEvent',
+        value: function dispatchEvent(event) {
+            if (!event || typeof event.type !== "string") {
+                throw new TypeError("\"event.type\" should be a string.");
+            }
 
-// Ensure `eventTarget instanceof window.EventTarget` is `true`.
-if (typeof window !== "undefined" && typeof window.EventTarget !== "undefined") {
-    Object.setPrototypeOf(EventTarget.prototype, window.EventTarget.prototype);
+            var eventName = event.type;
+            var onFunc = this['on' + eventName];
+            if (onFunc && typeof onFunc === 'function') {
+                event._target = event._currentTarget = this;
+                onFunc.call(this, event);
+                event._target = event._currentTarget = null;
+                event._eventPhase = 0;
+                event._passiveListener = null;
+
+                if (event.defaultPrevented) return false;
+            }
+
+            // If listeners aren't registered, terminate.
+            var listeners = this._listeners;
+
+            var node = listeners.get(eventName);
+            if (!node) {
+                return true;
+            }
+
+            event._target = event._currentTarget = this;
+
+            // This doesn't process capturing phase and bubbling phase.
+            // This isn't participating in a tree.
+            var prev = null;
+            while (node) {
+                // Remove this listener if it's once
+                if (node.once) {
+                    if (prev) {
+                        prev.next = node.next;
+                    } else if (node.next) {
+                        listeners.set(eventName, node.next);
+                    } else {
+                        listeners.delete(eventName);
+                    }
+                } else {
+                    prev = node;
+                }
+
+                // Call this listener
+                event._passiveListener = node.passive ? node.listener : null;
+                if (typeof node.listener === "function") {
+                    node.listener.call(this, event);
+                }
+
+                // Break if `event.stopImmediatePropagation` was called.
+                if (event._stopped) {
+                    break;
+                }
+
+                node = node.next;
+            }
+            event._target = event._currentTarget = null;
+            event._eventPhase = 0;
+            event._passiveListener = null;
+
+            return !event.defaultPrevented;
+        }
+    }]);
+
+    return EventTarget;
+}();
+
+function touchEventHandlerFactory(type) {
+    return function (touches) {
+        var touchEvent = new TouchEvent(type);
+
+        touchEvent.touches = touches;
+        touchEvent.targetTouches = Array.prototype.slice.call(touchEvent.touches);
+        touchEvent.changedTouches = touches; //event.changedTouches
+        // touchEvent.timeStamp = event.timeStamp
+
+        var i = 0,
+            touchCount = touches.length;
+        var target;
+        for (var key in __listenTouchEventMap) {
+            target = __listenTouchEventMap[key];
+            for (i = 0; i < touchCount; ++i) {
+                touches[i].target = target;
+            }
+            target.dispatchEvent(touchEvent);
+        }
+    };
 }
+
+jsb.onTouchStart = touchEventHandlerFactory('touchstart');
+jsb.onTouchMove = touchEventHandlerFactory('touchmove');
+jsb.onTouchEnd = touchEventHandlerFactory('touchend');
+jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 // export { defineEventAttribute, EventTarget }
 // export default EventTarget
 module.exports = EventTarget;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1186,7 +2702,8 @@ var FileReader = function (_EventTarget) {
     key: 'readAsDataURL',
     value: function readAsDataURL(blob) {
       this.result = 'data:image/png;base64,' + window.btoa(blob);
-      this.onload();
+      var event = new Event('load');
+      this.dispatchEvent(event);
     }
 
     // Starts reading the contents of the specified Blob, once finished, the result attribute contains the contents of the file as a text string.
@@ -1201,7 +2718,7 @@ var FileReader = function (_EventTarget) {
 
 module.exports = FileReader;
 
-},{"./EventTarget":8}],10:[function(require,module,exports){
+},{"./EventTarget":9}],11:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1271,7 +2788,7 @@ var FontFace = function () {
 
 module.exports = FontFace;
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1382,8 +2899,10 @@ var FontFaceSet = function (_EventTarget) {
 
 module.exports = FontFaceSet;
 
-},{"./Event":7,"./EventTarget":8}],12:[function(require,module,exports){
+},{"./Event":8,"./EventTarget":9}],13:[function(require,module,exports){
 'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -1418,24 +2937,89 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var HTMLMediaElement = require('./HTMLMediaElement');
 
+var HAVE_NOTHING = 0;
+var HAVE_METADATA = 1;
+var HAVE_CURRENT_DATA = 2;
+var HAVE_FUTURE_DATA = 3;
+var HAVE_ENOUGH_DATA = 4;
+
+var _innerAudioContext = new WeakMap();
+var _src = new WeakMap();
+var _loop = new WeakMap();
+var _autoplay = new WeakMap();
+
 var HTMLAudioElement = function (_HTMLMediaElement) {
-  _inherits(HTMLAudioElement, _HTMLMediaElement);
+    _inherits(HTMLAudioElement, _HTMLMediaElement);
 
-  function HTMLAudioElement() {
-    _classCallCheck(this, HTMLAudioElement);
+    function HTMLAudioElement(url) {
+        _classCallCheck(this, HTMLAudioElement);
 
-    return _possibleConstructorReturn(this, (HTMLAudioElement.__proto__ || Object.getPrototypeOf(HTMLAudioElement)).call(this, 'audio'));
-  }
+        var _this = _possibleConstructorReturn(this, (HTMLAudioElement.__proto__ || Object.getPrototypeOf(HTMLAudioElement)).call(this, 'audio'));
 
-  return HTMLAudioElement;
+        _this.readyState = HAVE_NOTHING;
+
+        _src.set(_this, '');
+
+        //TODO:
+        return _this;
+    }
+
+    _createClass(HTMLAudioElement, [{
+        key: 'load',
+        value: function load() {
+            console.warn('HTMLAudioElement.load() is not implemented.');
+        }
+    }, {
+        key: 'play',
+        value: function play() {}
+    }, {
+        key: 'pause',
+        value: function pause() {}
+    }, {
+        key: 'canPlayType',
+        value: function canPlayType() {
+            var mediaType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
+            if (typeof mediaType !== 'string') {
+                return '';
+            }
+
+            if (mediaType.indexOf('audio/mpeg') > -1 || mediaType.indexOf('audio/mp4')) {
+                return 'probably';
+            }
+            return '';
+        }
+    }, {
+        key: 'cloneNode',
+        value: function cloneNode() {}
+    }, {
+        key: 'currentTime',
+        get: function get() {},
+        set: function set(value) {}
+    }, {
+        key: 'src',
+        get: function get() {},
+        set: function set(value) {}
+    }, {
+        key: 'loop',
+        get: function get() {},
+        set: function set(value) {}
+    }, {
+        key: 'autoplay',
+        get: function get() {},
+        set: function set(value) {}
+    }, {
+        key: 'paused',
+        get: function get() {}
+    }]);
+
+    return HTMLAudioElement;
 }(HTMLMediaElement);
 
 module.exports = HTMLAudioElement;
 
-},{"./HTMLMediaElement":16}],13:[function(require,module,exports){
+},{"./HTMLMediaElement":17}],14:[function(require,module,exports){
 'use strict';
-
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -1508,168 +3092,6 @@ var TextMetrics = function () {
     return TextMetrics;
 }();
 
-// class CanvasRenderingContext2D {
-//     constructor() {
-//         console.log("==> CanvasRenderingContext2D constructor");
-
-//         // Line styles
-//         this.lineWidth = 1;
-//         this.lineCap = 'butt';
-//         this.lineJoin = 'miter';
-//         this.miterLimit = 10;
-//         this.lineDashOffset = 0;
-
-//         // Text styles
-//         this.font = '10px sans-serif';
-//         this.textAlign = 'start';
-//         this.textBaseline = 'alphabetic';
-
-//         // Fill and stroke styles
-//         this.fillStyle = '#000';
-//         this.strokeStyle = '#000';
-
-//         // Shadows
-//         this.shadowBlur = 0;
-//         this.shadowColor = 'black';
-//         this.shadowOffsetX = 0;
-//         this.shadowOffsetY = 0;
-
-//         // Compositing
-//         this.globalAlpha = 1;
-//         this.globalCompositeOperation = 'source-over';
-
-//     }
-
-//     clearRect(x, y, width, height) {
-//         console.log(`==> CanvasRenderingContext2D clearRect: [${x}, ${y}, ${width}, ${height}]`);
-//     }
-
-//     fillRect(x, y, width, height) {
-//         console.log(`==> CanvasRenderingContext2D fillRect: [${x}, ${y}, ${width}, ${height}]`);
-//     }
-
-//     strokeRect(x, y, width, height) {
-//         console.log(`==> CanvasRenderingContext2D strokeRect: [${x}, ${y}, ${width}, ${height}]`);
-//     }
-
-//     getLineDash() {
-//         return [];
-//     }
-
-//     setLineDash(segments) {
-
-//     }
-
-//     drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight) {
-//         console.log("==> CanvasRenderingContext2D drawImage");
-//     }
-
-//     getImageData(sx, sy, sw, sh) {
-//         console.log(`==> CanvasRenderingContext2D getImageData(${sx}, ${sy}, ${sw}, ${sh})`);
-//         let data = new Uint8ClampedArray(sw * sh * 4);
-//         for (let i = 0; i < data.length; ++i) {
-//             data[i] = Math.floor(Math.random() * 255);
-//         }
-//         return {
-//             width: sw,
-//             height: sh,
-//             data: data
-//         };
-//     }
-
-//     fillText(text, x, y, maxWidth) {
-//         console.log("==> CanvasRenderingContext2D fillText: " + text 
-//             + ', font: ' + this.font + ', textAlign: ' + this.textAlign
-//             + ', textBaseline: ' + this.textBaseline);
-//     }
-
-//     strokeText(text, x, y, maxWidth) {
-//         console.log("==> CanvasRenderingContext2D strokeText" + text 
-//             + ', font: ' + this.font + ', textAlign: ' + this.textAlign
-//             + ', textBaseline: ' + this.textBaseline);
-//     }
-
-//     measureText(text) {
-//         console.log("==> CanvasRenderingContext2D measureText: " + text 
-//             + ', font: ' + this.font + ', textAlign: ' + this.textAlign
-//             + ', textBaseline: ' + this.textBaseline);
-//         if (text === '') {
-//             new Error("measureText empty");
-//         }
-//         return new TextMetrics(100);
-//     }
-
-//     // Gradients and patterns
-//     createLinearGradient(x0, y0, x1, y1) {
-//         console.log("==> CanvasRenderingContext2D createLinearGradient");
-//         return new CanvasGradient();
-//     }
-
-//     createRadialGradient(x0, y0, r0, x1, y1, r1) {
-//         return null;
-//     }
-
-//     createPattern(image, repetition) {
-//         return null;
-//     }
-
-//     save() {
-//         console.log("==> CanvasRenderingContext2D save");
-//     }
-
-//     // Paths
-//     beginPath() {
-//         console.log("==> CanvasRenderingContext2D beginPath");
-//     }
-
-//     closePath() {
-
-//     }
-
-//     moveTo() {
-//         console.log("==> CanvasRenderingContext2D moveTo");
-//     }
-
-//     lineTo() {
-//         console.log("==> CanvasRenderingContext2D lineTo");
-//     }
-
-//     bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y) {
-
-//     }
-
-//     quadraticCurveTo(cpx, cpy, x, y) {
-
-//     }
-
-//     arc(x, y, radius, startAngle, endAngle, anticlockwise) {
-
-//     }
-
-//     rect(x, y, width, height) {
-
-//     }
-
-//     // Drawing paths
-//     stroke() {
-//         console.log("==> CanvasRenderingContext2D stroke");
-//     }
-
-//     /*
-//     void ctx.fill([fillRule]);
-//     void ctx.fill(path[, fillRule]);
-//     */
-//     fill() {
-
-//     }
-
-//     restore() {
-
-//     }
-// }
-
-var __listenTouchEventCanvasMap = {};
-
 var HTMLCanvasElement = function (_HTMLElement) {
     _inherits(HTMLCanvasElement, _HTMLElement);
 
@@ -1683,8 +3105,14 @@ var HTMLCanvasElement = function (_HTMLElement) {
 
         _this.top = 0;
         _this.left = 0;
-        _this._width = width ? Math.ceil(width) : 1;
-        _this._height = height ? Math.ceil(height) : 1;
+        _this._width = width ? width : 0;
+        _this._height = height ? height : 0;
+        var w = Math.ceil(_this._width);
+        var h = Math.ceil(_this._height);
+        w = w <= 0 ? 1 : w;
+        h = h <= 0 ? 1 : h;
+        _this._bufferWidth = w % 2 === 0 ? w : ++w;
+        _this._bufferHeight = h % 2 === 0 ? h : ++h;
         _this._context2D = null;
         _this._data = null;
         return _this;
@@ -1697,15 +3125,17 @@ var HTMLCanvasElement = function (_HTMLElement) {
         key: 'getContext',
         value: function getContext(name, opts) {
             var self = this;
-            console.log('==> Canvas getContext(' + name + ')');
+            // console.log(`==> Canvas getContext(${name})`);
             if (name === 'webgl' || name === 'experimental-webgl') {
-                return window.gl;
+                return window.__ccgl;
             } else if (name === '2d') {
                 if (!this._context2D) {
-                    this._context2D = new CanvasRenderingContext2D(this._width, this._height);
+                    this._context2D = new CanvasRenderingContext2D(this._bufferWidth, this._bufferHeight);
                     this._context2D._canvas = this;
                     this._context2D._setCanvasBufferUpdatedCallback(function (data) {
-                        self._data = new ImageData(data, self._width, self._height);
+                        // Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
+                        // HOW TO FIX ?
+                        self._data = new ImageData(data, self._bufferWidth, self._bufferHeight);
                     });
                 }
                 return this._context2D;
@@ -1716,6 +3146,7 @@ var HTMLCanvasElement = function (_HTMLElement) {
     }, {
         key: 'toDataURL',
         value: function toDataURL() {
+            //TODO:
             console.log("==> Canvas toDataURL");
             return "";
         }
@@ -1725,36 +3156,15 @@ var HTMLCanvasElement = function (_HTMLElement) {
             return new DOMRect(0, 0, this._width, this._height);
         }
     }, {
-        key: 'addEventListener',
-        value: function addEventListener(eventName, listener, options) {
-            var ret = _get(HTMLCanvasElement.prototype.__proto__ || Object.getPrototypeOf(HTMLCanvasElement.prototype), 'addEventListener', this).call(this, eventName, listener, options);
-            if (ret) {
-                if (eventName === 'touchstart') {
-                    __listenTouchEventCanvasMap[this._index] = this;
-                }
-            }
-
-            return ret;
-        }
-    }, {
-        key: 'removeEventListener',
-        value: function removeEventListener(eventName, listener, options) {
-            var ret = _get(HTMLCanvasElement.prototype.__proto__ || Object.getPrototypeOf(HTMLCanvasElement.prototype), 'removeEventListener', this).call(this, eventName, listener, options);
-            if (ret) {
-                if (eventName === 'touchstart') {
-                    delete __listenTouchEventCanvasMap[this._index];
-                }
-            }
-
-            return ret;
-        }
-    }, {
         key: 'width',
         set: function set(width) {
+            this._width = width;
             width = Math.ceil(width);
-            console.log('==> HTMLCanvasElement.width = ' + width);
-            if (this._width !== width) {
-                this._width = width;
+            // console.log(`==> HTMLCanvasElement.width = ${width}`);
+            // Make sure width could be divided by 2, otherwise text display may be wrong.
+            width = width % 2 === 0 ? width : ++width;
+            if (this._bufferWidth !== width) {
+                this._bufferWidth = width;
                 if (this._context2D) {
                     this._context2D._width = width;
                 }
@@ -1766,10 +3176,13 @@ var HTMLCanvasElement = function (_HTMLElement) {
     }, {
         key: 'height',
         set: function set(height) {
+            this._height = height;
             height = Math.ceil(height);
-            console.log('==> HTMLCanvasElement.height = ' + height);
-            if (this._height !== height) {
-                this._height = height;
+            // console.log(`==> HTMLCanvasElement.height = ${height}`);
+            // Make sure height could be divided by 2, otherwise text display may be wrong.
+            height = height % 2 === 0 ? height : ++height;
+            if (this._bufferHeight !== height) {
+                this._bufferHeight = height;
                 if (this._context2D) {
                     this._context2D._height = height;
                 }
@@ -1815,29 +3228,9 @@ ctx2DProto.drawImage = function (image, sx, sy, sWidth, sHeight, dx, dy, dWidth,
 ;ctx2DProto.bezierCurveTo = function () {};
 ctx2DProto.fill = function () {};
 
-function touchEventHandlerFactory(type) {
-    return function (touches) {
-        var touchEvent = new TouchEvent(type);
-
-        touchEvent.touches = touches;
-        // touchEvent.targetTouches = Array.prototype.slice.call(event.touches)
-        touchEvent.changedTouches = touches; //event.changedTouches
-        // touchEvent.timeStamp = event.timeStamp
-
-        for (var key in __listenTouchEventCanvasMap) {
-            __listenTouchEventCanvasMap[key].dispatchEvent(touchEvent);
-        }
-    };
-}
-
-jsb.onTouchStart = touchEventHandlerFactory('touchstart');
-jsb.onTouchMove = touchEventHandlerFactory('touchmove');
-jsb.onTouchEnd = touchEventHandlerFactory('touchend');
-jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
-
 module.exports = HTMLCanvasElement;
 
-},{"./DOMRect":5,"./HTMLElement":14,"./ImageData":18}],14:[function(require,module,exports){
+},{"./DOMRect":6,"./HTMLElement":15,"./ImageData":21}],15:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1900,7 +3293,7 @@ var HTMLElement = function (_Element) {
     _this.insertBefore = noop;
 
     _this.innerHTML = '';
-    _this.parentElement = window.canvas;
+    _this.parentElement = window.__cccanvas;
     return _this;
   }
 
@@ -1924,7 +3317,257 @@ var HTMLElement = function (_Element) {
 
 module.exports = HTMLElement;
 
-},{"./Element":6,"./util":25}],15:[function(require,module,exports){
+},{"./Element":7,"./util":29}],16:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/****************************************************************************
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+
+ http://www.cocos.com
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated engine source code (the "Software"), a limited,
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
+ to use Cocos Creator solely to develop games on your target platforms. You shall
+  not use Cocos Creator software for developing other software or tools that's
+  used for developing games. You are not granted to publish, distribute,
+  sublicense, and/or sell copies of Cocos Creator.
+
+ The software or tools in this License Agreement are licensed, not sold.
+ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
+
+var HTMLElement = require('./HTMLElement');
+var Event = require('./Event');
+var gl = window.__ccgl;
+
+var HTMLImageElement = function (_HTMLElement) {
+    _inherits(HTMLImageElement, _HTMLElement);
+
+    function HTMLImageElement(width, height, isCalledFromImage) {
+        _classCallCheck(this, HTMLImageElement);
+
+        if (!isCalledFromImage) {
+            throw new TypeError("Illegal constructor, use 'new Image(w, h); instead!'");
+            return _possibleConstructorReturn(_this);
+        }
+
+        var _this = _possibleConstructorReturn(this, (HTMLImageElement.__proto__ || Object.getPrototypeOf(HTMLImageElement)).call(this, 'img'));
+
+        _this.width = width ? width : 0;
+        _this.height = height ? height : 0;
+        _this._data = null;
+        _this._src = null;
+        _this.complete = false;
+        _this._glFormat = _this._glInternalFormat = gl.RGBA;
+        _this.crossOrigin = null;
+        return _this;
+    }
+
+    _createClass(HTMLImageElement, [{
+        key: 'getBoundingClientRect',
+        value: function getBoundingClientRect() {
+            return new DOMRect(0, 0, this.width, this.height);
+        }
+    }, {
+        key: 'src',
+        set: function set(src) {
+            var _this2 = this;
+
+            this._src = src;
+            jsb.loadImage(src, function (info) {
+                _this2.width = _this2.naturalWidth = info.width;
+                _this2.height = _this2.naturalHeight = info.height;
+                _this2._data = info.data;
+                // console.log(`glFormat: ${info.glFormat}, glInternalFormat: ${info.glInternalFormat}, glType: ${info.glType}`);
+                _this2._glFormat = info.glFormat;
+                _this2._glInternalFormat = info.glInternalFormat;
+                _this2._glType = info.glType;
+                _this2._numberOfMipmaps = info.numberOfMipmaps;
+                _this2._compressed = info.compressed;
+                _this2._bpp = info.bpp;
+                _this2._premultiplyAlpha = info.premultiplyAlpha;
+
+                _this2._alignment = 1;
+                // Set the row align only when mipmapsNum == 1 and the data is uncompressed
+                if ((_this2._numberOfMipmaps == 0 || _this2._numberOfMipmaps == 1) && !_this2._compressed) {
+                    var bytesPerRow = _this2.width * _this2._bpp / 8;
+                    if (bytesPerRow % 8 == 0) _this2._alignment = 8;else if (bytesPerRow % 4 == 0) _this2._alignment = 4;else if (bytesPerRow % 2 == 0) _this2._alignment = 2;
+                }
+
+                _this2.complete = true;
+
+                var event = new Event('load');
+                _this2.dispatchEvent(event);
+            });
+        },
+        get: function get() {
+            return this._src;
+        }
+    }, {
+        key: 'clientWidth',
+        get: function get() {
+            return this.width;
+        }
+    }, {
+        key: 'clientHeight',
+        get: function get() {
+            return this.height;
+        }
+    }]);
+
+    return HTMLImageElement;
+}(HTMLElement);
+
+module.exports = HTMLImageElement;
+
+},{"./Event":8,"./HTMLElement":15}],17:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/****************************************************************************
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+
+ http://www.cocos.com
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated engine source code (the "Software"), a limited,
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
+ to use Cocos Creator solely to develop games on your target platforms. You shall
+  not use Cocos Creator software for developing other software or tools that's
+  used for developing games. You are not granted to publish, distribute,
+  sublicense, and/or sell copies of Cocos Creator.
+
+ The software or tools in this License Agreement are licensed, not sold.
+ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
+
+var HTMLElement = require('./HTMLElement');
+var MediaError = require('./MediaError');
+
+var HAVE_NOTHING = 0;
+var HAVE_METADATA = 1;
+var HAVE_CURRENT_DATA = 2;
+var HAVE_FUTURE_DATA = 3;
+var HAVE_ENOUGH_DATA = 4;
+
+var HTMLMediaElement = function (_HTMLElement) {
+    _inherits(HTMLMediaElement, _HTMLElement);
+
+    function HTMLMediaElement(type) {
+        _classCallCheck(this, HTMLMediaElement);
+
+        var _this = _possibleConstructorReturn(this, (HTMLMediaElement.__proto__ || Object.getPrototypeOf(HTMLMediaElement)).call(this, type));
+
+        _this._volume = 1.0;
+        _this._duration = 0;
+        _this._isEnded = false;
+        _this._isMute = false;
+        _this._readyState = HAVE_NOTHING;
+        _this._error = new MediaError();
+        return _this;
+    }
+
+    _createClass(HTMLMediaElement, [{
+        key: 'addTextTrack',
+        value: function addTextTrack() {}
+    }, {
+        key: 'captureStream',
+        value: function captureStream() {}
+    }, {
+        key: 'fastSeek',
+        value: function fastSeek() {}
+    }, {
+        key: 'load',
+        value: function load() {}
+    }, {
+        key: 'pause',
+        value: function pause() {}
+    }, {
+        key: 'play',
+        value: function play() {}
+    }, {
+        key: 'canPlayType',
+        value: function canPlayType(mediaType) {
+            return '';
+        }
+    }, {
+        key: 'volume',
+        set: function set(volume) {
+            this._volume = volume;
+        },
+        get: function get() {
+            return this._volume;
+        }
+    }, {
+        key: 'duration',
+        get: function get() {
+            return this._duration;
+        }
+    }, {
+        key: 'ended',
+        get: function get() {
+            return this._isEnded;
+        }
+    }, {
+        key: 'muted',
+        get: function get() {
+            return this._isMute;
+        }
+    }, {
+        key: 'readyState',
+        get: function get() {
+            return this._readyState;
+        }
+    }, {
+        key: 'error',
+        get: function get() {
+            return this._error;
+        }
+    }, {
+        key: 'currentTime',
+        get: function get() {
+            return 0;
+        }
+    }]);
+
+    return HTMLMediaElement;
+}(HTMLElement);
+
+module.exports = HTMLMediaElement;
+
+},{"./HTMLElement":15,"./MediaError":22}],18:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1963,85 +3606,33 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var HTMLElement = require('./HTMLElement');
 var Event = require('./Event');
 
-var HTMLImageElement = function (_HTMLElement) {
-    _inherits(HTMLImageElement, _HTMLElement);
+var HTMLScriptElement = function (_HTMLElement) {
+    _inherits(HTMLScriptElement, _HTMLElement);
 
-    function HTMLImageElement(width, height) {
-        _classCallCheck(this, HTMLImageElement);
+    function HTMLScriptElement(width, height) {
+        _classCallCheck(this, HTMLScriptElement);
 
-        var _this = _possibleConstructorReturn(this, (HTMLImageElement.__proto__ || Object.getPrototypeOf(HTMLImageElement)).call(this, 'img'));
-
-        _this.width = width;
-        _this.height = height;
-        _this._data = null;
-        _this.onload = null;
-        _this._src = null;
-        _this.complete = false;
-        _this._glFormat = _this._glInternalFormat = gl.RGBA;
-        _this.crossOrigin = null;
-        return _this;
+        return _possibleConstructorReturn(this, (HTMLScriptElement.__proto__ || Object.getPrototypeOf(HTMLScriptElement)).call(this, 'script'));
     }
 
-    _createClass(HTMLImageElement, [{
-        key: 'getBoundingClientRect',
-        value: function getBoundingClientRect() {
-            return new DOMRect(0, 0, this.width, this.height);
-        }
-    }, {
+    _createClass(HTMLScriptElement, [{
         key: 'src',
-        set: function set(src) {
+        set: function set(url) {
             var _this2 = this;
 
-            this._src = src;
-            jsb.loadImage(src, function (info) {
-                _this2.width = _this2.naturalWidth = info.width;
-                _this2.height = _this2.naturalHeight = info.height;
-                _this2._data = info.data;
-                // console.log(`glFormat: ${info.glFormat}, glInternalFormat: ${info.glInternalFormat}, glType: ${info.glType}`);
-                _this2._glFormat = info.glFormat;
-                _this2._glInternalFormat = info.glInternalFormat;
-                _this2._glType = info.glType;
-                _this2._numberOfMipmaps = info.numberOfMipmaps;
-                _this2._compressed = info.compressed;
-                _this2._bpp = info.bpp;
-
-                _this2._alignment = 1;
-                // Set the row align only when mipmapsNum == 1 and the data is uncompressed
-                if (_this2._numberOfMipmaps == 1 && !_this2._compressed) {
-                    var bytesPerRow = _this2.width * _this2._bpp / 8;
-                    if (bytesPerRow % 8 == 0) _alignment = 8;else if (bytesPerRow % 4 == 0) _alignment = 4;else if (bytesPerRow % 2 == 0) _alignment = 2;
-                }
-
-                _this2.complete = true;
-
+            setTimeout(function () {
+                require(url);
                 _this2.dispatchEvent(new Event('load'));
-
-                if (_this2.onload) {
-                    _this2.onload();
-                }
-            });
-        },
-        get: function get() {
-            return this._src;
-        }
-    }, {
-        key: 'clientWidth',
-        get: function get() {
-            return this.width;
-        }
-    }, {
-        key: 'clientHeight',
-        get: function get() {
-            return this.height;
+            }, 0);
         }
     }]);
 
-    return HTMLImageElement;
+    return HTMLScriptElement;
 }(HTMLElement);
 
-module.exports = HTMLImageElement;
+module.exports = HTMLScriptElement;
 
-},{"./Event":7,"./HTMLElement":14}],16:[function(require,module,exports){
+},{"./Event":8,"./HTMLElement":15}],19:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2077,44 +3668,38 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
  THE SOFTWARE.
  ****************************************************************************/
 
-var HTMLElement = require('./HTMLElement');
+var HTMLMediaElement = require('./HTMLMediaElement');
 
-var HTMLMediaElement = function (_HTMLElement) {
-  _inherits(HTMLMediaElement, _HTMLElement);
+var HTMLVideoElement = function (_HTMLMediaElement) {
+  _inherits(HTMLVideoElement, _HTMLMediaElement);
 
-  function HTMLMediaElement(type) {
-    _classCallCheck(this, HTMLMediaElement);
+  function HTMLVideoElement() {
+    _classCallCheck(this, HTMLVideoElement);
 
-    return _possibleConstructorReturn(this, (HTMLMediaElement.__proto__ || Object.getPrototypeOf(HTMLMediaElement)).call(this, type));
+    return _possibleConstructorReturn(this, (HTMLVideoElement.__proto__ || Object.getPrototypeOf(HTMLVideoElement)).call(this, 'video'));
   }
 
-  _createClass(HTMLMediaElement, [{
-    key: 'addTextTrack',
-    value: function addTextTrack() {}
-  }, {
-    key: 'captureStream',
-    value: function captureStream() {}
-  }, {
-    key: 'fastSeek',
-    value: function fastSeek() {}
-  }, {
-    key: 'load',
-    value: function load() {}
-  }, {
-    key: 'pause',
-    value: function pause() {}
-  }, {
-    key: 'play',
-    value: function play() {}
+  _createClass(HTMLVideoElement, [{
+    key: 'canPlayType',
+    value: function canPlayType(type) {
+      if (type === 'video/mp4') return true;
+      return false;
+    }
   }]);
 
-  return HTMLMediaElement;
-}(HTMLElement);
+  return HTMLVideoElement;
+}(HTMLMediaElement);
 
-module.exports = HTMLMediaElement;
+module.exports = HTMLVideoElement;
 
-},{"./HTMLElement":14}],17:[function(require,module,exports){
+},{"./HTMLMediaElement":17}],20:[function(require,module,exports){
 'use strict';
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 /****************************************************************************
  Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
@@ -2143,13 +3728,21 @@ module.exports = HTMLMediaElement;
 
 var HTMLImageElement = require('./HTMLImageElement');
 
-function Image(width, height) {
-  return new HTMLImageElement(width, height);
-}
+var Image = function (_HTMLImageElement) {
+  _inherits(Image, _HTMLImageElement);
+
+  function Image(width, height) {
+    _classCallCheck(this, Image);
+
+    return _possibleConstructorReturn(this, (Image.__proto__ || Object.getPrototypeOf(Image)).call(this, width, height, true));
+  }
+
+  return Image;
+}(HTMLImageElement);
 
 module.exports = Image;
 
-},{"./HTMLImageElement":15}],18:[function(require,module,exports){
+},{"./HTMLImageElement":16}],21:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2224,7 +3817,41 @@ var ImageData = function () {
 
 module.exports = ImageData;
 
-},{}],19:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var MEDIA_ERR_ABORTED = 1;
+var MEDIA_ERR_NETWORK = 2;
+var MEDIA_ERR_DECODE = 3;
+var MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
+
+var MediaError = function () {
+	function MediaError() {
+		_classCallCheck(this, MediaError);
+	}
+
+	_createClass(MediaError, [{
+		key: "code",
+		get: function get() {
+			return MEDIA_ERR_ABORTED;
+		}
+	}, {
+		key: "message",
+		get: function get() {
+			return "";
+		}
+	}]);
+
+	return MediaError;
+}();
+
+module.exports = MediaError;
+
+},{}],23:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2271,6 +3898,7 @@ var Node = function (_EventTarget) {
     var _this = _possibleConstructorReturn(this, (Node.__proto__ || Object.getPrototypeOf(Node)).call(this));
 
     _this.childNodes = [];
+    _this.parentNode = window.__cccanvas;
     return _this;
   }
 
@@ -2303,6 +3931,11 @@ var Node = function (_EventTarget) {
       }
       return null;
     }
+  }, {
+    key: 'contains',
+    value: function contains(node) {
+      return this.childNodes.indexOf(node) > -1;
+    }
   }]);
 
   return Node;
@@ -2310,7 +3943,7 @@ var Node = function (_EventTarget) {
 
 module.exports = Node;
 
-},{"./EventTarget":8}],20:[function(require,module,exports){
+},{"./EventTarget":9}],24:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -2364,7 +3997,7 @@ var TouchEvent = function (_Event) {
 
 module.exports = TouchEvent;
 
-},{"./Event":7}],21:[function(require,module,exports){
+},{"./Event":8}],25:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2404,6 +4037,8 @@ var HTMLElement = require('./HTMLElement');
 var Image = require('./Image');
 var Audio = require('./Audio');
 var HTMLCanvasElement = require('./HTMLCanvasElement');
+var HTMLVideoElement = require('./HTMLVideoElement');
+var HTMLScriptElement = require('./HTMLScriptElement');
 var Node = require('./Node');
 var FontFaceSet = require('./FontFaceSet');
 
@@ -2446,11 +4081,9 @@ var Document = function (_Node) {
       } else if (tagName === 'img') {
         return new Image();
       } else if (tagName === 'video') {
-        return {
-          canPlayType: function canPlayType() {
-            return false;
-          }
-        };
+        return new HTMLVideoElement();
+      } else if (tagName === 'script') {
+        return new HTMLScriptElement();
       }
 
       return new HTMLElement(tagName);
@@ -2458,10 +4091,10 @@ var Document = function (_Node) {
   }, {
     key: 'getElementById',
     value: function getElementById(id) {
-      if (id === window.canvas.id) {
-        return window.canvas;
+      if (id === window.__cccanvas.id || id === 'canvas') {
+        return window.__cccanvas;
       }
-      return null;
+      return new HTMLElement(id);
     }
   }, {
     key: 'getElementsByTagName',
@@ -2471,9 +4104,9 @@ var Document = function (_Node) {
       } else if (tagName === 'body') {
         return [document.body];
       } else if (tagName === 'canvas') {
-        return [window.canvas];
+        return [window.__cccanvas];
       }
-      return [];
+      return [new HTMLElement(tagName)];
     }
   }, {
     key: 'getElementsByName',
@@ -2483,9 +4116,9 @@ var Document = function (_Node) {
       } else if (tagName === 'body') {
         return [document.body];
       } else if (tagName === 'canvas') {
-        return [window.canvas];
+        return [window.__cccanvas];
       }
-      return [];
+      return [new HTMLElement(tagName)];
     }
   }, {
     key: 'querySelector',
@@ -2495,11 +4128,11 @@ var Document = function (_Node) {
       } else if (query === 'body') {
         return document.body;
       } else if (query === 'canvas') {
-        return window.canvas;
-      } else if (query === '#' + window.canvas.id) {
-        return window.canvas;
+        return window.__cccanvas;
+      } else if (query === '#' + window.__cccanvas.id) {
+        return window.__cccanvas;
       }
-      return null;
+      return new HTMLElement(query);
     }
   }, {
     key: 'querySelectorAll',
@@ -2509,14 +4142,27 @@ var Document = function (_Node) {
       } else if (query === 'body') {
         return [document.body];
       } else if (query === 'canvas') {
-        return [window.canvas];
+        return [window.__cccanvas];
       }
-      return [];
+      return [new HTMLElement(query)];
     }
   }, {
     key: 'createTextNode',
     value: function createTextNode() {
       return new HTMLElement('text');
+    }
+  }, {
+    key: 'elementFromPoint',
+    value: function elementFromPoint() {
+      return window.canvas;
+    }
+  }, {
+    key: 'createEvent',
+    value: function createEvent(type) {
+      if (window[type]) {
+        return new window[type]();
+      }
+      return null;
     }
   }]);
 
@@ -2527,7 +4173,7 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":4,"./FontFaceSet":11,"./HTMLCanvasElement":13,"./HTMLElement":14,"./Image":17,"./Node":19,"./location":23}],22:[function(require,module,exports){
+},{"./Audio":5,"./FontFaceSet":12,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLScriptElement":18,"./HTMLVideoElement":19,"./Image":20,"./Node":23,"./location":27}],26:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2556,7 +4202,7 @@ module.exports = document;
  ****************************************************************************/
 require('./window');
 
-},{"./window":26}],23:[function(require,module,exports){
+},{"./window":30}],27:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2586,13 +4232,15 @@ require('./window');
 
 var location = {
   href: 'game.js',
+  pathname: 'game.js',
+  search: '',
   hash: '',
   reload: function reload() {}
 };
 
 module.exports = location;
 
-},{}],24:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2623,18 +4271,13 @@ module.exports = location;
 var _require = require('./util'),
     noop = _require.noop;
 
-// TODO 需要 wx.getSystemInfo 获取更详细信息
-// cjh const { platform } = wx.getSystemInfoSync()
-
-
 var navigator = {
-  platform: 'wx', //cjh added wx
-  language: 'zh-cn',
+  platform: __getOS(),
+  language: __getCurrentLanguage(),
   appVersion: '5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1',
-  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Mobile/14E8301 MicroMessenger/6.6.0 MiniGame NetType/WIFI Language/zh_CN',
-  onLine: true, // TODO 用 wx.getNetworkStateChange 和 wx.onNetworkStateChange 来返回真实的状态
+  userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Mobile/14E8301 NetType/WIFI Language/zh_CN',
+  onLine: true, //FIXME:
 
-  // TODO 用 wx.getLocation 来封装 geolocation
   geolocation: {
     getCurrentPosition: noop,
     watchPosition: noop,
@@ -2646,14 +4289,39 @@ var navigator = {
 
 module.exports = navigator;
 
-},{"./util":25}],25:[function(require,module,exports){
+},{"./util":29}],29:[function(require,module,exports){
 "use strict";
+
+/****************************************************************************
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+
+ http://www.cocos.com
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated engine source code (the "Software"), a limited,
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
+ to use Cocos Creator solely to develop games on your target platforms. You shall
+  not use Cocos Creator software for developing other software or tools that's
+  used for developing games. You are not granted to publish, distribute,
+  sublicense, and/or sell copies of Cocos Creator.
+
+ The software or tools in this License Agreement are licensed, not sold.
+ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
 
 function noop() {}
 
 module.exports = noop;
 
-},{}],26:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2690,6 +4358,8 @@ function inject() {
     window.ontouchcancel = null;
 
     window.pageXOffset = window.pageYOffset = window.clientTop = window.clientLeft = 0;
+    window.outerWidth = window.innerWidth;
+    window.outerHeight = window.innerHeight;
 
     window.location = require('./location');
     window.document = require('./document');
@@ -2699,9 +4369,12 @@ function inject() {
     window.HTMLImageElement = require('./HTMLImageElement');
     window.HTMLMediaElement = require('./HTMLMediaElement');
     window.HTMLAudioElement = require('./HTMLAudioElement');
-    window.canvas = new HTMLCanvasElement();
-    window.gl.canvas = window.canvas;
-    window.WebGLRenderingContext = window.gl;
+    window.HTMLVideoElement = require('./HTMLVideoElement');
+    window.HTMLScriptElement = require('./HTMLScriptElement');
+    window.__cccanvas = new HTMLCanvasElement();
+    window.__cccanvas._width = window.innerWidth;
+    window.__cccanvas._height = window.innerHeight;
+    window.__ccgl.canvas = window.__cccanvas;
     window.navigator = require('./navigator');
     window.Image = require('./Image');
     window.Audio = require('./Audio');
@@ -2731,15 +4404,15 @@ function inject() {
     };
 
     window.addEventListener = function (eventName, listener, options) {
-        window.canvas.addEventListener(eventName, listener, options);
+        window.__cccanvas.addEventListener(eventName, listener, options);
     };
 
     window.removeEventListener = function (eventName, listener, options) {
-        window.canvas.removeEventListener(eventName, listener, options);
+        window.__cccanvas.removeEventListener(eventName, listener, options);
     };
 
     window.dispatchEvent = function (event) {
-        window.canvas.dispatchEvent(event);
+        window.__cccanvas.dispatchEvent(event);
     };
 
     window.getComputedStyle = function (element) {
@@ -2751,6 +4424,8 @@ function inject() {
         };
     };
 
+    window.focus = function () {};
+
     window._isInjected = true;
 }
 
@@ -2760,7 +4435,7 @@ if (!window._isInjected) {
 
 window.localStorage = sys.localStorage;
 
-},{"./Audio":4,"./Element":6,"./Event":7,"./EventTarget":8,"./FileReader":9,"./FontFace":10,"./FontFaceSet":11,"./HTMLAudioElement":12,"./HTMLCanvasElement":13,"./HTMLElement":14,"./HTMLImageElement":15,"./HTMLMediaElement":16,"./Image":17,"./TouchEvent":20,"./document":21,"./location":23,"./navigator":24}],27:[function(require,module,exports){
+},{"./Audio":5,"./Element":7,"./Event":8,"./EventTarget":9,"./FileReader":10,"./FontFace":11,"./FontFaceSet":12,"./HTMLAudioElement":13,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLImageElement":16,"./HTMLMediaElement":17,"./HTMLScriptElement":18,"./HTMLVideoElement":19,"./Image":20,"./TouchEvent":24,"./document":25,"./location":27,"./navigator":28}],31:[function(require,module,exports){
 "use strict";
 
 /*
@@ -2801,7 +4476,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],28:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict';
 
 /*
@@ -2835,6 +4510,8 @@ window.localStorage = sys.localStorage;
 
 require('./jsb_opengl_constants');
 
+var gl = __ccgl;
+
 gl.drawingBufferWidth = window.innerWidth;
 gl.drawingBufferHeight = window.innerHeight;
 
@@ -2857,6 +4534,7 @@ var HTMLCanvasElement = require('./jsb-adapter/HTMLCanvasElement');
 var HTMLImageElement = require('./jsb-adapter/HTMLImageElement');
 var ImageData = require('./jsb-adapter/ImageData');
 
+var _glPixelStorei = gl.pixelStorei;
 var _glTexImage2D = gl.texImage2D;
 
 /*
@@ -2871,22 +4549,21 @@ void gl.texImage2D(target, level, internalformat, format, type, ImageBitmap? pix
 gl.texImage2D = function (target, level, internalformat, width, height, border, format, type, pixels) {
     var argCount = arguments.length;
     if (argCount == 6) {
+
         var image = border;
         type = height;
         format = width;
 
         if (image instanceof HTMLImageElement) {
-            // console.log(`==> texImage2D HTMLImageElement internalformat: ${image._glInternalFormat}, format: ${image._glFormat}, image: w:${image.width}, h:${image.height}, dataLen:${image._data.length}`);
-            gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
-
+            _glPixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
             _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
-            // console.log(`==> texImage2D HTMLCanvasElement internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);//, dataLen:${image._data.length}`);
+            var data = null;
             if (image._data) {
-                _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data._data);
+                data = image._data._data;
             }
+            _glTexImage2D(target, level, internalformat, image._bufferWidth, image._bufferHeight, 0, format, type, data);
         } else if (image instanceof ImageData) {
-            // console.log(`==> texImage2D ImageData internalformat: ${internalformat}, format: ${format}, image: w:${image.width}, h:${image.height}`);
             _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data);
         } else {
             console.error("Invalid pixel argument passed to gl.texImage2D!");
@@ -2915,14 +4592,15 @@ gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, for
         type = height;
         format = width;
 
-        //TODO: ImageData
         if (image instanceof HTMLImageElement) {
-            gl.pixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
+            _glPixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
         } else if (image instanceof HTMLCanvasElement) {
+            var data = null;
             if (image._data) {
-                _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data._data);
+                data = image._data._data;
             }
+            _glTexSubImage2D(target, level, xoffset, yoffset, image._bufferWidth, image._bufferHeight, format, type, data);
         } else if (image instanceof ImageData) {
             _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data);
         } else {
@@ -2939,7 +4617,7 @@ gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, for
 gl.getContextAttributes = function () {
     return {
         alpha: true,
-        antialias: true,
+        antialias: false,
         depth: true,
         failIfMajorPerformanceCaveat: false,
         premultipliedAlpha: true,
@@ -2952,7 +4630,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":13,"./jsb-adapter/HTMLImageElement":15,"./jsb-adapter/ImageData":18,"./jsb_opengl_constants":29}],29:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":14,"./jsb-adapter/HTMLImageElement":16,"./jsb-adapter/ImageData":21,"./jsb_opengl_constants":33}],33:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -2980,11 +4658,7 @@ gl.isContextLost = function () {
  THE SOFTWARE.
  ****************************************************************************/
 
-/*
-* AUTOGENERATED FILE. DO NOT EDIT IT
-* Generated by "generate_jsb.py -c opengl_jsb.ini" on 2013-03-18
-* Script version: v0.6
-*/
+var gl = __ccgl;
 
 gl.GCCSO_SHADER_BINARY_FJ = 0x9260;
 gl._3DC_XY_AMD = 0x87fa;
@@ -3819,7 +5493,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],30:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -4063,7 +5737,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],31:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -4320,7 +5994,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":32,"./entities":33,"./sax":34}],32:[function(require,module,exports){
+},{"./dom":36,"./entities":37,"./sax":38}],36:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -5540,7 +7214,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],33:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -5788,7 +7462,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],34:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
@@ -6418,4 +8092,4 @@ function split(source, start) {
 
 exports.XMLReader = XMLReader;
 
-},{}]},{},[3]);
+},{}]},{},[4]);
