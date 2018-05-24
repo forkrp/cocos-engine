@@ -22,38 +22,13 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  ****************************************************************************/
- 
-const Element = require('./Element');
-const { noop } = require('./util');
+const Event = require('./Event')
 
-class HTMLElement extends Element {
+class MouseEvent extends Event {
 
-  constructor(tagName = '') {
-    super()
-    this.tagName = tagName.toUpperCase()
-
-    this.className = ''
-    this.children = []
-    this.style = {
-      width: `${window.innerWidth}px`,
-      height: `${window.innerHeight}px`
-    }
-
-    this.innerHTML = ''
-    this.parentElement = window.__cccanvas
-  }
-
-  setAttribute(name, value) {
-    this[name] = value
-  }
-
-  getAttribute(name) {
-    return this[name]
-  }
-
-  focus() {
-    
+  constructor(type) {
+    super(type)
   }
 }
 
-module.exports = HTMLElement;
+module.exports = MouseEvent
