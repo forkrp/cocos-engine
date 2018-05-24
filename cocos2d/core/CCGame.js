@@ -302,25 +302,30 @@ var game = {
      * @method restart
      */
     restart: function () {
-        cc.director.once(cc.Director.EVENT_AFTER_DRAW, function () {
-            for (var id in game._persistRootNodes) {
-                game.removePersistRootNode(game._persistRootNodes[id]);
-            }
+        if (CC_JSB) {
+            cc.sys.restartVM();
+        }
+        else {
+            cc.director.once(cc.Director.EVENT_AFTER_DRAW, function () {
+                for (var id in game._persistRootNodes) {
+                    game.removePersistRootNode(game._persistRootNodes[id]);
+                }
 
-            // Clear scene
-            cc.director.getScene().destroy();
-            cc.Object._deferredDestroy();
+                // Clear scene
+                cc.director.getScene().destroy();
+                cc.Object._deferredDestroy();
 
-            cc.director.purgeDirector();
+                cc.director.purgeDirector();
 
-            // Clean up audio
-            if (cc.audioEngine) {
-                cc.audioEngine.uncacheAll();
-            }
+                // Clean up audio
+                if (cc.audioEngine) {
+                    cc.audioEngine.uncacheAll();
+                }
 
-            cc.director.reset();
-            game.onStart();
-        });
+                cc.director.reset();
+                game.onStart();
+            });
+        }
     },
 
     /**
