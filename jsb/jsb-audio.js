@@ -46,6 +46,8 @@ cc.Audio.Type = {
 
     // Using the new audioEngine
     cc.audioEngine = audioEngine;
+    audioEngine._break = function() {};
+    audioEngine._restore = function() {};
     audioEngine.play = audioEngine.play2d;
     audioEngine.setMaxWebAudioSize = function () {};
 

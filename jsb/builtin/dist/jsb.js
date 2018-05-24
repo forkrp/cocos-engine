@@ -2159,7 +2159,7 @@ if (window.SocketIO) {
 
 window.gameTick = tick;
 
-},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":26,"./jsb_audioengine":31,"./jsb_opengl":32,"./jsb_prepare":34,"./xmldom/dom-parser":35}],5:[function(require,module,exports){
+},{"./Blob":1,"./base64/base64.min":2,"./glOptMode":3,"./jsb-adapter":27,"./jsb_audioengine":32,"./jsb_opengl":33,"./jsb_prepare":35,"./xmldom/dom-parser":36}],5:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -2291,6 +2291,8 @@ var Element = function (_Node) {
         _this.children = [];
         _this.clientLeft = 0;
         _this.clientTop = 0;
+        _this.scrollLeft = 0;
+        _this.scrollTop = 0;
         return _this;
     }
 
@@ -2322,7 +2324,7 @@ var Element = function (_Node) {
 
 module.exports = Element;
 
-},{"./DOMRect":6,"./Node":23}],8:[function(require,module,exports){
+},{"./DOMRect":6,"./Node":24}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2605,8 +2607,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var __targetID = 0;
 var __listenTouchEventMap = {};
+var __listenMouseEventMap = {};
 
 var __touchEventNames = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+var __mouseEventNames = ['mousedown', 'mousemove', 'mouseup', 'mousewheel'];
 
 // Listener types
 var CAPTURE = 1;
@@ -2639,19 +2643,42 @@ var EventTarget = function () {
 
         this._targetID = ++__targetID;
         this._touchListenerCount = 0;
+        this._mouseListenerCount = 0;
         this._listeners = new Map();
     }
 
-    /**
-     * Add a given listener to this event target.
-     * @param {string} eventName The event name to add.
-     * @param {Function} listener The listener to add.
-     * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
-     * @returns {boolean} `true` if the listener was added actually.
-     */
-
-
     _createClass(EventTarget, [{
+        key: '_associateSystemEventListener',
+        value: function _associateSystemEventListener(eventName) {
+            if (__touchEventNames.indexOf(eventName) > -1) {
+                if (this._touchListenerCount === 0) __listenTouchEventMap[this._targetID] = this;
+                ++this._touchListenerCount;
+            } else if (__mouseEventNames.indexOf(eventName) > -1) {
+                if (this._mouseListenerCount === 0) __listenMouseEventMap[this._targetID] = this;
+                ++this._mouseListenerCount;
+            }
+        }
+    }, {
+        key: '_dissociateSystemEventListener',
+        value: function _dissociateSystemEventListener(eventName) {
+            if (__touchEventNames.indexOf(eventName) > -1) {
+                --this._touchListenerCount;
+                if (this._touchListenerCount <= 0) delete __listenTouchEventMap[this._targetID];
+            } else if (__mouseEventNames.indexOf(eventName) > -1) {
+                --this._mouseListenerCount;
+                if (this._mouseListenerCount <= 0) delete __listenMouseEventMap[this._targetID];
+            }
+        }
+
+        /**
+         * Add a given listener to this event target.
+         * @param {string} eventName The event name to add.
+         * @param {Function} listener The listener to add.
+         * @param {boolean|{capture?:boolean,passive?:boolean,once?:boolean}} [options] The options for this listener.
+         * @returns {boolean} `true` if the listener was added actually.
+         */
+
+    }, {
         key: 'addEventListener',
         value: function addEventListener(eventName, listener, options) {
             if (!listener) {
@@ -2676,10 +2703,7 @@ var EventTarget = function () {
             };var node = listeners.get(eventName);
             if (node === undefined) {
                 listeners.set(eventName, newNode);
-                if (__touchEventNames.indexOf(eventName) > -1) {
-                    if (this._touchListenerCount === 0) __listenTouchEventMap[this._targetID] = this;
-                    ++this._touchListenerCount;
-                }
+                this._associateSystemEventListener(eventName);
                 return true;
             }
 
@@ -2696,10 +2720,7 @@ var EventTarget = function () {
 
             // Add it.
             prev.next = newNode;
-            if (__touchEventNames.indexOf(eventName) > -1) {
-                if (this._touchListenerCount === 0) __listenTouchEventMap[this._targetID] = this;
-                ++this._touchListenerCount;
-            }
+            this._associateSystemEventListener(eventName);
             return true;
         }
 
@@ -2734,10 +2755,7 @@ var EventTarget = function () {
                         listeners.delete(eventName);
                     }
 
-                    if (__touchEventNames.indexOf(eventName) > -1) {
-                        --this._touchListenerCount;
-                        if (this._touchListenerCount <= 0) delete __listenTouchEventMap[this._targetID];
-                    }
+                    this._dissociateSystemEventListener(eventName);
 
                     return true;
                 }
@@ -2852,8 +2870,29 @@ jsb.onTouchMove = touchEventHandlerFactory('touchmove');
 jsb.onTouchEnd = touchEventHandlerFactory('touchend');
 jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
-// export { defineEventAttribute, EventTarget }
-// export default EventTarget
+function mouseEventHandlerFactory(type) {
+    return function (event) {
+        var mouseEvent = new MouseEvent(type);
+        var button = event.button;
+        mouseEvent.button = button;
+        mouseEvent.which = button + 1;
+        mouseEvent.wheelDelta = event.wheelDeltaY;
+        mouseEvent.clientX = mouseEvent.screenX = mouseEvent.pageX = event.x;
+        mouseEvent.clientY = mouseEvent.screenY = mouseEvent.pageY = event.y;
+
+        var target;
+        for (var key in __listenMouseEventMap) {
+            target = __listenMouseEventMap[key];
+            target.dispatchEvent(mouseEvent);
+        }
+    };
+}
+
+jsb.onMouseDown = mouseEventHandlerFactory('mousedown');
+jsb.onMouseMove = mouseEventHandlerFactory('mousemove');
+jsb.onMouseUp = mouseEventHandlerFactory('mouseup');
+jsb.onMouseWheel = mouseEventHandlerFactory('mousewheel');
+
 module.exports = EventTarget;
 
 },{}],10:[function(require,module,exports){
@@ -3181,8 +3220,6 @@ var HTMLAudioElement = function (_HTMLMediaElement) {
 
         var _this = _possibleConstructorReturn(this, (HTMLAudioElement.__proto__ || Object.getPrototypeOf(HTMLAudioElement)).call(this, 'audio'));
 
-        _this.readyState = HAVE_NOTHING;
-
         _src.set(_this, '');
 
         //TODO:
@@ -3330,16 +3367,11 @@ var HTMLCanvasElement = function (_HTMLElement) {
 
         _this.top = 0;
         _this.left = 0;
-        _this._width = width ? width : 0;
-        _this._height = height ? height : 0;
-        var w = Math.ceil(_this._width);
-        var h = Math.ceil(_this._height);
-        w = w <= 0 ? 1 : w;
-        h = h <= 0 ? 1 : h;
-        _this._bufferWidth = w % 2 === 0 ? w : ++w;
-        _this._bufferHeight = h % 2 === 0 ? h : ++h;
+        _this._width = width ? Math.ceil(width) : 0;
+        _this._height = height ? Math.ceil(height) : 0;
         _this._context2D = null;
         _this._data = null;
+        _this._alignment = 4; // Canvas is used for rendering text only and we make sure the data format is RGBA.
         return _this;
     }
 
@@ -3355,12 +3387,13 @@ var HTMLCanvasElement = function (_HTMLElement) {
                 return window.__ccgl;
             } else if (name === '2d') {
                 if (!this._context2D) {
-                    this._context2D = new CanvasRenderingContext2D(this._bufferWidth, this._bufferHeight);
+                    this._context2D = new CanvasRenderingContext2D(this._width, this._height);
                     this._context2D._canvas = this;
                     this._context2D._setCanvasBufferUpdatedCallback(function (data) {
-                        // Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
-                        // HOW TO FIX ?
-                        self._data = new ImageData(data, self._bufferWidth, self._bufferHeight);
+                        // FIXME: Canvas's data will take 2x memory size, one in C++, another is obtained by Uint8Array here.
+                        self._data = new ImageData(data, self._width, self._height);
+                        // If the width of canvas could be divided by 2, it means that the bytes per row could be divided by 8.
+                        self._alignment = self._width % 2 === 0 ? 8 : 4;
                     });
                 }
                 return this._context2D;
@@ -3383,13 +3416,9 @@ var HTMLCanvasElement = function (_HTMLElement) {
     }, {
         key: 'width',
         set: function set(width) {
-            this._width = width;
             width = Math.ceil(width);
-            // console.log(`==> HTMLCanvasElement.width = ${width}`);
-            // Make sure width could be divided by 2, otherwise text display may be wrong.
-            width = width % 2 === 0 ? width : ++width;
-            if (this._bufferWidth !== width) {
-                this._bufferWidth = width;
+            if (this._width !== width) {
+                this._width = width;
                 if (this._context2D) {
                     this._context2D._width = width;
                 }
@@ -3401,13 +3430,9 @@ var HTMLCanvasElement = function (_HTMLElement) {
     }, {
         key: 'height',
         set: function set(height) {
-            this._height = height;
             height = Math.ceil(height);
-            // console.log(`==> HTMLCanvasElement.height = ${height}`);
-            // Make sure height could be divided by 2, otherwise text display may be wrong.
-            height = height % 2 === 0 ? height : ++height;
-            if (this._bufferHeight !== height) {
-                this._bufferHeight = height;
+            if (this._height !== height) {
+                this._height = height;
                 if (this._context2D) {
                     this._context2D._height = height;
                 }
@@ -3515,8 +3540,6 @@ var HTMLElement = function (_Element) {
       height: window.innerHeight + 'px'
     };
 
-    _this.insertBefore = noop;
-
     _this.innerHTML = '';
     _this.parentElement = window.__cccanvas;
     return _this;
@@ -3542,7 +3565,7 @@ var HTMLElement = function (_Element) {
 
 module.exports = HTMLElement;
 
-},{"./Element":7,"./util":29}],16:[function(require,module,exports){
+},{"./Element":7,"./util":30}],16:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4079,6 +4102,55 @@ module.exports = MediaError;
 },{}],23:[function(require,module,exports){
 'use strict';
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/****************************************************************************
+ Copyright (c) 2018 Xiamen Yaji Software Co., Ltd.
+
+ http://www.cocos.com
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated engine source code (the "Software"), a limited,
+  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
+ to use Cocos Creator solely to develop games on your target platforms. You shall
+  not use Cocos Creator software for developing other software or tools that's
+  used for developing games. You are not granted to publish, distribute,
+  sublicense, and/or sell copies of Cocos Creator.
+
+ The software or tools in this License Agreement are licensed, not sold.
+ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
+var Event = require('./Event');
+
+var MouseEvent = function (_Event) {
+  _inherits(MouseEvent, _Event);
+
+  function MouseEvent(type) {
+    _classCallCheck(this, MouseEvent);
+
+    return _possibleConstructorReturn(this, (MouseEvent.__proto__ || Object.getPrototypeOf(MouseEvent)).call(this, type));
+  }
+
+  return MouseEvent;
+}(Event);
+
+module.exports = MouseEvent;
+
+},{"./Event":8}],24:[function(require,module,exports){
+'use strict';
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4137,6 +4209,18 @@ var Node = function (_EventTarget) {
       }
     }
   }, {
+    key: 'insertBefore',
+    value: function insertBefore(newNode, referenceNode) {
+      //TODO:
+      return newNode;
+    }
+  }, {
+    key: 'replaceChild',
+    value: function replaceChild(newChild, oldChild) {
+      //TODO:
+      return oldChild;
+    }
+  }, {
     key: 'cloneNode',
     value: function cloneNode() {
       var copyNode = Object.create(this);
@@ -4168,7 +4252,7 @@ var Node = function (_EventTarget) {
 
 module.exports = Node;
 
-},{"./EventTarget":9}],24:[function(require,module,exports){
+},{"./EventTarget":9}],25:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4222,7 +4306,7 @@ var TouchEvent = function (_Event) {
 
 module.exports = TouchEvent;
 
-},{"./Event":8}],25:[function(require,module,exports){
+},{"./Event":8}],26:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4398,7 +4482,7 @@ var document = new Document();
 
 module.exports = document;
 
-},{"./Audio":5,"./FontFaceSet":12,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLScriptElement":18,"./HTMLVideoElement":19,"./Image":20,"./Node":23,"./location":27}],26:[function(require,module,exports){
+},{"./Audio":5,"./FontFaceSet":12,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLScriptElement":18,"./HTMLVideoElement":19,"./Image":20,"./Node":24,"./location":28}],27:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -4427,7 +4511,7 @@ module.exports = document;
  ****************************************************************************/
 require('./window');
 
-},{"./window":30}],27:[function(require,module,exports){
+},{"./window":31}],28:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -4465,7 +4549,7 @@ var location = {
 
 module.exports = location;
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -4514,7 +4598,7 @@ var navigator = {
 
 module.exports = navigator;
 
-},{"./util":29}],29:[function(require,module,exports){
+},{"./util":30}],30:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -4546,7 +4630,7 @@ function noop() {}
 
 module.exports = noop;
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 /****************************************************************************
@@ -4609,6 +4693,7 @@ function inject() {
     window.EventTarget = require('./EventTarget');
     window.Event = require('./Event');
     window.TouchEvent = require('./TouchEvent');
+    window.MouseEvent = require('./MouseEvent');
 
     window.devicePixelRatio = 1.0;
     window.screen = {
@@ -4650,6 +4735,7 @@ function inject() {
     };
 
     window.focus = function () {};
+    window.scroll = function () {};
 
     window._isInjected = true;
 }
@@ -4660,7 +4746,7 @@ if (!window._isInjected) {
 
 window.localStorage = sys.localStorage;
 
-},{"./Audio":5,"./Element":7,"./Event":8,"./EventTarget":9,"./FileReader":10,"./FontFace":11,"./FontFaceSet":12,"./HTMLAudioElement":13,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLImageElement":16,"./HTMLMediaElement":17,"./HTMLScriptElement":18,"./HTMLVideoElement":19,"./Image":20,"./TouchEvent":24,"./document":25,"./location":27,"./navigator":28}],31:[function(require,module,exports){
+},{"./Audio":5,"./Element":7,"./Event":8,"./EventTarget":9,"./FileReader":10,"./FontFace":11,"./FontFaceSet":12,"./HTMLAudioElement":13,"./HTMLCanvasElement":14,"./HTMLElement":15,"./HTMLImageElement":16,"./HTMLMediaElement":17,"./HTMLScriptElement":18,"./HTMLVideoElement":19,"./Image":20,"./MouseEvent":23,"./TouchEvent":25,"./document":26,"./location":28,"./navigator":29}],32:[function(require,module,exports){
 "use strict";
 
 /*
@@ -4701,7 +4787,7 @@ window.localStorage = sys.localStorage;
     jsb.AudioEngine.TIME_UNKNOWN = -1;
 })(jsb);
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict';
 
 /*
@@ -4743,15 +4829,59 @@ gl.drawingBufferHeight = window.innerHeight;
 //
 // Extensions
 //
+
+var WebGLCompressedTextureS3TC = {
+    COMPRESSED_RGB_S3TC_DXT1_EXT: 0x83F0, // A DXT1-compressed image in an RGB image format.
+    COMPRESSED_RGBA_S3TC_DXT1_EXT: 0x83F1, // A DXT1-compressed image in an RGB image format with a simple on/off alpha value.
+    COMPRESSED_RGBA_S3TC_DXT3_EXT: 0x83F2, // A DXT3-compressed image in an RGBA image format. Compared to a 32-bit RGBA texture, it offers 4:1 compression.
+    COMPRESSED_RGBA_S3TC_DXT5_EXT: 0x83F3 // A DXT5-compressed image in an RGBA image format. It also provides a 4:1 compression, but differs to the DXT3 compression in how the alpha compression is done.
+};
+
+var WebGLCompressedTextureETC1 = {
+    COMPRESSED_RGB_ETC1_WEBGL: 0x8D64 // Compresses 24-bit RGB data with no alpha channel.
+};
+
+var WebGLCompressedTexturePVRTC = {
+    COMPRESSED_RGB_PVRTC_4BPPV1_IMG: 0x8C00, //  RGB compression in 4-bit mode. One block for each 4×4 pixels.
+    COMPRESSED_RGBA_PVRTC_4BPPV1_IMG: 0x8C02, //  RGBA compression in 4-bit mode. One block for each 4×4 pixels.
+    COMPRESSED_RGB_PVRTC_2BPPV1_IMG: 0x8C01, //  RGB compression in 2-bit mode. One block for each 8×4 pixels.
+    COMPRESSED_RGBA_PVRTC_2BPPV1_IMG: 0x8C03 //  RGBA compression in 2-bit mode. One block for each 8×4 pixe
+};
+
+var extensionPrefixArr = ['MOZ_', 'WEBKIT_'];
+
+var extensionMap = {
+    WEBGL_compressed_texture_s3tc: WebGLCompressedTextureS3TC,
+    WEBGL_compressed_texture_pvrtc: WebGLCompressedTexturePVRTC,
+    WEBGL_compressed_texture_etc1: WebGLCompressedTextureETC1
+};
+
 // From the WebGL spec:
 // Returns an object if, and only if, name is an ASCII case-insensitive match [HTML] for one of the names returned from getSupportedExtensions;
 // otherwise, returns null. The object returned from getExtension contains any constants or functions provided by the extension.
 // A returned object may have no constants or functions if the extension does not define any, but a unique object must still be returned.
 // That object is used to indicate that the extension has been enabled.
 // XXX: The returned object must return the functions and constants.
+
+var supportedExtensions = gl.getSupportedExtensions();
+
 gl.getExtension = function (extension) {
-    var extensions = gl.getSupportedExtensions();
-    if (extensions.indexOf(extension) > -1) return {};
+    var prefix;
+    for (var i = 0, len = extensionPrefixArr.length; i < len; ++i) {
+        prefix = extensionPrefixArr[i];
+        if (extension.startsWith(prefix)) {
+            extension = extension.substring(prefix.length);
+            break;
+        }
+    }
+
+    if (supportedExtensions.indexOf(extension) > -1) {
+        if (extension in extensionMap) {
+            return extensionMap[extension];
+        }
+        return {}; //TODO: Return an empty object to indicate this platform supports the extension. But we should not return an empty object actually.
+    }
+
     return null;
 };
 
@@ -4759,7 +4889,6 @@ var HTMLCanvasElement = require('./jsb-adapter/HTMLCanvasElement');
 var HTMLImageElement = require('./jsb-adapter/HTMLImageElement');
 var ImageData = require('./jsb-adapter/ImageData');
 
-var _glPixelStorei = gl.pixelStorei;
 var _glTexImage2D = gl.texImage2D;
 
 /*
@@ -4780,21 +4909,20 @@ gl.texImage2D = function (target, level, internalformat, width, height, border, 
         format = width;
 
         if (image instanceof HTMLImageElement) {
-            _glPixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
-            _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data);
+            _glTexImage2D(target, level, image._glInternalFormat, image.width, image.height, 0, image._glFormat, image._glType, image._data, image._alignment);
         } else if (image instanceof HTMLCanvasElement) {
             var data = null;
             if (image._data) {
                 data = image._data._data;
             }
-            _glTexImage2D(target, level, internalformat, image._bufferWidth, image._bufferHeight, 0, format, type, data);
+            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, data, image._alignment);
         } else if (image instanceof ImageData) {
-            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data);
+            _glTexImage2D(target, level, internalformat, image.width, image.height, 0, format, type, image._data, 0);
         } else {
             console.error("Invalid pixel argument passed to gl.texImage2D!");
         }
     } else if (argCount == 9) {
-        _glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+        _glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels, 0);
     } else {
         console.error("gl.texImage2D: invalid argument count!");
     }
@@ -4818,21 +4946,20 @@ gl.texSubImage2D = function (target, level, xoffset, yoffset, width, height, for
         format = width;
 
         if (image instanceof HTMLImageElement) {
-            _glPixelStorei(gl.UNPACK_ALIGNMENT, image._alignment);
-            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data);
+            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, image._glFormat, image._glType, image._data, image._alignment);
         } else if (image instanceof HTMLCanvasElement) {
             var data = null;
             if (image._data) {
                 data = image._data._data;
             }
-            _glTexSubImage2D(target, level, xoffset, yoffset, image._bufferWidth, image._bufferHeight, format, type, data);
+            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, data, image._alignment);
         } else if (image instanceof ImageData) {
-            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data);
+            _glTexSubImage2D(target, level, xoffset, yoffset, image.width, image.height, format, type, image._data, 0);
         } else {
             console.error("Invalid pixel argument passed to gl.texImage2D!");
         }
     } else if (argCount == 9) {
-        _glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+        _glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels, 0);
     } else {
         console.error(new Error("gl.texImage2D: invalid argument count!").stack);
     }
@@ -4855,7 +4982,7 @@ gl.isContextLost = function () {
     return false;
 };
 
-},{"./jsb-adapter/HTMLCanvasElement":14,"./jsb-adapter/HTMLImageElement":16,"./jsb-adapter/ImageData":21,"./jsb_opengl_constants":33}],33:[function(require,module,exports){
+},{"./jsb-adapter/HTMLCanvasElement":14,"./jsb-adapter/HTMLImageElement":16,"./jsb-adapter/ImageData":21,"./jsb_opengl_constants":34}],34:[function(require,module,exports){
 "use strict";
 
 /****************************************************************************
@@ -5718,7 +5845,7 @@ gl.CONTEXT_LOST_WEBGL = 0x9242;
 gl.UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 gl.BROWSER_DEFAULT_WEBGL = 0x9244;
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 "use strict";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -5962,7 +6089,7 @@ jsb.unregisterChildRefsForNode = function (node, recursive) {
     }
 };
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict';
 
 function DOMParser(options) {
@@ -6219,7 +6346,7 @@ exports.XMLSerializer = require('./dom').XMLSerializer;
 exports.DOMParser = DOMParser;
 //}
 
-},{"./dom":36,"./entities":37,"./sax":38}],36:[function(require,module,exports){
+},{"./dom":37,"./entities":38,"./sax":39}],37:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -7439,7 +7566,7 @@ exports.DOMImplementation = DOMImplementation;
 exports.XMLSerializer = XMLSerializer;
 //}
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict';
 
 exports.entityMap = {
@@ -7687,7 +7814,7 @@ exports.entityMap = {
 };
 //for(var  n in exports.entityMap){console.log(exports.entityMap[n].charCodeAt())}
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 "use strict";
 
 //[4]   	NameStartChar	   ::=   	":" | [A-Z] | "_" | [a-z] | [#xC0-#xD6] | [#xD8-#xF6] | [#xF8-#x2FF] | [#x370-#x37D] | [#x37F-#x1FFF] | [#x200C-#x200D] | [#x2070-#x218F] | [#x2C00-#x2FEF] | [#x3001-#xD7FF] | [#xF900-#xFDCF] | [#xFDF0-#xFFFD] | [#x10000-#xEFFFF]
