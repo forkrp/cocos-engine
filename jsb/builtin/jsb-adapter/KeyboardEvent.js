@@ -66,7 +66,7 @@ class KeyboardEvent extends Event {
             this._key = this._shiftKeyActive ? __numberShiftMap[keyCode] : ('' + number);
         }
         else if (keyCode >= 10048 && keyCode <= 10057) { // Numberpad 0 ~ 9
-            // reset to web keyCode since it's a hack in C++ for distinguish numbers in Numberpad.
+            // reset to web keyCode since it's a hack in C++ for distinguishing numbers in Numberpad.
             keyCode = this._keyCode = keyCode - 10000;
             var number = (keyCode - 48);
             this._code = 'Numpad' + number;
