@@ -250,6 +250,7 @@ _ccsg.EditBox = _ccsg.Node.extend({
     __autoResize: false,
     _placeholderColor: null,
     _className: 'EditBox',
+    _inputMode: InputMode.ANY,
 
     ctor: function (size, normal9SpriteBg) {
         _ccsg.Node.prototype.ctor.call(this);
@@ -334,6 +335,7 @@ _ccsg.EditBox = _ccsg.Node.extend({
         var bb = cc.rect(0,0, this._contentSize.width, this._contentSize.height);
         var hitted = cc.rectContainsPoint(bb, this.convertToNodeSpace(touchPoint));
         if(hitted) {
+            this._renderCmd._createJSBInput();
             return true;
         }
         else {
@@ -511,7 +513,7 @@ _ccsg.EditBox = _ccsg.Node.extend({
         this._edHeight = size.height;
         this.dom.style.height = this._edHeight.toString() + 'px';
         this.dom.style.backgroundColor = cc.colorToHex(bgColor);
-    }
+    },
 });
 
 var _p = _ccsg.EditBox.prototype;
@@ -940,6 +942,48 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         }
     };
 
+    proto._createJSBInput = function () {
+        var thisPointer = this;
+        var multiline = this._inputMode === InputMode.ANY;
+        var retrunTypeStrings = ['done', 'done', 'send', 'search', 'go'];
+
+        var inputTypeStrings = ['text', 'email', 'number', 'phone', 'text', 'number', 'text'];
+        var inputTypeString = inputTypeStrings[this._inputMode];
+        if (this._eidtBox._editBoxInputFlag === InputFlag.PASSWORD)
+            inputTypeString = 'password';
+
+        var editBox = this._editBox;
+        jsb.inputBox.show({
+            defaultValue: editBox._text,
+            maxLength: 140,
+            multiple: multiline,
+            confirmHold: true,
+            confirmType: retrunTypeStrings[thisPointer._editBox._keyboardReturnType],
+            inputType: inputTypeString
+        });
+        editBox._delegate && editBox._delegate.editBoxEditingDidBegan && editBox._delegate.editBoxEditingDidBegan(editBox);
+        jsb.inputBox.onConfirm(function (res) {
+            editBox._text = res.value;
+            thisPointer._updateDomTextCases();
+            editBox._delegate && editBox._delegate.editBoxEditingReturn && editBox._delegate.editBoxEditingReturn(editBox);
+            jsb.InputBox.hide(); 
+        });
+        editBox._delegate && editBox._delegate.editBoxEditingDidEnded && editBox._delegate.editBoxEditingDidEnded(editBox);
+        jsb.inputBox.onInput(function (res) {
+            if (editBox._delegate && editBox._delegate.editBoxTextChanged && editBox._text !== res.value) {
+                editBox._text = res.value;
+                thisPointer._updateDomTextCases();
+                editBox._delegate.editBoxTextChanged(editBox, editBox._text);
+            }
+        });
+        jsb.inputBox.onComplete(function () {
+            thisPointer._endEditing();
+            jsb.InputBox.offConfirm();
+            jsb.InputBox.offInput();
+            jsb.InputBox.offComplete();
+        });
+    };
+
     proto._createLabels = function () {
         var editBoxSize = this._editBox.getContentSize();
         if(!this._textLabel) {
@@ -1040,7 +1084,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
     proto._showLabels = function () {
         this._hiddenLabels();
-        var text = sys.platform === sys.WECHAT_GAME ? this._editBox._text : this._edTxt.value;
+        var text = (sys.platform === sys.WECHAT_GAME || CC_JSB) ? this._editBox._text : this._edTxt.value;
         if (text === '') {
             if(this._placeholderLabel) {
                 this._placeholderLabel.setVisible(true);
@@ -1093,7 +1137,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             this._edTxt.style.display = 'none';
         }
         this._showLabels();
-        if (sys.platform !== sys.WECHAT_GAME && sys.isMobile && this._editingMode) {
+        if (sys.platform !== sys.WECHAT_GAME && !CC_JSB && sys.isMobile && this._editingMode) {
             var self = this;
             // Delay end editing adaptation to ensure virtual keyboard is disapeared
             setTimeout(function () {
@@ -1158,6 +1202,8 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
     };
 
     proto._updateDomInputType = function () {
+        if(!this._edTxt) return;
+
         var inputMode = this._editBox._editBoxInputMode;
         if(inputMode === InputMode.EMAIL_ADDR) {
             this._edTxt.type = 'email';
@@ -1209,6 +1255,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             this._createDomInput();
         }
 
+        this._inputMode = inputMode;
         this._updateDomInputType();
         var contentSize = this._node.getContentSize();
         this.updateSize(contentSize.width, contentSize.height);
