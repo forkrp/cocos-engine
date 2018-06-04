@@ -949,7 +949,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
 
         var inputTypeStrings = ['text', 'email', 'number', 'phone', 'text', 'number', 'text'];
         var inputTypeString = inputTypeStrings[this._inputMode];
-        if (this._eidtBox._editBoxInputFlag === InputFlag.PASSWORD)
+        if (this._editBox._editBoxInputFlag === InputFlag.PASSWORD)
             inputTypeString = 'password';
 
         var editBox = this._editBox;
@@ -966,7 +966,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             editBox._text = res.value;
             thisPointer._updateDomTextCases();
             editBox._delegate && editBox._delegate.editBoxEditingReturn && editBox._delegate.editBoxEditingReturn(editBox);
-            jsb.InputBox.hide(); 
+            jsb.inputBox.hide(); 
         });
         editBox._delegate && editBox._delegate.editBoxEditingDidEnded && editBox._delegate.editBoxEditingDidEnded(editBox);
         jsb.inputBox.onInput(function (res) {
@@ -978,9 +978,9 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         });
         jsb.inputBox.onComplete(function () {
             thisPointer._endEditing();
-            jsb.InputBox.offConfirm();
-            jsb.InputBox.offInput();
-            jsb.InputBox.offComplete();
+            jsb.inputBox.offConfirm();
+            jsb.inputBox.offInput();
+            jsb.inputBox.offComplete();
         });
     };
 
