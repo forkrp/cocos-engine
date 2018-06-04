@@ -24,11 +24,53 @@
  ****************************************************************************/
  
 var __targetID = 0;
-var __listenTouchEventMap = {};
-var __listenMouseEventMap = {};
 
-const __touchEventNames = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
-const __mouseEventNames = ['mousedown', 'mousemove', 'mouseup', 'mousewheel'];
+var __listenerMap = {
+    touch: {},
+    mouse: {},
+    keyboard: {},
+    devicemotion: {}
+};
+
+var __listenerCountMap = {
+    touch: 0,
+    mouse: 0,
+    keyboard: 0,
+    devicemotion: 0
+};
+
+var __enableCallbackMap = {
+    touch: null,
+    mouse: null,
+    keyboard: null,
+    //FIXME: Cocos Creator invokes addEventListener('devicemotion') when engine initializes, it will active sensor hardware.
+    // In that case, CPU and temperature cost will increase. Therefore, we require developer to invoke 'jsb.device.setMotionEnabled(true)'
+    // on native platforms since most games will not listen motion event.
+    devicemotion: null
+    // devicemotion: function() {
+    //     jsb.device.setMotionEnabled(true);
+    // }
+};
+
+var __disableCallbackMap = {
+    touch: null,
+    mouse: null,
+    //FIXME: Cocos Creator invokes addEventListener('devicemotion') when engine initializes, it will active sensor hardware.
+    // In that case, CPU and temperature cost will increase. Therefore, we require developer to invoke 'jsb.device.setMotionEnabled(true)'
+    // on native platforms since most games will not listen motion event.
+    keyboard: null,
+    devicemotion: null
+    // devicemotion: function() {
+    //     jsb.device.setMotionEnabled(false);
+    // }
+};
+
+const __handleEventNames = {
+    touch: ['touchstart', 'touchmove', 'touchend', 'touchcancel'],
+    mouse: ['mousedown', 'mousemove', 'mouseup', 'mousewheel'],
+    keyboard: ['keydown', 'keyup', 'keypress'],
+    devicemotion: ['devicemotion']
+}
 
 // Listener types
 const CAPTURE = 1
@@ -57,34 +99,47 @@ function isObject(x) {
 class EventTarget {
     constructor() {
         this._targetID = ++__targetID;
-        this._touchListenerCount = 0;
-        this._mouseListenerCount = 0;
+        this._listenerCount = {
+            touch: 0,
+            mouse: 0,
+            keyboard: 0,
+            devicemotion: 0
+        };
         this._listeners = new Map();
     }
 
     _associateSystemEventListener(eventName) {
-        if (__touchEventNames.indexOf(eventName) > -1) {
-            if (this._touchListenerCount === 0)
-                __listenTouchEventMap[this._targetID] = this;
-            ++this._touchListenerCount;
-        }
-        else if (__mouseEventNames.indexOf(eventName) > -1) {
-            if (this._mouseListenerCount === 0)
-                __listenMouseEventMap[this._targetID] = this;
-            ++this._mouseListenerCount;
+        var handleEventNames;
+        for (var key in __handleEventNames) {
+            handleEventNames = __handleEventNames[key];
+            if (handleEventNames.indexOf(eventName) > -1) {
+                if (__enableCallbackMap[key] && __listenerCountMap[key] === 0) {
+                    __enableCallbackMap[key]();
+                }
+
+                if (this._listenerCount[key] === 0)
+                    __listenerMap[key][this._targetID] = this;
+                ++this._listenerCount[key];
+                ++__listenerCountMap[key];
+                break;
+            }
         }
     }
 
     _dissociateSystemEventListener(eventName) {
-        if (__touchEventNames.indexOf(eventName) > -1) {
-            --this._touchListenerCount;
-            if (this._touchListenerCount <= 0)
-                delete __listenTouchEventMap[this._targetID];
-        }
-        else if (__mouseEventNames.indexOf(eventName) > -1) {
-            --this._mouseListenerCount;
-            if (this._mouseListenerCount <= 0)
-                delete __listenMouseEventMap[this._targetID];
+        var handleEventNames;
+        for (var key in __handleEventNames) {
+            handleEventNames = __handleEventNames[key];
+            if (handleEventNames.indexOf(eventName) > -1) {
+                if (this._listenerCount[key] <= 0)
+                    delete __listenerMap[key][this._targetID];
+                --__listenerCountMap[key];
+
+                if (__disableCallbackMap[key] && __listenerCountMap[key] === 0) {
+                    __disableCallbackMap[key]();
+                }
+                break;
+            }
         }
     }
 
@@ -267,8 +322,9 @@ function touchEventHandlerFactory(type) {
 
         var i = 0, touchCount = touches.length;
         var target;
-        for (let key in __listenTouchEventMap) {
-            target = __listenTouchEventMap[key];
+        var touchListenerMap = __listenerMap.touch;
+        for (let key in touchListenerMap) {
+            target = touchListenerMap[key];
             for (i = 0; i < touchCount; ++i) {
                 touches[i].target = target;
             }
@@ -284,17 +340,26 @@ jsb.onTouchCancel = touchEventHandlerFactory('touchcancel');
 
 function mouseEventHandlerFactory(type) {
     return (event) => {
-        const mouseEvent = new MouseEvent(type);
         var button = event.button;
-        mouseEvent.button = button;
-        mouseEvent.which = button + 1;
-        mouseEvent.wheelDelta = event.wheelDeltaY;
-        mouseEvent.clientX = mouseEvent.screenX = mouseEvent.pageX = event.x;
-        mouseEvent.clientY = mouseEvent.screenY = mouseEvent.pageY = event.y;
+        var x = event.x;
+        var y = event.y;
 
+        const mouseEvent = new MouseEvent(type, {
+            button: button,
+            which: button + 1,
+            wheelDelta: event.wheelDeltaY,
+            clientX: x,
+            clientY: y,
+            screenX: x,
+            screenY: y,
+            pageX: x,
+            pageY: y
+        });
+        
         var target;
-        for (let key in __listenMouseEventMap) {
-            target = __listenMouseEventMap[key];
+        var mouseListenerMap = __listenerMap.mouse;
+        for (let key in mouseListenerMap) {
+            target = mouseListenerMap[key];
             target.dispatchEvent(mouseEvent);
         }
     }
@@ -304,6 +369,38 @@ jsb.onMouseDown = mouseEventHandlerFactory('mousedown');
 jsb.onMouseMove = mouseEventHandlerFactory('mousemove');
 jsb.onMouseUp = mouseEventHandlerFactory('mouseup');
 jsb.onMouseWheel = mouseEventHandlerFactory('mousewheel');
+
+
+function keyboardEventHandlerFactory(type) {
+    return (event) => {
+        const keyboardEvent = new KeyboardEvent(type, {
+            altKey: event.altKey,
+            ctrlKey: event.ctrlKey,
+            metaKey: event.metaKey,
+            shiftKey: event.shiftKey,
+            repeat: event.repeat,
+            keyCode: event.keyCode
+        });
+        var target;
+        var keyboardListenerMap = __listenerMap.keyboard;
+        for (let key in keyboardListenerMap) {
+            target = keyboardListenerMap[key];
+            target.dispatchEvent(keyboardEvent);
+        }
+    }
+}
+
+jsb.onKeyDown = keyboardEventHandlerFactory('keydown');
+jsb.onKeyUp = keyboardEventHandlerFactory('keyup');
+
+jsb.dispatchDeviceMotionEvent = function(event) {
+    var target;
+    var devicemotionListenerMap = __listenerMap.devicemotion;
+    for (let key in devicemotionListenerMap) {
+        target = devicemotionListenerMap[key];
+        target.dispatchEvent(event);
+    }
+};
 
 module.exports = EventTarget
 
