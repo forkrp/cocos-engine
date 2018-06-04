@@ -25,8 +25,10 @@
  
 const HTMLAudioElement = require('./HTMLAudioElement');
 
-function Audio(url) {
-    return new HTMLAudioElement(url);
+class Audio extends HTMLAudioElement {
+	constructor(url) {
+		super(url, true);
+	}
 }
 
 module.exports = Audio;

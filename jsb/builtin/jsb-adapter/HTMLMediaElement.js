@@ -41,6 +41,7 @@ class HTMLMediaElement extends HTMLElement {
         this._isMute = false;
         this._readyState = HAVE_NOTHING;
         this._error = new MediaError();
+        this._loop = false;
     }
 
     addTextTrack() {}

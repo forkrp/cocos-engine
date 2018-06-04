@@ -24,6 +24,7 @@
  ****************************************************************************/
  
 const HTMLMediaElement = require('./HTMLMediaElement');
+const Event = require('./Event');
 
 const HAVE_NOTHING = 0
 const HAVE_METADATA = 1
@@ -31,18 +32,17 @@ const HAVE_CURRENT_DATA = 2
 const HAVE_FUTURE_DATA = 3
 const HAVE_ENOUGH_DATA = 4
 
-const _innerAudioContext = new WeakMap()
-const _src = new WeakMap()
-const _loop = new WeakMap()
-const _autoplay = new WeakMap()
-
 class HTMLAudioElement extends HTMLMediaElement {
-    constructor(url) {
+    constructor(url, isCalledFromAudio) {
+        if (!isCalledFromAudio) {
+            throw new TypeError("Illegal constructor, use 'new Image(w, h); instead!'");
+            return;
+        }
+
         super('audio')
-
-        _src.set(this, '')
-
-        //TODO:
+        this._audioID = null;
+        this.src = url;
+        this.configDirty = true;
     }
 
     load() {
@@ -50,11 +50,16 @@ class HTMLAudioElement extends HTMLMediaElement {
     }
 
     play() {
-
+        if (this._audioID)
+            jsb.AudioEngine.stop(this._audioID);
+        this._audioID = jsb.AudioEngine.play2d(this._src);
+        this.loop = this._loop;
     }
 
     pause() {
-
+        if (this._audioID) {
+            jsb.AudioEngine.pause(this._audioID);
+        }
     }
 
     canPlayType(mediaType = '') {
@@ -69,27 +74,40 @@ class HTMLAudioElement extends HTMLMediaElement {
     }
 
     get currentTime() {
-
+        if (this._audioID) {
+            return jsb.AudioEngine.getCurrentTime(this._audioID);
+        }
+        return 0;
     }
 
     set currentTime(value) {
-
+        if (this._audioID) {
+            jsb.AudioEngine.setCurrentTime(this._audioID, value);
+        }
     }
 
     get src() {
-
+        return this._src;
     }
 
     set src(value) {
-
+        this._src = value;
+        this._audioID = null;
+        if (value) {
+            jsb.AudioEngine.preload(this._src, ()=>{
+                this.dispatchEvent(new Event('canplaythrough'));
+            });
+        }
     }
 
     get loop() {
-
+        return this._loop;
     }
 
     set loop(value) {
-
+        this._loop = value;
+        if (this._audioID)
+            jsb.AudioEngine.setLoop(this._audioID, value);
     }
 
     get autoplay() {
@@ -105,7 +123,7 @@ class HTMLAudioElement extends HTMLMediaElement {
     }
 
     cloneNode() {
-
+        return new Audio(this._src);
     }
 }
 
