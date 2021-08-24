@@ -28,7 +28,6 @@
  * @hidden
  */
 
-import { JSB } from 'internal:constants';
 import { MeshBuffer } from './mesh-buffer';
 import { Material } from '../../core/assets/material';
 import { Texture, Sampler, InputAssembler, DescriptorSet, Shader } from '../../core/gfx';
@@ -40,42 +39,23 @@ import { Batcher2D } from './batcher-2d';
 import { Layers } from '../../core/scene-graph/layers';
 import { legacyCC } from '../../core/global-exports';
 import { Pass } from '../../core/renderer/core/pass';
-import { NativeDrawBatch2D, NativePass } from '../../core/renderer/scene';
 
 const UI_VIS_FLAG = Layers.Enum.NONE | Layers.Enum.UI_3D;
 
 export class DrawBatch2D {
-    public get native (): NativeDrawBatch2D {
-        return this._nativeObj!;
-    }
-
     public get inputAssembler () {
         return this._inputAssember;
     }
-    public set inputAssembler (ia: InputAssembler | null) {
-        this._inputAssember = ia;
-        if (JSB) {
-            this._nativeObj!.inputAssembler = ia;
-        }
-    }
+
     public get descriptorSet () {
         return this._descriptorSet;
     }
-    public set descriptorSet (ds: DescriptorSet | null) {
-        this._descriptorSet = ds;
-        if (JSB) {
-            this._nativeObj!.descriptorSet = ds;
-        }
-    }
+
     public get visFlags () {
         return this._visFlags;
     }
     public set visFlags (vis) {
         this._visFlags = vis;
-
-        if (JSB) {
-            this._nativeObj!.visFlags = vis;
-        }
     }
     public get passes () {
         return this._passes;
@@ -100,26 +80,15 @@ export class DrawBatch2D {
     private _visFlags: number = UI_VIS_FLAG;
     private _inputAssember: InputAssembler | null = null;
     private _descriptorSet: DescriptorSet | null = null;
-    private declare _nativeObj: NativeDrawBatch2D | null;
-
-    constructor () {
-        if (JSB) {
-            this._nativeObj = new NativeDrawBatch2D();
-            this._nativeObj.visFlags = this._visFlags;
-        }
-    }
 
     public destroy (ui: Batcher2D) {
         this._passes = [];
-        if (JSB) {
-            this._nativeObj = null;
-        }
     }
 
     public clear () {
         this.bufferBatch = null;
-        this.inputAssembler = null;
-        this.descriptorSet = null;
+        this._inputAssember = null;
+        this._descriptorSet = null;
         this.camera = null;
         this.texture = null;
         this.sampler = null;
@@ -163,18 +132,6 @@ export class DrawBatch2D {
                 this._shaders[i] = passInUse.getShaderVariant(patches)!;
 
                 dirty = true;
-            }
-
-            if (JSB) {
-                if (dirty) {
-                    const nativePasses: NativePass[] = [];
-                    const passes = this._passes;
-                    for (let i = 0; i < passes.length; i++) {
-                        nativePasses.push(passes[i].native);
-                    }
-                    this._nativeObj!.passes = nativePasses;
-                    this._nativeObj!.shaders = this._shaders;
-                }
             }
         }
     }
