@@ -527,13 +527,6 @@ export class Pass {
      */
     public endChangeStatesSilently (): void {}
 
-    private _setState (bs: BlendState, dss: DepthStencilState, rs: RasterizerState, ds: DescriptorSet) {
-        this._bs = bs;
-        this._dss = dss;
-        this._rs = rs;
-        this._descriptorSet = ds;
-    }
-
     protected _doInit (info: IPassInfoFull, copyDefines = false): void {
         this._priority = RenderPriority.DEFAULT;
         this._stage = RenderPassStage.DEFAULT;
