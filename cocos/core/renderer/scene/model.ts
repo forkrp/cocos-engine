@@ -128,7 +128,7 @@ export class Model {
     }
 
     set receiveShadow (val) {
-        this._setReceiveShadow(val);
+        this._receiveShadow = val;
         this.onMacroPatchesStateChanged();
     }
 

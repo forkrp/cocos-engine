@@ -144,7 +144,7 @@ export class Shadows {
     }
 
     set enabled (val: boolean) {
-        this._setEnable(val);
+        this._enabled = val;
         this.activate();
     }
 
