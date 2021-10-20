@@ -303,5 +303,3 @@ cc.Node._findChildComponents = function (children, constructor, components) {
         }
     }
 }
-
-legacyCC.Node = cc.Node;
