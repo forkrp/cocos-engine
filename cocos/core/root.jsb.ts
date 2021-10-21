@@ -3,9 +3,9 @@ import {warnID} from "./platform";
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import legacyCC from '../../predefine';
 
-declare const cc: any;
+declare const jsb: any;
 
-var Root = cc.Root;
+var Root = jsb.Root;
 
 enum LightType {
     DIRECTIONAL,

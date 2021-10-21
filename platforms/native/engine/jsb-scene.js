@@ -78,8 +78,8 @@ function beginTrans(fn, minBytes) {
 }
 
 // DrawBatch2D
-const DRAW_BATCH_FN_TABLE = ns.DrawBatch2D.fnTable;
-Object.defineProperty(ns.DrawBatch2D.prototype, "visFlags", {
+const DRAW_BATCH_FN_TABLE = jsb.DrawBatch2D.fnTable;
+Object.defineProperty(jsb.DrawBatch2D.prototype, "visFlags", {
     set: function (v) {
         let trans = beginTrans(DRAW_BATCH_FN_TABLE['visFlags'], 12);
         trans.writeBigUint64(this.__native_ptr__);
@@ -91,7 +91,7 @@ Object.defineProperty(ns.DrawBatch2D.prototype, "visFlags", {
 });
 
 
-Object.defineProperty(ns.DrawBatch2D.prototype, "descriptorSet", {
+Object.defineProperty(jsb.DrawBatch2D.prototype, "descriptorSet", {
     set: function (v) {
         let trans = beginTrans(DRAW_BATCH_FN_TABLE['descriptorSet'], 16);
         trans.writeBigUint64(this.__native_ptr__);
@@ -103,7 +103,7 @@ Object.defineProperty(ns.DrawBatch2D.prototype, "descriptorSet", {
 });
 
 
-Object.defineProperty(ns.DrawBatch2D.prototype, "inputAssembler", {
+Object.defineProperty(jsb.DrawBatch2D.prototype, "inputAssembler", {
     set: function (v) {
         let trans = beginTrans(DRAW_BATCH_FN_TABLE['inputAssembler'], 16);
         trans.writeBigUint64(this.__native_ptr__);
@@ -115,7 +115,7 @@ Object.defineProperty(ns.DrawBatch2D.prototype, "inputAssembler", {
 });
 
 
-Object.defineProperty(ns.DrawBatch2D.prototype, "passes", {
+Object.defineProperty(jsb.DrawBatch2D.prototype, "passes", {
     set: function (passes) {
         if (!passes) return;
 
@@ -132,7 +132,7 @@ Object.defineProperty(ns.DrawBatch2D.prototype, "passes", {
 });
 
 
-Object.defineProperty(ns.DrawBatch2D.prototype, "shaders", {
+Object.defineProperty(jsb.DrawBatch2D.prototype, "shaders", {
     set: function (shaders) {
         if (!shaders) return;
         let trans = beginTrans(DRAW_BATCH_FN_TABLE['shaders'], 8 + 4 + shaders.length * 8);
@@ -148,8 +148,8 @@ Object.defineProperty(ns.DrawBatch2D.prototype, "shaders", {
 });
 
 // Pass
-const PASS_FN_TABLE = ns.Pass.fnTable;
-Object.defineProperty(ns.Pass.prototype, "blendState", {
+const PASS_FN_TABLE = jsb.Pass.fnTable;
+Object.defineProperty(v.Pass.prototype, "blendState", {
     set: function (v) {
         let trans = beginTrans(PASS_FN_TABLE['blendState'], 16);
         trans.writeBigUint64(this.__native_ptr__);
@@ -160,7 +160,7 @@ Object.defineProperty(ns.Pass.prototype, "blendState", {
     configurable: true
 });
 
-Object.defineProperty(ns.Pass.prototype, "depthStencilState", {
+Object.defineProperty(jsb.Pass.prototype, "depthStencilState", {
     set: function (v) {
         let trans = beginTrans(PASS_FN_TABLE['depthStencilState'], 16);
         trans.writeBigUint64(this.__native_ptr__);
@@ -171,7 +171,7 @@ Object.defineProperty(ns.Pass.prototype, "depthStencilState", {
     configurable: true
 });
 
-Object.defineProperty(ns.Pass.prototype, "rasterizerState", {
+Object.defineProperty(jsb.Pass.prototype, "rasterizerState", {
     set: function (v) {
         let trans = beginTrans(PASS_FN_TABLE['rasterizerState'], 16);
         trans.writeBigUint64(this.__native_ptr__);
@@ -182,7 +182,7 @@ Object.defineProperty(ns.Pass.prototype, "rasterizerState", {
     configurable: true
 });
 
-Object.defineProperty(ns.Pass.prototype, "descriptorSet", {
+Object.defineProperty(jsb.Pass.prototype, "descriptorSet", {
     set: function (v) {
         let trans = beginTrans(PASS_FN_TABLE['descriptorSet'], 16);
         trans.writeBigUint64(this.__native_ptr__);
