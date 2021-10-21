@@ -26,6 +26,7 @@ Root.prototype._ctor = function() {
     this._modelPools = new Map();
     this._lightPools = new Map();
     this._batcher = null;
+    this._registerNativeEvent();
 };
 
 Root.prototype.initialize = function (info: IRootInfo) {
