@@ -47,7 +47,8 @@
                 "cocos/dragon-bones/index.ts": "cocos/dragon-bones/index.jsb.ts",
                 "cocos/physics/physx/instantiate.ts": "cocos/physics/physx/instantiate.jsb.ts",
                 "cocos/core/scene-graph/index.ts": "cocos/core/scene-graph/index.jsb.ts",
-                "cocos/core/scene-graph/node.ts": "cocos/core/scene-graph/node.jsb.ts"
+                "cocos/core/scene-graph/node.ts": "cocos/core/scene-graph/node.jsb.ts",
+                "cocos/core/root.ts": "cocos/core/scene-graph/root.jsb.ts"
             }
         },
         {
