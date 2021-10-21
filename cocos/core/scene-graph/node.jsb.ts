@@ -6,6 +6,7 @@ import { errorID, getError } from '../platform/debug';
 import { Component } from '../components/component';
 import { NodeEventType } from './node-event';
 import { CCObject } from '../data/object';
+import { NodeUIProperties } from './node-ui-properties';
 
 export const TRANSFORM_ON = 1 << 0;
 const Destroying = CCObject.Flags.Destroying;
@@ -25,7 +26,9 @@ function getConstructor<T> (typeOrClassName) {
 cc.Node.prototype._ctor = function (name?: string) {
     this._components = [];
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
+    this._uiProps = new NodeUIProperties(this);
 }
+
 Object.defineProperties(cc.Node.prototype, {
     '_components': { 
         get: function () {
@@ -207,7 +210,7 @@ cc.Node.prototype.targetOff = function (target: string | unknown) {
     let eventMask = this.getEventMask();
     if ((eventMask & TRANSFORM_ON) && !this._eventProcessor.hasEventListener(NodeEventType.TRANSFORM_CHANGED)) {
         // this._eventMask &= ~TRANSFORM_ON;
-        this.setEventMask(eventMask & TRANSFORM_ON);
+        this.setEventMask(eventMask & ~TRANSFORM_ON);
     }
 }
 
@@ -228,6 +231,61 @@ cc.Node.prototype._removeComponent = function (component: Component) {
             errorID(3815);
         }
     }
+}
+
+// These functions are invoked by native Node object.
+
+cc.Node.prototype._onTransformChanged = function (transformType) {
+    this._eventProcessor.dispatchEvent(NodeEventType.TRANSFORM_CHANGED, transformType);
+}
+
+cc.Node.prototype._onParentChanged = function (oldParent) {
+    this._eventProcessor(NodeEventType.PARENT_CHANGED, oldParent);
+}
+
+cc.Node.prototype._onReattach = function () {
+    this._eventProcessor.reattach();
+}
+
+cc.Node.prototype._onRemovePersistRootNode = function () {
+    legacyCC.game.removePersistRootNode(this);
+}
+
+cc.Node.prototype._onDestroyComponents = function () {
+    const comps = this._components;
+    for (let i = 0; i < comps.length; ++i) {
+        // destroy immediate so its _onPreDestroy can be called
+        // TO DO
+        comps[i]._destroyImmediate();
+    }
+}
+
+cc.Node.prototype._onLayerChanged = function (layer) {
+    this.emit(NodeEventType.LAYER_CHANGED, layer);
+}
+
+cc.Node.prototype._onChildRemoved = function (child) {
+    this.emit(NodeEventType.CHILD_REMOVED, child);
+}
+
+cc.Node.prototype._onChildAdded = function (child) {
+    this.emit(NodeEventType.CHILD_ADDED, child);
+}
+
+cc.Node.prototype._onNodeDestroyed = function () {
+    this.emit(NodeEventType.NODE_DESTROYED, this);
+}
+
+cc.Node.prototype._onSiblingOrderChanged = function () {
+    this.emit(NodeEventType.SIBLING_ORDER_CHANGED);
+}
+
+cc.Node.prototype._onUiTransformDirty = function () {
+    this._uiProps.uiTransformDirty = true;
+}
+
+cc.Node.prototype._onActivateNode = function (shouldActiveNow) {
+    legacyCC.director._nodeActivator.activateNode(this, shouldActiveNow);
 }
 
 // Static functions.
