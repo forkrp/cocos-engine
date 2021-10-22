@@ -40,4 +40,4 @@ export interface IRaycastResult {
     distance: number;
 }
 
-export type RenderScene = jsb.RenderScene;
+export const RenderScene = jsb.RenderScene;

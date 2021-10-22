@@ -38,7 +38,7 @@ export { addStage };
 
 export * from './core/constants';
 export * from './core/pass-utils';
-export type Pass = jsb.Pass;
+export const Pass = jsb.Pass;
 const ProgramLib = jsb.ProgramLib;
 export const programLib = new ProgramLib();
 legacyCC.programLib = programLib;
@@ -50,8 +50,8 @@ export * from './core/texture-buffer-pool';
     owner?: RenderableComponent;
     subModelIdx?: number;
 }
-export type MaterialInstance = jsb.MaterialInstance;
-export type PassInstance = jsb.PassInstance;
+export const MaterialInstance = jsb.MaterialInstance;
+export const PassInstance = jsb.PassInstance;
 
 export * from './core/memory-pools';
 export { scene };

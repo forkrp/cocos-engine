@@ -1,8 +1,8 @@
 import './node-event-processor';
 import './deprecated';
 
-export type Node = jsb.Node;
-export type Scene = jsb.Scene;
+export const Node = jsb.Node;
+export const Scene = jsb.Scene;
 
 export { Layers } from './layers';
 export * from './deprecated';

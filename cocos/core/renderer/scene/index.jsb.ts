@@ -23,14 +23,14 @@
  THE SOFTWARE.
  */
 
-export type Ambient = jsb.Ambient;
-export type DirectionalLight = jsb.DirectionalLight;
-export type Fog = jsb.Fog;
-export type Light = jsb.Light;
-export type Shadow = jsb.Shadow;
-export type Skybox = jsb.Skybox;
-export type SphereLight = jsb.SphereLight;
-export type SpotLight = jsb.SpotLight;
+export const Ambient = jsb.Ambient;
+export const DirectionalLight = jsb.DirectionalLight;
+export const Fog = jsb.Fog;
+export const Light = jsb.Light;
+export const Shadow = jsb.Shadow;
+export const Skybox = jsb.Skybox;
+export const SphereLight = jsb.SphereLight;
+export const SpotLight = jsb.SpotLight;
 
 export * from './camera';
 export * from './model';

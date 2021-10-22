@@ -34,4 +34,4 @@ export interface IRenderWindowInfo {
     shouldSyncSizeWithSwapchain?: boolean;
 }
 
-export type RenderWindow = jsb.RenderWindow;
+export const RenderWindow = jsb.RenderWindow;

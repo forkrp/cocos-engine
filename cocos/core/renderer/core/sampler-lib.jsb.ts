@@ -25,7 +25,7 @@
 
 import { legacyCC } from "../../global-exports";
 
-export type Pass = jsb.Pass;
+export const Pass = jsb.Pass;
 
 const SamplerLib = nr.SamplerLib;
 export const samplerLib = new SamplerLib();

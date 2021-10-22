@@ -31,4 +31,4 @@ export interface IMaterialInstanceInfo {
     owner?: RenderableComponent;
     subModelIdx?: number;
 }
-export type MaterialInstance = jsb.MaterialInstance;
+export const MaterialInstance = jsb.MaterialInstance;

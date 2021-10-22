@@ -23,4 +23,4 @@
  THE SOFTWARE.
  */
 
-export type BaseNode = jsb.Node;
+export const BaseNode = jsb.Node;

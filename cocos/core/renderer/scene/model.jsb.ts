@@ -40,4 +40,4 @@ export enum ModelType {
     LINE,
 }
 
-export type Model = jsb.Model;
+export const Model = jsb.Model;

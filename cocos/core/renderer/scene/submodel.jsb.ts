@@ -23,4 +23,4 @@
  THE SOFTWARE.
  */
 
-export type SubModel = jsb.SubModel;
+export const SubModel = jsb.SubModel;

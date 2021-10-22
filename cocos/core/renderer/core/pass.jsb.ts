@@ -45,5 +45,4 @@ export enum BatchingSchemes {
     VB_MERGING = 2,
 }
 
-export type Pass = jsb.Pass;
-
+export const Pass = jsb.Pass;
