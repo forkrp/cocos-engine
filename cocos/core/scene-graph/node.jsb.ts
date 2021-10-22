@@ -361,3 +361,5 @@ jsb.Node._findChildComponents = function (children, constructor, components) {
         }
     }
 }
+
+export const Node = jsb.Node;
