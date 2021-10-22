@@ -27,6 +27,8 @@ jsb.Node.prototype._ctor = function (name?: string) {
     this._components = [];
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
+
+    this._registerListeners();
 }
 
 Object.defineProperties(jsb.Node.prototype, {
