@@ -3,7 +3,7 @@ import {warnID} from "./platform";
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import legacyCC from '../../predefine';
 
-declare const jsb: any;
+
 
 export const Root = jsb.Root;
 

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
 
  https://www.cocos.com/
 
@@ -23,8 +23,35 @@
  THE SOFTWARE.
  */
 
-declare const jsb: any;
+import config from './config';
 
-export const NativeBufferPool = jsb.NativeBufferPool;
-export const NativeObjectPool = jsb.NativeObjectPool;
-export const NativeBufferAllocator = jsb.NativeBufferAllocator;
+import * as scene from './scene';
+
+import './scene/deprecated';
+import { legacyCC } from "../global-exports";
+import { RenderableComponent } from "../components";
+
+export { createIA } from './utils';
+
+const addStage = config.addStage;
+export { addStage };
+
+export * from './core/constants';
+export * from './core/pass-utils';
+export const Pass = jsb.Pass;
+const ProgramLib = jsb.ProgramLib;
+export const programLib = new ProgramLib();
+legacyCC.programLib = programLib;
+export * from "./core/sampler-lib";
+export * from './core/texture-buffer-pool';
+
+ export interface IMaterialInstanceInfo {
+    parent: any;
+    owner?: RenderableComponent;
+    subModelIdx?: number;
+}
+export const MaterialInstance = jsb.MaterialInstance;
+export const PassInstance = jsb.PassInstance;
+
+export * from './core/memory-pools';
+export { scene };

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
 
  https://www.cocos.com/
 
@@ -23,8 +23,16 @@
  THE SOFTWARE.
  */
 
-declare const jsb: any;
+export const Ambient = jsb.Ambient;
+export const DirectionalLight = jsb.DirectionalLight;
+export const Fog = jsb.Fog;
+export const Light = jsb.Light;
+export const Shadow = jsb.Shadow;
+export const Skybox = jsb.Skybox;
+export const SphereLight = jsb.SphereLight;
+export const SpotLight = jsb.SpotLight;
 
-export const NativeBufferPool = jsb.NativeBufferPool;
-export const NativeObjectPool = jsb.NativeObjectPool;
-export const NativeBufferAllocator = jsb.NativeBufferAllocator;
+export * from './camera';
+export * from './model';
+export * from './render-scene';
+export * from './submodel';

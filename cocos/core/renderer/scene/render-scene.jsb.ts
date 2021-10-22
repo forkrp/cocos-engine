@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
 
  https://www.cocos.com/
 
@@ -23,8 +23,21 @@
  THE SOFTWARE.
  */
 
-declare const jsb: any;
+import { Node } from "../../scene-graph";
 
-export const NativeBufferPool = jsb.NativeBufferPool;
-export const NativeObjectPool = jsb.NativeObjectPool;
-export const NativeBufferAllocator = jsb.NativeBufferAllocator;
+export interface IRenderSceneInfo {
+    name: string;
+}
+
+export interface ISceneNodeInfo {
+    name: string;
+    isStatic?: boolean;
+    // parent: Node;
+}
+
+export interface IRaycastResult {
+    node: Node;
+    distance: number;
+}
+
+export const RenderScene = jsb.RenderScene;

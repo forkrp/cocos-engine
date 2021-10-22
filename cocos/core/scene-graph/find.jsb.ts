@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
 
  https://www.cocos.com/
 
@@ -23,8 +23,7 @@
  THE SOFTWARE.
  */
 
-declare const jsb: any;
+import { legacyCC } from "../global-exports";
 
-export const NativeBufferPool = jsb.NativeBufferPool;
-export const NativeObjectPool = jsb.NativeObjectPool;
-export const NativeBufferAllocator = jsb.NativeBufferAllocator;
+export const find = jsb.Node.find;
+legacyCC.find = find;

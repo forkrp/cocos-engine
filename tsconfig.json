@@ -23,6 +23,7 @@
         "./@types/globals",
         "./@types/consts",
         "./@types/jsb",
+        "./@types/jsb.auto",
         "./@types/editor-extends",
         "./@types/webGL.extras",
         "./@types/webGL2.extras",
@@ -42,6 +43,7 @@
     "include": [
         "exports/**/*.ts",
         "index.ts",
-        "pal/**/*.ts"
+        "pal/**/*.ts",
+        "./cocos/**/*.jsb.ts",
     ]
   }

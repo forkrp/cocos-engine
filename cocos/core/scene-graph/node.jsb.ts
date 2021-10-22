@@ -1,5 +1,3 @@
-declare const jsb: any;
-
 import * as js from '../utils/js';
 import { legacyCC } from '../global-exports';
 import { errorID, getError } from '../platform/debug';
@@ -8,6 +6,7 @@ import { NodeEventType } from './node-event';
 import { CCObject } from '../data/object';
 import { NodeUIProperties } from './node-ui-properties';
 
+const nodeProto: any = jsb.Node.prototype;
 export const TRANSFORM_ON = 1 << 0;
 const Destroying = CCObject.Flags.Destroying;
 
@@ -22,14 +21,13 @@ function getConstructor<T> (typeOrClassName) {
     return typeOrClassName;
 }
 
-
-jsb.Node.prototype._ctor = function (name?: string) {
+nodeProto._ctor = function (name?: string) {
     this._components = [];
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
 
     this._registerListeners();
-}
+};
 
 Object.defineProperties(jsb.Node.prototype, {
     '_components': {
@@ -44,13 +42,13 @@ Object.defineProperties(jsb.Node.prototype, {
     }
 });
 
-jsb.Node.prototype.getComponent = function (typeOrClassName) {
+nodeProto.getComponent = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     if (constructor) {
         return jsb.Node._findComponent(this, constructor);
     }
     return null;
-}
+};
 
 jsb.Node.prototype.getComponents = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
@@ -59,17 +57,17 @@ jsb.Node.prototype.getComponents = function (typeOrClassName) {
         jsb.Node._findComponents(this, constructor, components);
     }
     return components;
-}
+};
 
-jsb.Node.prototype.getComponentInChildren = function (typeOrClassName) {
+nodeProto.getComponentInChildren = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     if (constructor) {
         return jsb.Node._findChildComponent(this._children, constructor);
     }
     return null;
-}
+};
 
-jsb.Node.prototype.getComponentsInChildren = function (typeOrClassName) {
+nodeProto.getComponentsInChildren = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     const components = [];
     if (constructor) {
@@ -77,9 +75,9 @@ jsb.Node.prototype.getComponentsInChildren = function (typeOrClassName) {
         jsb.Node._findChildComponents(this.getChildren(), constructor, components);
     }
     return components;
-}
+};
 
-jsb.Node.prototype.addComponent = function (typeOrClassName) {
+nodeProto.addComponent = function (typeOrClassName) {
     // if (EDITOR && (this._objFlags & Destroying)) {
     //     throw Error('isDestroying');
     // }
@@ -144,9 +142,9 @@ jsb.Node.prototype.addComponent = function (typeOrClassName) {
     }
 
     return component;
-}
+};
 
-jsb.Node.prototype.removeComponent = function (component) {
+nodeProto.removeComponent = function (component) {
     if (!component) {
         errorID(3813);
         return;
@@ -160,9 +158,9 @@ jsb.Node.prototype.removeComponent = function (component) {
     if (componentInstance) {
         componentInstance.destroy();
     }
-}
+};
 
-jsb.Node.prototype.on = function (type, callback, target, useCapture) {
+nodeProto.on = function (type, callback, target, useCapture) {
     switch (type) {
     case NodeEventType.TRANSFORM_CHANGED:
         // this._eventMask |= TRANSFORM_ON;
@@ -172,9 +170,9 @@ jsb.Node.prototype.on = function (type, callback, target, useCapture) {
         break;
     }
     this._eventProcessor.on(type, callback, target, useCapture);
-}
+};
 
-jsb.Node.prototype.off = function (type: string, callback?, target?, useCapture = false) {
+nodeProto.off = function (type: string, callback?, target?, useCapture = false) {
     this._eventProcessor.off(type, callback, target, useCapture);
 
     const hasListeners = this._eventProcessor.hasEventListener(type);
@@ -189,34 +187,34 @@ jsb.Node.prototype.off = function (type: string, callback?, target?, useCapture 
             break;
         }
     }
-}
+};
 
-jsb.Node.prototype.once = function (type: string, callback, target?: unknown, useCapture?: any) {
+nodeProto.once = function (type: string, callback, target?: unknown, useCapture?: any) {
     this._eventProcessor.once(type, callback, target, useCapture);
-}
+};
 
-jsb.Node.prototype.emit = function (type: string, arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) {
+nodeProto.emit = function (type: string, arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) {
     this._eventProcessor.emit(type, arg0, arg1, arg2, arg3, arg4);
-}
+};
 
-jsb.Node.prototype.dispatchEvent = function (event: Event) {
+nodeProto.dispatchEvent = function (event: Event) {
     this._eventProcessor.dispatchEvent(event);
-}
+};
 
-jsb.Node.prototype.hasEventListener = function (type: string, callback?, target?: unknown) {
+nodeProto.hasEventListener = function (type: string, callback?, target?: unknown) {
     return this._eventProcessor.hasEventListener(type, callback, target);
-}
+};
 
-jsb.Node.prototype.targetOff = function (target: string | unknown) {
+nodeProto.targetOff = function (target: string | unknown) {
     // Check for event mask reset
     let eventMask = this.getEventMask();
     if ((eventMask & TRANSFORM_ON) && !this._eventProcessor.hasEventListener(NodeEventType.TRANSFORM_CHANGED)) {
         // this._eventMask &= ~TRANSFORM_ON;
         this.setEventMask(eventMask & ~TRANSFORM_ON);
     }
-}
+};
 
-jsb.Node.prototype._removeComponent = function (component: Component) {
+nodeProto._removeComponent = function (component: Component) {
     if (!component) {
         errorID(3814);
         return;
@@ -233,62 +231,62 @@ jsb.Node.prototype._removeComponent = function (component: Component) {
             errorID(3815);
         }
     }
-}
+};
 
 // These functions are invoked by native Node object.
 
-jsb.Node.prototype._onTransformChanged = function (transformType) {
+nodeProto._onTransformChanged = function (transformType) {
     this._eventProcessor.dispatchEvent(NodeEventType.TRANSFORM_CHANGED, transformType);
-}
+};
 
-jsb.Node.prototype._onParentChanged = function (oldParent) {
+nodeProto._onParentChanged = function (oldParent) {
     this._eventProcessor(NodeEventType.PARENT_CHANGED, oldParent);
-}
+};
 
-jsb.Node.prototype._onReattach = function () {
+nodeProto._onReattach = function () {
     this._eventProcessor.reattach();
-}
+};
 
-jsb.Node.prototype._onRemovePersistRootNode = function () {
+nodeProto._onRemovePersistRootNode = function () {
     legacyCC.game.removePersistRootNode(this);
-}
+};
 
-jsb.Node.prototype._onDestroyComponents = function () {
+nodeProto._onDestroyComponents = function () {
     const comps = this._components;
     for (let i = 0; i < comps.length; ++i) {
         // destroy immediate so its _onPreDestroy can be called
         // TO DO
         comps[i]._destroyImmediate();
     }
-}
+};
 
-jsb.Node.prototype._onLayerChanged = function (layer) {
+nodeProto._onLayerChanged = function (layer) {
     this.emit(NodeEventType.LAYER_CHANGED, layer);
-}
+};
 
-jsb.Node.prototype._onChildRemoved = function (child) {
+nodeProto._onChildRemoved = function (child) {
     this.emit(NodeEventType.CHILD_REMOVED, child);
-}
+};
 
-jsb.Node.prototype._onChildAdded = function (child) {
+nodeProto._onChildAdded = function (child) {
     this.emit(NodeEventType.CHILD_ADDED, child);
-}
+};
 
-jsb.Node.prototype._onNodeDestroyed = function () {
+nodeProto._onNodeDestroyed = function () {
     this.emit(NodeEventType.NODE_DESTROYED, this);
-}
+};
 
-jsb.Node.prototype._onSiblingOrderChanged = function () {
+nodeProto._onSiblingOrderChanged = function () {
     this.emit(NodeEventType.SIBLING_ORDER_CHANGED);
-}
+};
 
-jsb.Node.prototype._onUiTransformDirty = function () {
+nodeProto._onUiTransformDirty = function () {
     this._uiProps.uiTransformDirty = true;
-}
+};
 
-jsb.Node.prototype._onActivateNode = function (shouldActiveNow) {
+nodeProto._onActivateNode = function (shouldActiveNow) {
     legacyCC.director._nodeActivator.activateNode(this, shouldActiveNow);
-}
+};
 
 // Static functions.
 
@@ -311,7 +309,7 @@ jsb.Node._findComponent = function (node, constructor) {
         }
     }
     return null;
-}
+};
 
 jsb.Node._findComponents = function (node, constructor, components) {
     const cls = constructor as any;
@@ -331,7 +329,7 @@ jsb.Node._findComponents = function (node, constructor, components) {
             }
         }
     }
-}
+};
 
 jsb.Node._findChildComponent = function (children, constructor) {
     for (let i = 0; i < children.length; ++i) {
@@ -350,7 +348,7 @@ jsb.Node._findChildComponent = function (children, constructor) {
         }
     }
     return null;
-}
+};
 
 jsb.Node._findChildComponents = function (children, constructor, components) {
     for (let i = 0; i < children.length; ++i) {
@@ -362,6 +360,6 @@ jsb.Node._findChildComponents = function (children, constructor, components) {
             jsb.Node._findChildComponents(childChildren, constructor, components);
         }
     }
-}
+};
 
 export const Node = jsb.Node;

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
 
  https://www.cocos.com/
 
@@ -23,8 +23,21 @@
  THE SOFTWARE.
  */
 
-declare const jsb: any;
+import { Attribute } from "../../gfx";
 
-export const NativeBufferPool = jsb.NativeBufferPool;
-export const NativeObjectPool = jsb.NativeObjectPool;
-export const NativeBufferAllocator = jsb.NativeBufferAllocator;
+export interface IInstancedAttributeBlock {
+    buffer: Uint8Array;
+    views: TypedArray[];
+    attributes: Attribute[];
+}
+
+export enum ModelType {
+    DEFAULT,
+    SKINNING,
+    BAKED_SKINNING,
+    BATCH_2D,
+    PARTICLE_BATCH,
+    LINE,
+}
+
+export const Model = jsb.Model;

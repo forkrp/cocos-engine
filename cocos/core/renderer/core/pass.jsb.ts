@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2020 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
 
  https://www.cocos.com/
 
@@ -23,8 +23,26 @@
  THE SOFTWARE.
  */
 
-declare const jsb: any;
+import { IPassInfo, IPassStates } from "../../assets/effect-asset";
+import { MacroRecord } from "./pass-utils";
 
-export const NativeBufferPool = jsb.NativeBufferPool;
-export const NativeObjectPool = jsb.NativeObjectPool;
-export const NativeBufferAllocator = jsb.NativeBufferAllocator;
+export interface IPassInfoFull extends IPassInfo {
+    // generated part
+    passIndex: number;
+    defines: MacroRecord;
+    stateOverrides?: PassOverrides;
+}
+export type PassOverrides = RecursivePartial<IPassStates>;
+
+export interface IMacroPatch {
+    name: string;
+    value: boolean | number | string;
+}
+
+export enum BatchingSchemes {
+    NONE = 0,
+    INSTANCING = 1,
+    VB_MERGING = 2,
+}
+
+export const Pass = jsb.Pass;
