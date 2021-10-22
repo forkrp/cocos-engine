@@ -40,6 +40,19 @@ import { legacyCC } from '../global-exports';
 import { CCObject } from '../data/object';
 import { warnID } from '../platform/debug';
 import { SceneGlobals } from './scene-globals';
+import { JSB } from "../default-constants";
+
+if (JSB) {
+    replaceProperty(Node.prototype, 'Node', [
+        {
+            name: 'childrenCount',
+            newName: 'children.length',
+            customGetter (this: Node) {
+                return this.children.length;
+            },
+        },
+    ]);
+}
 
 replaceProperty(BaseNode.prototype, 'BaseNode', [
     {

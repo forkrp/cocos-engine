@@ -1,5 +1,3 @@
-declare const jsb: any;
-
 import * as js from '../utils/js';
 import { legacyCC } from '../global-exports';
 import { errorID, getError } from '../platform/debug';
@@ -22,14 +20,13 @@ function getConstructor<T> (typeOrClassName) {
     return typeOrClassName;
 }
 
-
 jsb.Node.prototype._ctor = function (name?: string) {
     this._components = [];
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
 
     this._registerListeners();
-}
+};
 
 Object.defineProperties(jsb.Node.prototype, {
     '_components': {
@@ -50,7 +47,7 @@ jsb.Node.prototype.getComponent = function (typeOrClassName) {
         return jsb.Node._findComponent(this, constructor);
     }
     return null;
-}
+};
 
 jsb.Node.prototype.getComponents = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
@@ -59,7 +56,7 @@ jsb.Node.prototype.getComponents = function (typeOrClassName) {
         jsb.Node._findComponents(this, constructor, components);
     }
     return components;
-}
+};
 
 jsb.Node.prototype.getComponentInChildren = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
@@ -67,7 +64,7 @@ jsb.Node.prototype.getComponentInChildren = function (typeOrClassName) {
         return jsb.Node._findChildComponent(this._children, constructor);
     }
     return null;
-}
+};
 
 jsb.Node.prototype.getComponentsInChildren = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
@@ -77,7 +74,7 @@ jsb.Node.prototype.getComponentsInChildren = function (typeOrClassName) {
         jsb.Node._findChildComponents(this.getChildren(), constructor, components);
     }
     return components;
-}
+};
 
 jsb.Node.prototype.addComponent = function (typeOrClassName) {
     // if (EDITOR && (this._objFlags & Destroying)) {
@@ -144,7 +141,7 @@ jsb.Node.prototype.addComponent = function (typeOrClassName) {
     }
 
     return component;
-}
+};
 
 jsb.Node.prototype.removeComponent = function (component) {
     if (!component) {
@@ -160,7 +157,7 @@ jsb.Node.prototype.removeComponent = function (component) {
     if (componentInstance) {
         componentInstance.destroy();
     }
-}
+};
 
 jsb.Node.prototype.on = function (type, callback, target, useCapture) {
     switch (type) {
@@ -172,7 +169,7 @@ jsb.Node.prototype.on = function (type, callback, target, useCapture) {
         break;
     }
     this._eventProcessor.on(type, callback, target, useCapture);
-}
+};
 
 jsb.Node.prototype.off = function (type: string, callback?, target?, useCapture = false) {
     this._eventProcessor.off(type, callback, target, useCapture);
@@ -189,23 +186,23 @@ jsb.Node.prototype.off = function (type: string, callback?, target?, useCapture 
             break;
         }
     }
-}
+};
 
 jsb.Node.prototype.once = function (type: string, callback, target?: unknown, useCapture?: any) {
     this._eventProcessor.once(type, callback, target, useCapture);
-}
+};
 
 jsb.Node.prototype.emit = function (type: string, arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) {
     this._eventProcessor.emit(type, arg0, arg1, arg2, arg3, arg4);
-}
+};
 
 jsb.Node.prototype.dispatchEvent = function (event: Event) {
     this._eventProcessor.dispatchEvent(event);
-}
+};
 
 jsb.Node.prototype.hasEventListener = function (type: string, callback?, target?: unknown) {
     return this._eventProcessor.hasEventListener(type, callback, target);
-}
+};
 
 jsb.Node.prototype.targetOff = function (target: string | unknown) {
     // Check for event mask reset
@@ -214,7 +211,7 @@ jsb.Node.prototype.targetOff = function (target: string | unknown) {
         // this._eventMask &= ~TRANSFORM_ON;
         this.setEventMask(eventMask & ~TRANSFORM_ON);
     }
-}
+};
 
 jsb.Node.prototype._removeComponent = function (component: Component) {
     if (!component) {
@@ -233,25 +230,25 @@ jsb.Node.prototype._removeComponent = function (component: Component) {
             errorID(3815);
         }
     }
-}
+};
 
 // These functions are invoked by native Node object.
 
 jsb.Node.prototype._onTransformChanged = function (transformType) {
     this._eventProcessor.dispatchEvent(NodeEventType.TRANSFORM_CHANGED, transformType);
-}
+};
 
 jsb.Node.prototype._onParentChanged = function (oldParent) {
     this._eventProcessor(NodeEventType.PARENT_CHANGED, oldParent);
-}
+};
 
 jsb.Node.prototype._onReattach = function () {
     this._eventProcessor.reattach();
-}
+};
 
 jsb.Node.prototype._onRemovePersistRootNode = function () {
     legacyCC.game.removePersistRootNode(this);
-}
+};
 
 jsb.Node.prototype._onDestroyComponents = function () {
     const comps = this._components;
@@ -260,35 +257,35 @@ jsb.Node.prototype._onDestroyComponents = function () {
         // TO DO
         comps[i]._destroyImmediate();
     }
-}
+};
 
 jsb.Node.prototype._onLayerChanged = function (layer) {
     this.emit(NodeEventType.LAYER_CHANGED, layer);
-}
+};
 
 jsb.Node.prototype._onChildRemoved = function (child) {
     this.emit(NodeEventType.CHILD_REMOVED, child);
-}
+};
 
 jsb.Node.prototype._onChildAdded = function (child) {
     this.emit(NodeEventType.CHILD_ADDED, child);
-}
+};
 
 jsb.Node.prototype._onNodeDestroyed = function () {
     this.emit(NodeEventType.NODE_DESTROYED, this);
-}
+};
 
 jsb.Node.prototype._onSiblingOrderChanged = function () {
     this.emit(NodeEventType.SIBLING_ORDER_CHANGED);
-}
+};
 
 jsb.Node.prototype._onUiTransformDirty = function () {
     this._uiProps.uiTransformDirty = true;
-}
+};
 
 jsb.Node.prototype._onActivateNode = function (shouldActiveNow) {
     legacyCC.director._nodeActivator.activateNode(this, shouldActiveNow);
-}
+};
 
 // Static functions.
 
@@ -311,7 +308,7 @@ jsb.Node._findComponent = function (node, constructor) {
         }
     }
     return null;
-}
+};
 
 jsb.Node._findComponents = function (node, constructor, components) {
     const cls = constructor as any;
@@ -331,7 +328,7 @@ jsb.Node._findComponents = function (node, constructor, components) {
             }
         }
     }
-}
+};
 
 jsb.Node._findChildComponent = function (children, constructor) {
     for (let i = 0; i < children.length; ++i) {
@@ -350,7 +347,7 @@ jsb.Node._findChildComponent = function (children, constructor) {
         }
     }
     return null;
-}
+};
 
 jsb.Node._findChildComponents = function (children, constructor, components) {
     for (let i = 0; i < children.length; ++i) {
@@ -362,6 +359,6 @@ jsb.Node._findChildComponents = function (children, constructor, components) {
             jsb.Node._findChildComponents(childChildren, constructor, components);
         }
     }
-}
+};
 
-export const Node = jsb.Node;
+export type Node = jsb.Node;

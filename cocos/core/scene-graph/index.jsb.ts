@@ -1,11 +1,11 @@
-declare const jsb: any;
-
 import './node-event-processor';
 import './deprecated';
 
-export const Node = jsb.Node;
-export const Scene = jsb.Scene;
-export const NodeActivator = jsb.NodeActivator;
-export const find = jsb.find;
+export type Node = jsb.Node;
+export type Scene = jsb.Scene;
+
 export { Layers } from './layers';
 export * from './deprecated';
+export * from './scene-globals';
+export * from './find';
+export { default as NodeActivator } from './node-activator';
