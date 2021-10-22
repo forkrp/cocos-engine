@@ -25,12 +25,12 @@ function getConstructor<T> (typeOrClassName) {
 
 jsb.Node.prototype._ctor = function (name?: string) {
     this._components = [];
-    this._eventProcessor = new legacyjsb.NodeEventProcessor(this);
+    this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
 }
 
 Object.defineProperties(jsb.Node.prototype, {
-    '_components': { 
+    '_components': {
         get: function () {
             return this._components;
         }
@@ -149,7 +149,7 @@ jsb.Node.prototype.removeComponent = function (component) {
         errorID(3813);
         return;
     }
-    let componentInstance = null;
+    let componentInstance: any = null;
     if (component instanceof Component) {
         componentInstance = component;
     } else {
@@ -361,3 +361,5 @@ jsb.Node._findChildComponents = function (children, constructor, components) {
         }
     }
 }
+
+export const Node = jsb.Node;

@@ -349,6 +349,10 @@ export class Pass {
         console.warn('base pass cannot override states, please use pass instance instead.');
     }
 
+    protected _setRootBufferDirty (val: boolean) {
+        this._rootBufferDirty = val;
+    }
+
     /**
      * @en Update the current uniforms data.
      * @zh 更新当前 Uniform 数据。

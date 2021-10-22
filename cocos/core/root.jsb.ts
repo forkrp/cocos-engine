@@ -5,7 +5,7 @@ import legacyCC from '../../predefine';
 
 declare const jsb: any;
 
-var Root = jsb.Root;
+export const Root = jsb.Root;
 
 enum LightType {
     DIRECTIONAL,
