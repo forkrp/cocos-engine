@@ -52,17 +52,17 @@ if (JSB) {
             },
         },
     ]);
-}
-
-replaceProperty(BaseNode.prototype, 'BaseNode', [
-    {
-        name: 'childrenCount',
-        newName: 'children.length',
-        customGetter (this: BaseNode) {
-            return this.children.length;
+} else {
+    replaceProperty(BaseNode.prototype, 'BaseNode', [
+        {
+            name: 'childrenCount',
+            newName: 'children.length',
+            customGetter(this: BaseNode) {
+                return this.children.length;
+            },
         },
-    },
-]);
+    ]);
+}
 
 replaceProperty(Node.prototype, 'Node', [
     {

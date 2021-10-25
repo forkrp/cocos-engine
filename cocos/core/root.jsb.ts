@@ -1,9 +1,7 @@
-import {Pool} from "./memop";
-import {warnID} from "./platform";
+import { Pool } from "./memop";
+import { warnID } from "./platform";
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import legacyCC from '../../predefine';
-
-
 
 export const Root = jsb.Root;
 
@@ -31,9 +29,9 @@ Root.prototype._ctor = function() {
 
 Root.prototype.initialize = function (info: IRootInfo) {
     //TODO:
-    this._initialize(info);
+    this._initialize();
     return Promise.resolve();
-}
+};
 
 Root.prototype.createModel = function (ModelCtor) {
     let p = this._modelPools.get(ModelCtor);
@@ -44,7 +42,7 @@ Root.prototype.createModel = function (ModelCtor) {
     const model = p.alloc();
     model.initialize();
     return model;
-}
+};
 
 Root.prototype.removeModel = function (m) {
     const p = this._modelPools.get(m.constructor);
@@ -88,7 +86,7 @@ Root.prototype.destroyLight = function(l) {
             }
         }
     }
-}
+};
 
 Root.prototype._onBatch2DInit = function() {
     if (!this._batcher && legacyCC.internal.Batcher2D) {

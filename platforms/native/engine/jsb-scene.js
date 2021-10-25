@@ -30,7 +30,7 @@ const NULL_PTR = BigInt(0);
 let isLittleEndian = new Uint8Array(new Uint32Array([0x12345678]).buffer)[0] === 0x78;
 
 let dataViews = [];
-function getDataView(idx) { 
+function getDataView(idx) {
     if(!dataViews[idx]) {
         dataViews[idx] = new DataView(__fastMQ__[idx]);
     }
@@ -141,52 +141,6 @@ Object.defineProperty(jsb.DrawBatch2D.prototype, "shaders", {
         for (let p of shaders) {
             trans.writeBigUint64(p ? p.__native_ptr__ : NULL_PTR);
         }
-        trans.commit();
-    },
-    enumerable: true,
-    configurable: true
-});
-
-// Pass
-const PASS_FN_TABLE = jsb.Pass.fnTable;
-Object.defineProperty(v.Pass.prototype, "blendState", {
-    set: function (v) {
-        let trans = beginTrans(PASS_FN_TABLE['blendState'], 16);
-        trans.writeBigUint64(this.__native_ptr__);
-        trans.writeBigUint64(v ? v.__native_ptr__ : NULL_PTR);
-        trans.commit();
-    },
-    enumerable: true,
-    configurable: true
-});
-
-Object.defineProperty(jsb.Pass.prototype, "depthStencilState", {
-    set: function (v) {
-        let trans = beginTrans(PASS_FN_TABLE['depthStencilState'], 16);
-        trans.writeBigUint64(this.__native_ptr__);
-        trans.writeBigUint64(v ? v.__native_ptr__ : NULL_PTR);
-        trans.commit();
-    },
-    enumerable: true,
-    configurable: true
-});
-
-Object.defineProperty(jsb.Pass.prototype, "rasterizerState", {
-    set: function (v) {
-        let trans = beginTrans(PASS_FN_TABLE['rasterizerState'], 16);
-        trans.writeBigUint64(this.__native_ptr__);
-        trans.writeBigUint64(v ? v.__native_ptr__ : NULL_PTR);
-        trans.commit();
-    },
-    enumerable: true,
-    configurable: true
-});
-
-Object.defineProperty(jsb.Pass.prototype, "descriptorSet", {
-    set: function (v) {
-        let trans = beginTrans(PASS_FN_TABLE['descriptorSet'], 16);
-        trans.writeBigUint64(this.__native_ptr__);
-        trans.writeBigUint64(v ? v.__native_ptr__ : NULL_PTR);
         trans.commit();
     },
     enumerable: true,
