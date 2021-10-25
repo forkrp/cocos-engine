@@ -24,6 +24,8 @@
 */
 
 import { legacyCC } from "../global-exports";
+import { js } from "../utils";
+import { CallbacksInvoker } from "../event/callbacks-invoker";
 
 /**
  * @param error - null or the error info
@@ -31,6 +33,7 @@ import { legacyCC } from "../global-exports";
  */
 type CreateNodeCallback = (error: Error | null, node: Node) => void;
 
+js.mixin(jsb.Asset, CallbacksInvoker);
 jsb.Asset.prototype.createNode = null!;
 
 export type Asset = jsb.Asset;
