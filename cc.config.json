@@ -49,6 +49,7 @@
                 "cocos/core/renderer/scene/model.ts": "cocos/core/renderer/scene/model.jsb.ts",
                 "cocos/core/renderer/scene/render-scene.ts": "cocos/core/renderer/scene/render-scene.jsb.ts",
                 "cocos/core/renderer/scene/submodel.ts": "cocos/core/renderer/scene/submodel.jsb.ts",
+                "cocos/core/renderer/scene/Ambient.ts": "cocos/core/renderer/scene/Ambient.jsb.ts",
                 "cocos/core/renderer/scene/index.ts": "cocos/core/renderer/scene/index.jsb.ts",
                 "cocos/core/gfx/index.ts": "cocos/core/gfx/index.jsb.ts",
                 "cocos/core/gfx/pipeline-state.ts": "cocos/core/gfx/pipeline-state.jsb.ts",
