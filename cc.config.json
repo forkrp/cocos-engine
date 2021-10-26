@@ -64,7 +64,8 @@
                 "cocos/core/root.ts": "cocos/core/root.jsb.ts",
                 "cocos/core/assets/asset.ts": "cocos/core/assets/asset.jsb.ts",
                 "cocos/core/assets/effect-asset.ts": "cocos/core/assets/effect-asset.jsb.ts",
-                "cocos/core/assets/material.ts": "cocos/core/assets/material.jsb.ts"
+                "cocos/core/assets/material.ts": "cocos/core/assets/material.jsb.ts",
+                "cocos/3d/assets/mesh.ts":"cocos/3d/assets/mesh.jsb.ts"
             }
         },
         {
