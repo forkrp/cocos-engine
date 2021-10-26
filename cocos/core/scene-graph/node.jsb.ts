@@ -50,19 +50,6 @@ nodeProto._ctor = function (name?: string) {
     this._registerListeners();
 };
 
-Object.defineProperties(jsb.Node.prototype, {
-    '_components': {
-        get: function () {
-            return this._components;
-        }
-    },
-    '_eventProcessor': {
-        get: function () {
-            return this._eventProcessor;
-        }
-    }
-});
-
 nodeProto.getComponent = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     if (constructor) {

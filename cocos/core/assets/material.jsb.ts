@@ -31,8 +31,10 @@ import { EffectAsset } from './effect-asset';
 import { Texture } from '../gfx';
 import { TextureBase } from './texture-base';
 import { legacyCC } from '../global-exports';
-import { PassOverrides } from '../renderer/core/pass';
-import { MacroRecord, MaterialProperty, PropertyType } from '../renderer/core/pass-utils';
+import { PassOverrides, MacroRecord, MaterialProperty } from '../renderer';
+
+import { Color, Mat3, Mat4, Quat, Vec2, Vec3, Vec4 } from '../math';
+import {wrap} from "yargs";
 
 /**
  * @en The basic infos for material initialization.
@@ -77,6 +79,162 @@ interface IMaterialInfo {
 }
 
 type MaterialPropertyFull = MaterialProperty | TextureBase | Texture | null;
+
+const matProto: any = jsb.Material.prototype;
+
+type setProperyCB = (name: string, val: MaterialPropertyFull | MaterialPropertyFull[], passIdx?: number) => void;
+function wrapSetProperty(cb: setProperyCB, target: Material, name: string, val: MaterialPropertyFull | MaterialPropertyFull[], passIdx?: number) {
+    if (passIdx) {
+        cb.call(target, name, val, passIdx);
+    } else {
+        cb.call(target, name, val);
+    }
+}
+
+matProto.setProperty = function (name: string, val: MaterialPropertyFull | MaterialPropertyFull[], passIdx?: number) {
+    if (Array.isArray(val)) {
+        const first = val[0];
+        if (typeof first === 'number') {
+            if (Number.isInteger(first)) {
+                wrapSetProperty(this.setPropertyInt32Array, this, name, val, passIdx);
+            } else {
+                wrapSetProperty(this.setPropertyFloat32Array, this, name, val, passIdx);
+            }
+        } else if (first instanceof Vec2) {
+            wrapSetProperty(this.setPropertyVec2Array, this, name, val, passIdx);
+        } else if (first instanceof Vec3) {
+            wrapSetProperty(this.setPropertyVec3Array, this, name, val, passIdx);
+        } else if (first instanceof Vec4) {
+            wrapSetProperty(this.setPropertyVec4Array, this, name, val, passIdx);
+        } else if (first instanceof Color) {
+            wrapSetProperty(this.setPropertyColorArray, this, name, val, passIdx);
+        } else if (first instanceof Mat3) {
+            wrapSetProperty(this.setPropertyMat3Array, this, name, val, passIdx);
+        } else if (first instanceof Mat4) {
+            wrapSetProperty(this.setPropertyMat4Array, this, name, val, passIdx);
+        } else if (first instanceof Quat) {
+            wrapSetProperty(this.setPropertyQuatArray, this, name, val, passIdx);
+        } else if (first instanceof TextureBase) {
+            wrapSetProperty(this.setPropertyTextureBaseArray, this, name, val, passIdx);
+        } else if (first instanceof Texture) {
+            wrapSetProperty(this.setPropertyGFXTextureArray, this, name, val, passIdx);
+        } else {
+            legacyCC.error(`Material.setProperty Unknown type: ${val}`);
+        }
+    } else {
+        if (typeof val === 'number') {
+            if (Number.isInteger(val)) {
+                wrapSetProperty(this.setPropertyInt32, this, name, val, passIdx);
+            } else {
+                wrapSetProperty(this.setPropertyFloat32, this, name, val, passIdx);
+            }
+        } else if (val instanceof Vec2) {
+            wrapSetProperty(this.setPropertyVec2, this, name, val, passIdx);
+        } else if (val instanceof Vec3) {
+            wrapSetProperty(this.setPropertyVec3, this, name, val, passIdx);
+        } else if (val instanceof Vec4) {
+            wrapSetProperty(this.setPropertyVec4, this, name, val, passIdx);
+        } else if (val instanceof Color) {
+            wrapSetProperty(this.setPropertyColor, this, name, val, passIdx);
+        } else if (val instanceof Mat3) {
+            wrapSetProperty(this.setPropertyMat3, this, name, val, passIdx);
+        } else if (val instanceof Mat4) {
+            wrapSetProperty(this.setPropertyMat4, this, name, val, passIdx);
+        } else if (val instanceof Quat) {
+            wrapSetProperty(this.setPropertyQuat, this, name, val, passIdx);
+        } else if (val instanceof TextureBase) {
+            wrapSetProperty(this.setPropertyTextureBase, this, name, val, passIdx);
+        } else if (val instanceof Texture) {
+            wrapSetProperty(this.setPropertyGFXTexture, this, name, val, passIdx);
+        } else {
+            legacyCC.error(`Material.setProperty Unknown type: ${val}`);
+        }
+    }
+};
+
+matProto.getProperty = function (name: string, passIdx?: number) {
+    const val = this._getProperty(name, passIdx);
+    if (Array.isArray(val)) {
+        const first = val[0];
+        const arr = []; // cjh TODO: optimize temporary gc objects being created
+        if (first instanceof Vec2) {
+            for (let i = 0, len = val.length; i < len; ++i) {
+                const e = val[i];
+                arr.push(new Vec2(e.x, e.y));
+            }
+        } else if (first instanceof Vec3) {
+            for (let i = 0, len = val.length; i < len; ++i) {
+                const e = val[i];
+                arr.push(new Vec3(e.x, e.y, e.z));
+            }
+        } else if (first instanceof Vec4) {
+            for (let i = 0, len = val.length; i < len; ++i) {
+                const e = val[i];
+                arr.push(new Vec4(e.x, e.y, e.z, e.w));
+            }
+        } else if (first instanceof Color) {
+            for (let i = 0, len = val.length; i < len; ++i) {
+                const e = val[i];
+                arr.push(new Color(e.r, e.g, e.b, e.a));
+            }
+        } else if (first instanceof Mat3) {
+            for (let i = 0, len = val.length; i < len; ++i) {
+                const e = val[i];
+                arr.push(new Mat3(
+                    e[0], e[1], e[2],
+                    e[3], e[4], e[5],
+                    e[6], e[7], e[8],
+                ));
+            }
+        } else if (first instanceof Mat4) {
+            for (let i = 0, len = val.length; i < len; ++i) {
+                let e = val[i];
+                arr.push(new Mat4(
+                    e[0], e[1], e[2], e[3],
+                    e[4], e[5], e[6], e[7],
+                    e[8], e[9], e[10], e[11],
+                    e[12], e[13], e[14], e[15],
+                ));
+            }
+        } else if (first instanceof Quat) {
+            for (let i = 0, len = val.length; i < len; ++i) {
+                let e = val[i];
+                arr.push(new Quat(e.x, e.y, e.z, e.w));
+            }
+        }
+
+        return arr ? arr : val;
+    }
+
+    let ret;
+    const e = val;
+    if (val instanceof Vec2) {
+        ret = new Vec3(e.x, e.y);
+    } else if (val instanceof Vec3) {
+        ret = new Vec3(e.x, e.y, e.z);
+    } else if (val instanceof Vec4) {
+        ret = new Vec4(e.x, e.y, e.z, e.w);
+    } else if (val instanceof Color) {
+        ret = new Color(e.r, e.g, e.b, e.a);
+    } else if (val instanceof Mat3) {
+        ret = new Mat3(
+            e[0], e[1], e[2],
+            e[3], e[4], e[5],
+            e[6], e[7], e[8],
+        );
+    } else if (val instanceof Mat4) {
+        ret = new Mat4(
+            e[0], e[1], e[2], e[3],
+            e[4], e[5], e[6], e[7],
+            e[8], e[9], e[10], e[11],
+            e[12], e[13], e[14], e[15],
+        );
+    } else if (val instanceof Quat) {
+        ret = new Quat(e.x, e.y, e.z, e.w);
+    }
+
+    return ret ? ret : val;
+};
 
 export type Material = jsb.Material;
 export const Material = jsb.Material;

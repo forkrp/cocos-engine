@@ -23,18 +23,26 @@
  THE SOFTWARE.
 */
 
-import { legacyCC } from "../global-exports";
-import { js } from "../utils";
-import { CallbacksInvoker } from "../event/callbacks-invoker";
+import { legacyCC } from '../global-exports';
+import { CallbacksInvoker } from '../event/callbacks-invoker';
+import { applyMixins } from '../event/event-target-factory';
+import { createMap } from "../utils/js-typed";
 
 /**
  * @param error - null or the error info
  * @param node - the created node or null
  */
-type CreateNodeCallback = (error: Error | null, node: Node) => void;
+export type CreateNodeCallback = (error: Error | null, node: Node) => void;
 
-js.mixin(jsb.Asset, CallbacksInvoker);
-jsb.Asset.prototype.createNode = null!;
+applyMixins(jsb.Asset, [CallbacksInvoker]);
+
+const assetProto: any = jsb.Asset.prototype;
+
+assetProto._ctor = function() {
+    this._callbackTable = createMap(true);
+};
+
+assetProto.createNode = null!;
 
 export type Asset = jsb.Asset;
 export const Asset = jsb.Asset;
