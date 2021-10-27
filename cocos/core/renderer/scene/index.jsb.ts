@@ -41,8 +41,14 @@ export type SphereLight = jsb.SphereLight;
 legacyCC.SphereLight = jsb.SphereLight;
 
 export const Fog = jsb.Fog;
+export type Fog = jsb.Fog;
+legacyCC.Fog = Fog;
+
 export const Shadow = jsb.Shadow;
+
 export const Skybox = jsb.Skybox;
+export type Skybox = jsb.Skybox;
+legacyCC.Skybox = Skybox;
 
 export * from './camera';
 export * from './model';
