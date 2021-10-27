@@ -22,15 +22,27 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
+import { legacyCC } from '../../global-exports';
 
+export type Ambient = jsb.Ambient;
 export const Ambient = jsb.Ambient;
+legacyCC.Ambient = Ambient;
+
 export const DirectionalLight = jsb.DirectionalLight;
+export type DirectionalLight = jsb.DirectionalLight;
+legacyCC.DirectionalLight = jsb.DirectionalLight;
+
+export const SpotLight = jsb.SpotLight;
+export type SpotLight = jsb.SpotLight;
+legacyCC.SpotLight = jsb.SpotLight;
+
+export const SphereLight = jsb.SphereLight;
+export type SphereLight = jsb.SphereLight;
+legacyCC.SphereLight = jsb.SphereLight;
+
 export const Fog = jsb.Fog;
-export const Light = jsb.Light;
 export const Shadow = jsb.Shadow;
 export const Skybox = jsb.Skybox;
-export const SphereLight = jsb.SphereLight;
-export const SpotLight = jsb.SpotLight;
 
 export * from './camera';
 export * from './model';
