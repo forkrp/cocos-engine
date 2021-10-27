@@ -44,7 +44,9 @@ export const Fog = jsb.Fog;
 export type Fog = jsb.Fog;
 legacyCC.Fog = Fog;
 
-export const Shadow = jsb.Shadow;
+export const Shadows = jsb.Shadow;
+export type Shadows = jsb.Shadow;
+legacyCC.Shadows = Shadows;
 
 export const Skybox = jsb.Skybox;
 export type Skybox = jsb.Skybox;
