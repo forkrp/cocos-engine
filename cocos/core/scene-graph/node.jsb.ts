@@ -26,6 +26,36 @@ import { Component } from '../components/component';
 import { NodeEventType } from './node-event';
 import { CCObject } from '../data/object';
 import { NodeUIProperties } from './node-ui-properties';
+import { NodeSpace, TransformBit } from './node-enum';
+import {Quat, Vec3} from "../math";
+
+export const Node = jsb.Node;
+
+const NodeCls: any = Node;
+/**
+ * @en Event types emitted by Node
+ * @zh 节点可能发出的事件类型
+ */
+NodeCls.EventType = NodeEventType;
+
+/**
+ * @en Coordinates space
+ * @zh 空间变换操作的坐标系
+ */
+NodeCls.NodeSpace = NodeSpace;
+
+/**
+ * @en Bit masks for Node transformation parts
+ * @zh 节点变换更新的具体部分
+ * @deprecated please use [[Node.TransformBit]]
+ */
+NodeCls.TransformDirtyBit = TransformBit;
+
+/**
+ * @en Bit masks for Node transformation parts, can be used to determine which part changed in [[NodeEventType.TRANSFORM_CHANGED]] event
+ * @zh 节点变换更新的具体部分，可用于判断 [[NodeEventType.TRANSFORM_CHANGED]] 事件的具体类型
+ */
+NodeCls.TransformBit = TransformBit;
 
 const nodeProto: any = jsb.Node.prototype;
 export const TRANSFORM_ON = 1 << 0;
@@ -53,7 +83,7 @@ nodeProto._ctor = function (name?: string) {
 nodeProto.getComponent = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     if (constructor) {
-        return jsb.Node._findComponent(this, constructor);
+        return NodeCls._findComponent(this, constructor);
     }
     return null;
 };
@@ -62,7 +92,7 @@ nodeProto.getComponents = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     const components = [];
     if (constructor) {
-        jsb.Node._findComponents(this, constructor, components);
+        NodeCls._findComponents(this, constructor, components);
     }
     return components;
 };
@@ -70,7 +100,7 @@ nodeProto.getComponents = function (typeOrClassName) {
 nodeProto.getComponentInChildren = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     if (constructor) {
-        return jsb.Node._findChildComponent(this._children, constructor);
+        return NodeCls._findChildComponent(this._children, constructor);
     }
     return null;
 };
@@ -79,8 +109,8 @@ nodeProto.getComponentsInChildren = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
     const components = [];
     if (constructor) {
-        jsb.Node._findComponents(this, constructor, components);
-        jsb.Node._findChildComponents(this.getChildren(), constructor, components);
+        NodeCls._findComponents(this, constructor, components);
+        NodeCls._findChildComponents(this.getChildren(), constructor, components);
     }
     return components;
 };
@@ -215,7 +245,7 @@ nodeProto.hasEventListener = function (type: string, callback?, target?: unknown
 
 nodeProto.targetOff = function (target: string | unknown) {
     // Check for event mask reset
-    let eventMask = this.getEventMask();
+    const eventMask = this.getEventMask();
     if ((eventMask & TRANSFORM_ON) && !this._eventProcessor.hasEventListener(NodeEventType.TRANSFORM_CHANGED)) {
         // this._eventMask &= ~TRANSFORM_ON;
         this.setEventMask(eventMask & ~TRANSFORM_ON);
@@ -244,14 +274,14 @@ nodeProto._removeComponent = function (component: Component) {
 // These functions are invoked by native Node object.
 
 nodeProto._onTransformChanged = function (transformType) {
-    this._eventProcessor.dispatchEvent(NodeEventType.TRANSFORM_CHANGED, transformType);
+    this.emit(NodeEventType.TRANSFORM_CHANGED, transformType);
 };
 
 nodeProto._onParentChanged = function (oldParent) {
-    this._eventProcessor(NodeEventType.PARENT_CHANGED, oldParent);
+    this.emit(NodeEventType.PARENT_CHANGED, oldParent);
 };
 
-nodeProto._onReattach = function () {
+nodeProto._onReAttach = function () {
     this._eventProcessor.reattach();
 };
 
@@ -298,19 +328,19 @@ nodeProto._onActivateNode = function (shouldActiveNow) {
 
 // Static functions.
 
-jsb.Node._findComponent = function (node, constructor) {
+NodeCls._findComponent = function (node, constructor) {
     const cls = constructor as any;
     const comps = node._components;
     if (cls._sealed) {
         for (let i = 0; i < comps.length; ++i) {
-            const comp = comps[i];
+            const comp: Component = comps[i];
             if (comp.constructor === constructor) {
                 return comp;
             }
         }
     } else {
         for (let i = 0; i < comps.length; ++i) {
-            const comp = comps[i];
+            const comp: Component = comps[i];
             if (comp instanceof constructor) {
                 return comp;
             }
@@ -319,7 +349,7 @@ jsb.Node._findComponent = function (node, constructor) {
     return null;
 };
 
-jsb.Node._findComponents = function (node, constructor, components) {
+NodeCls._findComponents = function (node, constructor, components) {
     const cls = constructor as any;
     const comps = node._components;
     if (cls._sealed) {
@@ -339,17 +369,17 @@ jsb.Node._findComponents = function (node, constructor, components) {
     }
 };
 
-jsb.Node._findChildComponent = function (children, constructor) {
+NodeCls._findChildComponent = function (children, constructor) {
     for (let i = 0; i < children.length; ++i) {
         const node = children[i];
-        let comp = jsb.Node._findComponent(node, constructor);
+        let comp: Component = NodeCls._findComponent(node, constructor);
         if (comp) {
             return comp;
         }
 
-        let childChildren = node.getChildren();
+        const childChildren = node.getChildren();
         if (childChildren.length > 0) {
-            comp = jsb.Node._findChildComponent(childChildren, constructor);
+            comp = NodeCls._findChildComponent(childChildren, constructor);
             if (comp) {
                 return comp;
             }
@@ -358,16 +388,87 @@ jsb.Node._findChildComponent = function (children, constructor) {
     return null;
 };
 
-jsb.Node._findChildComponents = function (children, constructor, components) {
+NodeCls._findChildComponents = function (children, constructor, components) {
     for (let i = 0; i < children.length; ++i) {
         const node = children[i];
-        jsb.Node._findComponents(node, constructor, components);
+        NodeCls._findComponents(node, constructor, components);
 
-        let childChildren = node.getChildren();
+        const childChildren = node.getChildren();
         if (childChildren.length > 0) {
-            jsb.Node._findChildComponents(childChildren, constructor, components);
+            NodeCls._findChildComponents(childChildren, constructor, components);
         }
     }
 };
 
-export const Node = jsb.Node;
+/**
+ * @en Determine whether the given object is a normal Node. Will return false if [[Scene]] given.
+ * @zh 指定对象是否是普通的节点？如果传入 [[Scene]] 会返回 false。
+ */
+NodeCls.isNode =  function (obj: unknown): obj is jsb.Node {
+    return obj instanceof jsb.Node && (obj.constructor === jsb.Node || !(obj instanceof legacyCC.Scene));
+};
+
+const oldGetPosition = nodeProto.getPosition;
+const oldGetRotation = nodeProto.getRotation;
+const oldGetScale = nodeProto.getScale;
+
+nodeProto.getPosition = function (out?: Vec3) : Vec3 {
+    const r = oldGetPosition.call(this);
+    if (out) {
+        return Vec3.set(out, r.x, r.y, r.z);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
+
+nodeProto.getRotation = function(out?: Quat): Quat {
+    const r = oldGetRotation.call(this);
+    if (out) {
+        return Quat.set(out, r.x, r.y, r.z, r.w);
+    }
+    return Quat.copy(new Quat(), r);
+};
+
+nodeProto.getScale = function (out?: Vec3) : Vec3 {
+    const r = oldGetScale.call(this);
+    if (out) {
+        return Vec3.set(out, r.x, r.y, r.z);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
+
+Object.defineProperty(nodeProto, 'position', {
+    configurable: true,
+    enumerable: true,
+    get () : Vec3 {
+        return this.getPosition();
+    },
+    set (v: Vec3) {
+        this.setPosition(v);
+    },
+});
+
+Object.defineProperty(nodeProto, 'rotation', {
+    configurable: true,
+    enumerable: true,
+    get () : Quat {
+        return this.getRotation();
+    },
+    set (v: Quat) {
+        this.setRotation(v);
+    },
+});
+
+Object.defineProperty(nodeProto, 'scale', {
+    configurable: true,
+    enumerable: true,
+    get () : Vec3 {
+        return this.getScale();
+    },
+    set (v: Vec3) {
+        this.setScale(v);
+    },
+});
+
+export type Node = jsb.Node;
+
+legacyCC.Node = Node;
