@@ -27,7 +27,8 @@ import { NodeEventType } from './node-event';
 import { CCObject } from '../data/object';
 import { NodeUIProperties } from './node-ui-properties';
 import { NodeSpace, TransformBit } from './node-enum';
-import {Quat, Vec3} from "../math";
+import { Quat, Vec3 } from '../math';
+import { NodeEventProcessor } from './node-event-processor';
 
 export const Node = jsb.Node;
 
@@ -466,6 +467,22 @@ Object.defineProperty(nodeProto, 'scale', {
     },
     set (v: Vec3) {
         this.setScale(v);
+    },
+});
+
+Object.defineProperty(nodeProto, 'eventProcessor', {
+    configurable: true,
+    enumerable: true,
+    get () : NodeEventProcessor {
+        return this._eventProcessor;
+    },
+});
+
+Object.defineProperty(nodeProto, 'components', {
+    configurable: true,
+    enumerable: true,
+    get () : ReadonlyArray<Component> {
+        return this._components;
     },
 });
 

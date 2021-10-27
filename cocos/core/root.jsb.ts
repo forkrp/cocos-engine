@@ -20,20 +20,22 @@ export interface IRootInfo {
     enableHDR?: boolean;
 }
 
-Root.prototype._ctor = function() {
+const rootProto: any = Root.prototype;
+
+rootProto._ctor = function() {
     this._modelPools = new Map();
     this._lightPools = new Map();
     this._batcher = null;
     this._registerListeners();
 };
 
-Root.prototype.initialize = function (info: IRootInfo) {
-    //TODO:
+rootProto.initialize = function (info: IRootInfo) {
+    // TODO:
     this._initialize();
     return Promise.resolve();
 };
 
-Root.prototype.createModel = function (ModelCtor) {
+rootProto.createModel = function (ModelCtor) {
     let p = this._modelPools.get(ModelCtor);
     if (!p) {
         this._modelPools.set(ModelCtor, new Pool(() => new ModelCtor(), 10));
@@ -44,7 +46,7 @@ Root.prototype.createModel = function (ModelCtor) {
     return model;
 };
 
-Root.prototype.removeModel = function (m) {
+rootProto.removeModel = function (m) {
     const p = this._modelPools.get(m.constructor);
     if (p) {
         p.free(m);
@@ -57,7 +59,7 @@ Root.prototype.removeModel = function (m) {
     }
 };
 
-Root.prototype.createLight = function (LightCtor) {
+rootProto.createLight = function (LightCtor) {
     let l = this._lightPools.get(LightCtor);
     if (!l) {
         this._lightPools.set(LightCtor, new Pool(() => new LightCtor(), 4));
@@ -68,7 +70,7 @@ Root.prototype.createLight = function (LightCtor) {
     return light;
 };
 
-Root.prototype.destroyLight = function(l) {
+rootProto.destroyLight = function(l) {
     const p = this._lightPools.get(l.constructor);
     l.destroy();
     if (p) {
@@ -88,7 +90,7 @@ Root.prototype.destroyLight = function(l) {
     }
 };
 
-Root.prototype._onBatch2DInit = function() {
+rootProto._onBatch2DInit = function() {
     if (!this._batcher && legacyCC.internal.Batcher2D) {
         this._batcher = new legacyCC.internal.Batcher2D(this) as Batcher2D;
         if (!this._batcher.initialize()) {
@@ -98,17 +100,19 @@ Root.prototype._onBatch2DInit = function() {
     }
 };
 
-Root.prototype._onBatch2DUpdate = function() {
-    for (let i = 0; i < this._scenes.length; ++i) {
-        this._scenes[i].removeBatches();
-    }
+rootProto._onBatch2DUpdate = function() {
     if (this._batcher) this._batcher.update();
 };
 
-Root.prototype._onBatch2DUploadBuffers = function () {
+rootProto._onBatch2DUploadBuffers = function () {
     if (this._batcher) this._batcher.uploadBuffers();
 };
 
-Root.prototype._onBatch2DReset = function () {
+rootProto._onBatch2DReset = function () {
     if (this._batcher) this._batcher.reset();
+};
+
+const oldFrameMove = rootProto.frameMove;
+rootProto.frameMove = function (deltaTime: number) {
+    oldFrameMove.call(this, deltaTime, legacyCC.director.getTotalFrames());
 };
