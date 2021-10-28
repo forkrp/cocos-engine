@@ -23,31 +23,22 @@
  THE SOFTWARE.
  */
 
-import config from './config';
-
-import * as scene from './scene';
-
-import './scene/deprecated';
 import { legacyCC } from '../global-exports';
-import { RenderableComponent } from '../components';
 
-export { createIA } from './utils';
+export const Layers = jsb.Layers;
+export type Layers = jsb.Layers;
+// built-in layers, users can use 0~19 bits, 20~31 are system preserve bits.
+const layerList = {
+    NONE: 0,
+    IGNORE_RAYCAST: (1 << 20),
+    GIZMOS: (1 << 21),
+    EDITOR: (1 << 22),
+    UI_3D: (1 << 23),
+    SCENE_GIZMO: (1 << 24),
+    UI_2D: (1 << 25),
 
-const addStage = config.addStage;
-export { addStage };
-
-export * from './core/constants';
-export * from './core/pass-utils';
-export const Pass = jsb.Pass;
-const ProgramLib = jsb.ProgramLib;
-export const programLib = new ProgramLib();
-legacyCC.programLib = programLib;
-export * from './core/sampler-lib';
-export * from './core/texture-buffer-pool';
-
-export const IMaterialInstanceInfo = jsb.IMaterialInstanceInfo;
-export const MaterialInstance = jsb.MaterialInstance;
-export const PassInstance = jsb.PassInstance;
-
-export * from './core/memory-pools';
-export { scene };
+    PROFILER: (1 << 28),
+    DEFAULT: (1 << 30),
+    ALL: 0xffffffff,
+};
+legacyCC.Layers = Layers;
