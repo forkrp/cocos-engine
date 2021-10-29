@@ -53,9 +53,9 @@ export enum BatchingSchemes {
 export const Pass = jsb.Pass;
 export type Pass = jsb.Pass;
 
-const clsDecorator = ccclass('cc.MaterialInstance');
+const clsDecorator = ccclass('cc.Pass');
 
-//TODO: 
+//TODO:
 // _applyDecoratedDescriptor
 
-clsDecorator(MaterialInstance);
+clsDecorator(Pass);
