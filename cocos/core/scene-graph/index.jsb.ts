@@ -1,8 +1,7 @@
-import './node-event-processor';
-import './deprecated';
+import { setClassName } from "../utils/js-typed";
 
-export const Node = jsb.Node;
-export const Scene = jsb.Scene;
+export * from './node';
+export * from './scene';
 
 export { Layers } from './layers';
 export * from './deprecated';

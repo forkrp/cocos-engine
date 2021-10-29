@@ -22,8 +22,15 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
+import { ccclass, editable, serializable } from 'cc.decorator';
+import {
+    _applyDecoratedDescriptor,
+    _assertThisInitialized,
+    _initializerDefineProperty,
+} from '../data/utils/decorator-jsb-utils';
 
 export const MaterialInstance = jsb.MaterialInstance;
+export type MaterialInstance = jsb.MaterialInstance;
 
 const materialInstanceProto:any = jsb.MaterialInstance.prototype;
 
@@ -34,3 +41,10 @@ materialInstanceProto.ctor = function (info) {
 materialInstanceProto.getOwner = function () {
     return this._owner;
 };
+
+const clsDecorator = ccclass('cc.MaterialInstance');
+
+// TODO:
+// _applyDecoratedDescriptor
+
+clsDecorator(MaterialInstance);
