@@ -22,7 +22,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-
+import { ccclass, editable, serializable } from 'cc.decorator';
+import {
+    _applyDecoratedDescriptor,
+    _assertThisInitialized,
+    _initializerDefineProperty,
+} from '../data/utils/decorator-jsb-utils';
 import { RenderPassInfo } from "../../gfx";
 
 export interface IRenderWindowInfo {
@@ -35,3 +40,11 @@ export interface IRenderWindowInfo {
 }
 
 export const RenderWindow = jsb.RenderWindow;
+export type RenderWindow = jsb.RenderWindow;
+
+const clsDecorator = ccclass('cc.RenderWindow');
+
+//TODO: 
+// _applyDecoratedDescriptor
+
+clsDecorator(RenderWindow);

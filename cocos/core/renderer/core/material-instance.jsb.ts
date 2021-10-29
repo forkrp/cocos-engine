@@ -22,9 +22,14 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-
-import { Material } from "../../assets";
-import { RenderableComponent } from "../../components";
+import { ccclass, editable, serializable } from 'cc.decorator';
+import {
+    _applyDecoratedDescriptor,
+    _assertThisInitialized,
+    _initializerDefineProperty,
+} from '../data/utils/decorator-jsb-utils';
+import { Material } from '../../assets';
+import { RenderableComponent } from '../../components';
 
 export interface IMaterialInstanceInfo {
     parent: Material;
@@ -32,3 +37,11 @@ export interface IMaterialInstanceInfo {
     subModelIdx?: number;
 }
 export const MaterialInstance = jsb.MaterialInstance;
+export type MaterialInstance = jsb.MaterialInstance;
+
+const clsDecorator = ccclass('cc.MaterialInstance');
+
+//TODO: 
+// _applyDecoratedDescriptor
+
+clsDecorator(MaterialInstance);
