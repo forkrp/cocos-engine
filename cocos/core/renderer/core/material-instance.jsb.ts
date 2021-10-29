@@ -23,12 +23,14 @@
  THE SOFTWARE.
  */
 
-import { Material } from "../../assets";
-import { RenderableComponent } from "../../components";
-
-export interface IMaterialInstanceInfo {
-    parent: Material;
-    owner?: RenderableComponent;
-    subModelIdx?: number;
-}
 export const MaterialInstance = jsb.MaterialInstance;
+
+const materialInstanceProto:any = jsb.MaterialInstance.prototype;
+
+materialInstanceProto.ctor = function (info) {
+    this._owner = info.owner;
+};
+
+materialInstanceProto.getOwner = function () {
+    return this._owner;
+};
