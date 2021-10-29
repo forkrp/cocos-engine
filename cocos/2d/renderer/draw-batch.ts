@@ -47,8 +47,16 @@ export class DrawBatch2D {
         return this._inputAssember;
     }
 
+    public set inputAssembler (ia: InputAssembler | null) {
+        this._inputAssember = ia;
+    }
+
     public get descriptorSet () {
         return this._descriptorSet;
+    }
+
+    public set descriptorSet (ia: DescriptorSet | null) {
+        this._descriptorSet = ia;
     }
 
     public get visFlags () {
