@@ -19,6 +19,13 @@
  THE SOFTWARE.
 */
 
+import { ccclass, editable, serializable, type } from 'cc.decorator';
+import {
+    _applyDecoratedDescriptor,
+    _assertThisInitialized,
+    _initializerDefineProperty
+} from '../data/utils/decorator-jsb-utils';
+
 import * as js from '../utils/js';
 import { legacyCC } from '../global-exports';
 import { errorID, getError } from '../platform/debug';
@@ -29,8 +36,13 @@ import { NodeUIProperties } from './node-ui-properties';
 import { NodeSpace, TransformBit } from './node-enum';
 import { Quat, Vec3 } from '../math';
 import { NodeEventProcessor } from './node-event-processor';
+import { Layers } from "./layers";
 
 export const Node = jsb.Node;
+export type Node = jsb.Node;
+legacyCC.Node = Node;
+
+const clsDecorator = ccclass('cc.Node');
 
 const NodeCls: any = Node;
 /**
@@ -72,14 +84,6 @@ function getConstructor<T> (typeOrClassName) {
 
     return typeOrClassName;
 }
-
-nodeProto._ctor = function (name?: string) {
-    this._components = [];
-    this._eventProcessor = new legacyCC.NodeEventProcessor(this);
-    this._uiProps = new NodeUIProperties(this);
-
-    this._registerListeners();
-};
 
 nodeProto.getComponent = function (typeOrClassName) {
     const constructor = getConstructor(typeOrClassName);
@@ -486,6 +490,128 @@ Object.defineProperty(nodeProto, 'components', {
     },
 });
 
-export type Node = jsb.Node;
+// Deserialization
+const _class2$u = Node;
+const _descriptor$o = _applyDecoratedDescriptor(_class2$u.prototype, "_parent", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return null;
+    },
+});
 
-legacyCC.Node = Node;
+const _descriptor2$h = _applyDecoratedDescriptor(_class2$u.prototype, "_children", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return [];
+    },
+});
+
+const _descriptor3$b = _applyDecoratedDescriptor(_class2$u.prototype, "_active", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return true;
+    },
+});
+
+const _descriptor4$9 = _applyDecoratedDescriptor(_class2$u.prototype, "_components", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return [];
+    },
+});
+
+const _descriptor5$6 = _applyDecoratedDescriptor(_class2$u.prototype, "_prefab", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return null;
+    },
+});
+
+// Node
+const _class2$v = Node;
+const _descriptor$p = _applyDecoratedDescriptor(_class2$v.prototype, "_lpos", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return new Vec3();
+    },
+});
+
+const _descriptor2$i = _applyDecoratedDescriptor(_class2$v.prototype, "_lrot", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return new Quat();
+    },
+});
+
+const _descriptor3$c = _applyDecoratedDescriptor(_class2$v.prototype, "_lscale", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return new Vec3(1, 1, 1);
+    },
+});
+
+const _descriptor4$a = _applyDecoratedDescriptor(_class2$v.prototype, "_layer", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return Layers.Enum.DEFAULT;
+    },
+});
+
+const _descriptor5$7 = _applyDecoratedDescriptor(_class2$v.prototype, "_euler", [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer() {
+        return new Vec3();
+    },
+});
+
+const _dec2$i = type(Vec3);
+_applyDecoratedDescriptor(_class2$v.prototype, "eulerAngles", [_dec2$i], Object.getOwnPropertyDescriptor(_class2$v.prototype, "eulerAngles"), _class2$v.prototype);
+_applyDecoratedDescriptor(_class2$v.prototype, "angle", [editable], Object.getOwnPropertyDescriptor(_class2$v.prototype, "angle"), _class2$v.prototype);
+_applyDecoratedDescriptor(_class2$v.prototype, "layer", [editable], Object.getOwnPropertyDescriptor(_class2$v.prototype, "layer"), _class2$v.prototype);
+
+//
+nodeProto._ctor = function (name?: string) {
+    this._components = [];
+    this._eventProcessor = new legacyCC.NodeEventProcessor(this);
+    this._uiProps = new NodeUIProperties(this);
+
+    this._registerListeners();
+    // // for deserialization
+    // // eslint-disable-next-line @typescript-eslint/no-this-alias
+    // const _this = this;
+    // // baseNode properties
+    // _initializerDefineProperty(_this, "_parent", _descriptor$o, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_children", _descriptor2$h, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_active", _descriptor3$b, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_components", _descriptor4$9, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_prefab", _descriptor5$6, _assertThisInitialized(_this));
+    // // Node properties
+    // _initializerDefineProperty(_this, "_lpos", _descriptor$p, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_lrot", _descriptor2$i, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_lscale", _descriptor3$c, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_layer", _descriptor4$a, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_euler", _descriptor5$7, _assertThisInitialized(_this));
+    // //
+};
+//
+clsDecorator(Node);

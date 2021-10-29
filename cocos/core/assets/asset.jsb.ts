@@ -22,7 +22,12 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-
+import { ccclass, editable, serializable } from 'cc.decorator';
+import {
+    _applyDecoratedDescriptor,
+    _assertThisInitialized,
+    _initializerDefineProperty,
+} from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
 import { CallbacksInvoker } from '../event/callbacks-invoker';
 import { applyMixins } from '../event/event-target-factory';
@@ -47,3 +52,10 @@ assetProto.createNode = null!;
 export type Asset = jsb.Asset;
 export const Asset = jsb.Asset;
 legacyCC.Asset = jsb.Asset;
+
+const clsDecorator = ccclass('cc.Asset');
+
+//TODO: 
+// _applyDecoratedDescriptor
+
+clsDecorator(Asset);

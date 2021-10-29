@@ -34,7 +34,7 @@ import { legacyCC } from '../global-exports';
 import { PassOverrides, MacroRecord, MaterialProperty } from '../renderer';
 
 import { Color, Mat3, Mat4, Quat, Vec2, Vec3, Vec4 } from '../math';
-import {wrap} from "yargs";
+import { setClassName } from "../utils/js-typed";
 
 /**
  * @en The basic infos for material initialization.
@@ -188,7 +188,7 @@ matProto.getProperty = function (name: string, passIdx?: number) {
             }
         } else if (first instanceof Mat4) {
             for (let i = 0, len = val.length; i < len; ++i) {
-                let e = val[i];
+                const e = val[i];
                 arr.push(new Mat4(
                     e[0], e[1], e[2], e[3],
                     e[4], e[5], e[6], e[7],
@@ -198,7 +198,7 @@ matProto.getProperty = function (name: string, passIdx?: number) {
             }
         } else if (first instanceof Quat) {
             for (let i = 0, len = val.length; i < len; ++i) {
-                let e = val[i];
+                const e = val[i];
                 arr.push(new Quat(e.x, e.y, e.z, e.w));
             }
         }
@@ -240,3 +240,5 @@ export type Material = jsb.Material;
 export const Material = jsb.Material;
 
 legacyCC.Material = Material;
+
+setClassName('cc.Material', Material);
