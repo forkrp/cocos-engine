@@ -55,8 +55,8 @@ export class DrawBatch2D {
         return this._descriptorSet;
     }
 
-    public set descriptorSet (ia: DescriptorSet | null) {
-        this._descriptorSet = ia;
+    public set descriptorSet (ds: DescriptorSet | null) {
+        this._descriptorSet = ds;
     }
 
     public get visFlags () {
