@@ -32,9 +32,8 @@ import { legacyCC } from '../global-exports';
 
 export const SceneAsset = jsb.SceneAsset;
 export type SceneAsset = jsb.SceneAsset;
-export { SceneAsset as default };
-legacyCC.SceneAsset = SceneAsset;
 
+legacyCC.SceneAsset = SceneAsset;
 const sceneAssetDecorator = ccclass('cc.SceneAsset');
 
 const sceneAssetProto: any = SceneAsset.prototype;
