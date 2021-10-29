@@ -104,7 +104,7 @@ export function createDefaultPipeline () {
 //     }
 // }
 //
-mixin(ForwardPipeline.prototype, Asset.prototype);
+// mixin(ForwardPipeline.prototype, Asset.prototype);
 
 const ForwardOnLoaded = ForwardPipeline.prototype.onLoaded;
 
@@ -237,7 +237,7 @@ ForwardPipeline.prototype.onLoaded = function () {
 //
 // }
 
-mixin(DeferredPipeline.prototype, Asset.prototype);
+// mixin(DeferredPipeline.prototype, Asset.prototype);
 
 const DeferredOnLoaded = DeferredPipeline.prototype.onLoaded;
 

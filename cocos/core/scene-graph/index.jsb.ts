@@ -1,5 +1,3 @@
-import { setClassName } from "../utils/js-typed";
-
 export * from './node';
 export * from './scene';
 
