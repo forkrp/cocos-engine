@@ -64,13 +64,18 @@
                 "cocos/core/root.ts": "cocos/core/root.jsb.ts",
                 "cocos/core/assets/index.ts": "cocos/core/assets/index.jsb.ts",
                 "cocos/core/assets/asset.ts": "cocos/core/assets/asset.jsb.ts",
+                "cocos/core/assets/buffer-asset.ts": "cocos/core/assets/buffer-asset.jsb.ts",
                 "cocos/core/assets/render-texture.ts": "cocos/core/assets/render-texture.jsb.ts",
+                "cocos/core/assets/simple-texture.ts": "cocos/core/assets/simple-texture.jsb.ts",
                 "cocos/core/assets/scene-asset.ts": "cocos/core/assets/scene-asset.jsb.ts",
                 "cocos/core/assets/effect-asset.ts": "cocos/core/assets/effect-asset.jsb.ts",
+                "cocos/core/assets/image-asset.ts": "cocos/core/assets/image-asset.jsb.ts",
                 "cocos/core/assets/texture-base.ts": "cocos/core/assets/texture-base.jsb.ts",
+                "cocos/core/assets/texture-asset.ts": "cocos/core/assets/texture-asset.jsb.ts",
                 "cocos/core/assets/texture-2d.ts": "cocos/core/assets/texture-2d.jsb.ts",
                 "cocos/core/assets/texture-cube.ts": "cocos/core/assets/texture-cube.jsb.ts",
                 "cocos/core/assets/material.ts": "cocos/core/assets/material.jsb.ts",
+                "cocos/core/assets/prefab.ts": "cocos/core/assets/prefab.jsb.ts",
                 "cocos/3d/assets/mesh.ts":"cocos/3d/assets/mesh.jsb.ts"
             }
         },
