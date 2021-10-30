@@ -41,7 +41,7 @@ export const TextureBase = jsb.TextureBase;
 const clsDecorator = ccclass('cc.TextureBase');
 
 const _class2$b = TextureBase;
-const _descriptor$9 = _applyDecoratedDescriptor(_class2$b.prototype, "_format", [serializable], {
+const _descriptor$9 = _applyDecoratedDescriptor(_class2$b.prototype, '_format', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
@@ -49,7 +49,7 @@ const _descriptor$9 = _applyDecoratedDescriptor(_class2$b.prototype, "_format", 
         return PixelFormat.RGBA8888;
     },
 });
-const _descriptor2$6 = _applyDecoratedDescriptor(_class2$b.prototype, "_minFilter", [serializable], {
+const _descriptor2$6 = _applyDecoratedDescriptor(_class2$b.prototype, '_minFilter', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
@@ -57,7 +57,7 @@ const _descriptor2$6 = _applyDecoratedDescriptor(_class2$b.prototype, "_minFilte
         return Filter.LINEAR;
     },
 });
-const _descriptor3$5 = _applyDecoratedDescriptor(_class2$b.prototype, "_magFilter", [serializable], {
+const _descriptor3$5 = _applyDecoratedDescriptor(_class2$b.prototype, '_magFilter', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
@@ -65,7 +65,7 @@ const _descriptor3$5 = _applyDecoratedDescriptor(_class2$b.prototype, "_magFilte
         return Filter.LINEAR;
     },
 });
-const _descriptor4$4 = _applyDecoratedDescriptor(_class2$b.prototype, "_mipFilter", [serializable], {
+const _descriptor4$4 = _applyDecoratedDescriptor(_class2$b.prototype, '_mipFilter', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
@@ -73,7 +73,7 @@ const _descriptor4$4 = _applyDecoratedDescriptor(_class2$b.prototype, "_mipFilte
         return Filter.NONE;
     },
 });
-const _descriptor5$3 = _applyDecoratedDescriptor(_class2$b.prototype, "_wrapS", [serializable], {
+const _descriptor5$3 = _applyDecoratedDescriptor(_class2$b.prototype, '_wrapS', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
@@ -81,7 +81,7 @@ const _descriptor5$3 = _applyDecoratedDescriptor(_class2$b.prototype, "_wrapS", 
         return WrapMode.REPEAT;
     },
 });
-const _descriptor6$1 = _applyDecoratedDescriptor(_class2$b.prototype, "_wrapT", [serializable], {
+const _descriptor6$1 = _applyDecoratedDescriptor(_class2$b.prototype, '_wrapT', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
@@ -89,7 +89,7 @@ const _descriptor6$1 = _applyDecoratedDescriptor(_class2$b.prototype, "_wrapT", 
         return WrapMode.REPEAT;
     },
 });
-const _descriptor7$1 = _applyDecoratedDescriptor(_class2$b.prototype, "_wrapR", [serializable], {
+const _descriptor7$1 = _applyDecoratedDescriptor(_class2$b.prototype, '_wrapR', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
@@ -97,7 +97,7 @@ const _descriptor7$1 = _applyDecoratedDescriptor(_class2$b.prototype, "_wrapR", 
         return WrapMode.REPEAT;
     },
 });
-const  _descriptor8$1 = _applyDecoratedDescriptor(_class2$b.prototype, "_anisotropy", [serializable], {
+const  _descriptor8$1 = _applyDecoratedDescriptor(_class2$b.prototype, '_anisotropy', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
