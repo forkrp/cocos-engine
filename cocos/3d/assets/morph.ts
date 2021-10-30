@@ -62,7 +62,7 @@ export interface SubMeshMorph {
     /**
      * Attributes to morph.
      */
-    attributes: AttributeName[];
+    attributes: (string|AttributeName)[]; // TODO(PatriceJiang): jsb.auto.d.ts export AttributeName as string
 
     /**
      * Targets.
