@@ -23,7 +23,7 @@
  THE SOFTWARE.
  */
 
-import { Attribute } from "../../gfx";
+import { Attribute } from '../../gfx';
 
 export interface IInstancedAttributeBlock {
     buffer: Uint8Array;
