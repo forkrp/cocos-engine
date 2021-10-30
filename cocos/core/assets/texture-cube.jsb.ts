@@ -22,52 +22,47 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-import { ccclass, editable, serializable } from 'cc.decorator';
+import { ccclass, serializable } from 'cc.decorator';
 import {
     _applyDecoratedDescriptor,
     _assertThisInitialized,
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
-import { CallbacksInvoker } from '../event/callbacks-invoker';
-import { applyMixins } from '../event/event-target-factory';
-import { createMap } from '../utils/js-typed';
-import { property } from '../data/class-decorator';
 
-/**
- * @param error - null or the error info
- * @param node - the created node or null
- */
-export type CreateNodeCallback = (error: Error | null, node: Node) => void;
+const textureCubeProto: any = jsb.TextureCube.prototype;
 
-applyMixins(jsb.Asset, [CallbacksInvoker]);
+textureCubeProto.createNode = null!;
 
-const assetProto: any = jsb.Asset.prototype;
+export type TextureCube = jsb.TextureCube;
+export const TextureCube = jsb.TextureCube;
 
-assetProto._ctor = function () {
-    this._callbackTable = createMap(true);
-    // for deserialization
-    // _initializerDefineProperty(_this, "_native", _descriptor$1, _assertThisInitialized(_this));
-};
+const clsDecorator = ccclass('cc.TextureCube');
 
-assetProto.createNode = null!;
-
-export type Asset = jsb.Asset;
-export const Asset = jsb.Asset;
-
-const clsDecorator = ccclass('cc.Asset');
-
-const _class2$1 = Asset;
-const _descriptor$1 = _applyDecoratedDescriptor(_class2$1.prototype, '_native', [serializable], {
+const _class2$d = TextureCube;
+const _descriptor$b = _applyDecoratedDescriptor(_class2$d.prototype, 'isRGBE', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
     initializer: function initializer () {
-        return '';
+        return false;
     },
 });
-_applyDecoratedDescriptor(_class2$1.prototype, '_nativeAsset', [property], Object.getOwnPropertyDescriptor(_class2$1.prototype, '_nativeAsset'), _class2$1.prototype);
+const _descriptor2$7 = _applyDecoratedDescriptor(_class2$d.prototype, '_mipmaps', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return [];
+    },
+});
 
-clsDecorator(Asset);
+textureCubeProto._ctor = function () {
+    // for deserialization
+    // _initializerDefineProperty(_this, 'isRGBE', _descriptor$b, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, '_mipmaps', _descriptor2$7, _assertThisInitialized(_this));
+};
 
-legacyCC.Asset = jsb.Asset;
+clsDecorator(TextureCube);
+
+legacyCC.TextureCube = jsb.TextureCube;

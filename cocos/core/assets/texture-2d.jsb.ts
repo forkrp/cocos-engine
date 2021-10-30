@@ -22,52 +22,42 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-import { ccclass, editable, serializable } from 'cc.decorator';
+import { ccclass, type } from 'cc.decorator';
 import {
     _applyDecoratedDescriptor,
     _assertThisInitialized,
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
-import { CallbacksInvoker } from '../event/callbacks-invoker';
-import { applyMixins } from '../event/event-target-factory';
-import { createMap } from '../utils/js-typed';
-import { property } from '../data/class-decorator';
+import { ImageAsset } from './image-asset';
 
-/**
- * @param error - null or the error info
- * @param node - the created node or null
- */
-export type CreateNodeCallback = (error: Error | null, node: Node) => void;
+const texture2DProto: any = jsb.Texture2D.prototype;
 
-applyMixins(jsb.Asset, [CallbacksInvoker]);
+texture2DProto.createNode = null!;
 
-const assetProto: any = jsb.Asset.prototype;
+export type Texture2D = jsb.Texture2D;
+export const Texture2D = jsb.Texture2D;
 
-assetProto._ctor = function () {
-    this._callbackTable = createMap(true);
-    // for deserialization
-    // _initializerDefineProperty(_this, "_native", _descriptor$1, _assertThisInitialized(_this));
-};
+const clsDecorator = ccclass('cc.Texture2D');
 
-assetProto.createNode = null!;
+const _class2$c = Texture2D;
+const _dec2$6 = type([ImageAsset]); // xwx: jsb.ImageAsset?
 
-export type Asset = jsb.Asset;
-export const Asset = jsb.Asset;
-
-const clsDecorator = ccclass('cc.Asset');
-
-const _class2$1 = Asset;
-const _descriptor$1 = _applyDecoratedDescriptor(_class2$1.prototype, '_native', [serializable], {
+const _descriptor$a = _applyDecoratedDescriptor(_class2$c.prototype, '_mipmaps', [_dec2$6], {
     configurable: true,
     enumerable: true,
     writable: true,
     initializer: function initializer () {
-        return '';
+        return [];
     },
 });
-_applyDecoratedDescriptor(_class2$1.prototype, '_nativeAsset', [property], Object.getOwnPropertyDescriptor(_class2$1.prototype, '_nativeAsset'), _class2$1.prototype);
 
-clsDecorator(Asset);
+texture2DProto._ctor = function () {
+    // for deserialization
+    // _initializerDefineProperty(_this, 'isRGBE', _descriptor$b, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, '_mipmaps', _descriptor2$7, _assertThisInitialized(_this));
+};
 
-legacyCC.Asset = jsb.Asset;
+clsDecorator(Texture2D);
+
+legacyCC.Texture2D = jsb.Texture2D;

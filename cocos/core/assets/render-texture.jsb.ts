@@ -22,52 +22,53 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-import { ccclass, editable, serializable } from 'cc.decorator';
+import { ccclass, rangeMax, rangeMin, serializable } from 'cc.decorator';
 import {
     _applyDecoratedDescriptor,
     _assertThisInitialized,
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
-import { CallbacksInvoker } from '../event/callbacks-invoker';
-import { applyMixins } from '../event/event-target-factory';
-import { createMap } from '../utils/js-typed';
-import { property } from '../data/class-decorator';
 
-/**
- * @param error - null or the error info
- * @param node - the created node or null
- */
-export type CreateNodeCallback = (error: Error | null, node: Node) => void;
+const renderTextureProto: any = jsb.RenderTexture.prototype;
 
-applyMixins(jsb.Asset, [CallbacksInvoker]);
+renderTextureProto.createNode = null!;
 
-const assetProto: any = jsb.Asset.prototype;
+export type RenderTexture = jsb.RenderTexture;
+export const RenderTexture = jsb.RenderTexture;
 
-assetProto._ctor = function () {
-    this._callbackTable = createMap(true);
-    // for deserialization
-    // _initializerDefineProperty(_this, "_native", _descriptor$1, _assertThisInitialized(_this));
-};
+const clsDecorator = ccclass('cc.RenderTexture');
 
-assetProto.createNode = null!;
+const _class2$j = RenderTexture;
+const _dec2$b = rangeMin(1);
+const _dec3$6 = rangeMax(1024);
+const _dec4$5 = rangeMin(1);
+const _dec5$2 = rangeMax(1024);
 
-export type Asset = jsb.Asset;
-export const Asset = jsb.Asset;
-
-const clsDecorator = ccclass('cc.Asset');
-
-const _class2$1 = Asset;
-const _descriptor$1 = _applyDecoratedDescriptor(_class2$1.prototype, '_native', [serializable], {
+const _descriptor$h = _applyDecoratedDescriptor(_class2$j.prototype, '_width', [serializable, _dec2$b, _dec3$6], {
     configurable: true,
     enumerable: true,
     writable: true,
     initializer: function initializer () {
-        return '';
+        return 1;
     },
 });
-_applyDecoratedDescriptor(_class2$1.prototype, '_nativeAsset', [property], Object.getOwnPropertyDescriptor(_class2$1.prototype, '_nativeAsset'), _class2$1.prototype);
 
-clsDecorator(Asset);
+const _descriptor2$d = _applyDecoratedDescriptor(_class2$j.prototype, '_height', [serializable, _dec4$5, _dec5$2], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return 1;
+    },
+});
 
-legacyCC.Asset = jsb.Asset;
+renderTextureProto._ctor = function () {
+    // for deserialization
+    // _initializerDefineProperty(_this, '_width', _descriptor$h, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, '_height', _descriptor2$d, _assertThisInitialized(_this));
+};
+
+clsDecorator(RenderTexture);
+
+legacyCC.RenderTexture = jsb.RenderTexture;

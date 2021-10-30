@@ -34,7 +34,9 @@ import { legacyCC } from '../global-exports';
 import { PassOverrides, MacroRecord, MaterialProperty } from '../renderer';
 
 import { Color, Mat3, Mat4, Quat, Vec2, Vec3, Vec4 } from '../math';
-import { setClassName } from "../utils/js-typed";
+import { setClassName } from '../utils/js-typed';
+import { _applyDecoratedDescriptor, _assertThisInitialized, _initializerDefineProperty } from '../data/utils/decorator-jsb-utils';
+import { ccclass, serializable, type } from '../data/decorators';
 
 /**
  * @en The basic infos for material initialization.
@@ -83,7 +85,7 @@ type MaterialPropertyFull = MaterialProperty | TextureBase | Texture | null;
 const matProto: any = jsb.Material.prototype;
 
 type setProperyCB = (name: string, val: MaterialPropertyFull | MaterialPropertyFull[], passIdx?: number) => void;
-function wrapSetProperty(cb: setProperyCB, target: Material, name: string, val: MaterialPropertyFull | MaterialPropertyFull[], passIdx?: number) {
+function wrapSetProperty (cb: setProperyCB, target: Material, name: string, val: MaterialPropertyFull | MaterialPropertyFull[], passIdx?: number) {
     if (passIdx) {
         cb.call(target, name, val, passIdx);
     } else {
@@ -121,34 +123,32 @@ matProto.setProperty = function (name: string, val: MaterialPropertyFull | Mater
         } else {
             legacyCC.error(`Material.setProperty Unknown type: ${val}`);
         }
-    } else {
-        if (typeof val === 'number') {
-            if (Number.isInteger(val)) {
-                wrapSetProperty(this.setPropertyInt32, this, name, val, passIdx);
-            } else {
-                wrapSetProperty(this.setPropertyFloat32, this, name, val, passIdx);
-            }
-        } else if (val instanceof Vec2) {
-            wrapSetProperty(this.setPropertyVec2, this, name, val, passIdx);
-        } else if (val instanceof Vec3) {
-            wrapSetProperty(this.setPropertyVec3, this, name, val, passIdx);
-        } else if (val instanceof Vec4) {
-            wrapSetProperty(this.setPropertyVec4, this, name, val, passIdx);
-        } else if (val instanceof Color) {
-            wrapSetProperty(this.setPropertyColor, this, name, val, passIdx);
-        } else if (val instanceof Mat3) {
-            wrapSetProperty(this.setPropertyMat3, this, name, val, passIdx);
-        } else if (val instanceof Mat4) {
-            wrapSetProperty(this.setPropertyMat4, this, name, val, passIdx);
-        } else if (val instanceof Quat) {
-            wrapSetProperty(this.setPropertyQuat, this, name, val, passIdx);
-        } else if (val instanceof TextureBase) {
-            wrapSetProperty(this.setPropertyTextureBase, this, name, val, passIdx);
-        } else if (val instanceof Texture) {
-            wrapSetProperty(this.setPropertyGFXTexture, this, name, val, passIdx);
+    } else if (typeof val === 'number') {
+        if (Number.isInteger(val)) {
+            wrapSetProperty(this.setPropertyInt32, this, name, val, passIdx);
         } else {
-            legacyCC.error(`Material.setProperty Unknown type: ${val}`);
+            wrapSetProperty(this.setPropertyFloat32, this, name, val, passIdx);
         }
+    } else if (val instanceof Vec2) {
+        wrapSetProperty(this.setPropertyVec2, this, name, val, passIdx);
+    } else if (val instanceof Vec3) {
+        wrapSetProperty(this.setPropertyVec3, this, name, val, passIdx);
+    } else if (val instanceof Vec4) {
+        wrapSetProperty(this.setPropertyVec4, this, name, val, passIdx);
+    } else if (val instanceof Color) {
+        wrapSetProperty(this.setPropertyColor, this, name, val, passIdx);
+    } else if (val instanceof Mat3) {
+        wrapSetProperty(this.setPropertyMat3, this, name, val, passIdx);
+    } else if (val instanceof Mat4) {
+        wrapSetProperty(this.setPropertyMat4, this, name, val, passIdx);
+    } else if (val instanceof Quat) {
+        wrapSetProperty(this.setPropertyQuat, this, name, val, passIdx);
+    } else if (val instanceof TextureBase) {
+        wrapSetProperty(this.setPropertyTextureBase, this, name, val, passIdx);
+    } else if (val instanceof Texture) {
+        wrapSetProperty(this.setPropertyGFXTexture, this, name, val, passIdx);
+    } else {
+        legacyCC.error(`Material.setProperty Unknown type: ${val}`);
     }
 };
 
@@ -203,7 +203,7 @@ matProto.getProperty = function (name: string, passIdx?: number) {
             }
         }
 
-        return arr ? arr : val;
+        return arr || val;
     }
 
     let ret;
@@ -233,7 +233,7 @@ matProto.getProperty = function (name: string, passIdx?: number) {
         ret = new Quat(e.x, e.y, e.z, e.w);
     }
 
-    return ret ? ret : val;
+    return ret || val;
 };
 
 export type Material = jsb.Material;
@@ -242,3 +242,62 @@ export const Material = jsb.Material;
 legacyCC.Material = Material;
 
 setClassName('cc.Material', Material);
+
+const clsDecorator = ccclass('cc.Asset');
+
+// Deserialization
+const _class2$f = Material;
+const _dec2$7 = type(EffectAsset);
+const _descriptor$d = _applyDecoratedDescriptor(_class2$f.prototype, '_effectAsset', [_dec2$7], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return null;
+    },
+});
+
+const _descriptor2$9 = _applyDecoratedDescriptor(_class2$f.prototype, '_techIdx', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return 0;
+    },
+});
+
+const _descriptor3$7 = _applyDecoratedDescriptor(_class2$f.prototype, '_defines', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return [];
+    },
+});
+const _descriptor4$6 = _applyDecoratedDescriptor(_class2$f.prototype, '_states', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return [];
+    },
+});
+const _descriptor5$4 = _applyDecoratedDescriptor(_class2$f.prototype, '_props', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return [];
+    },
+});
+
+const materialProto: any = Material.prototype;
+
+materialProto._ctor = function () {
+    // _initializerDefineProperty(_this, "_effectAsset", _descriptor$d, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_techIdx", _descriptor2$9, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_defines", _descriptor3$7, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_states", _descriptor4$6, _assertThisInitialized(_this));
+    // _initializerDefineProperty(_this, "_props", _descriptor5$4, _assertThisInitialized(_this));
+};
+clsDecorator(Material);
