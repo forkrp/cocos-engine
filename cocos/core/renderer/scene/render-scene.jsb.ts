@@ -23,6 +23,7 @@
  THE SOFTWARE.
  */
 
+import { DrawBatch2D } from '../../../2d/renderer/draw-batch';
 import { Node } from '../../scene-graph';
 
 export interface IRenderSceneInfo {
@@ -39,5 +40,17 @@ export interface IRaycastResult {
     node: Node;
     distance: number;
 }
+
+const renderSceneProto = jsb.RenderScene.prototype;
+
+const oldAddBatch = renderSceneProto.addBatch;
+renderSceneProto.addBatch = function (batch: DrawBatch2D) {
+    oldAddBatch.call(this, batch.native);
+};
+
+const oldRemoveBatch = renderSceneProto.removeBatch;
+renderSceneProto.removeBatch = function (batch: DrawBatch2D) {
+    oldRemoveBatch.call(this, batch.native);
+};
 
 export const RenderScene = jsb.RenderScene;

@@ -28,6 +28,7 @@
  * @hidden
  */
 
+import { JSB } from 'internal:constants';
 import { MeshBuffer } from './mesh-buffer';
 import { Material } from '../../core/assets/material';
 import { Texture, Sampler, InputAssembler, DescriptorSet, Shader } from '../../core/gfx';
@@ -43,12 +44,20 @@ import { Pass } from '../../core/renderer/core/pass';
 const UI_VIS_FLAG = Layers.Enum.NONE | Layers.Enum.UI_3D;
 
 export class DrawBatch2D {
+    public get native (): any {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return this._nativeObj;
+    }
+
     public get inputAssembler () {
-        return this._inputAssember;
+        return this._inputAssembler;
     }
 
     public set inputAssembler (ia: InputAssembler | null) {
-        this._inputAssember = ia;
+        this._inputAssembler = ia;
+        if (JSB) {
+            this._nativeObj.inputAssembler = ia;
+        }
     }
 
     public get descriptorSet () {
@@ -57,6 +66,9 @@ export class DrawBatch2D {
 
     public set descriptorSet (ds: DescriptorSet | null) {
         this._descriptorSet = ds;
+        if (JSB) {
+            this._nativeObj.descriptorSet = ds;
+        }
     }
 
     public get visFlags () {
@@ -64,6 +76,9 @@ export class DrawBatch2D {
     }
     public set visFlags (vis) {
         this._visFlags = vis;
+        if (JSB) {
+            this._nativeObj.visFlags = vis;
+        }
     }
     public get passes () {
         return this._passes;
@@ -86,16 +101,27 @@ export class DrawBatch2D {
     private _passes: Pass[] = [];
     private _shaders: Shader[] = [];
     private _visFlags: number = UI_VIS_FLAG;
-    private _inputAssember: InputAssembler | null = null;
+    private _inputAssembler: InputAssembler | null = null;
     private _descriptorSet: DescriptorSet | null = null;
+    private declare _nativeObj: any;
+
+    constructor () {
+        if (JSB) {
+            this._nativeObj = new jsb.DrawBatch2D();
+            this._nativeObj.visFlags = this._visFlags;
+        }
+    }
 
     public destroy (ui: Batcher2D) {
         this._passes = [];
+        if (JSB) {
+            this._nativeObj = null;
+        }
     }
 
     public clear () {
         this.bufferBatch = null;
-        this._inputAssember = null;
+        this._inputAssembler = null;
         this._descriptorSet = null;
         this.camera = null;
         this.texture = null;
@@ -140,6 +166,13 @@ export class DrawBatch2D {
                 this._shaders[i] = passInUse.getShaderVariant(patches)!;
 
                 dirty = true;
+            }
+
+            if (JSB) {
+                if (dirty) {
+                    this._nativeObj.passes = this._passes;
+                    this._nativeObj.shaders = this._shaders;
+                }
             }
         }
     }
