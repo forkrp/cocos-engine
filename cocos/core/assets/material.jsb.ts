@@ -243,7 +243,7 @@ legacyCC.Material = Material;
 
 setClassName('cc.Material', Material);
 
-const clsDecorator = ccclass('cc.Asset');
+const clsDecorator = ccclass('cc.Material');
 
 // Deserialization
 const _class2$f = Material;
