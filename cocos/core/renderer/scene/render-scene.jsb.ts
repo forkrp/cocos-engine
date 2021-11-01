@@ -23,7 +23,7 @@
  THE SOFTWARE.
  */
 
-import { Node } from "../../scene-graph";
+import { Node } from '../../scene-graph';
 
 export interface IRenderSceneInfo {
     name: string;

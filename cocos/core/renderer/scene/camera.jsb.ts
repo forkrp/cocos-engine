@@ -23,8 +23,8 @@
  THE SOFTWARE.
  */
 
-import { RenderWindow } from "../core/render-window";
-import { ClearFlagBit } from "../../gfx";
+import { RenderWindow } from '../core/render-window';
+import { ClearFlagBit } from '../../gfx';
 
 export enum CameraFOVAxis {
     VERTICAL,
@@ -84,11 +84,6 @@ export enum CameraShutter {
     D2000,
     D4000,
 }
-
-const FSTOPS: number[] = [1.8, 2.0, 2.2, 2.5, 2.8, 3.2, 3.5, 4.0, 4.5, 5.0, 5.6, 6.3, 7.1, 8.0, 9.0, 10.0, 11.0, 13.0, 14.0, 16.0, 18.0, 20.0, 22.0];
-const SHUTTERS: number[] = [1.0, 1.0 / 2.0, 1.0 / 4.0, 1.0 / 8.0, 1.0 / 15.0, 1.0 / 30.0, 1.0 / 60.0, 1.0 / 125.0,
-    1.0 / 250.0, 1.0 / 500.0, 1.0 / 1000.0, 1.0 / 2000.0, 1.0 / 4000.0];
-const ISOS: number[] = [100.0, 200.0, 400.0, 800.0];
 
 export interface ICameraInfo {
     name: string;
