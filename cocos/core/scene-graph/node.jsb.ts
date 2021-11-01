@@ -37,6 +37,7 @@ import { NodeSpace, TransformBit } from './node-enum';
 import { Quat, Vec3 } from '../math';
 import { NodeEventProcessor } from './node-event-processor';
 import { Layers } from "./layers";
+import { defineArrayProxy } from "../utils/jsb-utils";
 
 export const Node = jsb.Node;
 export type Node = jsb.Node;
@@ -612,6 +613,23 @@ nodeProto._ctor = function (name?: string) {
     // _initializerDefineProperty(_this, "_layer", _descriptor4$a, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_euler", _descriptor5$7, _assertThisInitialized(_this));
     // //
+    defineArrayProxy({
+        owner: this,
+        arrElementType: "object",
+        arrPropertyName: "_children",
+        getArrayElementCB(index: number) {
+            return this._getChild(index);
+        },
+        getArraySizeCB(): number {
+            return this._getChildrenSize();
+        },
+        setArrayElementCB(index: number, val: any): void {
+            this._setChild(index, val);
+        },
+        setArraySizeCB(size: number): void {
+            this._setChildrenSize(size);
+        },
+    });
 };
 //
 clsDecorator(Node);
