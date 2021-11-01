@@ -36,7 +36,7 @@ export const BufferAsset = jsb.BufferAsset;
 const clsDecorator = ccclass('cc.BufferAsset');
 
 const _class2$D = BufferAsset;
-_applyDecoratedDescriptor(_class2$D.prototype, '_nativeAsset', [override], Object.getOwnPropertyDescriptor(_class2$D.prototype, '_nativeAsset'), _class2$D.prototype);
+//cjh FIXME: _applyDecoratedDescriptor(_class2$D.prototype, '_nativeAsset', [override], Object.getOwnPropertyDescriptor(_class2$D.prototype, '_nativeAsset'), _class2$D.prototype);
 
 clsDecorator(BufferAsset);
 

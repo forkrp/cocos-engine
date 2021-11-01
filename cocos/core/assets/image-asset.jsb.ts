@@ -37,7 +37,7 @@ const clsDecorator = ccclass('cc.ImageAsset');
 
 const _class2$a = ImageAsset;
 
-_applyDecoratedDescriptor(_class2$a.prototype, '_nativeAsset', [override], Object.getOwnPropertyDescriptor(_class2$a.prototype, '_nativeAsset'), _class2$a.prototype);
+//cjh FIXME:  _applyDecoratedDescriptor(_class2$a.prototype, '_nativeAsset', [override], Object.getOwnPropertyDescriptor(_class2$a.prototype, '_nativeAsset'), _class2$a.prototype);
 
 clsDecorator(ImageAsset);
 
