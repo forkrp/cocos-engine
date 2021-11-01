@@ -19,39 +19,38 @@
  THE SOFTWARE.
 */
 
-import { ccclass, editable, serializable, type } from 'cc.decorator';
+import { ccclass, editable, serializable } from 'cc.decorator';
 import {
     _applyDecoratedDescriptor,
     _assertThisInitialized,
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
-import { SceneGlobals } from "./scene-globals";
+import { SceneGlobals } from './scene-globals';
 
 export const Scene = jsb.Scene;
 export type Scene = jsb.Scene;
-legacyCC.Scene = Scene;
 
 const clsDecorator = ccclass('cc.Scene');
 
 const sceneProto: any = Scene.prototype;
 const _class2$x = Scene;
 
-_applyDecoratedDescriptor(_class2$x.prototype, "globals", [editable], Object.getOwnPropertyDescriptor(_class2$x.prototype, "globals"), _class2$x.prototype);
-const _descriptor$r = _applyDecoratedDescriptor(_class2$x.prototype, "autoReleaseAssets", [serializable, editable], {
+_applyDecoratedDescriptor(_class2$x.prototype, 'globals', [editable], Object.getOwnPropertyDescriptor(_class2$x.prototype, 'globals'), _class2$x.prototype);
+const _descriptor$r = _applyDecoratedDescriptor(_class2$x.prototype, 'autoReleaseAssets', [serializable, editable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return false;
     },
 });
 
-const _descriptor2$k = _applyDecoratedDescriptor(_class2$x.prototype, "_globals", [serializable], {
+const _descriptor2$k = _applyDecoratedDescriptor(_class2$x.prototype, '_globals', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new SceneGlobals();
     },
 });
@@ -64,3 +63,5 @@ sceneProto._ctor = function () {
 };
 
 clsDecorator(Scene);
+
+legacyCC.Scene = Scene;
