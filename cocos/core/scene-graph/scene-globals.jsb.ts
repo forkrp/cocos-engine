@@ -26,10 +26,10 @@ import {
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
-import { Color, Vec2 } from "../math";
-import { CCFloat } from "../data";
-import { TextureCube } from "../assets";
-import { Enum } from "../value-types";
+import { Color, Vec2, Vec3 } from '../math';
+import { CCFloat } from '../data';
+import { TextureCube } from '../assets';
+import { Enum } from '../value-types';
 
 /**
  * @zh
@@ -171,38 +171,38 @@ legacyCC.AmbientInfo = AmbientInfo;
 const ambientInfoProto: any = AmbientInfo.prototype;
 const ambientInfoDecorator = ccclass('cc.AmbientInfo');
 const _class2$w = AmbientInfo;
-const _descriptor$q = _applyDecoratedDescriptor(_class2$w.prototype, "_skyColor", [serializable], {
+const _descriptor$q = _applyDecoratedDescriptor(_class2$w.prototype, '_skyColor', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Color(51, 128, 204, 1.0);
-    }
+    },
 });
 
-const _descriptor2$j = _applyDecoratedDescriptor(_class2$w.prototype, "_skyIllum", [serializable], {
+const _descriptor2$j = _applyDecoratedDescriptor(_class2$w.prototype, '_skyIllum', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 20000.0; // cjh FIXME: Ambient.SKY_ILLUM;
-    }
+    },
 });
 
-const _descriptor3$d = _applyDecoratedDescriptor(_class2$w.prototype, "_groundAlbedo", [serializable], {
+const _descriptor3$d = _applyDecoratedDescriptor(_class2$w.prototype, '_groundAlbedo', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Color(51, 51, 51, 255);
-    }
+    },
 });
 
 const _dec2$j = type(CCFloat);
 
-_applyDecoratedDescriptor(_class2$w.prototype, "skyColor", [editable], Object.getOwnPropertyDescriptor(_class2$w.prototype, "skyColor"), _class2$w.prototype);
-_applyDecoratedDescriptor(_class2$w.prototype, "skyIllum", [editable, _dec2$j], Object.getOwnPropertyDescriptor(_class2$w.prototype, "skyIllum"), _class2$w.prototype);
-_applyDecoratedDescriptor(_class2$w.prototype, "groundAlbedo", [editable], Object.getOwnPropertyDescriptor(_class2$w.prototype, "groundAlbedo"), _class2$w.prototype);
+_applyDecoratedDescriptor(_class2$w.prototype, 'skyColor', [editable], Object.getOwnPropertyDescriptor(_class2$w.prototype, 'skyColor'), _class2$w.prototype);
+_applyDecoratedDescriptor(_class2$w.prototype, 'skyIllum', [editable, _dec2$j], Object.getOwnPropertyDescriptor(_class2$w.prototype, 'skyIllum'), _class2$w.prototype);
+_applyDecoratedDescriptor(_class2$w.prototype, 'groundAlbedo', [editable], Object.getOwnPropertyDescriptor(_class2$w.prototype, 'groundAlbedo'), _class2$w.prototype);
 
 ambientInfoProto._ctor = function () {
     // _initializerDefineProperty(this, "_skyColor", _descriptor$q, this);
@@ -223,46 +223,46 @@ const skyboxInfoDecorator = ccclass('cc.SkyboxInfo');
 const _dec4$9 = type(TextureCube);
 const _dec5$6 = type(TextureCube);
 const _class5$3 = SkyboxInfo;
-const _descriptor4$b = _applyDecoratedDescriptor(_class5$3.prototype, "_envmap", [_dec4$9], {
+const _descriptor4$b = _applyDecoratedDescriptor(_class5$3.prototype, '_envmap', [_dec4$9], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return null;
-    }
+    },
 });
 
-const _descriptor5$8 = _applyDecoratedDescriptor(_class5$3.prototype, "_isRGBE", [serializable], {
+const _descriptor5$8 = _applyDecoratedDescriptor(_class5$3.prototype, '_isRGBE', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return false;
-    }
+    },
 });
 
-const _descriptor6$3 = _applyDecoratedDescriptor(_class5$3.prototype, "_enabled", [serializable], {
+const _descriptor6$3 = _applyDecoratedDescriptor(_class5$3.prototype, '_enabled', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return false;
-    }
+    },
 });
 
-const _descriptor7$3 = _applyDecoratedDescriptor(_class5$3.prototype, "_useIBL", [serializable], {
+const _descriptor7$3 = _applyDecoratedDescriptor(_class5$3.prototype, '_useIBL', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return false;
-    }
+    },
 });
 
-_applyDecoratedDescriptor(_class5$3.prototype, "enabled", [editable], Object.getOwnPropertyDescriptor(_class5$3.prototype, "enabled"), _class5$3.prototype);
-_applyDecoratedDescriptor(_class5$3.prototype, "useIBL", [editable], Object.getOwnPropertyDescriptor(_class5$3.prototype, "useIBL"), _class5$3.prototype);
-//cjh _applyDecoratedDescriptor(_class5$3.prototype, "envmap", [editable, _dec5$6], Object.getOwnPropertyDescriptor(_class5$3.prototype, "envmap"), _class5$3.prototype);
-_applyDecoratedDescriptor(_class5$3.prototype, "isRGBE", [editable], Object.getOwnPropertyDescriptor(_class5$3.prototype, "isRGBE"), _class5$3.prototype);
+_applyDecoratedDescriptor(_class5$3.prototype, 'enabled', [editable], Object.getOwnPropertyDescriptor(_class5$3.prototype, 'enabled'), _class5$3.prototype);
+_applyDecoratedDescriptor(_class5$3.prototype, 'useIBL', [editable], Object.getOwnPropertyDescriptor(_class5$3.prototype, 'useIBL'), _class5$3.prototype);
+// cjh _applyDecoratedDescriptor(_class5$3.prototype, "envmap", [editable, _dec5$6], Object.getOwnPropertyDescriptor(_class5$3.prototype, "envmap"), _class5$3.prototype);
+_applyDecoratedDescriptor(_class5$3.prototype, 'isRGBE', [editable], Object.getOwnPropertyDescriptor(_class5$3.prototype, 'isRGBE'), _class5$3.prototype);
 
 skyboxInfoProto._ctor = function () {
     // _initializerDefineProperty(this, "_envmap", _descriptor4$b, this);
@@ -282,81 +282,81 @@ legacyCC.FogInfo = FogInfo;
 const fogInfoProto: any = FogInfo.prototype;
 const fogInfoDecorator = ccclass('cc.FogInfo');
 const _class8$1 = FogInfo;
-const _descriptor8$3 = _applyDecoratedDescriptor(_class8$1.prototype, "_type", [serializable], {
+const _descriptor8$3 = _applyDecoratedDescriptor(_class8$1.prototype, '_type', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return FogType.LINEAR;
-    }
+    },
 });
-const _descriptor9$2 = _applyDecoratedDescriptor(_class8$1.prototype, "_fogColor", [serializable], {
+const _descriptor9$2 = _applyDecoratedDescriptor(_class8$1.prototype, '_fogColor', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Color('#C8C8C8');
-    }
+    },
 });
-const _descriptor10$2 = _applyDecoratedDescriptor(_class8$1.prototype, "_enabled", [serializable], {
+const _descriptor10$2 = _applyDecoratedDescriptor(_class8$1.prototype, '_enabled', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return false;
-    }
+    },
 });
 
-const _descriptor11$1 = _applyDecoratedDescriptor(_class8$1.prototype, "_fogDensity", [serializable], {
+const _descriptor11$1 = _applyDecoratedDescriptor(_class8$1.prototype, '_fogDensity', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 0.3;
-    }
+    },
 });
-const _descriptor12$1 = _applyDecoratedDescriptor(_class8$1.prototype, "_fogStart", [serializable], {
+const _descriptor12$1 = _applyDecoratedDescriptor(_class8$1.prototype, '_fogStart', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 0.5;
-    }
+    },
 });
-const _descriptor13$1 = _applyDecoratedDescriptor(_class8$1.prototype, "_fogEnd", [serializable], {
+const _descriptor13$1 = _applyDecoratedDescriptor(_class8$1.prototype, '_fogEnd', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 300;
-    }
+    },
 });
-const _descriptor14$1 = _applyDecoratedDescriptor(_class8$1.prototype, "_fogAtten", [serializable], {
+const _descriptor14$1 = _applyDecoratedDescriptor(_class8$1.prototype, '_fogAtten', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 5;
-    }
+    },
 });
-const _descriptor15$1 = _applyDecoratedDescriptor(_class8$1.prototype, "_fogTop", [serializable], {
+const _descriptor15$1 = _applyDecoratedDescriptor(_class8$1.prototype, '_fogTop', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 1.5;
-    }
+    },
 });
-const _descriptor16$1 = _applyDecoratedDescriptor(_class8$1.prototype, "_fogRange", [serializable], {
+const _descriptor16$1 = _applyDecoratedDescriptor(_class8$1.prototype, '_fogRange', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 1.2;
-    }
+    },
 });
 
-//, _dec8$1 = visible(), _dec9$1 = type(CCFloat), _dec10$1 = range(), _dec11$1 = rangeStep(), _dec12$1 = displayOrder(), _dec13$1 = visible(), _dec14$1 = type(CCFloat), _dec15$1 = rangeStep(), _dec16$1 = displayOrder(), _dec17$1 = visible(), _dec18$1 = type(CCFloat), _dec19$1 = rangeStep(), _dec20$1 = displayOrder(), _dec21$1 = visible(), _dec22$1 = type(CCFloat), _dec23$1 = rangeMin(), _dec24$1 = rangeStep(), _dec25$1 = displayOrder(), _dec26$1 = visible(), _dec27$1 = type(CCFloat), _dec28$1 = rangeStep(), _dec29$1 = displayOrder(), _dec30$1 = visible(), _dec31$1 = type(CCFloat), _dec32 = rangeStep(), _dec33 = displayOrder()
+// , _dec8$1 = visible(), _dec9$1 = type(CCFloat), _dec10$1 = range(), _dec11$1 = rangeStep(), _dec12$1 = displayOrder(), _dec13$1 = visible(), _dec14$1 = type(CCFloat), _dec15$1 = rangeStep(), _dec16$1 = displayOrder(), _dec17$1 = visible(), _dec18$1 = type(CCFloat), _dec19$1 = rangeStep(), _dec20$1 = displayOrder(), _dec21$1 = visible(), _dec22$1 = type(CCFloat), _dec23$1 = rangeMin(), _dec24$1 = rangeStep(), _dec25$1 = displayOrder(), _dec26$1 = visible(), _dec27$1 = type(CCFloat), _dec28$1 = rangeStep(), _dec29$1 = displayOrder(), _dec30$1 = visible(), _dec31$1 = type(CCFloat), _dec32 = rangeStep(), _dec33 = displayOrder()
 
 // _applyDecoratedDescriptor(_class8$1.prototype, "enabled", [editable], Object.getOwnPropertyDescriptor(_class8$1.prototype, "enabled"), _class8$1.prototype);
 // _applyDecoratedDescriptor(_class8$1.prototype, "fogColor", [editable], Object.getOwnPropertyDescriptor(_class8$1.prototype, "fogColor"), _class8$1.prototype);
@@ -380,10 +380,10 @@ const shadowInfoDecorator = ccclass('cc.ShadowsInfo');
 Object.defineProperty(ShadowsInfo.prototype, '_shadowColor', {
     configurable: true,
     enumerable: true,
-    get()  {
+    get ()  {
         return new Color(this._shadowColorInternal.r, this._shadowColorInternal.g, this._shadowColorInternal.b, this._shadowColorInternal.a);
     },
-    set(val) {
+    set (val) {
         this._shadowColorInternal = val;
     },
 });
@@ -391,137 +391,137 @@ Object.defineProperty(ShadowsInfo.prototype, '_shadowColor', {
 Object.defineProperty(ShadowsInfo.prototype, 'shadowColor', {
     configurable: true,
     enumerable: true,
-    get() {
+    get () {
         return new Color(this.shadowColorInternal.r, this.shadowColorInternal.g, this.shadowColorInternal.b, this.shadowColorInternal.a);
     },
-    set(val) {
+    set (val) {
         this.shadowColorInternal = val;
     },
 });
 
 const _class11$1 = ShadowsInfo;
-const _descriptor17$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_type", [serializable], {
+const _descriptor17$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_type', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return ShadowType.Planar;
-    }
+    },
 });
-const _descriptor18$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_enabled", [serializable], {
+const _descriptor18$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_enabled', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return false;
-    }
+    },
 });
 
-const _descriptor19$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_normal", [serializable], {
+const _descriptor19$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_normal', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Vec3(0, 1, 0);
-    }
+    },
 });
 
-const _descriptor20$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_distance", [serializable], {
+const _descriptor20$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_distance', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 0;
-    }
+    },
 });
 
-const _descriptor21$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_shadowColor", [serializable], {
+const _descriptor21$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_shadowColor', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Color(0, 0, 0, 76);
-    }
+    },
 });
-const _descriptor22$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_autoAdapt", [serializable], {
+const _descriptor22$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_autoAdapt', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return true;
-    }
+    },
 });
-const _descriptor23$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_pcf", [serializable], {
+const _descriptor23$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_pcf', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return PCFType.HARD;
-    }
+    },
 });
-const _descriptor24$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_bias", [serializable], {
+const _descriptor24$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_bias', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 0.00001;
-    }
+    },
 });
-const _descriptor25$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_normalBias", [serializable], {
+const _descriptor25$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_normalBias', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 0.0;
-    }
+    },
 });
-const _descriptor26$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_near", [serializable], {
+const _descriptor26$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_near', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 1;
-    }
+    },
 });
-const _descriptor27$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_far", [serializable], {
+const _descriptor27$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_far', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 30;
-    }
+    },
 });
-const _descriptor28$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_orthoSize", [serializable], {
+const _descriptor28$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_orthoSize', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 5;
-    }
+    },
 });
-const _descriptor29$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_maxReceived", [serializable], {
+const _descriptor29$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_maxReceived', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 4;
-    }
+    },
 });
-const _descriptor30$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_size", [serializable], {
+const _descriptor30$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_size', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Vec2(512, 512);
-    }
+    },
 });
-const _descriptor31$1 = _applyDecoratedDescriptor(_class11$1.prototype, "_saturation", [serializable], {
+const _descriptor31$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_saturation', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return 0.75;
-    }
+    },
 });
 // _applyDecoratedDescriptor(_class11$1.prototype, "enabled", [editable], Object.getOwnPropertyDescriptor(_class11$1.prototype, "enabled"), _class11$1.prototype);
 // _applyDecoratedDescriptor(_class11$1.prototype, "type", [editable, _dec35], Object.getOwnPropertyDescriptor(_class11$1.prototype, "type"), _class11$1.prototype);
@@ -549,37 +549,37 @@ export const SceneGlobals = jsb.SceneGlobals;
 legacyCC.SceneGlobals = SceneGlobals;
 const sceneGlobalsDecorator = ccclass('cc.SceneGlobals');
 const _class14$1 = SceneGlobals;
-const _descriptor32$1 = _applyDecoratedDescriptor(_class14$1.prototype, "ambient", [serializable, editable], {
+const _descriptor32$1 = _applyDecoratedDescriptor(_class14$1.prototype, 'ambient', [serializable, editable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new AmbientInfo();
-    }
+    },
 });
-const _descriptor33$1 = _applyDecoratedDescriptor(_class14$1.prototype, "shadows", [serializable, editable], {
+const _descriptor33$1 = _applyDecoratedDescriptor(_class14$1.prototype, 'shadows', [serializable, editable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new ShadowsInfo();
-    }
+    },
 });
-const _descriptor34$1 = _applyDecoratedDescriptor(_class14$1.prototype, "_skybox", [serializable], {
+const _descriptor34$1 = _applyDecoratedDescriptor(_class14$1.prototype, '_skybox', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new SkyboxInfo();
-    }
+    },
 });
-const _descriptor35$1 = _applyDecoratedDescriptor(_class14$1.prototype, "fog", [editable, serializable], {
+const _descriptor35$1 = _applyDecoratedDescriptor(_class14$1.prototype, 'fog', [editable, serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new FogInfo();
-    }
+    },
 });
 
 // _applyDecoratedDescriptor(_class14$1.prototype, "skybox", [editable, _dec62], Object.getOwnPropertyDescriptor(_class14$1.prototype, "skybox"), _class14$1.prototype);
