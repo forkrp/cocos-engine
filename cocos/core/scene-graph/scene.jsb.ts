@@ -27,6 +27,7 @@ import {
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
 import { SceneGlobals } from './scene-globals';
+import { Node } from './node';
 
 export const Scene = jsb.Scene;
 export type Scene = jsb.Scene;
@@ -56,12 +57,33 @@ const _descriptor2$k = _applyDecoratedDescriptor(_class2$x.prototype, '_globals'
 });
 
 sceneProto._ctor = function () {
+    Node.prototype._ctor.apply(this, arguments);
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     // const _this = this;
     // _initializerDefineProperty(_this, "autoReleaseAssets", _descriptor$r, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_globals", _descriptor2$k, _assertThisInitialized(_this));
 };
 
-clsDecorator(Scene);
+function updateChildren(node: Node) {
+    node._setChildren(node._children);
+    for (let i = 0, len = node._children; i < len; ++i) {
+        const child = node._children[i];
+        updateChildren(child);
+    }
+    Object.defineProperty(node, '_children', {
+        enumerable: true,
+        configurable: true,
+        get () {
+            return node.getChildren();
+        },
+    });
+}
 
+const oldLoad = sceneProto._load;
+sceneProto._load = function () {
+    updateChildren(this);
+    oldLoad.call(this);
+};
+
+clsDecorator(Scene);
 legacyCC.Scene = Scene;

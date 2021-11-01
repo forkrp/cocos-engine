@@ -75,7 +75,6 @@
                 "cocos/core/assets/texture-2d.ts": "cocos/core/assets/texture-2d.jsb.ts",
                 "cocos/core/assets/texture-cube.ts": "cocos/core/assets/texture-cube.jsb.ts",
                 "cocos/core/assets/material.ts": "cocos/core/assets/material.jsb.ts",
-                "cocos/core/assets/prefab.ts": "cocos/core/assets/prefab.jsb.ts",
                 "cocos/3d/assets/mesh.ts":"cocos/3d/assets/mesh.jsb.ts"
             }
         },

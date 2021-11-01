@@ -491,6 +491,65 @@ Object.defineProperty(nodeProto, 'components', {
     },
 });
 
+Object.defineProperty(nodeProto, '_parent', {
+    configurable: true,
+    enumerable: true,
+    get () {
+        return this._parentInternal;
+    },
+    set (v) {
+        this._parentRef = v; // Root JSB object to avoid child node being garbage collected
+        this._parentInternal = v;
+    },
+});
+
+Object.defineProperty(nodeProto, 'parent', {
+    configurable: true,
+    enumerable: true,
+    get () {
+        return this.getParent();
+    },
+    set (v) {
+        this._parentRef = v; // Root JSB object to avoid child node being garbage collected
+        this.setParent(v);
+    },
+});
+
+nodeProto.addChild = function (child: Node): void {
+    child._parentRef = this;
+    child.setParent(this);
+};
+
+nodeProto.insertChild = function (child: Node, siblingIndex: number) {
+    child.parent = this;
+    child.setSiblingIndex(siblingIndex);
+};
+
+nodeProto.removeFromParent = function () {
+    if (this._parent) {
+        this._parent.removeChild(this);
+    }
+};
+
+const oldRemoveChild = nodeProto.removeChild;
+nodeProto.removeChild = function (child: Node) {
+    oldRemoveChild.call(this, child);
+    child._parentRef = null;
+};
+
+const oldRemoveAllChildren = nodeProto.removeAllChildren;
+nodeProto.removeAllChildren = function () {
+    oldRemoveAllChildren.call(this);
+    // cjh TODO: need to improve performance
+    const children = this.getChildren();
+    for (let i = children.length - 1; i >= 0; i--) {
+        const node = children[i];
+        if (node) {
+            node._parentRef = null;
+        }
+    }
+};
+
 // Deserialization
 const _class2$u = Node;
 const _descriptor$o = _applyDecoratedDescriptor(_class2$u.prototype, "_parent", [serializable], {
@@ -592,6 +651,7 @@ _applyDecoratedDescriptor(_class2$v.prototype, "layer", [editable], Object.getOw
 
 //
 nodeProto._ctor = function (name?: string) {
+    this._parentRef = null;
     this._components = [];
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
@@ -613,23 +673,25 @@ nodeProto._ctor = function (name?: string) {
     // _initializerDefineProperty(_this, "_layer", _descriptor4$a, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_euler", _descriptor5$7, _assertThisInitialized(_this));
     // //
-    defineArrayProxy({
-        owner: this,
-        arrElementType: "object",
-        arrPropertyName: "_children",
-        getArrayElementCB(index: number) {
-            return this._getChild(index);
-        },
-        getArraySizeCB(): number {
-            return this._getChildrenSize();
-        },
-        setArrayElementCB(index: number, val: any): void {
-            this._setChild(index, val);
-        },
-        setArraySizeCB(size: number): void {
-            this._setChildrenSize(size);
-        },
-    });
+    // defineArrayProxy({
+    //     owner: this,
+    //     arrElementType: "object",
+    //     arrPropertyName: "_children",
+    //     getArrayElementCB(index: number) {
+    //         return this._getChild(index);
+    //     },
+    //     getArraySizeCB(): number {
+    //         return this._getChildrenSize();
+    //     },
+    //     setArrayElementCB(index: number, val: any): void {
+    //         this._setChild(index, val);
+    //     },
+    //     setArraySizeCB(size: number): void {
+    //         this._setChildrenSize(size);
+    //     },
+    // });
+
+    this._children = [];
 };
 //
 clsDecorator(Node);

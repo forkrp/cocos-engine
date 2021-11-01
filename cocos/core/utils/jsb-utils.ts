@@ -15,21 +15,35 @@ class ProxyHandler {
     }
 
     get(target: any, property: string) {
-        console.log('getting ' + property + ' for :' + target);
         const i = parseInt(property);
         let result;
         if (!isNaN(i)) {
-            result = target[property] = this._options.getArrayElementCB.call(this._options.owner, i);
+            result = this._options.getArrayElementCB.call(this._options.owner, i);
+            if (undefined == result) {
+                result = target[property];
+                this._options.setArrayElementCB.call(this._options.owner, i, result);
+            }
         } else if (property === 'length') {
-            result = target[property] = this._options.getArraySizeCB.call(this._options.owner);
+            result = this._options.getArraySizeCB.call(this._options.owner);
+        } else if (property === 'push') {
+            const func = target[property];
+            result = function() {
+                for (let i = 0, len = arguments.length; i < len; ++i) {
+                    this._options.setArrayElementCB(i, arguments[i]);
+                }
+                func.apply(target, arguments);
+            };
+        } else {
+            console.error('dont go here....');
+            result = target[property];
         }
-
+        console.warn(`==> get [${property}], result: ${result}, for target: ${target}`);
         // property is index in this case
         return result;
     }
 
     set(target: any, property: string, value: any, receiver: any) {
-        console.log('setting ' + property + ' for ' + target + ' with value ' + value);
+        console.warn(`==> set [${property}]=${value}, for target: ${target}`);
         const i = parseInt(property);
         if (!isNaN(i)) {
             if (typeof value === this._options.arrElementType) {
@@ -46,17 +60,17 @@ class ProxyHandler {
 }
 
 export function defineArrayProxy(options: IArrayProxy) {
-    let arrProxy = new Proxy([], new ProxyHandler(options));
+    const arrProxy = [new Proxy([], new ProxyHandler(options))];
     Object.defineProperty(options.owner, options.arrPropertyName, {
         enumerable: true,
         configurable: true,
         get() {
-            //TODO: get children from native and sync to arrProxy
-            return arrProxy;
+            // TODO: get children from native and sync to arrProxy
+            return arrProxy[0];
         },
         set(v) {
-            arrProxy = new Proxy(v, new ProxyHandler(options));
-            //TODO: resize native array
+            arrProxy[0] = new Proxy(v, new ProxyHandler(options));
+            // TODO: resize native array
             options.setArraySizeCB.call(options.owner, v.length);
             for (let i = 0, len = v.length; i < len; ++i) {
                 const e = v[i];
