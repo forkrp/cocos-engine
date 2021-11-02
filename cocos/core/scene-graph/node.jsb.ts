@@ -23,7 +23,7 @@ import { ccclass, editable, serializable, type } from 'cc.decorator';
 import {
     _applyDecoratedDescriptor,
     _assertThisInitialized,
-    _initializerDefineProperty
+    _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 
 import * as js from '../utils/js';
@@ -36,8 +36,8 @@ import { NodeUIProperties } from './node-ui-properties';
 import { NodeSpace, TransformBit } from './node-enum';
 import { Quat, Vec3 } from '../math';
 import { NodeEventProcessor } from './node-event-processor';
-import { Layers } from "./layers";
-import { eventManager } from "../platform/event-manager/event-manager";
+import { Layers } from './layers';
+import { eventManager } from '../platform/event-manager/event-manager';
 
 export const Node = jsb.Node;
 export type Node = jsb.Node;
@@ -427,6 +427,14 @@ NodeCls.isNode =  function (obj: unknown): obj is jsb.Node {
 const oldGetPosition = nodeProto.getPosition;
 const oldGetRotation = nodeProto.getRotation;
 const oldGetScale = nodeProto.getScale;
+const oldGetWorldPosition = nodeProto.getWorldPosition;
+const oldGetWorldRotation = nodeProto.getWorldRotation;
+const oldGetWorldScale = nodeProto.getWorldScale;
+const oldEulerAngles = nodeProto.getEulerAngles;
+const oldGetWorldMatrix = nodeProto.getWorldMatrix;
+const oldGetForward = nodeProto.getForward;
+const oldGetUp = nodeProto.getUp;
+const oldGetRight = nodeProto.getRight;
 
 nodeProto.getPosition = function (out?: Vec3) : Vec3 {
     const r = oldGetPosition.call(this);
@@ -436,7 +444,7 @@ nodeProto.getPosition = function (out?: Vec3) : Vec3 {
     return Vec3.copy(new Vec3(), r);
 };
 
-nodeProto.getRotation = function(out?: Quat): Quat {
+nodeProto.getRotation = function (out?: Quat): Quat {
     const r = oldGetRotation.call(this);
     if (out) {
         return Quat.set(out, r.x, r.y, r.z, r.w);
@@ -452,36 +460,176 @@ nodeProto.getScale = function (out?: Vec3) : Vec3 {
     return Vec3.copy(new Vec3(), r);
 };
 
+nodeProto.getWorldPosition = function (out?: Vec3) : Vec3 {
+    const r = oldGetWorldPosition.call(this);
+    if (out) {
+        return Vec3.copy(out, r);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
+
+nodeProto.getWorldRotation = function (out?: Quat) : Quat {
+    const r = oldGetWorldRotation.call(this);
+    if (out) {
+        return Quat.copy(out, r);
+    }
+    return Quat.copy(new Quat(), r);
+};
+
+nodeProto.getWorldScale = function (out?: Vec3) : Vec3 {
+    const r = oldGetWorldScale.call(this);
+    if (out) {
+        return Vec3.copy(out, r);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
+
+nodeProto.getWorldMatrix = function (out?: Mat4) : Mat4 {
+    const r = oldGetWorldMatrix.call(this);
+    const target = out || new Mat4();
+    return Mat4.copy(target, r);
+};
+
+nodeProto.getEulerAngles = function (out?: Vec3) : Vec3 {
+    const r = oldEulerAngles.call(this);
+    if (out) {
+        return Vec3.copy(out, r);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
+
+nodeProto.getForward = function (out?: Vec3) : Vec3 {
+    const r = oldGetForward.call(this);
+    if (out) {
+        return Vec3.copy(out, r);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
+
+nodeProto.getUp = function (out?: Vec3) : Vec3 {
+    const r = oldGetUp.call(this);
+    if (out) {
+        return Vec3.copy(out, r);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
+
+nodeProto.getRight = function (out?: Vec3) : Vec3 {
+    const r = oldGetRight.call(this);
+    if (out) {
+        return Vec3.copy(out, r);
+    }
+    return Vec3.copy(new Vec3(), r);
+};
 Object.defineProperty(nodeProto, 'position', {
     configurable: true,
     enumerable: true,
-    get () : Vec3 {
+    get () : Readonly<Vec3> {
         return this.getPosition();
     },
-    set (v: Vec3) {
-        this.setPosition(v);
+    set (v: Readonly<Vec3>) {
+        this.setPosition(v as Vec3);
     },
 });
 
 Object.defineProperty(nodeProto, 'rotation', {
     configurable: true,
     enumerable: true,
-    get () : Quat {
+    get () : Readonly<Quat> {
         return this.getRotation();
     },
-    set (v: Quat) {
-        this.setRotation(v);
+    set (v: Readonly<Quat>) {
+        this.setRotation(v as Quat);
     },
 });
 
 Object.defineProperty(nodeProto, 'scale', {
     configurable: true,
     enumerable: true,
-    get () : Vec3 {
+    get () : Readonly<Vec3> {
         return this.getScale();
     },
-    set (v: Vec3) {
-        this.setScale(v);
+    set (v: Readonly<Vec3>) {
+        this.setScale(v as Vec3);
+    },
+});
+
+Object.defineProperty(nodeProto, 'worldPosition', {
+    configurable: true,
+    enumerable: true,
+    get () : Readonly<Vec3> {
+        return this.getWorldPosition();
+    },
+    set (v: Readonly<Vec3>) {
+        this.setWorldPosition(v as Vec3);
+    },
+});
+
+Object.defineProperty(nodeProto, 'worldRotation', {
+    configurable: true,
+    enumerable: true,
+    get () : Readonly<Quat> {
+        return this.getWorldRotation();
+    },
+    set (v: Readonly<Quat>) {
+        this.setWorldRotation(v as Quat);
+    },
+});
+
+Object.defineProperty(nodeProto, 'worldScale', {
+    configurable: true,
+    enumerable: true,
+    get () : Readonly<Vec3> {
+        return this.getWorldScale();
+    },
+    set (v: Readonly<Vec3>) {
+        this.setWorldScale(v as Vec3);
+    },
+});
+
+Object.defineProperty(nodeProto, 'eulerAngles', {
+    configurable: true,
+    enumerable: true,
+    get () : Readonly<Vec3> {
+        return this.getEulerAngles();
+    },
+    set (v: Readonly<Vec3>) {
+        this.setRotationFromEuler(v.x, v.y, v.z);
+    },
+});
+
+Object.defineProperty(nodeProto, 'worldMatrix', {
+    configurable: true,
+    enumerable: true,
+    get () : Readonly<Vec3> {
+        return this.getWorldMatrix();
+    },
+});
+
+Object.defineProperty(nodeProto, 'forward', {
+    configurable: true,
+    enumerable: true,
+    get () : Vec3 {
+        return this.getForward();
+    },
+    set (dir: Vec3) {
+        this.forward = dir;
+    },
+});
+
+Object.defineProperty(nodeProto, 'up', {
+    configurable: true,
+    enumerable: true,
+    get () : Vec3 {
+        return this.getUp();
+    },
+});
+
+Object.defineProperty(nodeProto, 'right', {
+    configurable: true,
+    enumerable: true,
+    get () : Vec3 {
+        return this.getRight();
     },
 });
 
@@ -570,102 +718,102 @@ nodeProto.removeAllChildren = function () {
 
 // Deserialization
 const _class2$u = Node;
-const _descriptor$o = _applyDecoratedDescriptor(_class2$u.prototype, "_parent", [serializable], {
+const _descriptor$o = _applyDecoratedDescriptor(_class2$u.prototype, '_parent', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return null;
     },
 });
 
-const _descriptor2$h = _applyDecoratedDescriptor(_class2$u.prototype, "_children", [serializable], {
+const _descriptor2$h = _applyDecoratedDescriptor(_class2$u.prototype, '_children', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return [];
     },
 });
 
-const _descriptor3$b = _applyDecoratedDescriptor(_class2$u.prototype, "_active", [serializable], {
+const _descriptor3$b = _applyDecoratedDescriptor(_class2$u.prototype, '_active', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return true;
     },
 });
 
-const _descriptor4$9 = _applyDecoratedDescriptor(_class2$u.prototype, "_components", [serializable], {
+const _descriptor4$9 = _applyDecoratedDescriptor(_class2$u.prototype, '_components', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return [];
     },
 });
 
-const _descriptor5$6 = _applyDecoratedDescriptor(_class2$u.prototype, "_prefab", [serializable], {
+const _descriptor5$6 = _applyDecoratedDescriptor(_class2$u.prototype, '_prefab', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return null;
     },
 });
 
 // Node
 const _class2$v = Node;
-const _descriptor$p = _applyDecoratedDescriptor(_class2$v.prototype, "_lpos", [serializable], {
+const _descriptor$p = _applyDecoratedDescriptor(_class2$v.prototype, '_lpos', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Vec3();
     },
 });
 
-const _descriptor2$i = _applyDecoratedDescriptor(_class2$v.prototype, "_lrot", [serializable], {
+const _descriptor2$i = _applyDecoratedDescriptor(_class2$v.prototype, '_lrot', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Quat();
     },
 });
 
-const _descriptor3$c = _applyDecoratedDescriptor(_class2$v.prototype, "_lscale", [serializable], {
+const _descriptor3$c = _applyDecoratedDescriptor(_class2$v.prototype, '_lscale', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Vec3(1, 1, 1);
     },
 });
 
-const _descriptor4$a = _applyDecoratedDescriptor(_class2$v.prototype, "_layer", [serializable], {
+const _descriptor4$a = _applyDecoratedDescriptor(_class2$v.prototype, '_layer', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return Layers.Enum.DEFAULT;
     },
 });
 
-const _descriptor5$7 = _applyDecoratedDescriptor(_class2$v.prototype, "_euler", [serializable], {
+const _descriptor5$7 = _applyDecoratedDescriptor(_class2$v.prototype, '_euler', [serializable], {
     configurable: true,
     enumerable: true,
     writable: true,
-    initializer: function initializer() {
+    initializer: function initializer () {
         return new Vec3();
     },
 });
 
 const _dec2$i = type(Vec3);
-_applyDecoratedDescriptor(_class2$v.prototype, "eulerAngles", [_dec2$i], Object.getOwnPropertyDescriptor(_class2$v.prototype, "eulerAngles"), _class2$v.prototype);
-_applyDecoratedDescriptor(_class2$v.prototype, "angle", [editable], Object.getOwnPropertyDescriptor(_class2$v.prototype, "angle"), _class2$v.prototype);
-_applyDecoratedDescriptor(_class2$v.prototype, "layer", [editable], Object.getOwnPropertyDescriptor(_class2$v.prototype, "layer"), _class2$v.prototype);
+_applyDecoratedDescriptor(_class2$v.prototype, 'eulerAngles', [_dec2$i], Object.getOwnPropertyDescriptor(_class2$v.prototype, 'eulerAngles'), _class2$v.prototype);
+_applyDecoratedDescriptor(_class2$v.prototype, 'angle', [editable], Object.getOwnPropertyDescriptor(_class2$v.prototype, 'angle'), _class2$v.prototype);
+_applyDecoratedDescriptor(_class2$v.prototype, 'layer', [editable], Object.getOwnPropertyDescriptor(_class2$v.prototype, 'layer'), _class2$v.prototype);
 
 //
 nodeProto._ctor = function (name?: string) {
