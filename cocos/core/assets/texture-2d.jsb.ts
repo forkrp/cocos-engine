@@ -30,6 +30,7 @@ import {
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
 import { ImageAsset } from './image-asset';
+import { SimpleTexture } from "./simple-texture";
 
 const texture2DProto: any = jsb.Texture2D.prototype;
 
@@ -53,6 +54,7 @@ const _descriptor$a = _applyDecoratedDescriptor(_class2$c.prototype, '_mipmaps',
 });
 
 texture2DProto._ctor = function () {
+    SimpleTexture.prototype._ctor.apply(this, arguments);
     // for deserialization
     // _initializerDefineProperty(_this, 'isRGBE', _descriptor$b, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, '_mipmaps', _descriptor2$7, _assertThisInitialized(_this));
