@@ -49,6 +49,10 @@ simpleTextureProto.uploadData = function (source, level = 0, arrayIndex = 0) {
 
 const clsDecorator = ccclass('cc.SimpleTexture');
 
+simpleTextureProto._ctor = function() {
+    
+};
+
 clsDecorator(SimpleTexture);
 
 legacyCC.SimpleTexture = jsb.SimpleTexture;
