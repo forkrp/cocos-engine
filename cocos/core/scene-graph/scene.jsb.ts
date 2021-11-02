@@ -68,6 +68,7 @@ function updateChildren(node: Node) {
     node._setChildren(node._children);
     for (let i = 0, len = node._children; i < len; ++i) {
         const child = node._children[i];
+        jsb.registerNativeRef(node, child);
         updateChildren(child);
     }
     Object.defineProperty(node, '_children', {
@@ -83,6 +84,20 @@ const oldLoad = sceneProto._load;
 sceneProto._load = function () {
     updateChildren(this);
     oldLoad.call(this);
+};
+
+const oldActivate = sceneProto._activate;
+sceneProto._activate = function (active: boolean) {
+    active = (active !== false);
+    // if (EDITOR) {
+    //     // register all nodes to editor
+    //     this._registerIfAttached!(active);
+    // }
+    legacyCC.director._nodeActivator.activateNode(this, active);
+    // The test environment does not currently support the renderer
+    // if (!TEST) {
+        this._globals.activate();
+    // }
 };
 
 clsDecorator(Scene);
