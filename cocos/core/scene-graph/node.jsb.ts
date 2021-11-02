@@ -37,7 +37,7 @@ import { NodeSpace, TransformBit } from './node-enum';
 import { Quat, Vec3 } from '../math';
 import { NodeEventProcessor } from './node-event-processor';
 import { Layers } from "./layers";
-import { defineArrayProxy } from "../utils/jsb-utils";
+import { eventManager } from "../platform/event-manager/event-manager";
 
 export const Node = jsb.Node;
 export type Node = jsb.Node;
@@ -332,6 +332,16 @@ nodeProto._onActivateNode = function (shouldActiveNow) {
     legacyCC.director._nodeActivator.activateNode(this, shouldActiveNow);
 };
 
+nodeProto._onPostActivated = function (active: boolean) {
+    if (active) { // activated
+        eventManager.resumeTarget(this);
+        // in case transform updated during deactivated period
+        this.invalidateChildren(TransformBit.TRS);
+    } else { // deactivated
+        eventManager.pauseTarget(this);
+    }
+};
+
 // Static functions.
 
 NodeCls._findComponent = function (node, constructor) {
@@ -498,7 +508,7 @@ Object.defineProperty(nodeProto, '_parent', {
         return this._parentInternal;
     },
     set (v) {
-        this._parentRef = v; // Root JSB object to avoid child node being garbage collected
+        jsb.registerNativeRef(v, this); // Root JSB object to avoid child node being garbage collected
         this._parentInternal = v;
     },
 });
@@ -510,13 +520,21 @@ Object.defineProperty(nodeProto, 'parent', {
         return this.getParent();
     },
     set (v) {
-        this._parentRef = v; // Root JSB object to avoid child node being garbage collected
+        jsb.registerNativeRef(v, this); // Root JSB object to avoid child node being garbage collected
         this.setParent(v);
     },
 });
 
+Object.defineProperty(nodeProto, 'children', {
+    configurable: true,
+    enumerable: true,
+    get () {
+        return this._children;
+    },
+});
+
 nodeProto.addChild = function (child: Node): void {
-    child._parentRef = this;
+    jsb.registerNativeRef(this, child); // Root JSB object to avoid child node being garbage collected
     child.setParent(this);
 };
 
@@ -534,7 +552,7 @@ nodeProto.removeFromParent = function () {
 const oldRemoveChild = nodeProto.removeChild;
 nodeProto.removeChild = function (child: Node) {
     oldRemoveChild.call(this, child);
-    child._parentRef = null;
+    jsb.unregisterNativeRef(this, child);
 };
 
 const oldRemoveAllChildren = nodeProto.removeAllChildren;
@@ -545,7 +563,7 @@ nodeProto.removeAllChildren = function () {
     for (let i = children.length - 1; i >= 0; i--) {
         const node = children[i];
         if (node) {
-            node._parentRef = null;
+            jsb.unregisterNativeRef(this, node);
         }
     }
 };
@@ -651,7 +669,6 @@ _applyDecoratedDescriptor(_class2$v.prototype, "layer", [editable], Object.getOw
 
 //
 nodeProto._ctor = function (name?: string) {
-    this._parentRef = null;
     this._components = [];
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
