@@ -33,6 +33,20 @@ import { legacyCC } from '../global-exports';
 export type SimpleTexture = jsb.SimpleTexture;
 export const SimpleTexture = jsb.SimpleTexture;
 
+const simpleTextureProto = jsb.SimpleTexture.prototype;
+const oldUpdateDataFunc = simpleTextureProto.uploadData;
+simpleTextureProto.uploadData = function (source, level = 0, arrayIndex = 0) {
+    let data;
+    if (source instanceof HTMLCanvasElement) {
+        data = source.data;
+    } else if (source instanceof HTMLImageElement) {
+        data = source._data;
+    } else if (ArrayBuffer.isView(source)) {
+        data = source.buffer;
+    }
+    oldUpdateDataFunc.call(this, data, level, arrayIndex);
+};
+
 const clsDecorator = ccclass('cc.SimpleTexture');
 
 clsDecorator(SimpleTexture);

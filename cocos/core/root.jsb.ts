@@ -1,5 +1,5 @@
-import { Pool } from "./memop";
-import { warnID } from "./platform";
+import { Pool } from './memop';
+import { warnID } from './platform';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import legacyCC from '../../predefine';
 
@@ -22,7 +22,15 @@ export interface IRootInfo {
 
 const rootProto: any = Root.prototype;
 
-rootProto._ctor = function() {
+Object.defineProperty(rootProto, 'batcher2D', {
+    configurable: true,
+    enumerable: true,
+    get () : Batcher2D {
+        return this._batcher;
+    },
+});
+
+rootProto._ctor = function () {
     this._modelPools = new Map();
     this._lightPools = new Map();
     this._batcher = null;
@@ -70,27 +78,27 @@ rootProto.createLight = function (LightCtor) {
     return light;
 };
 
-rootProto.destroyLight = function(l) {
+rootProto.destroyLight = function (l) {
     const p = this._lightPools.get(l.constructor);
     l.destroy();
     if (p) {
         p.free(l);
         if (l.scene) {
             switch (l.type) {
-                case LightType.SPHERE:
-                    l.scene.removeSphereLight(l);
-                    break;
-                case LightType.SPOT:
-                    l.scene.removeSpotLight(l);
-                    break;
-                default:
-                    break;
+            case LightType.SPHERE:
+                l.scene.removeSphereLight(l);
+                break;
+            case LightType.SPOT:
+                l.scene.removeSpotLight(l);
+                break;
+            default:
+                break;
             }
         }
     }
 };
 
-rootProto._onBatch2DInit = function() {
+rootProto._onBatch2DInit = function () {
     if (!this._batcher && legacyCC.internal.Batcher2D) {
         this._batcher = new legacyCC.internal.Batcher2D(this) as Batcher2D;
         if (!this._batcher.initialize()) {
@@ -100,7 +108,7 @@ rootProto._onBatch2DInit = function() {
     }
 };
 
-rootProto._onBatch2DUpdate = function() {
+rootProto._onBatch2DUpdate = function () {
     if (this._batcher) this._batcher.update();
 };
 
