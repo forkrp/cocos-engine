@@ -66,6 +66,27 @@ const _descriptor$1 = _applyDecoratedDescriptor(_class2$1.prototype, '_native', 
         return '';
     },
 });
+
+//cjh FIXME: replace object.ts with object.jsb.ts
+_applyDecoratedDescriptor(_class2$1.prototype, '_name', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return '';
+    },
+});
+
+_applyDecoratedDescriptor(_class2$1.prototype, '_objFlags', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return 0;
+    },
+});
+//
+
 _applyDecoratedDescriptor(_class2$1.prototype, '_nativeAsset', [property], Object.getOwnPropertyDescriptor(_class2$1.prototype, '_nativeAsset'), _class2$1.prototype);
 
 clsDecorator(Asset);

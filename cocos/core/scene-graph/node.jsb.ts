@@ -717,7 +717,27 @@ nodeProto.removeAllChildren = function () {
 };
 
 // Deserialization
-const _class2$u = Node;
+
+//cjh FIXME: replace object.ts with object.jsb.ts
+_applyDecoratedDescriptor(_class2$u.prototype, '_name', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return '';
+    },
+});
+
+_applyDecoratedDescriptor(_class2$u.prototype, '_objFlags', [serializable], {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    initializer: function initializer () {
+        return 0;
+    },
+});
+//
+
 const _descriptor$o = _applyDecoratedDescriptor(_class2$u.prototype, '_parent', [serializable], {
     configurable: true,
     enumerable: true,
