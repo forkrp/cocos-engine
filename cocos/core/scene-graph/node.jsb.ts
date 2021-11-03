@@ -720,7 +720,6 @@ nodeProto.removeAllChildren = function () {
 const _class2$u = Node;
 
 // cjh FIXME: replace object.ts with object.jsb.ts
-const _class2$u = Node;
 _applyDecoratedDescriptor(_class2$u.prototype, '_name', [serializable], {
     configurable: true,
     enumerable: true,
