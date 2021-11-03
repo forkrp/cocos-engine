@@ -28,7 +28,7 @@ import {
 import { legacyCC } from '../global-exports';
 import { Color, Vec2, Vec3 } from '../math';
 import { CCFloat } from '../data';
-import { TextureCube } from '../assets';
+import { TextureCube } from '../assets/texture-cube';
 import { Enum } from '../value-types';
 
 /**

@@ -26,7 +26,6 @@ import {
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 
-import * as js from '../utils/js';
 import { legacyCC } from '../global-exports';
 import { errorID, getError } from '../platform/debug';
 import { Component } from '../components/component';
@@ -130,7 +129,7 @@ nodeProto.addComponent = function (typeOrClassName) {
 
     let constructor;
     if (typeof typeOrClassName === 'string') {
-        constructor = js.getClassByName(typeOrClassName);
+        constructor = getClassByName(typeOrClassName);
         if (!constructor) {
             if (legacyCC._RF.peek()) {
                 errorID(3808, typeOrClassName);
@@ -149,7 +148,7 @@ nodeProto.addComponent = function (typeOrClassName) {
     if (typeof constructor !== 'function') {
         throw TypeError(getError(3809));
     }
-    if (!js.isChildClassOf(constructor, Component)) {
+    if (!isChildClassOf(constructor, Component)) {
         throw TypeError(getError(3810));
     }
 
