@@ -34,7 +34,7 @@ import { NodeEventType } from './node-event';
 import { CCObject } from '../data/object';
 import { NodeUIProperties } from './node-ui-properties';
 import { NodeSpace, TransformBit } from './node-enum';
-import { Quat, Vec3 } from '../math';
+import { Mat4, Quat, Vec3 } from '../math';
 import { NodeEventProcessor } from './node-event-processor';
 import { Layers } from './layers';
 import { eventManager } from '../platform/event-manager/event-manager';
@@ -432,9 +432,6 @@ const oldGetWorldRotation = nodeProto.getWorldRotation;
 const oldGetWorldScale = nodeProto.getWorldScale;
 const oldEulerAngles = nodeProto.getEulerAngles;
 const oldGetWorldMatrix = nodeProto.getWorldMatrix;
-const oldGetForward = nodeProto.getForward;
-const oldGetUp = nodeProto.getUp;
-const oldGetRight = nodeProto.getRight;
 
 nodeProto.getPosition = function (out?: Vec3) : Vec3 {
     const r = oldGetPosition.call(this);
@@ -499,27 +496,18 @@ nodeProto.getEulerAngles = function (out?: Vec3) : Vec3 {
 };
 
 nodeProto.getForward = function (out?: Vec3) : Vec3 {
-    const r = oldGetForward.call(this);
-    if (out) {
-        return Vec3.copy(out, r);
-    }
-    return Vec3.copy(new Vec3(), r);
+    const target = out || new Vec3();
+    return Vec3.transformQuat(target, Vec3.FORWARD, this.worldRotation);
 };
 
 nodeProto.getUp = function (out?: Vec3) : Vec3 {
-    const r = oldGetUp.call(this);
-    if (out) {
-        return Vec3.copy(out, r);
-    }
-    return Vec3.copy(new Vec3(), r);
+    const target = out || new Vec3();
+    return Vec3.transformQuat(target, Vec3.UP, this.worldRotation);
 };
 
 nodeProto.getRight = function (out?: Vec3) : Vec3 {
-    const r = oldGetRight.call(this);
-    if (out) {
-        return Vec3.copy(out, r);
-    }
-    return Vec3.copy(new Vec3(), r);
+    const target = out || new Vec3();
+    return Vec3.transformQuat(target, Vec3.RIGHT, this.worldRotation);
 };
 Object.defineProperty(nodeProto, 'position', {
     configurable: true,
