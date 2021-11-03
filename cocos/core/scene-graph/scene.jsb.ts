@@ -64,9 +64,9 @@ sceneProto._ctor = function () {
     // _initializerDefineProperty(_this, "_globals", _descriptor2$k, _assertThisInitialized(_this));
 };
 
-function updateChildren(node: Node) {
+function updateChildren (node: Node) {
     node._setChildren(node._children);
-    for (let i = 0, len = node._children; i < len; ++i) {
+    for (let i = 0, len = node._children.length; i < len; ++i) {
         const child = node._children[i];
         jsb.registerNativeRef(node, child);
         updateChildren(child);
@@ -96,7 +96,7 @@ sceneProto._activate = function (active: boolean) {
     legacyCC.director._nodeActivator.activateNode(this, active);
     // The test environment does not currently support the renderer
     // if (!TEST) {
-        this._globals.activate();
+    this._globals.activate();
     // }
 };
 
