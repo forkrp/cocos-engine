@@ -159,7 +159,7 @@ nodeProto.addComponent = function (typeOrClassName) {
 
     // check requirement
 
-    const ReqComp = (constructor as typeof constructor & { _requireComponent?: typeof Component })._requireComponent;
+    const ReqComp = (constructor)._requireComponent;
     if (ReqComp && !this.getComponent(ReqComp)) {
         this.addComponent(ReqComp);
     }
@@ -345,7 +345,7 @@ nodeProto._onPostActivated = function (active: boolean) {
 // Static functions.
 
 NodeCls._findComponent = function (node, constructor) {
-    const cls = constructor as any;
+    const cls = constructor;
     const comps = node._components;
     if (cls._sealed) {
         for (let i = 0; i < comps.length; ++i) {
@@ -366,7 +366,7 @@ NodeCls._findComponent = function (node, constructor) {
 };
 
 NodeCls._findComponents = function (node, constructor, components) {
-    const cls = constructor as any;
+    const cls = constructor;
     const comps = node._components;
     if (cls._sealed) {
         for (let i = 0; i < comps.length; ++i) {
@@ -718,7 +718,8 @@ nodeProto.removeAllChildren = function () {
 
 // Deserialization
 
-//cjh FIXME: replace object.ts with object.jsb.ts
+// cjh FIXME: replace object.ts with object.jsb.ts
+const _class2$u = Node;
 _applyDecoratedDescriptor(_class2$u.prototype, '_name', [serializable], {
     configurable: true,
     enumerable: true,
