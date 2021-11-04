@@ -23,14 +23,13 @@
  THE SOFTWARE.
  */
 
-
 declare const nr: any;
 
 import { getPhaseID } from './pass-phase';
 import { setClassName, mixin } from '../../core/utils/js';
-import { DeferredPipelineSceneData } from './deferred/deferred-pipeline-scene-data';
-import { legacyCC } from '../../core/global-exports';
-import { Asset } from '../assets/asset';
+// import { DeferredPipelineSceneData } from './deferred/deferred-pipeline-scene-data';
+// import { legacyCC } from '../../core/global-exports';
+// import { Asset } from '../assets/asset';
 
 nr.getPhaseID = getPhaseID;
 

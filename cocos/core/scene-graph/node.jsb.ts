@@ -735,6 +735,10 @@ nodeProto[serializeTag] = function (serializationOutput: SerializationOutput, co
     }
 };
 
+nodeProto._onActiveNode = function (shouldActiveNow: boolean) {
+    legacyCC.director._nodeActivator.activateNode(this, shouldActiveNow);
+};
+
 nodeProto._onBatchCreated = function(dontSyncChildPrefab: boolean) {
     const prefabInstance = this._prefab?.instance;
     if (!dontSyncChildPrefab && prefabInstance) {
@@ -764,6 +768,35 @@ nodeProto._onBatchCreated = function(dontSyncChildPrefab: boolean) {
     }
 
     applyTargetOverrides(this);
+};
+
+nodeProto._instantiate = function (cloned: Node, isSyncedNode: boolean) {
+    if (!cloned) {
+        cloned = legacyCC.instantiate._clone(this, this);
+    }
+
+    const newPrefabInfo = cloned._prefab;
+    if (EDITOR && newPrefabInfo) {
+        if (cloned === newPrefabInfo.root) {
+            // newPrefabInfo.fileId = '';
+        } else {
+            // var PrefabUtils = Editor.require('scene://utils/prefab');
+            // PrefabUtils.unlinkPrefab(cloned);
+        }
+    }
+    if (EDITOR && legacyCC.GAME_VIEW) {
+        const syncing = newPrefabInfo && cloned === newPrefabInfo.root && newPrefabInfo.sync;
+        if (!syncing) {
+            cloned._name += ' (Clone)';
+        }
+    }
+
+    // reset and init
+    cloned._parent = null;
+    cloned._onBatchCreated(isSyncedNode);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return cloned;
 };
 
 // Deserialization
