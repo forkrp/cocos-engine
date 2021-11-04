@@ -68,6 +68,9 @@ export enum LightType {
 }
 
 export const nt2lm = (size: number) => 4 * Math.PI * Math.PI * size * size;
+export const Light = jsb.Light;
+export type Light = jsb.Light;
+legacyCC.Light = jsb.Light;
 
 export const DirectionalLight = jsb.DirectionalLight;
 export type DirectionalLight = jsb.DirectionalLight;

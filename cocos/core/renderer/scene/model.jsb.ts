@@ -24,6 +24,7 @@
  */
 
 import { Attribute } from '../../gfx';
+import { Vec3 } from '../../math';
 
 export interface IInstancedAttributeBlock {
     buffer: Uint8Array;
@@ -41,3 +42,10 @@ export enum ModelType {
 }
 
 export const Model = jsb.Model;
+
+const modelProto: any = Model.prototype;
+const oldCreateBoundingShape = modelProto.createBoundingShape;
+modelProto.createBoundingShape = function (minPos?: Vec3, maxPos?: Vec3) {
+    if (!minPos || !maxPos) { return; }
+    oldCreateBoundingShape.call(this, minPos, maxPos);
+};
