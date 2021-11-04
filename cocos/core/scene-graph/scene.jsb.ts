@@ -31,6 +31,7 @@ import { Node } from './node';
 import { applyTargetOverrides } from "../utils/prefab/utils";
 import { EDITOR, TEST } from "../default-constants";
 import { assert } from "../platform/debug";
+import { updateChildren } from '../utils/jsb-utils';
 
 export const Scene = jsb.Scene;
 export type Scene = jsb.Scene;
@@ -68,28 +69,6 @@ sceneProto._ctor = function () {
     // _initializerDefineProperty(_this, "autoReleaseAssets", _descriptor$r, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_globals", _descriptor2$k, _assertThisInitialized(_this));
 };
-
-function updateChildren (node: Node) {
-    if (!node) {
-        return;
-    }
-    node._setChildren(node._children);
-    for (let i = 0, len = node._children.length; i < len; ++i) {
-        const child = node._children[i];
-        jsb.registerNativeRef(node, child);
-        updateChildren(child);
-    }
-    Object.defineProperty(node, '_children', {
-        enumerable: true,
-        configurable: true,
-        get () {
-            return this.getChildren();
-        },
-        set (v) {
-            this._setChildren(v);
-        }
-    });
-}
 
 sceneProto._onBatchCreated = function(dontSyncChildPrefab: boolean) {
     Node.prototype._onBatchCreated.call(this, dontSyncChildPrefab);

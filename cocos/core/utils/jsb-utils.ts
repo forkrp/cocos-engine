@@ -1,3 +1,5 @@
+import type { Node } from "../scene-graph";
+
 export interface IArrayProxy {
     owner: any,
     arrPropertyName: string,
@@ -78,6 +80,28 @@ export function defineArrayProxy(options: IArrayProxy) {
                     options.setArrayElementCB(i, e);
                 }
             }
+        }
+    });
+}
+
+export function updateChildren (node: Node) {
+    if (!node) {
+        return;
+    }
+    node._setChildren(node._children);
+    for (let i = 0, len = node._children.length; i < len; ++i) {
+        const child = node._children[i];
+        jsb.registerNativeRef(node, child);
+        updateChildren(child);
+    }
+    Object.defineProperty(node, '_children', {
+        enumerable: true,
+        configurable: true,
+        get () {
+            return this.getChildren();
+        },
+        set (v) {
+            this._setChildren(v);
         }
     });
 }
