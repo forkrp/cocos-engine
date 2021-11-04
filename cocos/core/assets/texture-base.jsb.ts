@@ -38,6 +38,10 @@ textureBaseProto.createNode = null!;
 export type TextureBase = jsb.TextureBase;
 export const TextureBase = jsb.TextureBase;
 
+(TextureBase as any).Filter = Filter;
+(TextureBase as any).PixelFormat = PixelFormat;
+(TextureBase as any).WrapMode = WrapMode;
+
 const clsDecorator = ccclass('cc.TextureBase');
 
 const _class2$b = TextureBase;

@@ -29,9 +29,14 @@ import {
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
+import { Filter, PixelFormat, WrapMode } from './asset-enum';
 
 export type SimpleTexture = jsb.SimpleTexture;
 export const SimpleTexture = jsb.SimpleTexture;
+
+(SimpleTexture as any).Filter = Filter;
+(SimpleTexture as any).PixelFormat = PixelFormat;
+(SimpleTexture as any).WrapMode = WrapMode;
 
 const simpleTextureProto = jsb.SimpleTexture.prototype;
 const oldUpdateDataFunc = simpleTextureProto.uploadData;
@@ -49,8 +54,8 @@ simpleTextureProto.uploadData = function (source, level = 0, arrayIndex = 0) {
 
 const clsDecorator = ccclass('cc.SimpleTexture');
 
-simpleTextureProto._ctor = function() {
-    
+simpleTextureProto._ctor = function () {
+
 };
 
 clsDecorator(SimpleTexture);

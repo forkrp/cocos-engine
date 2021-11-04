@@ -29,6 +29,7 @@ import {
     _initializerDefineProperty,
 } from '../data/utils/decorator-jsb-utils';
 import { legacyCC } from '../global-exports';
+import { Filter, PixelFormat, WrapMode } from './asset-enum';
 
 const textureCubeProto: any = jsb.TextureCube.prototype;
 
@@ -36,6 +37,10 @@ textureCubeProto.createNode = null!;
 
 export type TextureCube = jsb.TextureCube;
 export const TextureCube = jsb.TextureCube;
+
+(TextureCube as any).Filter = Filter;
+(TextureCube as any).PixelFormat = PixelFormat;
+(TextureCube as any).WrapMode = WrapMode;
 
 const clsDecorator = ccclass('cc.TextureCube');
 
