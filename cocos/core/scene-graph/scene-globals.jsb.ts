@@ -377,27 +377,27 @@ export const ShadowsInfo = jsb.ShadowsInfo;
 legacyCC.ShadowsInfo = ShadowsInfo;
 const shadowInfoDecorator = ccclass('cc.ShadowsInfo');
 
-Object.defineProperty(ShadowsInfo.prototype, '_shadowColor', {
-    configurable: true,
-    enumerable: true,
-    get ()  {
-        return new Color(this._shadowColorInternal.r, this._shadowColorInternal.g, this._shadowColorInternal.b, this._shadowColorInternal.a);
-    },
-    set (val) {
-        this._shadowColorInternal = val;
-    },
-});
+// Object.defineProperty(ShadowsInfo.prototype, '_shadowColor', {
+//     configurable: true,
+//     enumerable: true,
+//     get ()  {
+//         return new Color(this._shadowColorInternal.r, this._shadowColorInternal.g, this._shadowColorInternal.b, this._shadowColorInternal.a);
+//     },
+//     set (val) {
+//         this._shadowColorInternal = val;
+//     },
+// });
 
-Object.defineProperty(ShadowsInfo.prototype, 'shadowColor', {
-    configurable: true,
-    enumerable: true,
-    get () {
-        return new Color(this.shadowColorInternal.r, this.shadowColorInternal.g, this.shadowColorInternal.b, this.shadowColorInternal.a);
-    },
-    set (val) {
-        this.shadowColorInternal = val;
-    },
-});
+// Object.defineProperty(ShadowsInfo.prototype, 'shadowColor', {
+//     configurable: true,
+//     enumerable: true,
+//     get () {
+//         return new Color(this.shadowColorInternal.r, this.shadowColorInternal.g, this.shadowColorInternal.b, this.shadowColorInternal.a);
+//     },
+//     set (val) {
+//         this.shadowColorInternal = val;
+//     },
+// });
 
 const _class11$1 = ShadowsInfo;
 const _descriptor17$1 = _applyDecoratedDescriptor(_class11$1.prototype, '_type', [serializable], {
