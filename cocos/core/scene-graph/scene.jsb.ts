@@ -77,6 +77,9 @@ function updateChildren (node: Node) {
         get () {
             return node.getChildren();
         },
+        set (v) {
+            node._setChildren(v);
+        }
     });
 }
 

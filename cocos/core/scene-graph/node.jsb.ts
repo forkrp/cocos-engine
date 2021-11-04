@@ -33,10 +33,20 @@ import { NodeEventType } from './node-event';
 import { CCObject } from '../data/object';
 import { NodeUIProperties } from './node-ui-properties';
 import { NodeSpace, TransformBit } from './node-enum';
-import { Quat, Vec3 } from '../math';
+import { Mat4, Quat, Vec3 } from '../math';
 import { NodeEventProcessor } from './node-event-processor';
 import { Layers } from './layers';
 import { eventManager } from '../platform/event-manager/event-manager';
+import { SerializationContext, SerializationOutput, serializeTag } from "../data";
+import { EDITOR } from "../default-constants";
+import {
+    applyMountedChildren,
+    applyMountedComponents, applyPropertyOverrides,
+    applyRemovedComponents, applyTargetOverrides,
+    createNodeWithPrefab,
+    generateTargetMap,
+} from '../utils/prefab/utils';
+import { getClassByName, isChildClassOf } from '../utils/js-typed';
 
 export const Node = jsb.Node;
 export type Node = jsb.Node;
@@ -79,7 +89,7 @@ function getConstructor<T> (typeOrClassName) {
         return null;
     }
     if (typeof typeOrClassName === 'string') {
-        return js.getClassByName(typeOrClassName);
+        return getClassByName(typeOrClassName);
     }
 
     return typeOrClassName;
@@ -678,6 +688,9 @@ Object.defineProperty(nodeProto, 'children', {
     get () {
         return this._children;
     },
+    set(v) {
+        this._children = v;
+    }
 });
 
 nodeProto.addChild = function (child: Node): void {
@@ -713,6 +726,44 @@ nodeProto.removeAllChildren = function () {
             jsb.unregisterNativeRef(this, node);
         }
     }
+};
+
+nodeProto[serializeTag] = function (serializationOutput: SerializationOutput, context: SerializationContext) {
+    if (!EDITOR) {
+        serializationOutput.writeThis();
+        return;
+    }
+};
+
+nodeProto._onBatchCreated = function(dontSyncChildPrefab: boolean) {
+    const prefabInstance = this._prefab?.instance;
+    if (!dontSyncChildPrefab && prefabInstance) {
+        createNodeWithPrefab(this);
+    }
+
+    this.hasChangedFlags = TransformBit.TRS;
+    this._dirtyFlags |= TransformBit.TRS;
+    this._uiProps.uiTransformDirty = true;
+    const children = this._children;
+    const len = children.length;
+    for (let i = 0; i < len; ++i) {
+        children[i]._siblingIndex = i;
+        children[i]._onBatchCreated(dontSyncChildPrefab);
+    }
+
+    // apply mounted children and property overrides after all the nodes in prefabAsset are instantiated
+    if (!dontSyncChildPrefab && prefabInstance) {
+        const targetMap: Record<string, any | Node | Component> = {};
+        prefabInstance.targetMap = targetMap;
+        generateTargetMap(this, targetMap, true);
+
+        applyMountedChildren(this, prefabInstance.mountedChildren, targetMap);
+        applyRemovedComponents(this, prefabInstance.removedComponents, targetMap);
+        applyMountedComponents(this, prefabInstance.mountedComponents, targetMap);
+        applyPropertyOverrides(this, prefabInstance.propertyOverrides, targetMap);
+    }
+
+    applyTargetOverrides(this);
 };
 
 // Deserialization
@@ -840,6 +891,7 @@ nodeProto._ctor = function (name?: string) {
     this._components = [];
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
+    this._prefab = null;
 
     this._registerListeners();
     // // for deserialization
