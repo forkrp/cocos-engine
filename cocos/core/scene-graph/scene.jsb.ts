@@ -28,6 +28,9 @@ import {
 import { legacyCC } from '../global-exports';
 import { SceneGlobals } from './scene-globals';
 import { Node } from './node';
+import { applyTargetOverrides } from "../utils/prefab/utils";
+import { EDITOR, TEST } from "../default-constants";
+import { assert } from "../platform/debug";
 
 export const Scene = jsb.Scene;
 export type Scene = jsb.Scene;
@@ -58,6 +61,8 @@ const _descriptor2$k = _applyDecoratedDescriptor(_class2$x.prototype, '_globals'
 
 sceneProto._ctor = function () {
     Node.prototype._ctor.apply(this, arguments);
+    this._inited = false;
+    this._prefabSyncedInLiveReload = false;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     // const _this = this;
     // _initializerDefineProperty(_this, "autoReleaseAssets", _descriptor$r, _assertThisInitialized(_this));
@@ -65,6 +70,9 @@ sceneProto._ctor = function () {
 };
 
 function updateChildren (node: Node) {
+    if (!node) {
+        return;
+    }
     node._setChildren(node._children);
     for (let i = 0, len = node._children.length; i < len; ++i) {
         const child = node._children[i];
@@ -75,16 +83,34 @@ function updateChildren (node: Node) {
         enumerable: true,
         configurable: true,
         get () {
-            return node.getChildren();
+            return this.getChildren();
         },
         set (v) {
-            node._setChildren(v);
+            this._setChildren(v);
         }
     });
 }
 
+sceneProto._onBatchCreated = function(dontSyncChildPrefab: boolean) {
+    Node.prototype._onBatchCreated.call(this, dontSyncChildPrefab);
+    const len = this._children.length;
+    for (let i = 0; i < len; ++i) {
+        this.children[i]._siblingIndex = i;
+        this._children[i]._onBatchCreated(dontSyncChildPrefab);
+    }
+
+    applyTargetOverrides(this);
+};
+
 const oldLoad = sceneProto._load;
 sceneProto._load = function () {
+    if (!this._inited) {
+        if (TEST) {
+            assert(!this._activeInHierarchy, 'Should deactivate ActionManager and EventManager by default');
+        }
+        this._onBatchCreated(EDITOR && this._prefabSyncedInLiveReload);
+        this._inited = true;
+    }
     updateChildren(this);
     oldLoad.call(this);
 };
