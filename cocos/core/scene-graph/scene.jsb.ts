@@ -41,6 +41,26 @@ const clsDecorator = ccclass('cc.Scene');
 const sceneProto: any = Scene.prototype;
 const _class2$x = Scene;
 
+Object.defineProperty(sceneProto, '_globals', {
+    enumerable: true,
+    configurable: true,
+    get () {
+        return this.getSceneGlobals();
+    },
+    set (v) {
+        this._globalRef = v;
+        this.setSceneGlobals(v);
+    },
+});
+
+Object.defineProperty(sceneProto, 'globals', {
+    enumerable: true,
+    configurable: true,
+    get () {
+        return this.getSceneGlobals();
+    },
+});
+
 _applyDecoratedDescriptor(_class2$x.prototype, 'globals', [editable], Object.getOwnPropertyDescriptor(_class2$x.prototype, 'globals'), _class2$x.prototype);
 const _descriptor$r = _applyDecoratedDescriptor(_class2$x.prototype, 'autoReleaseAssets', [serializable, editable], {
     configurable: true,
@@ -63,6 +83,7 @@ const _descriptor2$k = _applyDecoratedDescriptor(_class2$x.prototype, '_globals'
 sceneProto._ctor = function () {
     Node.prototype._ctor.apply(this, arguments);
     this._inited = false;
+    this._globalRef = null;
     this._prefabSyncedInLiveReload = false;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     // const _this = this;
