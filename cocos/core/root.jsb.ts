@@ -2,6 +2,7 @@ import { Pool } from './memop';
 import { warnID } from './platform';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import legacyCC from '../../predefine';
+import { builtinResMgr } from './builtin';
 
 export const Root = jsb.Root;
 
@@ -40,7 +41,13 @@ rootProto._ctor = function () {
 rootProto.initialize = function (info: IRootInfo) {
     // TODO:
     this._initialize();
-    return Promise.resolve();
+    return Promise.resolve(builtinResMgr.initBuiltinRes(this.device)).then(() => {
+        legacyCC.view.on('design-resolution-changed', () => {
+            const width = legacyCC.game.canvas.width;
+            const height = legacyCC.game.canvas.height;
+            this.resize(width, height);
+        }, this);
+    });
 };
 
 rootProto.createModel = function (ModelCtor) {
