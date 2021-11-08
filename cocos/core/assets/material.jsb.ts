@@ -238,8 +238,9 @@ matProto.getProperty = function (name: string, passIdx?: number) {
 
 export type Material = jsb.Material;
 export const Material = jsb.Material;
-
 legacyCC.Material = Material;
+
+const materialProto: any = Material.prototype;
 
 const clsDecorator = ccclass('cc.Material');
 
@@ -289,13 +290,19 @@ const _descriptor5$4 = _applyDecoratedDescriptor(_class2$f.prototype, '_props', 
     },
 });
 
-const materialProto: any = Material.prototype;
-
 materialProto._ctor = function () {
+    this._props = {};
     // _initializerDefineProperty(_this, "_effectAsset", _descriptor$d, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_techIdx", _descriptor2$9, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_defines", _descriptor3$7, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_states", _descriptor4$6, _assertThisInitialized(_this));
     // _initializerDefineProperty(_this, "_props", _descriptor5$4, _assertThisInitialized(_this));
 };
+
+const oldOnLoaded = materialProto.onLoaded;
+materialProto.onLoaded = function () {
+    this._propsInternal = this._props;
+    oldOnLoaded.call(this);
+};
+
 clsDecorator(Material);
