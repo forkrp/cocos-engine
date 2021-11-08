@@ -241,8 +241,6 @@ export const Material = jsb.Material;
 
 legacyCC.Material = Material;
 
-setClassName('cc.Material', Material);
-
 const clsDecorator = ccclass('cc.Material');
 
 // Deserialization

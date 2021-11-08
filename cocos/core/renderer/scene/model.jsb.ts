@@ -25,6 +25,7 @@
 
 import { Attribute } from '../../gfx';
 import { Vec3 } from '../../math';
+import { legacyCC } from '../../global-exports';
 
 export interface IInstancedAttributeBlock {
     buffer: Uint8Array;
@@ -44,6 +45,11 @@ export enum ModelType {
 export const Model = jsb.Model;
 
 const modelProto: any = Model.prototype;
+
+modelProto._ctor = function () {
+    this._device = legacyCC.director.root.device;
+};
+
 const oldCreateBoundingShape = modelProto.createBoundingShape;
 modelProto.createBoundingShape = function (minPos?: Vec3, maxPos?: Vec3) {
     if (!minPos || !maxPos) { return; }
