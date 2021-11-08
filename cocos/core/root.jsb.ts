@@ -4,6 +4,7 @@ import { Batcher2D } from '../2d/renderer/batcher-2d';
 import legacyCC from '../../predefine';
 import { DataPoolManager } from '../3d/skeletal-animation/data-pool-manager';
 import { Device } from './gfx';
+import { builtinResMgr } from './builtin';
 
 export const Root = jsb.Root;
 
@@ -51,7 +52,13 @@ rootProto._ctor = function (device: Device) {
 rootProto.initialize = function (info: IRootInfo) {
     // TODO:
     this._initialize();
-    return Promise.resolve();
+    return Promise.resolve(builtinResMgr.initBuiltinRes(this.device)).then(() => {
+        legacyCC.view.on('design-resolution-changed', () => {
+            const width = legacyCC.game.canvas.width;
+            const height = legacyCC.game.canvas.height;
+            this.resize(width, height);
+        }, this);
+    });
 };
 
 rootProto.createModel = function (ModelCtor) {
