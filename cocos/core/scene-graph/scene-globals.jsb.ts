@@ -547,7 +547,76 @@ shadowInfoDecorator(ShadowsInfo);
  */
 export const SceneGlobals = jsb.SceneGlobals;
 legacyCC.SceneGlobals = SceneGlobals;
+const sceneGlobalsProto: any = SceneGlobals.prototype;
 const sceneGlobalsDecorator = ccclass('cc.SceneGlobals');
+
+sceneGlobalsProto._ctor = function () {
+    this._ambientRef = null;
+    this._shadowsRef = null;
+    this._skyboxRef = null;
+    this._fogRef = null;
+};
+
+Object.defineProperty(sceneGlobalsProto, 'ambient', {
+    enumerable: true,
+    configurable: true,
+    get () {
+        return this.getAmbientInfo();
+    },
+    set (v) {
+        this._ambientRef = v;
+        this.setAmbientInfo(v);
+    },
+});
+
+Object.defineProperty(sceneGlobalsProto, 'shadows', {
+    enumerable: true,
+    configurable: true,
+    get () {
+        return this.getShadowsInfo();
+    },
+    set (v) {
+        this._shadowsRef = v;
+        this.setShadowsInfo(v);
+    },
+});
+
+Object.defineProperty(sceneGlobalsProto, '_skybox', {
+    enumerable: true,
+    configurable: true,
+    get () {
+        return this.getSkyboxInfo();
+    },
+    set (v) {
+        this._skyboxRef = v;
+        this.setSkyboxInfo(v);
+    },
+});
+
+Object.defineProperty(sceneGlobalsProto, 'skybox', {
+    enumerable: true,
+    configurable: true,
+    get () {
+        return this.getSkyboxInfo();
+    },
+    set (v) {
+        this._skyboxRef = v;
+        this.setSkyboxInfo(v);
+    },
+});
+
+Object.defineProperty(sceneGlobalsProto, 'fog', {
+    enumerable: true,
+    configurable: true,
+    get () {
+        return this.getFogInfo();
+    },
+    set (v) {
+        this._fogRef = v;
+        this.setFogInfo(v);
+    },
+});
+
 const _class14$1 = SceneGlobals;
 const _descriptor32$1 = _applyDecoratedDescriptor(_class14$1.prototype, 'ambient', [serializable, editable], {
     configurable: true,

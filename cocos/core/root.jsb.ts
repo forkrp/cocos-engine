@@ -2,6 +2,8 @@ import { Pool } from './memop';
 import { warnID } from './platform';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import legacyCC from '../../predefine';
+import { DataPoolManager } from '../3d/skeletal-animation/data-pool-manager';
+import { Device } from './gfx';
 import { builtinResMgr } from './builtin';
 
 export const Root = jsb.Root;
@@ -31,7 +33,16 @@ Object.defineProperty(rootProto, 'batcher2D', {
     },
 });
 
-rootProto._ctor = function () {
+Object.defineProperty(rootProto, 'dataPoolManager', {
+    configurable: true,
+    enumerable: true,
+    get () : DataPoolManager {
+        return this._dataPoolMgr;
+    },
+});
+
+rootProto._ctor = function (device: Device) {
+    this._dataPoolMgr = legacyCC.internal.DataPoolManager && new legacyCC.internal.DataPoolManager(device) as DataPoolManager;
     this._modelPools = new Map();
     this._lightPools = new Map();
     this._batcher = null;
