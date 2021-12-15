@@ -33,7 +33,9 @@ import { EDITOR, TEST } from "../default-constants";
 import { assert } from "../platform/debug";
 import { updateChildrenForDeserialize } from '../utils/jsb-utils';
 
+// @ts-ignore
 export const Scene = jsb.Scene;
+// @ts-ignore
 export type Scene = jsb.Scene;
 
 const clsDecorator = ccclass('cc.Scene');
@@ -103,6 +105,7 @@ const _descriptor2$k = _applyDecoratedDescriptor(_class2$x.prototype, '_globals'
 });
 
 sceneProto._ctor = function () {
+    // @ts-ignore
     Node.prototype._ctor.apply(this, arguments);
     this._inited = false;
     this._renderSceneInternal = null;
@@ -115,6 +118,8 @@ sceneProto._ctor = function () {
 };
 
 sceneProto._onBatchCreated = function(dontSyncChildPrefab: boolean) {
+    // @ts-ignore
+    Node.flushCommandsToNative();
     // Don't invoke Node.prototype._onBatchCreated because we refactor Node&BaseNode, BaseNode is empty just for
     // instanceof check in ts engine. After ts engine removes BaseNode, we could remove BaseNode.h/.cpp too.
     if (this._parent) {
@@ -146,6 +151,8 @@ sceneProto._load = function () {
 
 const oldActivate = sceneProto._activate;
 sceneProto._activate = function (active: boolean) {
+    // @ts-ignore
+    Node.flushCommandsToNative();
     active = (active !== false);
     // if (EDITOR) {
     //     // register all nodes to editor

@@ -144,5 +144,9 @@ rootProto._onDirectorBeforeCommit = function () {
 
 const oldFrameMove = rootProto.frameMove;
 rootProto.frameMove = function (deltaTime: number) {
+    // @ts-ignore
+    jsb.Node.flushCommandsToNative();
     oldFrameMove.call(this, deltaTime, legacyCC.director.getTotalFrames());
+    // @ts-ignore
+    jsb.Node.flushCommandsToNative();
 };

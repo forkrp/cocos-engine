@@ -49,6 +49,7 @@ import { js } from './utils';
 import { legacyCC } from './global-exports';
 import { errorID, error, assertID, warnID } from './platform/debug';
 import inputManager from './platform/event-manager/input-manager';
+import { JSB } from './default-constants';
 
 // ----------------------------------------------------------------------------------------------------------------------
 
@@ -752,8 +753,6 @@ export class Director extends EventTarget {
                 this._compScheduler.lateUpdatePhase(dt);
                 // User can use this event to do things after update
                 this.emit(Director.EVENT_AFTER_UPDATE);
-                // Destroy entities that have been removed recently
-                CCObject._deferredDestroy();
 
                 // Post update systems
                 for (let i = 0; i < this._systems.length; ++i) {
@@ -762,11 +761,38 @@ export class Director extends EventTarget {
             }
 
             this.emit(Director.EVENT_BEFORE_DRAW);
+
+            if (JSB) {
+                const nodeCtor = Node as any;
+                nodeCtor.flushCommandsToNative();
+                nodeCtor.setUpdateWorldTransformRecursively(true);
+                if (this._scene) {
+                    nodeCtor.updateWorldTransformRecursively(this._scene);
+                }
+                nodeCtor.flushCommandsToNative();
+            }
+
+            if (!this._paused) {
+                // Destroy entities that have been removed recently
+                CCObject._deferredDestroy();
+            }
+
             // The test environment does not currently support the renderer
             if (!TEST) this._root!.frameMove(dt);
+
+            if (JSB) {
+                const nodeCtor = Node as any;
+                nodeCtor.setUpdateWorldTransformRecursively(false);
+            }
+
             this.emit(Director.EVENT_AFTER_DRAW);
 
             eventManager.frameUpdateListeners();
+
+            if (JSB) {
+                const nodeCtor = Node as any;
+                nodeCtor.flushCommandsToNative();
+            }
             Node.resetHasChangedFlags();
             Node.clearNodeArray();
             this.emit(Director.EVENT_END_FRAME);
