@@ -147,6 +147,8 @@ sceneProto._load = function () {
     }
     updateChildrenForDeserialize(this);
     oldLoad.call(this);
+    // @ts-ignore
+    Node.flushCommandsToNative();
 };
 
 const oldActivate = sceneProto._activate;
@@ -163,6 +165,8 @@ sceneProto._activate = function (active: boolean) {
     // if (!TEST) {
     this._globals.activate();
     // }
+    // @ts-ignore
+    Node.flushCommandsToNative();
 };
 
 clsDecorator(Scene);

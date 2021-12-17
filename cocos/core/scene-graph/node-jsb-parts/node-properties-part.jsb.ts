@@ -162,7 +162,6 @@ export function initNodePropertiesPart () {
             return this._activeInHierarchyArr[0] !== 0;
         },
         set(v) {
-            Node.flushCommandsToNative();
             this._activeInHierarchyArr[0] = (v ? 1 : 0);
         },
     });
@@ -174,7 +173,6 @@ export function initNodePropertiesPart () {
             return this._activeInHierarchyArr[0] !== 0;
         },
         set(v) {
-            Node.flushCommandsToNative();
             this._activeInHierarchyArr[0] = (v ? 1 : 0);
         },
     });
@@ -186,7 +184,6 @@ export function initNodePropertiesPart () {
             return this._layerArr[0];
         },
         set(v) {
-            Node.flushCommandsToNative();
             this._layerArr[0] = v;
             this.emit(NodeEventType.LAYER_CHANGED, v);
         },
@@ -199,7 +196,6 @@ export function initNodePropertiesPart () {
             return this._layerArr[0];
         },
         set(v) {
-            Node.flushCommandsToNative();
             this._layerArr[0] = v;
         },
     });
@@ -251,11 +247,9 @@ export function initNodePropertiesPart () {
         configurable: true,
         enumerable: true,
         get() {
-            Node.flushCommandsToNative();
             return this._parentInternal;
         },
         set(v) {
-            Node.flushCommandsToNative();
             this._parentInternal = v;
             this._setParent(v);
         },
@@ -265,7 +259,6 @@ export function initNodePropertiesPart () {
         configurable: true,
         enumerable: true,
         get() {
-            Node.flushCommandsToNative();
             return this._parentInternal;
         },
         set(v) {
@@ -277,7 +270,6 @@ export function initNodePropertiesPart () {
         configurable: true,
         enumerable: true,
         get() {
-            Node.flushCommandsToNative();
             return this._children;
         },
         set(v) {
@@ -289,7 +281,6 @@ export function initNodePropertiesPart () {
         configurable: true,
         enumerable: true,
         get() {
-            Node.flushCommandsToNative();
             return this._scene;
         }
     });

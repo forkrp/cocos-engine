@@ -1,20 +1,20 @@
+import {Pool} from "../../memop";
+
 export class CommandQueue {
-    private _queueSizeInBytes: number = 1024 * 1024; // Default 1MB
     private _commandQueueArrayBuffer: ArrayBuffer;
-    private _commandQueueIndex: number = 0;
     private _dataView: DataView;
+    private _queueSizeInBytes: number = 0;
     private _byteOffset: number = 0;
     private _flushDepth: number = 0;
-    private _flushCallback: (queueIndex: number, commandBytes: number) => void;
+    private _flushCallback: ((buffer: ArrayBuffer) => void) | null = null;
 
-    constructor(queueIndex: number, flushCallback: (queueIndex: number, commandBytes: number) => void, queueSizeInBytes?: number) {
-        this._flushCallback = flushCallback;
-        if (queueSizeInBytes) {
-            this._queueSizeInBytes = queueSizeInBytes;
-        }
-        this._commandQueueArrayBuffer = new ArrayBuffer(this._queueSizeInBytes);
+    constructor(queueSizeInBytes, flushCallback: (buffer: ArrayBuffer) => void) {
+        this._queueSizeInBytes = queueSizeInBytes;
+        this._commandQueueArrayBuffer = new ArrayBuffer(queueSizeInBytes);
         this._dataView = new DataView(this._commandQueueArrayBuffer);
-        this._commandQueueIndex = queueIndex;
+        this._dataView.setUint32(0, 4, true); // Store used size in the first 4 bytes.
+        this._byteOffset = 4;
+        this._flushCallback = flushCallback;
     }
 
     public get buffer () {
@@ -26,7 +26,7 @@ export class CommandQueue {
     }
 
     public isEmpty() {
-        return this._byteOffset === 0;
+        return this._byteOffset <= 4;
     }
 
     public ensureEnoughSpace(bytesNeeds: number) {
@@ -38,41 +38,52 @@ export class CommandQueue {
     public pushBool(v: boolean) {
         this._dataView.setUint8(this._byteOffset, v ? 1 : 0);
         this._byteOffset += 1;
+        this._dataView.setUint32(0, this._byteOffset, true);
     }
 
     public pushUint8 (v: number) {
         this._dataView.setUint8(this._byteOffset, v);
         this._byteOffset += 1;
+        this._dataView.setUint32(0, this._byteOffset, true);
     }
 
     public pushUint32 (v : number) {
         this._dataView.setUint32(this._byteOffset, v, true);
         this._byteOffset += 4;
+        this._dataView.setUint32(0, this._byteOffset, true);
     }
 
     public pushInt32 (v: number) {
         this._dataView.setInt32(this._byteOffset, v, true);
         this._byteOffset += 4;
+        this._dataView.setUint32(0, this._byteOffset, true);
     }
 
     public pushFloat32 (v: number) {
         this._dataView.setFloat32(this._byteOffset, v, true);
         this._byteOffset += 4;
+        this._dataView.setUint32(0, this._byteOffset, true);
     }
 
     public pushBigUint64 (v: number) {
         // @ts-ignore
         this._dataView.setBigUint64(this._byteOffset, v, true);
         this._byteOffset += 8;
+        this._dataView.setUint32(0, this._byteOffset, true);
     }
 
     public flush () {
         ++this._flushDepth;
         if (this._flushDepth === 1) {
-            if (this._byteOffset > 0) {
-                this._flushCallback(this._commandQueueIndex, this._byteOffset);
-                this._byteOffset = 0;
+            if (this._byteOffset > 4) {
+                if (this._flushCallback) {
+                    this._flushCallback(this._commandQueueArrayBuffer);
+                }
+                this._byteOffset = 4;
+                this._dataView.setUint32(0, 4, true);
             }
+        } else {
+            throw new Error(`Should not happen`);
         }
         --this._flushDepth;
     }
@@ -83,51 +94,37 @@ export class CommandQueue {
 }
 
 export class CommandQueueManager {
-    private _queues: CommandQueue[];
-    private _curQueueIndex: number = 0;
+    private readonly _queues: Pool<CommandQueue>;
+    private _curQueue: CommandQueue;
+    private _genNextQueueCallback: (buffer: ArrayBuffer) => void;
 
-    constructor(flushCallback: (queueIndex: number, commandBytes: number) => void, queueSizeInBytes?: number) {
-        this._queues = [
-            new CommandQueue(0, flushCallback, queueSizeInBytes),
-            new CommandQueue(1, flushCallback, queueSizeInBytes)
-        ];
-    }
-
-    public get queues () {
-        return this._queues;
+    constructor(
+        flushCallback: (buffer: ArrayBuffer) => void,
+        genNextQueueCallback: (buffer: ArrayBuffer) => void,
+        queueSizeInBytes?: number
+    ) {
+        this._queues = new Pool<CommandQueue>(
+            () => new CommandQueue(queueSizeInBytes, flushCallback),
+            5
+        );
+        this._curQueue = this._queues.alloc();
+        this._genNextQueueCallback = genNextQueueCallback;
     }
 
     public getCommandQueue() : CommandQueue {
-        return this._queues[this._curQueueIndex];
-    }
-
-    private flushInternal () {
-        const curQueueIndex = this._curQueueIndex;
-        this.swap();
-        const nextQueueIndex = this._curQueueIndex;
-        this._queues[curQueueIndex].flush();
-
-        if (!this._queues[nextQueueIndex].isEmpty()) {
-            this.flushInternal();
-        }
+        return this._curQueue;
     }
 
     public flush () {
-        this.flushInternal();
-        if (!this.isEmpty()) {
-            throw new Error(`Queues isn't empty after flush`);
+        const curQueue = this._curQueue;
+        if (curQueue.isEmpty()) {
+            return;
         }
-    }
-
-    public isEmpty() : boolean {
-        return this._queues[0].isEmpty() && this._queues[1].isEmpty();
-    }
-
-    public get length() : number {
-        return this._queues[0].length + this._queues[1].length;
-    }
-
-    private swap () {
-        this._curQueueIndex = (this._curQueueIndex + 1) % 2;
+        const nextQueue = this._queues.alloc();
+        this._curQueue = nextQueue;
+        this._genNextQueueCallback(nextQueue.buffer);
+        curQueue.flush();
+        this._queues.free(nextQueue);
+        this._curQueue = curQueue;
     }
 }

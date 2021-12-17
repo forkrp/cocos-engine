@@ -92,12 +92,17 @@ export function initNodeCommandHandlerPart () {
     Node.TransformBit = TransformBit;
 
     Node._setTempFloatArray(_tempFloatArray.buffer);
-    const cqMgr = new CommandQueueManager(Node._flushCommandsToNative, NODE_QUEUE_SIZE_IN_BYTES);
-    Node._setCommandArrayBuffer(cqMgr.queues[0].buffer, cqMgr.queues[1].buffer);
+    const cqMgr = new CommandQueueManager(Node._flushCommandsToNative, Node._genNextCommandQueue, 1024 * 1024);
 
     Node.flushCommandsToNative = function () {
         cqMgr.flush();
     };
+
+    Node.assertIfCommandQueueNotEmpty = function assertIfCommandQueueNotEmpty() {
+        // if (!cqMgr.isEmpty()) {
+        //     throw new Error(`Node command queue is not empty with size: ${cqMgr.length}`);
+        // }
+    }
 
     let isUpdateWorldTransformRecursively: boolean = false;
     Node.setUpdateWorldTransformRecursively = function (v: boolean) {
@@ -111,12 +116,6 @@ export function initNodeCommandHandlerPart () {
             arr[8], arr[9], arr[10], arr[11],
             arr[12], arr[13], arr[14], arr[15],
         );
-    }
-
-    function assertIfCommandQueueNotEmpty() {
-        if (!cqMgr.isEmpty()) {
-            throw new Error(`Node command queue is not empty with size: ${cqMgr.length}`);
-        }
     }
 
 // Async functions
@@ -371,7 +370,7 @@ export function initNodeCommandHandlerPart () {
 
     nodeProto.updateWorldTransform = function () {
         if (isUpdateWorldTransformRecursively) {
-            assertIfCommandQueueNotEmpty();
+            Node.assertIfCommandQueueNotEmpty();
             return;
         }
         this._needUpdatelocalPRS = true;
@@ -467,6 +466,7 @@ export function initNodeCommandHandlerPart () {
     };
 
     nodeProto.setEventMask = function setEventMask(v: number) {
+        this._eventMaskInternal = v;
         const commandQueue = cqMgr.getCommandQueue();
         commandQueue.ensureEnoughSpace(NODE_COMMAND_HEAD_BYTES + 4);
         commandQueue.pushUint8(NODE_COMMAND_SET_EVENT_MASK);
@@ -513,7 +513,7 @@ export function initNodeCommandHandlerPart () {
     nodeProto.getWorldPosition = function getWorldPosition(out?: Vec3): Vec3 {
         const target: Vec3 = out || this._worldPositionCache;
         if (isUpdateWorldTransformRecursively) {
-            assertIfCommandQueueNotEmpty();
+            Node.assertIfCommandQueueNotEmpty();
             const arr = this._worldPositionArr;
             target.set(arr[0], arr[1], arr[2]);
             return target;
@@ -527,7 +527,7 @@ export function initNodeCommandHandlerPart () {
     nodeProto.getWorldRotation = function getWorldRotation(out?: Quat): Quat {
         const target: Quat = out || this._worldRotationCache;
         if (isUpdateWorldTransformRecursively) {
-            assertIfCommandQueueNotEmpty();
+            Node.assertIfCommandQueueNotEmpty();
             const arr = this._worldRotationArr;
             target.set(arr[0], arr[1], arr[2], arr[3]);
             return target;
@@ -541,7 +541,7 @@ export function initNodeCommandHandlerPart () {
     nodeProto.getWorldScale = function getWorldScale(out?: Vec3): Vec3 {
         const target: Vec3 = out || this._worldScaleCache;
         if (isUpdateWorldTransformRecursively) {
-            assertIfCommandQueueNotEmpty();
+            Node.assertIfCommandQueueNotEmpty();
             const arr = this._worldScaleArr;
             target.set(arr[0], arr[1], arr[2]);
             return target;
@@ -555,7 +555,7 @@ export function initNodeCommandHandlerPart () {
     nodeProto.getWorldMatrix = function getWorldMatrix(out?: Mat4): Mat4 {
         const target = out || this._worldMatrixCache;
         if (isUpdateWorldTransformRecursively) {
-            assertIfCommandQueueNotEmpty();
+            Node.assertIfCommandQueueNotEmpty();
             return convertFloat32ArrayToMat4(target, this._worldMatrixArr);
         }
 
@@ -663,8 +663,9 @@ export function initNodeCommandHandlerPart () {
     };
 
     nodeProto.getEventMask = function getEventMask() {
-        Node.flushCommandsToNative();
-        return oldGetEventMask.call(this);
+        // Node.flushCommandsToNative();
+        // return oldGetEventMask.call(this);
+        return this._eventMaskInternal;
     };
 
     nodeProto.setParent = function setParent() {

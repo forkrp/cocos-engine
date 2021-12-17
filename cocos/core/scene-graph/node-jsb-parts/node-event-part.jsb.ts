@@ -18,7 +18,6 @@ export function initNodeEventPart () {
     nodeProto.on = function (type, callback, target, useCapture: any = false) {
         switch (type) {
             case NodeEventType.TRANSFORM_CHANGED:
-
                 // this._eventMask |= TRANSFORM_ON;
                 this.setEventMask(this.getEventMask() | ~TRANSFORM_ON);
                 if (!(this._registeredNodeEventTypeMask & REGISTERED_EVENT_MASK_TRANSFORM_CHANGED)) {

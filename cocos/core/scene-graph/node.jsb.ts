@@ -458,6 +458,7 @@ nodeProto._ctor = function (name?: string) {
     this._worldRSCache = new Mat4();
     this._inverseTransformPointCache = new Vec3();
     this._needUpdatelocalPRS = false;
+    this._eventMaskInternal = 0;
     //
 
     this._registeredNodeEventTypeMask = 0;

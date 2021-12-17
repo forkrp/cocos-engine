@@ -798,6 +798,12 @@ export class Director extends EventTarget {
             this.emit(Director.EVENT_END_FRAME);
             this._totalFrames++;
         }
+
+        if (JSB) {
+            const nodeCtor = Node as any;
+            nodeCtor.flushCommandsToNative();
+            nodeCtor.assertIfCommandQueueNotEmpty();
+        }
     }
 
     private _initOnRendererInitialized () {
