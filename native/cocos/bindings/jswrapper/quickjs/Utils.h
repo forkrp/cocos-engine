@@ -1,6 +1,5 @@
 /****************************************************************************
- Copyright (c) 2016 Chukong Technologies Inc.
- Copyright (c) 2017-2022 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2022 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos.com
 
@@ -26,30 +25,40 @@
 
 #pragma once
 
-#include "config.h"
-
-#if SCRIPT_ENGINE_TYPE == SCRIPT_ENGINE_SM
-    #include "sm/SeApi.h"
-#endif
-
-#if SCRIPT_ENGINE_TYPE == SCRIPT_ENGINE_V8
-    #include "v8/SeApi.h"
-#endif
-
-#if SCRIPT_ENGINE_TYPE == SCRIPT_ENGINE_JSC
-    #include "jsc/SeApi.h"
-#endif
-
-#if SCRIPT_ENGINE_TYPE == SCRIPT_ENGINE_CHAKRACORE
-    #include "chakracore/SeApi.h"
-#endif
+#include "../config.h"
 
 #if SCRIPT_ENGINE_TYPE == SCRIPT_ENGINE_QUICKJS
-    #include "quickjs/SeApi.h"
-#endif
 
-#include "HandleObject.h"
-#include "MappingUtils.h"
-#include "Object.h"
-#include "State.h"
-#include "Value.h"
+    #include "Base.h"
+
+    #include "../Value.h"
+
+namespace se {
+
+class Class;
+
+namespace internal {
+
+void        forceConvertJsValueToStdString(JSContext *cx, JSValue jsval, std::string *ret);
+std::string jsToStdString(JSContext *cx, JSValue jsStr);
+
+void jsToSeArgs(JSContext *cx, int argc, JSValueConst *argv, ValueArray &outArr);
+void jsToSeValue(JSContext *cx, JSValueConst jsval, Value *v);
+void seToJsArgs(JSContext *cx, const ValueArray &args, JSValue *outArr);
+void seToJsValue(JSContext *cx, const Value &v, JSValue *outVal);
+
+void setReturnValue(JSContext *cx, const Value &data, JSValueConst *argv);
+
+bool  hasPrivate(JSContext *cx, JSValue obj);
+void *getPrivate(JSContext *cx, JSValue obj, uint32_t slot);
+void  setPrivate(JSContext *cx, JSValue obj, PrivateObjectBase *data, Object *seObj, JSClassFinalizer finalizeCb);
+void  clearPrivate(JSContext *cx, JSValue obj);
+
+void* SE_JS_GetPrivate(JSValue obj, uint32_t slot);
+void SE_JS_SetPrivate(JSValue obj, uint32_t slot, void* data);
+
+} // namespace internal
+
+} // namespace se
+
+#endif // #if SCRIPT_ENGINE_TYPE == SCRIPT_ENGINE_QUICKJS
