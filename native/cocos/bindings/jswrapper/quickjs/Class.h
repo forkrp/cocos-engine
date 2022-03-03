@@ -50,8 +50,8 @@ public:
          *  @return A class instance used for creating relevant native binding objects.
          *  @note Don't need to delete the pointer return by this method, it's managed internally.
          */
-    static Class *create(const char *className, Object *obj, Object *parentProto, JSCFunction* ctor);
-    static Class *create(const std::initializer_list<const char *> &classPath, se::Object *parent, Object *parentProto, JSCFunction* ctor);
+    static Class *create(const char *className, Object *obj, Object *parentProto, JSCFunction *ctor);
+    static Class *create(const std::initializer_list<const char *> &classPath, se::Object *parent, Object *parentProto, JSCFunction *ctor);
 
     /**
          *  @brief Defines a member function with a callback. Each objects created by class will have this function property.
@@ -59,7 +59,7 @@ public:
          *  @param[in] func A callback to invoke when the property is called as a function.
          *  @return true if succeed, otherwise false.
          */
-    bool defineFunction(const char *name, JSCFunction* func);
+    bool defineFunction(const char *name, JSCFunction *func);
 
     /**
          *  @brief Defines a property with accessor callbacks. Each objects created by class will have this property.
@@ -77,7 +77,7 @@ public:
          *  @param[in] func A callback to invoke when the constructor's property is called as a function.
          *  @return true if succeed, otherwise false.
          */
-    bool defineStaticFunction(const char *name, JSCFunction* func);
+    bool defineStaticFunction(const char *name, JSCFunction *func);
 
     /**
          *  @brief Defines a static property with accessor callbacks. Only JavaScript constructor object will have this property.
@@ -122,7 +122,7 @@ private:
     Class();
     ~Class();
 
-    bool init(const char *clsName, Object *obj, Object *parentProto, JSCFunction* ctor);
+    bool init(const char *clsName, Object *obj, Object *parentProto, JSCFunction *ctor);
     void destroy();
 
     static JSValue _createJSObjectWithClass(Class *cls);
@@ -130,17 +130,16 @@ private:
     static void setContext(JSContext *cx);
     static void cleanup();
 
-
     const char *_name{nullptr};
     Object *    _parent{nullptr};
     Object *    _proto{nullptr};
     Object *    _parentProto{nullptr};
 
-    JSCFunction* _ctor{nullptr};
+    JSCFunction *     _ctor{nullptr};
     JSClassFinalizer *_finalizeOp{nullptr};
 
     JSClassDef _classOps;
-    JSClassID _classId{0};
+    JSClassID  _classId{0};
 
     std::vector<JSCFunctionListEntry> _propertiesOrFuncs;
     std::vector<JSCFunctionListEntry> _staticPropertiesOrStaticFuncs;

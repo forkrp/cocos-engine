@@ -29,7 +29,7 @@
 
 #if SCRIPT_ENGINE_TYPE == SCRIPT_ENGINE_QUICKJS
 
-#include "Base.h"
+    #include "Base.h"
 
 namespace se {
 
@@ -86,7 +86,7 @@ public:
      *  @note This method just add a callback to a vector, callbacks is invoked in `start` method.
      */
     void addPermanentRegisterCallback(RegisterCallback cb);
-    
+
     /**
          *  @brief Starts the script engine.
          *  @return true if succeed, otherwise false.
@@ -151,7 +151,10 @@ public:
      *  @param[in] pathBc The location where bytecode file should be written to. The path should be ends with ".bc", which indicates a bytecode file.
      *  @return true if succeed, otherwise false.
      */
-    bool saveByteCodeToFile(const std::string &path, const std::string &pathBc) { assert(false); return false; } //cjh
+    bool saveByteCodeToFile(const std::string &path, const std::string &pathBc) {
+        assert(false);
+        return false;
+    } //cjh
 
     /**
      * @brief Grab a snapshot of the current JavaScript execution stack.
@@ -230,7 +233,7 @@ public:
     /**
      * @brief Throw JS exception
      */
-    void throwException(const std::string &errorMessage) { assert(false); } //cjh 
+    void throwException(const std::string &errorMessage) { assert(false); } //cjh
 
     /**
          *  @brief Clears all exceptions.
@@ -290,7 +293,6 @@ public:
      * @brief Handle all exceptions throwed by promise
      */
     void handlePromiseExceptions();
-    
 
     // Private API used in wrapper
     JSContext *_getContext() const { return _cx; }
@@ -303,7 +305,7 @@ private:
     ~ScriptEngine();
 
     JSRuntime *_rt{nullptr};
-    JSContext * _cx{nullptr};
+    JSContext *_cx{nullptr};
 
     Object *_globalObj{nullptr};
     Object *_debugGlobalObj{nullptr};

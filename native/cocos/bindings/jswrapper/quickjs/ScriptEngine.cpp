@@ -133,10 +133,9 @@ bool JSB_console_time(State &s) {
 SE_BIND_FUNC(JSB_console_time)
 
 bool JSB_console_timeEnd(State &s) {
-    return true;//TODO(cjh)
+    return true; //TODO(cjh)
 }
 SE_BIND_FUNC(JSB_console_timeEnd)
-
 
 } // namespace
 
@@ -195,9 +194,8 @@ bool ScriptEngine::init() {
     Object::setContext(_cx);
 
     JSValue globalObj = JS_GetGlobalObject(_cx);
-    _globalObj = Object::_createJSObject(nullptr, globalObj);
+    _globalObj        = Object::_createJSObject(nullptr, globalObj);
     _globalObj->root();
-
 
     _globalObj->setProperty("window", Value(_globalObj));
 
@@ -213,15 +211,15 @@ bool ScriptEngine::init() {
     consoleObj->defineFunction("warn", _SE(JSB_console_warn));
     consoleObj->defineFunction("error", _SE(JSB_console_error));
     consoleObj->defineFunction("assert", _SE(JSB_console_assert));
-    consoleObj->defineFunction("time", _SE(JSB_console_info)); //TODO(cjh)
+    consoleObj->defineFunction("time", _SE(JSB_console_info));    //TODO(cjh)
     consoleObj->defineFunction("timeEnd", _SE(JSB_console_info)); //TODO(cjh)
 
     _globalObj->setProperty("console", Value(consoleObj));
 
     _globalObj->setProperty("scriptEngineType", Value("SpiderMonkey"));
 
-//    JS_DefineFunction(_cx, rootedGlobalObj, "log", __log, 0, JSPROP_PERMANENT);
-//    JS_DefineFunction(_cx, rootedGlobalObj, "forceGC", __forceGC, 0, JSPROP_READONLY | JSPROP_PERMANENT);
+    //    JS_DefineFunction(_cx, rootedGlobalObj, "log", __log, 0, JSPROP_PERMANENT);
+    //    JS_DefineFunction(_cx, rootedGlobalObj, "forceGC", __forceGC, 0, JSPROP_READONLY | JSPROP_PERMANENT);
 
     _isValid = true;
 
@@ -254,13 +252,12 @@ void ScriptEngine::cleanup() {
     JS_FreeContext(_cx);
     JS_FreeRuntime(_rt);
 
-    _rt = nullptr;
-    _cx             = nullptr;
-    _globalObj      = nullptr;
-    _isValid        = false;
+    _rt        = nullptr;
+    _cx        = nullptr;
+    _globalObj = nullptr;
+    _isValid   = false;
 
     _registerCallbackArray.clear();
-
 
     for (const auto &hook : _afterCleanupHookArray) {
         hook();
@@ -315,7 +312,6 @@ bool ScriptEngine::start() {
         return false;
 
     if (isDebuggerEnabled() && _debugGlobalObj == nullptr) {
-
     }
 
     bool ok    = false;
@@ -350,7 +346,6 @@ bool ScriptEngine::evalString(const char *script, ssize_t length /* = -1 */, Val
     if (fileName == nullptr)
         fileName = "(no filename)";
 
-
     return false;
 }
 
@@ -378,11 +373,9 @@ void ScriptEngine::setExceptionCallback(const ExceptionCallback &cb) {
 }
 
 void ScriptEngine::setJSExceptionCallback(const ExceptionCallback &cb) { //TODO(cjh)
-
 }
 
 void ScriptEngine::enableDebugger(const std::string &serverAddr, uint32_t port, bool isWait) {
-
 }
 
 bool ScriptEngine::isDebuggerEnabled() const {
@@ -395,8 +388,6 @@ void ScriptEngine::mainLoopUpdate() {
 }
 
 bool ScriptEngine::callFunction(Object *targetObj, const char *funcName, uint32_t argc, Value *args, Value *rval /* = nullptr*/) {
-
-
     return false;
 }
 

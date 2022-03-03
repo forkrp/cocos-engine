@@ -115,8 +115,8 @@ public:
          */
     static Object *createArrayBufferObject(const void *data, size_t byteLength);
 
-    using BufferContentsFreeFunc = void (*)(void* contents, size_t byteLength, void* userData);
-    static Object *createExternalArrayBufferObject(void* contents, size_t nbytes, BufferContentsFreeFunc freeFunc, void* freeUserData = nullptr);
+    using BufferContentsFreeFunc = void (*)(void *contents, size_t byteLength, void *userData);
+    static Object *createExternalArrayBufferObject(void *contents, size_t nbytes, BufferContentsFreeFunc freeFunc, void *freeUserData = nullptr);
 
     /**
          *  @brief Creates a JavaScript Object from a JSON formatted string.
@@ -187,7 +187,7 @@ public:
          *  @param[in] func The native callback triggered by JavaScript code.
          *  @return true if succeed, otherwise false.
          */
-    bool defineFunction(const char *funcName, JSCFunction* func);
+    bool defineFunction(const char *funcName, JSCFunction *func);
 
     /**
          *  @brief Tests whether an object can be called as a function.
@@ -409,7 +409,7 @@ public:
     static Object *_createJSObject(Class *cls, JSValue obj);
     static Object *_createJSObjectForConstructor(Class *cls, JSValueConst *args);
     void           _setFinalizeCallback(JSClassFinalizer finalizeCb);
-    JSValue     _getJSObject() const;
+    JSValue        _getJSObject() const;
     Class *        _getClass() const { return _cls; }
     //
 
@@ -427,9 +427,9 @@ private:
 
     JSValue _obj{JS_UNDEFINED};
 
-    PrivateObjectBase *    _privateObject{nullptr};
+    PrivateObjectBase *_privateObject{nullptr};
 
-    Class *      _cls{nullptr};
+    Class *           _cls{nullptr};
     JSClassFinalizer *_finalizeCb{nullptr};
 
     uint32_t _rootCount{0};

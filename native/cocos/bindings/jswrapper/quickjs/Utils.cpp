@@ -35,12 +35,12 @@ namespace se {
 
 namespace internal {
 
-void* SE_JS_GetPrivate(JSValue obj, uint32_t slot) {
+void *SE_JS_GetPrivate(JSValue obj, uint32_t slot) {
     assert(slot >= 0 && slot < 2);
     return nullptr;
 }
 
-void SE_JS_SetPrivate(JSValue obj, uint32_t slot, void* data) {
+void SE_JS_SetPrivate(JSValue obj, uint32_t slot, void *data) {
     assert(slot >= 0 && slot < 2);
 }
 
@@ -50,7 +50,6 @@ bool isJSBClass(JSValue obj) {
 
 void forceConvertJsValueToStdString(JSContext *cx, JSValue jsval, std::string *ret) {
     assert(ret != nullptr);
-
 }
 
 std::string jsToStdString(JSContext *cx, JSValue jsStr) {
@@ -66,9 +65,9 @@ void jsToSeArgs(JSContext *cx, int argc, JSValueConst *argv, ValueArray &outArr)
 
 void seToJsArgs(JSContext *cx, const ValueArray &args, JSValue *outArr) {
     for (const auto &arg : args) {
-//        JS::RootedValue v(cx);
-//        seToJsValue(cx, arg, &v);
-//        outArr->append(v);
+        //        JS::RootedValue v(cx);
+        //        seToJsValue(cx, arg, &v);
+        //        outArr->append(v);
     }
 }
 
@@ -91,16 +90,12 @@ void seToJsValue(JSContext *cx, const Value &arg, JSValue *outVal) {
         } break;
 
         case Value::Type::Null: {
-
         } break;
 
         case Value::Type::Undefined: {
-
         } break;
         case Value::Type::BigInt: {
-
-        }
-            break;
+        } break;
         default:
             assert(false);
             break;
@@ -113,7 +108,7 @@ void jsToSeValue(JSContext *cx, JSValue jsval, Value *v) {
         JS_ToFloat64(cx, &val, jsval);
         v->setDouble(val);
     } else if (JS_IsString(jsval)) {
-        const char* cStr = JS_ToCString(cx, jsval);
+        const char *cStr = JS_ToCString(cx, jsval);
         if (cStr != nullptr) {
             v->setString(cStr);
             JS_FreeCString(cx, cStr);
@@ -121,16 +116,16 @@ void jsToSeValue(JSContext *cx, JSValue jsval, Value *v) {
     } else if (JS_IsBool(jsval)) {
         v->setBoolean(JS_ToBool(cx, jsval));
     } else if (JS_IsObject(jsval)) {
-        Object *object = nullptr;
+        Object *           object        = nullptr;
         PrivateObjectBase *privateObject = static_cast<PrivateObjectBase *>(getPrivate(cx, jsval, 0));
-        void *nativeObj = privateObject ? privateObject->getRaw() : nullptr;
-        bool needRoot = false;
+        void *             nativeObj     = privateObject ? privateObject->getRaw() : nullptr;
+        bool               needRoot      = false;
         if (nativeObj != nullptr) {
             object = Object::getObjectWithPtr(nativeObj);
         }
 
         if (object == nullptr) {
-            object = Object::_createJSObject(nullptr, jsval);
+            object   = Object::_createJSObject(nullptr, jsval);
             needRoot = true;
         }
         v->setObject(object, needRoot);
@@ -149,7 +144,6 @@ void jsToSeValue(JSContext *cx, JSValue jsval, Value *v) {
 }
 
 void setReturnValue(JSContext *cx, const Value &data, JSValueConst *argv) {
-
 }
 
 bool hasPrivate(JSContext *cx, JSValue obj) {

@@ -34,7 +34,7 @@ namespace se {
 
 namespace {
 
-JSContext *__cx = nullptr;
+JSContext *          __cx = nullptr;
 std::vector<Class *> __allClasses;
 
 } // namespace
@@ -48,7 +48,7 @@ Class::Class() {
 Class::~Class() {
 }
 
-Class *Class::create(const char *className, Object *obj, Object *parentProto, JSCFunction* ctor) {
+Class *Class::create(const char *className, Object *obj, Object *parentProto, JSCFunction *ctor) {
     Class *cls = new Class();
     if (cls != nullptr && !cls->init(className, obj, parentProto, ctor)) {
         delete cls;
@@ -57,11 +57,10 @@ Class *Class::create(const char *className, Object *obj, Object *parentProto, JS
     return cls;
 }
 
-Class *Class::create(const std::initializer_list<const char *> &classPath, se::Object *parent, Object *parentProto, JSCFunction* ctor) {
-
+Class *Class::create(const std::initializer_list<const char *> &classPath, se::Object *parent, Object *parentProto, JSCFunction *ctor) {
 }
 
-bool Class::init(const char *clsName, Object *parent, Object *parentProto, JSCFunction* ctor) {
+bool Class::init(const char *clsName, Object *parent, Object *parentProto, JSCFunction *ctor) {
     _name = clsName;
 
     JS_NewClassID(&_classId);
@@ -99,7 +98,7 @@ bool Class::install() {
     return true;
 }
 
-bool Class::defineFunction(const char *name, JSCFunction* func) {
+bool Class::defineFunction(const char *name, JSCFunction *func) {
     JSCFunctionListEntry cb = JS_CFUNC_DEF(name, 0, func);
     _propertiesOrFuncs.emplace_back(cb);
     return true;
@@ -119,7 +118,7 @@ bool Class::defineProperty(const std::initializer_list<const char *> &names, JSP
     return ret;
 }
 
-bool Class::defineStaticFunction(const char *name, JSCFunction* func) {
+bool Class::defineStaticFunction(const char *name, JSCFunction *func) {
     JSCFunctionListEntry cb = JS_CFUNC_DEF(name, 0, func);
     _staticPropertiesOrStaticFuncs.emplace_back(cb);
     return true;
@@ -137,7 +136,6 @@ bool Class::defineFinalizeFunction(JSClassFinalizer func) {
 }
 
 JSValue Class::_createJSObjectWithClass(Class *cls) {
-
 }
 
 void Class::setContext(JSContext *cx) {

@@ -54,8 +54,8 @@ void *getPrivate(JSContext *cx, JSValue obj, uint32_t slot);
 void  setPrivate(JSContext *cx, JSValue obj, PrivateObjectBase *data, Object *seObj, JSClassFinalizer finalizeCb);
 void  clearPrivate(JSContext *cx, JSValue obj);
 
-void* SE_JS_GetPrivate(JSValue obj, uint32_t slot);
-void SE_JS_SetPrivate(JSValue obj, uint32_t slot, void* data);
+void *SE_JS_GetPrivate(JSValue obj, uint32_t slot);
+void  SE_JS_SetPrivate(JSValue obj, uint32_t slot, void *data);
 
 } // namespace internal
 

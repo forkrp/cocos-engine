@@ -36,7 +36,7 @@ using JSPropSetter = JSValue (*)(JSContext *ctx, JSValueConst this_val, JSValueC
 #include <assert.h>
 #include <chrono>
 #include <functional>
+#include <initializer_list>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <initializer_list>

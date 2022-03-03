@@ -60,7 +60,7 @@ Object::~Object() {
 }
 
 bool Object::init(Class *cls, JSValue obj) {
-    _cls  = cls;
+    _cls = cls;
     _obj = obj;
 
     assert(__objectMap.find(this) == __objectMap.end());
@@ -101,7 +101,7 @@ Object *Object::createPlainObject() {
 
 Object *Object::createObjectWithClass(Class *cls) {
     JSValue jsobj = Class::_createJSObjectWithClass(cls);
-    Object *  obj   = Object::_createJSObject(cls, jsobj);
+    Object *obj   = Object::_createJSObject(cls, jsobj);
     return obj;
 }
 
@@ -120,71 +120,71 @@ Object *Object::createArrayObject(size_t length) {
     for (size_t i = 0; i < length; ++i) {
         JS_SetPropertyUint32(__cx, jsobj, i, JS_UNDEFINED);
     }
-    Object *         obj = Object::_createJSObject(nullptr, jsobj);
+    Object *obj = Object::_createJSObject(nullptr, jsobj);
     return obj;
 }
 
 Object *Object::createArrayBufferObject(const void *data, size_t byteLength) {
-    Object* obj = nullptr;
+    Object *obj = nullptr;
 
-//    if (byteLength > 0 && data != nullptr)
-//    {
-//        mozilla::UniquePtr<uint8_t[], JS::FreePolicy> jsBuf(
-//            js_pod_arena_malloc<uint8_t>(js::ArrayBufferContentsArena, byteLength)
-//        );
-//        if (!jsBuf)
-//            return nullptr;
-//
-//        memcpy(jsBuf.get(), data, byteLength);
-//        JS::RootedObject jsobj(__cx, JS::NewArrayBufferWithContents(__cx, byteLength, jsBuf.get()));
-//        if (jsobj)
-//        {
-//            // If JS::NewArrayBufferWithContents returns non-null, the ownership of
-//            // the data is transfered to obj, so we release the ownership here.
-//            mozilla::Unused << jsBuf.release();
-//
-//            obj = Object::_createJSObject(nullptr, jsobj);
-//        }
-//    }
-//    else
-//    {
-//        JS::RootedObject jsobj(__cx, JS::NewArrayBuffer(__cx, byteLength));
-//        if (jsobj)
-//        {
-//            obj = Object::_createJSObject(nullptr, jsobj);
-//        }
-//    }
+    //    if (byteLength > 0 && data != nullptr)
+    //    {
+    //        mozilla::UniquePtr<uint8_t[], JS::FreePolicy> jsBuf(
+    //            js_pod_arena_malloc<uint8_t>(js::ArrayBufferContentsArena, byteLength)
+    //        );
+    //        if (!jsBuf)
+    //            return nullptr;
+    //
+    //        memcpy(jsBuf.get(), data, byteLength);
+    //        JS::RootedObject jsobj(__cx, JS::NewArrayBufferWithContents(__cx, byteLength, jsBuf.get()));
+    //        if (jsobj)
+    //        {
+    //            // If JS::NewArrayBufferWithContents returns non-null, the ownership of
+    //            // the data is transfered to obj, so we release the ownership here.
+    //            mozilla::Unused << jsBuf.release();
+    //
+    //            obj = Object::_createJSObject(nullptr, jsobj);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        JS::RootedObject jsobj(__cx, JS::NewArrayBuffer(__cx, byteLength));
+    //        if (jsobj)
+    //        {
+    //            obj = Object::_createJSObject(nullptr, jsobj);
+    //        }
+    //    }
 
     return obj;
 }
 
 /* static */
-Object *Object::createExternalArrayBufferObject(void* contents, size_t byteLength, BufferContentsFreeFunc freeFunc, void* freeUserData/* = nullptr*/) {
+Object *Object::createExternalArrayBufferObject(void *contents, size_t byteLength, BufferContentsFreeFunc freeFunc, void *freeUserData /* = nullptr*/) {
     struct BackingStoreUserData {
         BufferContentsFreeFunc freeFunc;
-        void* freeUserData;
-        size_t byteLength;
+        void *                 freeUserData;
+        size_t                 byteLength;
     };
 
-    auto* userData = new BackingStoreUserData();
-    userData->freeFunc = freeFunc;
+    auto *userData         = new BackingStoreUserData();
+    userData->freeFunc     = freeFunc;
     userData->freeUserData = freeUserData;
-    userData->byteLength = byteLength;
+    userData->byteLength   = byteLength;
 
-    Object* obj = nullptr;
-//    JS::RootedObject jsobj(__cx, JS::NewExternalArrayBuffer(
-//        __cx, byteLength, contents,
-//        [](void* data, void* deleterData) {
-//            auto* userData = reinterpret_cast<BackingStoreUserData*>(deleterData);
-//            userData->freeFunc(data, userData->byteLength, userData->freeUserData);
-//            delete userData;
-//        },
-//        userData)
-//    );
-//    if (jsobj)
-//    {
-//        obj = Object::_createJSObject(nullptr, jsobj);
-//    }
+    Object *obj = nullptr;
+    //    JS::RootedObject jsobj(__cx, JS::NewExternalArrayBuffer(
+    //        __cx, byteLength, contents,
+    //        [](void* data, void* deleterData) {
+    //            auto* userData = reinterpret_cast<BackingStoreUserData*>(deleterData);
+    //            userData->freeFunc(data, userData->byteLength, userData->freeUserData);
+    //            delete userData;
+    //        },
+    //        userData)
+    //    );
+    //    if (jsobj)
+    //    {
+    //        obj = Object::_createJSObject(nullptr, jsobj);
+    //    }
     return obj;
 }
 
@@ -199,43 +199,44 @@ Object *Object::createTypedArray(TypedArrayType type, const void *data, size_t b
         return nullptr;
     }
 
+    #define CREATE_TYPEDARRAY(_type_, _data, _byteLength, count)                        \
+        {                                                                               \
+            void *           tmpData = nullptr;                                         \
+            JS::RootedObject arr(__cx, JS_New##_type_##Array(__cx, (uint32_t)(count))); \
+            bool             isShared = false;                                          \
+            if (_data != nullptr) {                                                     \
+                JS::AutoCheckCannotGC nogc;                                             \
+                tmpData = JS_Get##_type_##ArrayData(arr, &isShared, nogc);              \
+                memcpy(tmpData, (const void *)_data, (_byteLength));                    \
+            }                                                                           \
+            Object *obj = Object::_createJSObject(nullptr, arr);                        \
+            return obj;                                                                 \
+        }
 
-#define CREATE_TYPEDARRAY(_type_, _data, _byteLength, count) { \
-        void* tmpData = nullptr; \
-        JS::RootedObject arr(__cx, JS_New##_type_##Array(__cx, (uint32_t)(count))); \
-        bool isShared = false; \
-        if (_data != nullptr) { \
-            JS::AutoCheckCannotGC nogc; \
-            tmpData = JS_Get##_type_##ArrayData(arr, &isShared, nogc); \
-            memcpy(tmpData, (const void*)_data, (_byteLength)); \
-        } \
-        Object* obj = Object::_createJSObject(nullptr, arr); \
-        return obj; }
+    //        switch (type) {
+    //            case TypedArrayType::INT8:
+    //                CREATE_TYPEDARRAY(Int8, data, byteLength, byteLength);
+    //            case TypedArrayType::INT16:
+    //                CREATE_TYPEDARRAY(Int16, data, byteLength, byteLength/2);
+    //            case TypedArrayType::INT32:
+    //                CREATE_TYPEDARRAY(Int32, data, byteLength, byteLength/4);
+    //            case TypedArrayType::UINT8:
+    //                CREATE_TYPEDARRAY(Uint8, data, byteLength, byteLength);
+    //            case TypedArrayType::UINT16:
+    //                CREATE_TYPEDARRAY(Uint16, data, byteLength, byteLength/2);
+    //            case TypedArrayType::UINT32:
+    //                CREATE_TYPEDARRAY(Uint32, data, byteLength, byteLength/4);
+    //            case TypedArrayType::FLOAT32:
+    //                CREATE_TYPEDARRAY(Float32, data, byteLength, byteLength/4);
+    //            case TypedArrayType::FLOAT64:
+    //                CREATE_TYPEDARRAY(Float64, data, byteLength, byteLength/8);
+    //            default:
+    //                assert(false); // Should never go here.
+    //                break;
+    //        }
 
-//        switch (type) {
-//            case TypedArrayType::INT8:
-//                CREATE_TYPEDARRAY(Int8, data, byteLength, byteLength);
-//            case TypedArrayType::INT16:
-//                CREATE_TYPEDARRAY(Int16, data, byteLength, byteLength/2);
-//            case TypedArrayType::INT32:
-//                CREATE_TYPEDARRAY(Int32, data, byteLength, byteLength/4);
-//            case TypedArrayType::UINT8:
-//                CREATE_TYPEDARRAY(Uint8, data, byteLength, byteLength);
-//            case TypedArrayType::UINT16:
-//                CREATE_TYPEDARRAY(Uint16, data, byteLength, byteLength/2);
-//            case TypedArrayType::UINT32:
-//                CREATE_TYPEDARRAY(Uint32, data, byteLength, byteLength/4);
-//            case TypedArrayType::FLOAT32:
-//                CREATE_TYPEDARRAY(Float32, data, byteLength, byteLength/4);
-//            case TypedArrayType::FLOAT64:
-//                CREATE_TYPEDARRAY(Float64, data, byteLength, byteLength/8);
-//            default:
-//                assert(false); // Should never go here.
-//                break;
-//        }
-
-        return nullptr;
-#undef CREATE_TYPEDARRAY
+    return nullptr;
+    #undef CREATE_TYPEDARRAY
 }
 
 /* static */
@@ -264,45 +265,45 @@ Object *Object::createTypedArrayWithBuffer(TypedArrayType type, const Object *ob
     }
 
     assert(obj->isArrayBuffer());
-//    JS::RootedObject jsobj(__cx, obj->_getJSObject());
-//
-//    switch (type) {
-//        case TypedArrayType::INT8: {
-//            JS::RootedObject typeArray(__cx, JS_NewInt8ArrayWithBuffer(__cx, jsobj, offset, byteLength));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        case TypedArrayType::INT16: {
-//            JS::RootedObject typeArray(__cx, JS_NewInt16ArrayWithBuffer(__cx, jsobj, offset, byteLength / 2));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        case TypedArrayType::INT32: {
-//            JS::RootedObject typeArray(__cx, JS_NewInt32ArrayWithBuffer(__cx, jsobj, offset, byteLength / 4));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        case TypedArrayType::UINT8: {
-//            JS::RootedObject typeArray(__cx, JS_NewUint8ArrayWithBuffer(__cx, jsobj, offset, byteLength));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        case TypedArrayType::UINT16: {
-//            JS::RootedObject typeArray(__cx, JS_NewUint16ArrayWithBuffer(__cx, jsobj, offset, byteLength / 2));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        case TypedArrayType::UINT32: {
-//            JS::RootedObject typeArray(__cx, JS_NewUint32ArrayWithBuffer(__cx, jsobj, offset, byteLength / 4));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        case TypedArrayType::FLOAT32: {
-//            JS::RootedObject typeArray(__cx, JS_NewFloat32ArrayWithBuffer(__cx, jsobj, offset, byteLength / 4));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        case TypedArrayType::FLOAT64: {
-//            JS::RootedObject typeArray(__cx, JS_NewFloat64ArrayWithBuffer(__cx, jsobj, offset, byteLength / 8));
-//            return Object::_createJSObject(nullptr, typeArray);
-//        }
-//        default:
-//            assert(false); // Should never go here.
-//            break;
-//    }
+    //    JS::RootedObject jsobj(__cx, obj->_getJSObject());
+    //
+    //    switch (type) {
+    //        case TypedArrayType::INT8: {
+    //            JS::RootedObject typeArray(__cx, JS_NewInt8ArrayWithBuffer(__cx, jsobj, offset, byteLength));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        case TypedArrayType::INT16: {
+    //            JS::RootedObject typeArray(__cx, JS_NewInt16ArrayWithBuffer(__cx, jsobj, offset, byteLength / 2));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        case TypedArrayType::INT32: {
+    //            JS::RootedObject typeArray(__cx, JS_NewInt32ArrayWithBuffer(__cx, jsobj, offset, byteLength / 4));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        case TypedArrayType::UINT8: {
+    //            JS::RootedObject typeArray(__cx, JS_NewUint8ArrayWithBuffer(__cx, jsobj, offset, byteLength));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        case TypedArrayType::UINT16: {
+    //            JS::RootedObject typeArray(__cx, JS_NewUint16ArrayWithBuffer(__cx, jsobj, offset, byteLength / 2));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        case TypedArrayType::UINT32: {
+    //            JS::RootedObject typeArray(__cx, JS_NewUint32ArrayWithBuffer(__cx, jsobj, offset, byteLength / 4));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        case TypedArrayType::FLOAT32: {
+    //            JS::RootedObject typeArray(__cx, JS_NewFloat32ArrayWithBuffer(__cx, jsobj, offset, byteLength / 4));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        case TypedArrayType::FLOAT64: {
+    //            JS::RootedObject typeArray(__cx, JS_NewFloat64ArrayWithBuffer(__cx, jsobj, offset, byteLength / 8));
+    //            return Object::_createJSObject(nullptr, typeArray);
+    //        }
+    //        default:
+    //            assert(false); // Should never go here.
+    //            break;
+    //    }
 
     return nullptr;
 }
@@ -312,7 +313,7 @@ Object *Object::createUint8TypedArray(uint8_t *data, size_t dataCount) {
 }
 
 Object *Object::createJSONObject(const std::string &jsonStr) {
-    Object *obj = nullptr;
+    Object *obj   = nullptr;
     JSValue jsval = JS_ParseJSON(__cx, jsonStr.c_str(), jsonStr.length(), "json_file");
     if (!JS_IsException(jsval)) {
         obj = Object::_createJSObject(nullptr, jsval);
@@ -355,7 +356,7 @@ bool Object::call(const ValueArray &args, Object *thisObject, Value *rval /* = n
     return false;
 }
 
-bool Object::defineFunction(const char *funcName, JSCFunction* func) {
+bool Object::defineFunction(const char *funcName, JSCFunction *func) {
     assert(false);
     return false;
 }
@@ -397,25 +398,25 @@ bool Object::isTypedArray() const {
 
 Object::TypedArrayType Object::getTypedArrayType() const {
     TypedArrayType ret = TypedArrayType::NONE;
-//    JSValue     obj = _getJSObject();
-//    if (JS_IsInit(obj))
-//        ret = TypedArrayType::INT8;
-//    else if (JS_IsInt16Array(obj))
-//        ret = TypedArrayType::INT16;
-//    else if (JS_IsInt32Array(obj))
-//        ret = TypedArrayType::INT32;
-//    else if (JS_IsUint8Array(obj))
-//        ret = TypedArrayType::UINT8;
-//    else if (JS_IsUint8ClampedArray(obj))
-//        ret = TypedArrayType::UINT8_CLAMPED;
-//    else if (JS_IsUint16Array(obj))
-//        ret = TypedArrayType::UINT16;
-//    else if (JS_IsUint32Array(obj))
-//        ret = TypedArrayType::UINT32;
-//    else if (JS_IsFloat32Array(obj))
-//        ret = TypedArrayType::FLOAT32;
-//    else if (JS_IsFloat64Array(obj))
-//        ret = TypedArrayType::FLOAT64;
+    //    JSValue     obj = _getJSObject();
+    //    if (JS_IsInit(obj))
+    //        ret = TypedArrayType::INT8;
+    //    else if (JS_IsInt16Array(obj))
+    //        ret = TypedArrayType::INT16;
+    //    else if (JS_IsInt32Array(obj))
+    //        ret = TypedArrayType::INT32;
+    //    else if (JS_IsUint8Array(obj))
+    //        ret = TypedArrayType::UINT8;
+    //    else if (JS_IsUint8ClampedArray(obj))
+    //        ret = TypedArrayType::UINT8_CLAMPED;
+    //    else if (JS_IsUint16Array(obj))
+    //        ret = TypedArrayType::UINT16;
+    //    else if (JS_IsUint32Array(obj))
+    //        ret = TypedArrayType::UINT32;
+    //    else if (JS_IsFloat32Array(obj))
+    //        ret = TypedArrayType::FLOAT32;
+    //    else if (JS_IsFloat64Array(obj))
+    //        ret = TypedArrayType::FLOAT64;
 
     return ret;
 }
