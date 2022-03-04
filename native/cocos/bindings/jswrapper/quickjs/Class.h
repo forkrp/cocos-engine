@@ -117,7 +117,7 @@ public:
 
     // Private API used in wrapper
     JSClassFinalizer *_getFinalizeCb() const;
-    JSClassID _getClassID() const { return _classId; };
+    JSClassID         _getClassID() const { return _classId; };
     //
 private:
     Class();

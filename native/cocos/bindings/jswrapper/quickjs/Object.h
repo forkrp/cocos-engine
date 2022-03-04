@@ -423,7 +423,7 @@ private:
     void protect();
     void unprotect();
     void reset();
-    bool hasProperty(const char* name) const;
+    bool hasProperty(const char *name) const;
 
     JSValue _obj{JS_UNDEFINED};
 

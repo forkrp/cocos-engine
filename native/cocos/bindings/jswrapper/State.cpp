@@ -37,7 +37,7 @@ State::State(Object *thisObject)
 }
 
 State::State(Object *thisObject, const ValueArray &args)
-:  _thisObject(thisObject),
+: _thisObject(thisObject),
   _args(&args) {
     if (_thisObject != nullptr) {
         _thisObject->incRef();

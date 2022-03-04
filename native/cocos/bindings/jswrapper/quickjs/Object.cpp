@@ -114,12 +114,11 @@ Object *Object::createArrayObject(size_t length) {
 }
 
 Object *Object::createArrayBufferObject(const void *data, size_t byteLength) {
-    Object *obj = nullptr;
-    JSValue jsobj =JS_NewArrayBufferCopy(__cx, reinterpret_cast<const uint8_t *>(data), byteLength);
+    Object *obj   = nullptr;
+    JSValue jsobj = JS_NewArrayBufferCopy(__cx, reinterpret_cast<const uint8_t *>(data), byteLength);
     if (!JS_IsException(jsobj)) {
         obj = Object::_createJSObject(nullptr, jsobj);
-    }
-    else {
+    } else {
         ScriptEngine::getInstance()->clearException();
     }
 
@@ -141,16 +140,17 @@ Object *Object::createExternalArrayBufferObject(void *contents, size_t byteLengt
 
     Object *obj = nullptr;
 
-    JSValue jsobj = JS_NewArrayBuffer(__cx, reinterpret_cast<uint8_t*>(contents), byteLength, [](JSRuntime *rt, void *opaque, void *ptr){
-        auto* userData = reinterpret_cast<BackingStoreUserData*>(opaque);
-        userData->freeFunc(ptr, userData->byteLength, userData->freeUserData);
-        delete userData;
-    }, userData, 0);
+    JSValue jsobj = JS_NewArrayBuffer(
+        __cx, reinterpret_cast<uint8_t *>(contents), byteLength, [](JSRuntime *rt, void *opaque, void *ptr) {
+            auto *userData = reinterpret_cast<BackingStoreUserData *>(opaque);
+            userData->freeFunc(ptr, userData->byteLength, userData->freeUserData);
+            delete userData;
+        },
+        userData, 0);
 
     if (!JS_IsException(jsobj)) {
         obj = Object::_createJSObject(nullptr, jsobj);
-    }
-    else {
+    } else {
         ScriptEngine::getInstance()->clearException();
     }
     return obj;
@@ -167,17 +167,17 @@ Object *Object::createTypedArray(TypedArrayType type, const void *data, size_t b
         return nullptr;
     }
 
-    #define CREATE_TYPEDARRAY(_name, _classId)                        \
-    { \
-        se::Value ctorVal; \
-        se::ScriptEngine::getInstance()->getGlobalObject()->getProperty(#_name, &ctorVal); \
-        JSValue ab = JS_NewArrayBufferCopy(__cx, reinterpret_cast<const uint8_t *>(data), byteLength); \
-        JS_DupValue(__cx, ab); \
-        JSValue ta = js_typed_array_constructor_ta(__cx, ctorVal.toObject()->_getJSObject(), ab, JS_CLASS_UINT8C_ARRAY); \
-        JS_FreeValue(__cx, ab); \
-        Object* obj = Object::_createJSObject(nullptr, ta); \
-        return obj; \
-    }
+    #define CREATE_TYPEDARRAY(_name, _classId)                                                                               \
+        {                                                                                                                    \
+            se::Value ctorVal;                                                                                               \
+            se::ScriptEngine::getInstance()->getGlobalObject()->getProperty(#_name, &ctorVal);                               \
+            JSValue ab = JS_NewArrayBufferCopy(__cx, reinterpret_cast<const uint8_t *>(data), byteLength);                   \
+            JS_DupValue(__cx, ab);                                                                                           \
+            JSValue ta = js_typed_array_constructor_ta(__cx, ctorVal.toObject()->_getJSObject(), ab, JS_CLASS_UINT8C_ARRAY); \
+            JS_FreeValue(__cx, ab);                                                                                          \
+            Object *obj = Object::_createJSObject(nullptr, ta);                                                              \
+            return obj;                                                                                                      \
+        }
 
     switch (type) {
         case TypedArrayType::INT8:
@@ -283,8 +283,7 @@ Object *Object::createJSONObject(const std::string &jsonStr) {
     JSValue jsval = JS_ParseJSON(__cx, jsonStr.c_str(), jsonStr.length(), "json_file");
     if (!JS_IsException(jsval)) {
         obj = Object::_createJSObject(nullptr, jsval);
-    }
-    else {
+    } else {
         ScriptEngine::getInstance()->clearException();
     }
     return obj;
@@ -297,14 +296,14 @@ void Object::_setFinalizeCallback(JSClassFinalizer finalizeCb) {
 bool Object::getProperty(const char *name, Value *data, bool cachePropertyName) {
     assert(data != nullptr);
 
-    bool ret = false;
+    bool    ret   = false;
     JSValue jsval = JS_UNDEFINED;
 
     JSAtom atom = JS_NewAtom(__cx, name);
 
     if (JS_HasProperty(__cx, _obj, atom) > 0) {
         jsval = JS_GetProperty(__cx, _obj, atom);
-        ret = true;
+        ret   = true;
     }
 
     JS_FreeAtom(__cx, atom);
@@ -345,7 +344,7 @@ bool Object::defineOwnProperty(const char *name, const se::Value &value, bool wr
 bool Object::call(const ValueArray &args, Object *thisObject, Value *rval /* = nullptr*/) {
     assert(isFunction());
 
-    JSValue *jsArgs = reinterpret_cast<JSValue*>(alloca(args.size() * sizeof(JSValue)));
+    JSValue *jsArgs = reinterpret_cast<JSValue *>(alloca(args.size() * sizeof(JSValue)));
     internal::seToJsArgs(__cx, args, jsArgs);
     JSValue jsRet = JS_Call(__cx, _obj, (thisObject != nullptr ? thisObject->_getJSObject() : JS_UNDEFINED), args.size(), jsArgs);
     if (!JS_IsException(jsRet) && rval != nullptr) {
@@ -454,9 +453,9 @@ bool Object::isArrayBuffer() const {
     return false;
 }
 
-bool Object::hasProperty(const char* name) const {
+bool Object::hasProperty(const char *name) const {
     JSAtom atom = JS_NewAtom(__cx, name);
-    bool ret = false;
+    bool   ret  = false;
     if (JS_HasProperty(__cx, _obj, atom) > 0) {
         ret = true;
     }
@@ -480,29 +479,28 @@ bool Object::getAllKeys(std::vector<std::string> *allKeys) const {
     assert(allKeys != nullptr);
     allKeys->clear();
 
-    uint32_t len, i;
+    uint32_t        len, i;
     JSPropertyEnum *tab;
-    char **envp, *pair;
-    const char *key, *str;
-    JSValue val;
-    size_t key_len, str_len;
+    char **         envp, *pair;
+    const char *    key, *str;
+    JSValue         val;
+    size_t          key_len, str_len;
 
     if (JS_GetOwnPropertyNames(__cx, &tab, &len, _obj, JS_GPN_STRING_MASK | JS_GPN_ENUM_ONLY) < 0) {
         return false;
     }
 
     do {
-        for(i = 0; i < len; i++) {
+        for (i = 0; i < len; i++) {
             key = JS_AtomToCString(__cx, tab[i].atom);
             if (key != nullptr) {
                 allKeys->emplace_back(str);
                 JS_FreeCString(__cx, key);
-            }
-            else {
+            } else {
                 break;
             }
         }
-    } while(false);
+    } while (false);
 
     return true;
 }

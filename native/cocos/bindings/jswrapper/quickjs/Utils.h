@@ -51,7 +51,7 @@ void *getPrivate(JSValue obj);
 void  setPrivate(JSValue obj, Object *seObj);
 void  clearPrivate(JSValue obj);
 
-bool isJSBClass(JSValue obj) ;
+bool isJSBClass(JSValue obj);
 
 void jsObjectToSeObject(JSValueConst jsval, Value *v);
 

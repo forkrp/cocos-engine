@@ -160,14 +160,13 @@ void clearPrivate(JSValue obj) {
 }
 
 void jsObjectToSeObject(JSValueConst jsval, Value *v) {
-    Value ret;
+    Value   ret;
     Object *seObj = static_cast<Object *>(getPrivate(jsval));
     if (seObj == nullptr) {
         seObj = Object::_createJSObject(nullptr, jsval);
         v->setObject(seObj, true);
         seObj->decRef();
-    }
-    else {
+    } else {
         v->setObject(seObj, false);
     }
 }

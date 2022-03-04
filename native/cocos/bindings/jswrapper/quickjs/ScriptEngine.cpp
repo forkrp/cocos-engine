@@ -39,7 +39,7 @@ namespace {
 
 const char *BYTE_CODE_FILE_EXT = ".jsc";
 
-#define countof(x) (sizeof(x) / sizeof((x)[0]))
+    #define countof(x) (sizeof(x) / sizeof((x)[0]))
 
 ScriptEngine *__instance = nullptr;
 
@@ -58,8 +58,7 @@ JSValue __log(JSContext *ctx, JSValueConst thisVal, int argc, JSValueConst *argv
     return JS_UNDEFINED;
 }
 
-void js_dump_obj(JSContext *ctx, FILE *f, JSValueConst val)
-{
+void js_dump_obj(JSContext *ctx, FILE *f, JSValueConst val) {
     const char *str;
 
     str = JS_ToCString(ctx, val);
@@ -411,8 +410,8 @@ void ScriptEngine::clearException() {
         return;
     }
 
-    JSValue val = JS_UNDEFINED;
-    int is_error = JS_IsError(_cx, exception_val);
+    JSValue val      = JS_UNDEFINED;
+    int     is_error = JS_IsError(_cx, exception_val);
     js_dump_obj(_cx, stderr, exception_val);
     if (is_error) {
         val = JS_GetPropertyStr(_cx, exception_val, "stack");
