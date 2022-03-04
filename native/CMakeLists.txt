@@ -10,9 +10,10 @@ set(ENGINE_NAME cocos_engine)
 
 ################################# options ############################################
 # default fallback options
-cc_set_if_undefined(USE_SE_V8                ON)
+cc_set_if_undefined(USE_SE_V8                OFF)
 cc_set_if_undefined(USE_SE_SM                OFF)
-cc_set_if_undefined(USE_V8_DEBUGGER          ON)
+cc_set_if_undefined(USE_SE_QUICKJS           ON)
+cc_set_if_undefined(USE_V8_DEBUGGER          OFF)
 cc_set_if_undefined(USE_SOCKET               ON)
 cc_set_if_undefined(USE_AUDIO                ON)
 cc_set_if_undefined(USE_EDIT_BOX             ON)
@@ -55,6 +56,22 @@ endif()
 if(USE_SE_JSC)
     set(USE_SE_V8 OFF)
     set(USE_V8_DEBUGGER OFF)
+    set(USE_SE_SM OFF)
+    set(USE_SE_QUICKJS OFF)
+endif()
+
+if(USE_SE_QUICKJS)
+    set(USE_SE_V8 OFF)
+    set(USE_V8_DEBUGGER OFF)
+    set(USE_SE_SM OFF)
+    set(USE_SE_JSC OFF)
+endif()
+
+if(USE_SE_SM)
+    set(USE_SE_V8 OFF)
+    set(USE_V8_DEBUGGER OFF)
+    set(USE_SE_JSC OFF)
+    set(USE_SE_QUICKJS OFF)
 endif()
 
 if(NOT USE_SOCKET)
@@ -101,6 +118,7 @@ cc_inspect_values(
     CC_USE_GLES2
     CC_USE_VULKAN
     USE_SE_V8
+    USE_SE_QUICKJS
     USE_V8_DEBUGGER
     USE_SE_SM
     USE_SOCKET
@@ -2444,6 +2462,23 @@ if(USE_SE_SM)
     )
 endif()
 
+if(USE_SE_QUICKJS)
+    cocos_source_files(MODULE ccbindings
+                    cocos/bindings/jswrapper/quickjs/Base.h
+        NO_WERROR   cocos/bindings/jswrapper/quickjs/Class.cpp
+                    cocos/bindings/jswrapper/quickjs/Class.h
+                    cocos/bindings/jswrapper/quickjs/HelperMacros.h
+        NO_WERROR   cocos/bindings/jswrapper/quickjs/HelperMacros.cpp
+        NO_WERROR   cocos/bindings/jswrapper/quickjs/Object.cpp
+                    cocos/bindings/jswrapper/quickjs/Object.h
+        NO_WERROR   cocos/bindings/jswrapper/quickjs/ScriptEngine.cpp
+                    cocos/bindings/jswrapper/quickjs/ScriptEngine.h
+                    cocos/bindings/jswrapper/quickjs/SeApi.h
+        NO_WERROR   cocos/bindings/jswrapper/quickjs/Utils.cpp
+                    cocos/bindings/jswrapper/quickjs/Utils.h
+    )
+endif()
+
 cocos_source_files(MODULE ccbindings
                  cocos/bindings/jswrapper/config.cpp
                  cocos/bindings/jswrapper/config.h
@@ -2818,8 +2853,10 @@ function(cc_apply_definations target)
         $<IF:$<BOOL:${USE_JOB_SYSTEM_TASKFLOW}>,USE_JOB_SYSTEM_TASKFLOW=1,USE_JOB_SYSTEM_TASKFLOW=0>
         $<IF:$<BOOL:${USE_PHYSICS_PHYSX}>,USE_PHYSICS_PHYSX=1,USE_PHYSICS_PHYSX=0>
         $<IF:$<BOOL:${CC_EDITOR}>,CC_EDITOR=1,CC_EDITOR=0>
-        $<$<BOOL:${USE_SE_JSC}>:SCRIPT_ENGINE_TYPE=3>
+        $<$<BOOL:${USE_SE_V8}>:SCRIPT_ENGINE_TYPE=0>
         $<$<BOOL:${USE_SE_SM}>:SCRIPT_ENGINE_TYPE=1>
+        $<$<BOOL:${USE_SE_JSC}>:SCRIPT_ENGINE_TYPE=3>
+        $<$<BOOL:${USE_SE_QUICKJS}>:SCRIPT_ENGINE_TYPE=5>
         $<$<CONFIG:Debug>:CC_DEBUG=1>
     )
 endfunction()
