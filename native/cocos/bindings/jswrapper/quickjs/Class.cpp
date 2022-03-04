@@ -58,13 +58,19 @@ Class *Class::create(const char *className, Object *obj, Object *parentProto, JS
 }
 
 Class *Class::create(const std::initializer_list<const char *> &classPath, se::Object *parent, Object *parentProto, JSCFunction *ctor) {
+    se::AutoHandleScope scope;
+    se::Object *        currentParent = parent;
+    se::Value           tmp;
+    for (auto i = 0; i < classPath.size() - 1; i++) {
+        bool ok = currentParent->getProperty(*(classPath.begin() + i), &tmp);
+        CCASSERT(ok, "class or namespace in path is not defined");
+        currentParent = tmp.toObject();
+    }
+    return create(*(classPath.end() - 1), currentParent, parentProto, ctor);
 }
 
 bool Class::init(const char *clsName, Object *parent, Object *parentProto, JSCFunction *ctor) {
     _name = clsName;
-
-    JS_NewClassID(&_classId);
-    JS_NewClass(JS_GetRuntime(__cx), _classId, &_classOps);
 
     _parent = parent;
     if (_parent != nullptr)
@@ -87,13 +93,31 @@ void Class::destroy() {
 }
 
 bool Class::install() {
-    _proto = Object::createPlainObject();
-    _proto->root();
+    JS_NewClassID(&_classId);se::ScriptEngine::getInstance()->clearException();
+    _classOps.class_name = _name;se::ScriptEngine::getInstance()->clearException();
+    _classOps.finalizer = _finalizeOp;se::ScriptEngine::getInstance()->clearException();
+    JS_NewClass(JS_GetRuntime(__cx), _classId, &_classOps);se::ScriptEngine::getInstance()->clearException();
 
-    JS_SetPropertyFunctionList(__cx, _proto->_getJSObject(), _propertiesOrFuncs.data(), _propertiesOrFuncs.size());
-    JSValue ctorVal = JS_NewCFunction2(__cx, _ctor, _name, 0, JS_CFUNC_constructor, 0);
-    JS_SetConstructor(__cx, ctorVal, _proto->_getJSObject());
-    JS_SetClassProto(__cx, _classId, _proto->_getJSObject());
+    JSValue protoObj = JS_UNDEFINED;
+    if (_parentProto != nullptr){
+        protoObj = JS_NewObjectProtoClass(__cx, _parentProto->_getJSObject(), _classId);se::ScriptEngine::getInstance()->clearException();
+    }
+    else {
+        protoObj = JS_NewObject(__cx);se::ScriptEngine::getInstance()->clearException();
+    }
+
+    JS_SetPropertyFunctionList(__cx, protoObj, _propertiesOrFuncs.data(), _propertiesOrFuncs.size());se::ScriptEngine::getInstance()->clearException();
+    JSValue ctorVal = JS_NewCFunction2(__cx, _ctor, _name, 0, JS_CFUNC_constructor, 0);se::ScriptEngine::getInstance()->clearException();
+    JS_SetConstructor(__cx, ctorVal, protoObj);se::ScriptEngine::getInstance()->clearException();
+    JS_SetClassProto(__cx, _classId, protoObj);se::ScriptEngine::getInstance()->clearException();
+
+    JS_SetPropertyFunctionList(__cx, ctorVal, _staticPropertiesOrStaticFuncs.data(), _staticPropertiesOrStaticFuncs.size());se::ScriptEngine::getInstance()->clearException();
+
+    JS_SetPropertyStr(__cx, _parent->_getJSObject(), _name, ctorVal);se::ScriptEngine::getInstance()->clearException();
+
+    _proto = Object::_createJSObject(this, protoObj);se::ScriptEngine::getInstance()->clearException();
+    _proto->root();
+    se::ScriptEngine::getInstance()->clearException();
 
     return true;
 }
@@ -136,6 +160,8 @@ bool Class::defineFinalizeFunction(JSClassFinalizer func) {
 }
 
 JSValue Class::_createJSObjectWithClass(Class *cls) {
+    JSValue protoVal = cls->_proto != nullptr ? cls->_proto->_getJSObject() : JS_UNDEFINED;
+    return JS_NewObjectProtoClass(__cx, protoVal, cls->_classId);
 }
 
 void Class::setContext(JSContext *cx) {

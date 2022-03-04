@@ -39,23 +39,21 @@ class Class;
 
 namespace internal {
 
-void        forceConvertJsValueToStdString(JSContext *cx, JSValue jsval, std::string *ret);
-std::string jsToStdString(JSContext *cx, JSValue jsStr);
+void forceConvertJsValueToStdString(JSContext *cx, JSValue jsval, std::string *ret);
 
 void jsToSeArgs(JSContext *cx, int argc, JSValueConst *argv, ValueArray &outArr);
 void jsToSeValue(JSContext *cx, JSValueConst jsval, Value *v);
 void seToJsArgs(JSContext *cx, const ValueArray &args, JSValue *outArr);
 void seToJsValue(JSContext *cx, const Value &v, JSValue *outVal);
 
-void setReturnValue(JSContext *cx, const Value &data, JSValueConst *argv);
+bool  hasPrivate(JSValue obj);
+void *getPrivate(JSValue obj);
+void  setPrivate(JSValue obj, Object *seObj);
+void  clearPrivate(JSValue obj);
 
-bool  hasPrivate(JSContext *cx, JSValue obj);
-void *getPrivate(JSContext *cx, JSValue obj, uint32_t slot);
-void  setPrivate(JSContext *cx, JSValue obj, PrivateObjectBase *data, Object *seObj, JSClassFinalizer finalizeCb);
-void  clearPrivate(JSContext *cx, JSValue obj);
+bool isJSBClass(JSValue obj) ;
 
-void *SE_JS_GetPrivate(JSValue obj, uint32_t slot);
-void  SE_JS_SetPrivate(JSValue obj, uint32_t slot, void *data);
+void jsObjectToSeObject(JSValueConst jsval, Value *v);
 
 } // namespace internal
 

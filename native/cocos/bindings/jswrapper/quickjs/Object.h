@@ -407,7 +407,6 @@ public:
 
     // Private API used in wrapper
     static Object *_createJSObject(Class *cls, JSValue obj);
-    static Object *_createJSObjectForConstructor(Class *cls, JSValueConst *args);
     void           _setFinalizeCallback(JSClassFinalizer finalizeCb);
     JSValue        _getJSObject() const;
     Class *        _getClass() const { return _cls; }
@@ -424,6 +423,7 @@ private:
     void protect();
     void unprotect();
     void reset();
+    bool hasProperty(const char* name) const;
 
     JSValue _obj{JS_UNDEFINED};
 

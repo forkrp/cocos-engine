@@ -29,55 +29,31 @@
 
 namespace se {
 
-State::State() = default;
+State::State(Object *thisObject)
+: _thisObject(thisObject) {
+    if (_thisObject != nullptr) {
+        _thisObject->incRef();
+    }
+}
+
+State::State(Object *thisObject, const ValueArray &args)
+:  _thisObject(thisObject),
+  _args(&args) {
+    if (_thisObject != nullptr) {
+        _thisObject->incRef();
+    }
+}
 
 State::~State() {
     SAFE_DEC_REF(_thisObject);
 }
 
-State::State(PrivateObjectBase *privateObject)
-: _privateObject(privateObject) {}
-
-State::State(PrivateObjectBase *privateObject, const ValueArray &args)
-: _privateObject(privateObject),
-  _args(&args) {
-}
-
-State::State(Object *thisObject, const ValueArray &args)
-: _thisObject(thisObject),
-  _args(&args) {
-    if (_thisObject != nullptr) {
-        _thisObject->incRef();
-    }
-}
-
-State::State(Object *thisObject, PrivateObjectBase *privateObject)
-: _privateObject(privateObject),
-  _thisObject(thisObject) {
-    if (_thisObject != nullptr) {
-        _thisObject->incRef();
-    }
-}
-
-State::State(Object *thisObject, PrivateObjectBase *privateObject, const ValueArray &args)
-: _privateObject(privateObject),
-  _thisObject(thisObject),
-  _args(&args) {
-    if (_thisObject != nullptr) {
-        _thisObject->incRef();
-    }
-}
-
 void *State::nativeThisObject() const {
-    return _privateObject ? _privateObject->getRaw() : nullptr;
+    return _thisObject->getPrivateData();
 }
 
 Object *State::thisObject() {
-    if (nullptr == _thisObject && nullptr != _privateObject) {
-        _thisObject = se::Object::getObjectWithPtr(_privateObject->getRaw());
-    }
-    // _nativeThisObject in Static method will be nullptr
-    //        assert(_thisObject != nullptr);
+    assert(_thisObject != nullptr);
     return _thisObject;
 }
 

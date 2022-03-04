@@ -39,6 +39,8 @@ namespace {
 
 const char *BYTE_CODE_FILE_EXT = ".jsc";
 
+#define countof(x) (sizeof(x) / sizeof((x)[0]))
+
 ScriptEngine *__instance = nullptr;
 
 JSValue __forceGC(JSContext *ctx, JSValueConst thisVal, int argc, JSValueConst *argv) {
@@ -54,6 +56,19 @@ JSValue __log(JSContext *ctx, JSValueConst thisVal, int argc, JSValueConst *argv
         }
     }
     return JS_UNDEFINED;
+}
+
+void js_dump_obj(JSContext *ctx, FILE *f, JSValueConst val)
+{
+    const char *str;
+
+    str = JS_ToCString(ctx, val);
+    if (str) {
+        fprintf(f, ">> %s\n", str);
+        JS_FreeCString(ctx, str);
+    } else {
+        fprintf(f, "[exception]\n");
+    }
 }
 
 // ------------------------------------------------------- ScriptEngine
@@ -165,7 +180,7 @@ ScriptEngine::ScriptEngine() {
 
 bool ScriptEngine::init() {
     cleanup();
-    SE_LOGD("Initializing SpiderMonkey, version: %s\n", "2021-03-27");
+    SE_LOGD("Initializing QuickJS, version: %s\n", "2021-03-27");
     ++_vmId;
 
     for (const auto &hook : _beforeInitHookArray) {
@@ -183,6 +198,8 @@ bool ScriptEngine::init() {
         return false;
     }
 
+    JS_SetMaxStackSize(_rt, 0xFFFFFFFF);
+
     JS_AddIntrinsicBigFloat(_cx);
     JS_AddIntrinsicBigDecimal(_cx);
     JS_AddIntrinsicOperators(_cx);
@@ -199,7 +216,7 @@ bool ScriptEngine::init() {
 
     _globalObj->setProperty("window", Value(_globalObj));
 
-    // SpiderMonkey isn't shipped with a console variable. Make a fake one.
+    // QuickJS isn't shipped with a console variable. Make a fake one.
     Value consoleVal;
     bool  hasConsole = _globalObj->getProperty("console", &consoleVal) && consoleVal.isObject();
     assert(!hasConsole);
@@ -216,10 +233,17 @@ bool ScriptEngine::init() {
 
     _globalObj->setProperty("console", Value(consoleObj));
 
-    _globalObj->setProperty("scriptEngineType", Value("SpiderMonkey"));
+    _globalObj->setProperty("scriptEngineType", Value("quickjs"));
 
-    //    JS_DefineFunction(_cx, rootedGlobalObj, "log", __log, 0, JSPROP_PERMANENT);
-    //    JS_DefineFunction(_cx, rootedGlobalObj, "forceGC", __forceGC, 0, JSPROP_READONLY | JSPROP_PERMANENT);
+    static const JSCFunctionListEntry funcs[] = {
+        JS_CFUNC_DEF("log", 0, __log),
+        JS_CFUNC_DEF("forceGC", 0, __forceGC),
+    };
+    JS_SetPropertyFunctionList(_cx, globalObj, funcs, countof(funcs));
+
+    JS_FreeValue(_cx, globalObj);
+
+    evalString("log(window.scriptEngineType); if (console) { log(console.debug); } function AAA(){}; log(AAA);  ");
 
     _isValid = true;
 
@@ -346,7 +370,16 @@ bool ScriptEngine::evalString(const char *script, ssize_t length /* = -1 */, Val
     if (fileName == nullptr)
         fileName = "(no filename)";
 
-    return false;
+    JSValue jsRet = JS_Eval(_cx, script, length, fileName, JS_EVAL_TYPE_GLOBAL);
+    if (JS_IsException(jsRet)) {
+        clearException();
+        return false;
+    }
+
+    if (ret != nullptr) {
+        internal::jsToSeValue(_cx, jsRet, ret);
+    }
+    return true;
 }
 
 void ScriptEngine::setFileOperationDelegate(const FileOperationDelegate &delegate) {
@@ -360,12 +393,36 @@ const ScriptEngine::FileOperationDelegate &ScriptEngine::getFileOperationDelegat
 bool ScriptEngine::runScript(const std::string &path, Value *ret /* = nullptr */) {
     assert(_fileOperationDelegate.isValid());
 
+    std::string scriptBuffer = _fileOperationDelegate.onGetStringFromFile(path);
+    if (!scriptBuffer.empty()) {
+        return evalString(scriptBuffer.c_str(), static_cast<ssize_t>(scriptBuffer.length()), ret, path.c_str());
+    }
+
+    SE_LOGE("ScriptEngine::runScript script %s, buffer is empty!\n", path.c_str());
     return false;
 }
 
 void ScriptEngine::clearException() {
     if (_cx == nullptr)
         return;
+
+    JSValue exception_val = JS_GetException(_cx);
+    if (JS_IsUndefined(exception_val) || JS_IsNull(exception_val) || JS_IsUninitialized(exception_val)) {
+        return;
+    }
+
+    JSValue val = JS_UNDEFINED;
+    int is_error = JS_IsError(_cx, exception_val);
+    js_dump_obj(_cx, stderr, exception_val);
+    if (is_error) {
+        val = JS_GetPropertyStr(_cx, exception_val, "stack");
+        if (!JS_IsUndefined(val)) {
+            js_dump_obj(_cx, stderr, val);
+        }
+        JS_FreeValue(_cx, val);
+    }
+
+    JS_FreeValue(_cx, exception_val);
 }
 
 void ScriptEngine::setExceptionCallback(const ExceptionCallback &cb) {

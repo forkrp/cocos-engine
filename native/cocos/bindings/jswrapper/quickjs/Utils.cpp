@@ -35,26 +35,25 @@ namespace se {
 
 namespace internal {
 
-void *SE_JS_GetPrivate(JSValue obj, uint32_t slot) {
-    assert(slot >= 0 && slot < 2);
-    return nullptr;
+void *SE_JS_GetPrivate(JSValue obj) {
+    return JS_GetOpaqueDontCheckClassId(obj);
 }
 
-void SE_JS_SetPrivate(JSValue obj, uint32_t slot, void *data) {
-    assert(slot >= 0 && slot < 2);
+void SE_JS_SetPrivate(JSValue obj, void *data) {
+    JS_SetOpaque(obj, data);
 }
 
 bool isJSBClass(JSValue obj) {
-    return false;
+    return JS_IsNativeObject(obj);
 }
 
 void forceConvertJsValueToStdString(JSContext *cx, JSValue jsval, std::string *ret) {
     assert(ret != nullptr);
-}
-
-std::string jsToStdString(JSContext *cx, JSValue jsStr) {
-    std::string ret;
-    return ret;
+    const char *cStr = JS_ToCString(cx, jsval);
+    if (cStr != nullptr) {
+        *ret = cStr;
+        JS_FreeCString(cx, cStr);
+    }
 }
 
 void jsToSeArgs(JSContext *cx, int argc, JSValueConst *argv, ValueArray &outArr) {
@@ -64,10 +63,12 @@ void jsToSeArgs(JSContext *cx, int argc, JSValueConst *argv, ValueArray &outArr)
 }
 
 void seToJsArgs(JSContext *cx, const ValueArray &args, JSValue *outArr) {
+    uint32_t i = 0;
     for (const auto &arg : args) {
-        //        JS::RootedValue v(cx);
-        //        seToJsValue(cx, arg, &v);
-        //        outArr->append(v);
+        JSValue v;
+        seToJsValue(cx, arg, &v);
+        outArr[i] = v;
+        ++i;
     }
 }
 
@@ -116,20 +117,7 @@ void jsToSeValue(JSContext *cx, JSValue jsval, Value *v) {
     } else if (JS_IsBool(jsval)) {
         v->setBoolean(JS_ToBool(cx, jsval));
     } else if (JS_IsObject(jsval)) {
-        Object *           object        = nullptr;
-        PrivateObjectBase *privateObject = static_cast<PrivateObjectBase *>(getPrivate(cx, jsval, 0));
-        void *             nativeObj     = privateObject ? privateObject->getRaw() : nullptr;
-        bool               needRoot      = false;
-        if (nativeObj != nullptr) {
-            object = Object::getObjectWithPtr(nativeObj);
-        }
-
-        if (object == nullptr) {
-            object   = Object::_createJSObject(nullptr, jsval);
-            needRoot = true;
-        }
-        v->setObject(object, needRoot);
-        object->decRef();
+        jsObjectToSeObject(jsval, v);
     } else if (JS_IsNull(jsval)) {
         v->setNull();
     } else if (JS_IsUndefined(jsval)) {
@@ -143,36 +131,44 @@ void jsToSeValue(JSContext *cx, JSValue jsval, Value *v) {
     }
 }
 
-void setReturnValue(JSContext *cx, const Value &data, JSValueConst *argv) {
-}
-
-bool hasPrivate(JSContext *cx, JSValue obj) {
+bool hasPrivate(JSValue obj) {
     return isJSBClass(obj);
 }
 
-void *getPrivate(JSContext *cx, JSValue obj, uint32_t slot) {
+void *getPrivate(JSValue obj) {
     bool found = isJSBClass(obj);
     if (found) {
-        return SE_JS_GetPrivate(obj, slot);
+        return SE_JS_GetPrivate(obj);
     }
 
     return nullptr;
 }
 
-void setPrivate(JSContext *cx, JSValue obj, PrivateObjectBase *data, Object *seObj, JSClassFinalizer finalizeCb) {
+void setPrivate(JSValue obj, Object *seObj) {
     bool found = isJSBClass(obj);
     assert(found);
     if (found) {
-        SE_JS_SetPrivate(obj, 0, data);
-        SE_JS_SetPrivate(obj, 1, seObj);
+        SE_JS_SetPrivate(obj, seObj);
     }
 }
 
-void clearPrivate(JSContext *cx, JSValue obj) {
+void clearPrivate(JSValue obj) {
     bool found = isJSBClass(obj);
     if (found) {
-        SE_JS_SetPrivate(obj, 0, nullptr);
-        SE_JS_SetPrivate(obj, 1, nullptr);
+        SE_JS_SetPrivate(obj, nullptr);
+    }
+}
+
+void jsObjectToSeObject(JSValueConst jsval, Value *v) {
+    Value ret;
+    Object *seObj = static_cast<Object *>(getPrivate(jsval));
+    if (seObj == nullptr) {
+        seObj = Object::_createJSObject(nullptr, jsval);
+        v->setObject(seObj, true);
+        seObj->decRef();
+    }
+    else {
+        v->setObject(seObj, false);
     }
 }
 
