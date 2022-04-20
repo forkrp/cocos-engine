@@ -512,9 +512,9 @@ struct is_jsb_object : std::false_type {}; // NOLINT(readability-identifier-nami
 template <typename T>
 constexpr bool is_jsb_object_v = is_jsb_object<typename std::remove_const<T>::type>::value; // NOLINT
 
-#define JSB_REGISTER_OBJECT_TYPE(T) \
+#define JSB_REGISTER_OBJECT_TYPE(...) \
     template <>                     \
-    struct is_jsb_object<T> : std::true_type {}
+    struct is_jsb_object<__VA_ARGS__> : std::true_type {}
 
 template <typename Out, typename In>
 constexpr inline typename std::enable_if<std::is_same<Out, In>::value, Out>::type &
@@ -1126,6 +1126,19 @@ bool nativevalue_to_se(const cc::variant<ARGS...> *from, se::Value &to, se::Obje
     return nativevalue_to_se(*from, to, ctx);
 }
 
+template <typename T>
+inline bool nativevalue_to_se(const ccstd::vector<T> &from, se::Value &to, se::Object *ctx); // NOLINT
+
+template <typename T>
+inline bool nativevalue_to_se(const ccstd::vector<T> *from, se::Value &to, se::Object *ctx) {
+    return nativevalue_to_se(*from, to, ctx);
+}
+
+template <typename T>
+inline bool nativevalue_to_se(ccstd::vector<T> * const from, se::Value &to, se::Object *ctx) {
+    return nativevalue_to_se(*from, to, ctx);
+}
+
 #if HAS_CONSTEXPR
 
 template <typename T>
@@ -1192,9 +1205,6 @@ bool nativevalue_to_se(const std::reference_wrapper<T> ref, se::Value &to, se::O
 
 template <typename... ARGS>
 bool nativevalue_to_se(const std::tuple<ARGS...> &from, se::Value &to, se::Object *ctx); // NOLINT
-
-template <typename T>
-inline bool nativevalue_to_se(const ccstd::vector<T> &from, se::Value &to, se::Object *ctx); // NOLINT
 
 template <typename K, typename V>
 inline bool nativevalue_to_se(const ccstd::unordered_map<K, V> &from, se::Value &to, se::Object *ctx); // NOLINT
