@@ -5,101 +5,14 @@
 %}
 
 %insert(header_file) %{
-#include <type_traits>
-#include "cocos/bindings/jswrapper/SeApi.h"
-#include "cocos/bindings/manual/jsb_conversions.h"
-#include "cocos/renderer/GFXDeviceManager.h"
+#include "bindings/jswrapper/SeApi.h"
+#include "bindings/manual/jsb_conversions.h"
+#include "renderer/GFXDeviceManager.h"
 %}
 
 %{
-#include "cocos/bindings/auto/jsb_gfx_auto.h"
+#include "bindings/auto/jsb_gfx_auto.h"
 %}
-
-%insert(header_file) %{
-struct MySize final {
-    float width;
-    float height;
-};
-
-struct MyRect {
-    float x;
-    float y;
-    MySize size;
-};
-
-%}
-
-struct MySize final {
-    float width;
-    float height;
-};
-
-struct MyRect {
-    float x;
-    float y;
-    MySize size;
-};
-
-// template<class T> 
-// class Foo {
-//     void foo();
-// };
-
-// template<class T> 
-// class Bar : public Foo<T> {
-//     void bar();
-// };
-
-// %inline %{
-
-// namespace cc { namespace gfx {
-//     class Hello final {
-//     public:
-//         static void foo();
-
-//         int get_hello();
-//     };
-// }}
-// %}
-
-// namespace cc { namespace gfx {
-//     %attribute(Hello, int, hello, get_hello);
-// }}
-
-// %{
-//     #include <string>
-//     #include <utility>
-// %}
-
-// #define %my_mangle(Type...)  #@Type
-
-// %define TEMPLATE_WRAP(prefix, T...) 
-// %template(prefix ## Foo) Foo<T >;
-// %template(prefix ## Bar) Bar<T >;
-// %enddef
-
-
-// // TEMPLATE_WRAP(int, int)
-// // TEMPLATE_WRAP(double, double)
-// // TEMPLATE_WRAP(String, char *)
-// TEMPLATE_WRAP(PairStringInt, std::pair<std::string, int>)
-
-
-
-// %insert(header_file) %{
-
-// template<class T> 
-// class Foo {
-//     void foo();
-// };
-
-// template<class T> 
-// class Bar : public Foo<T> {
-//     void bar();
-// };
-
-// %}
-
 
 // Device
 %attribute(cc::gfx::Device, cc::gfx::API, gfxAPI, getGfxAPI);
@@ -216,7 +129,7 @@ namespace cc { namespace gfx {
 %ignore CommandBuffer::execute;
 %ignore CommandBuffer::updateBuffer;
 %ignore CommandBuffer::copyBuffersToTexture;
-%ignore CommandBuffer::draw(const DrawInfo&);
+%rename(drawWithInfo) CommandBuffer::draw(const DrawInfo&);
 
 %ignore DescriptorSetLayout::getBindingIndices;
 %ignore DescriptorSetLayout::descriptorIndices;
@@ -235,18 +148,15 @@ namespace cc { namespace gfx {
 
 %import "base/Macros.h"
 %import "base/memory/Memory.h"
-// %import "base/RefCounted.h"
 
 %include "renderer/gfx-base/GFXDef-common.h"
 %include "renderer/gfx-base/GFXObject.h"
-
 %include "renderer/gfx-base/GFXBuffer.h"
 %include "renderer/gfx-base/GFXCommandBuffer.h"
 %include "renderer/gfx-base/GFXDescriptorSet.h"
 %include "renderer/gfx-base/GFXDescriptorSetLayout.h"
 %include "renderer/gfx-base/GFXFramebuffer.h"
 %include "renderer/gfx-base/GFXInputAssembler.h"
-
 %include "renderer/gfx-base/GFXPipelineLayout.h"
 %include "renderer/gfx-base/GFXPipelineState.h"
 %include "renderer/gfx-base/GFXQueryPool.h"
