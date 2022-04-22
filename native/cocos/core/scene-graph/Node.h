@@ -118,6 +118,7 @@ public:
     void walk(const std::function<void(Node *)> &preFunc);
     void walk(const std::function<void(Node *)> &preFunc, const std::function<void(Node *)> &postFunc);
 
+#ifndef SWIGCOCOS
     template <typename Target, typename... Args>
     void on(const CallbacksInvoker::KeyType &type, void (Target::*memberFn)(Args...), Target *target, bool useCapture = false);
 
@@ -202,6 +203,8 @@ public:
     bool hasEventListener(const CallbacksInvoker::KeyType &type, void (Target::*memberFn)(Args...), Target *target) const;
 
     void targetOff(const CallbacksInvoker::KeyType &type);
+
+#endif // SWIG_COCOS
 
     bool destroy() override {
         if (CCObject::destroy()) {
@@ -710,6 +713,8 @@ private:
     CC_DISALLOW_COPY_MOVE_ASSIGN(Node);
 };
 
+#ifndef SWIGCOCOS
+
 template <typename T>
 bool Node::isNode(T *obj) {
     return dynamic_cast<Node *>(obj) != nullptr && dynamic_cast<Scene *>(obj) == nullptr;
@@ -854,5 +859,7 @@ template <typename Target, typename... Args>
 bool Node::hasEventListener(const CallbacksInvoker::KeyType &type, void (Target::*memberFn)(Args...), Target *target) const {
     return _eventProcessor->hasEventListener(type, memberFn, target);
 }
+
+#endif // SWIGCOCOS
 
 } // namespace cc
