@@ -72,7 +72,9 @@ namespace cc {
 
 %attribute(cc::TextureBase, bool, isCompressed, isCompressed);
 %attribute(cc::TextureBase, uint32_t, _width, getWidth, setWidth);
+%attribute(cc::TextureBase, uint32_t, width, getWidth, setWidth);
 %attribute(cc::TextureBase, uint32_t, _height, getHeight, setHeight);
+%attribute(cc::TextureBase, uint32_t, height, getHeight, setHeight);
 
 %attribute(cc::SimpleTexture, uint32_t, mipmapLevel, mipmapLevel);
 %attribute(cc::RenderTexture, cc::scene::RenderWindow*, window, getWindow);
