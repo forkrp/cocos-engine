@@ -8,6 +8,7 @@
 #include "cocos/bindings/auto/jsb_scene_auto.h"
 #include "cocos/renderer/pipeline/custom/RenderCommonJsb.h"
 #include "cocos/renderer/pipeline/custom/RenderGraphJsb.h"
+#include "renderer/pipeline/GlobalDescriptorSetManager.h"
 
 #ifndef JSB_ALLOC
 #define JSB_ALLOC(kls, ...) new (std::nothrow) kls(__VA_ARGS__)
