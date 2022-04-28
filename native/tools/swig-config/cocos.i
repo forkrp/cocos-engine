@@ -26,6 +26,7 @@ namespace cc {
 // %rename(CanvasGradient) ICanvasGradient;
 %rename(PlistParser) SAXParser;
 
+%ignore ICanvasRenderingContext2D::Delegate;
 %ignore ICanvasRenderingContext2D::setCanvasBufferUpdatedCallback;
 %ignore ICanvasRenderingContext2D::fillText;
 %ignore ICanvasRenderingContext2D::strokeText;

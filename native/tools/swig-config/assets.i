@@ -17,37 +17,110 @@
 #include "3d/assets/Morph.h"
 #include "3d/assets/Mesh.h"
 #include "3d/assets/Skeleton.h"
+#include "3d/misc/CreateMesh.h"
 %}
 
 %{
 #include "bindings/auto/jsb_assets_auto.h"
 #include "bindings/auto/jsb_cocos_auto.h"
 #include "bindings/auto/jsb_gfx_auto.h"
+#include "bindings/auto/jsb_scene_auto.h"
 
 #include "renderer/core/PassUtils.h"
 #include "renderer/gfx-base/GFXDef-common.h"
 #include "renderer/pipeline/Define.h"
 #include "renderer/pipeline/RenderStage.h"
 #include "scene/Pass.h"
+#include "scene/RenderWindow.h"
 #include "core/scene-graph/Scene.h"
 %}
+
+
+%rename(cpp_keyword_struct) cc::Mesh::ICreateInfo::structInfo;
+%rename(cpp_keyword_switch) cc::IPassInfoFull::switch_;
+%rename(cpp_keyword_register) cc::EffectAsset::registerAsset;
+
+%rename(_getProperty) cc::Material::getProperty;
+%rename(_propsInternal) cc::Material::_props;
+
+%rename(_getBindposes) cc::Skeleton::getBindposes;
+%rename(_setBindposes) cc::Skeleton::setBindposes;
+
+%rename(_data) cc::IMemoryImageSource::data;
+%rename(_compressed) cc::IMemoryImageSource::compressed;
 
 namespace cc {
 %ignore Asset::createNode; //FIXME: swig needs to support std::function
 %ignore BufferAsset::getBuffer;
-%ignore IMemoryImageSource::data;
+// %ignore IMemoryImageSource::data;
 %ignore SimpleTexture::uploadDataWithArrayBuffer;
-%ignore Mesh::copyAttribute; //TODO:
-%ignore Mesh::copyIndices;//TODO:
-%ignore SceneAsset::setScene;
+// %ignore Mesh::copyAttribute; //TODO:
+// %ignore Mesh::copyIndices;//TODO:
+%ignore Material::setProperty;
+%ignore ImageAsset::setData;
 }
+
+%attribute(cc::Asset, ccstd::string&, _uuid, getUuid, setUuid);
+%attribute(cc::Asset, ccstd::string, nativeUrl, getNativeUrl);
+%attribute(cc::Asset, cc::NativeDep, _nativeDep, getNativeDep);
+%attribute(cc::Asset, bool, isDefault, isDefault);
+
+%attribute(cc::ImageAsset, cc::PixelFormat, format, getFormat, setFormat);
+%attribute(cc::ImageAsset, ccstd::string&, url, getUrl, setUrl);
+
+%attribute(cc::BufferAsset, cc::ArrayBuffer*, buffer, getBuffer);
+
+%attribute(cc::TextureBase, bool, isCompressed, isCompressed);
+%attribute(cc::TextureBase, uint32_t, _width, getWidth, setWidth);
+%attribute(cc::TextureBase, uint32_t, _height, getHeight, setHeight);
+
+%attribute(cc::SimpleTexture, uint32_t, mipmapLevel, mipmapLevel);
+%attribute(cc::RenderTexture, cc::scene::RenderWindow*, window, getWindow);
+
+%attribute(cc::Mesh, uint32_t, _hash, getHash);
+%attribute(cc::Mesh, uint32_t, hash, getHash);
+%attribute(cc::Mesh, cc::Uint8Array&, data, getData);
+%attribute(cc::Mesh, cc::Uint8Array&, _data, getData);
+%attribute(cc::Mesh, cc::Mesh::JointBufferIndicesType&, jointBufferIndices, getJointBufferIndices);
+%attribute(cc::Mesh, cc::Vec3&, maxPosition, getMaxPosition);
+%attribute(cc::Mesh, cc::Vec3&, minPosition, getMinPosition);
+%attribute(cc::Mesh, cc::Mesh::RenderingSubMeshList&, renderingSubMeshes, getRenderingSubMeshes);
+%attribute(cc::Mesh, uint32_t, subMeshCount, getSubMeshCount);
+%attribute(cc::Mesh, cc::ArrayBuffer*, _nativeAsset, getAssetData, setAssetData);
+
+%attribute(cc::Material, cc::EffectAsset*, effectAsset, getEffectAsset, setEffectAsset);
+%attribute(cc::Material, ccstd::string, effectName, getEffectName);
+%attribute(cc::Material, uint32_t, technique, getTechniqueIndex);
+%attribute(cc::Material, uint32_t, hash, getHash);
+%attribute(cc::Material, cc::Material*, parent, getParent);
+
+%attribute(cc::RenderingSubMesh, cc::Mesh*, mesh, getMesh, setMesh);
+%attribute(cc::RenderingSubMesh, cc::optional<uint32_t>&, subMeshIdx, getSubMeshIdx, setSubMeshIdx);
+%attribute(cc::RenderingSubMesh, ccstd::vector<cc::IFlatBuffer>&, flatBuffers, getFlatBuffers, setFlatBuffers);
+%attribute(cc::RenderingSubMesh, ccstd::vector<cc::IFlatBuffer>&, _flatBuffers, getFlatBuffers, setFlatBuffers);
+%attribute(cc::RenderingSubMesh, cc::gfx::BufferList&, jointMappedBuffers, getJointMappedBuffers);
+%attribute(cc::RenderingSubMesh, cc::gfx::InputAssemblerInfo&, iaInfo, getIaInfo);
+%attribute(cc::RenderingSubMesh, cc::gfx::InputAssemblerInfo&, _iaInfo, getIaInfo);
+%attribute(cc::RenderingSubMesh, cc::gfx::PrimitiveMode, primitiveMode, getPrimitiveMode);
+
+%attribute(cc::Skeleton, ccstd::vector<ccstd::string>&, joints, getJoints, setJoints);
+%attribute(cc::Skeleton, ccstd::vector<ccstd::string>&, _joints, getJoints, setJoints);
+%attribute(cc::Skeleton, uint32_t, hash, getHash, setHash);
+%attribute(cc::Skeleton, uint32_t, _hash, getHash, setHash);
+
+%attribute(cc::EffectAsset, ccstd::vector<cc::ITechniqueInfo> &, techniques, getTechniques, setTechniques);
+%attribute(cc::EffectAsset, ccstd::vector<cc::IShaderInfo> &, shaders, getShaders, setShaders);
+%attribute(cc::EffectAsset, ccstd::vector<cc::IPreCompileInfo> &, combinations, getCombinations, setCombinations);
+
 
 %import "base/Macros.h"
 %import "base/TypeDef.h"
 %import "base/Ptr.h"
 %import "base/memory/Memory.h"
 
-%import "core/Types.h"
+%include "core/Types.h"
+
+%import "core/ArrayBuffer.h"
 %import "core/data/Object.h"
 %import "core/scene-graph/Node.h"
 %import "core/TypedArray.h"
@@ -74,13 +147,17 @@ namespace cc {
 %include "core/assets/TextureBase.h"
 %include "core/assets/SimpleTexture.h"
 %include "core/assets/Texture2D.h"
+%include "core/assets/TextureCube.h"
+%include "core/assets/RenderTexture.h"
 %include "core/assets/BufferAsset.h"
 %include "core/assets/EffectAsset.h"
 %include "core/assets/ImageAsset.h"
 %include "core/assets/SceneAsset.h"
 %include "core/assets/TextAsset.h"
 %include "core/assets/Material.h"
+%include "core/assets/RenderingSubMesh.h"
 %include "core/builtin/BuiltinResMgr.h"
 %include "3d/assets/Morph.h"
 %include "3d/assets/Mesh.h"
 %include "3d/assets/Skeleton.h"
+%include "3d/misc/CreateMesh.h"
