@@ -23,8 +23,8 @@
  THE SOFTWARE.
 ****************************************************************************/
 
-#include <boost/functional/hash.hpp>
 #include "base/Utils.h"
+#include "base/HashUtils.h"
 #include "base/std/container/array.h"
 
 #include "GFXDef.h"
@@ -35,13 +35,13 @@ namespace gfx {
 
 // T must have no implicit padding
 template <typename T>
-size_t quickHashTrivialStruct(const T *info, size_t count = 1) {
+uint32_t quickHashTrivialStruct(const T *info, size_t count = 1) {
     static_assert(std::is_trivially_copyable<T>::value && sizeof(T) % 8 == 0, "T must be 8 bytes aligned and trivially copyable");
-    return boost::hash_range(reinterpret_cast<const uint64_t *>(info), reinterpret_cast<const uint64_t *>(info + count));
+    return hash_range_32(reinterpret_cast<const uint64_t *>(info), reinterpret_cast<const uint64_t *>(info + count));
 }
 
 template <>
-size_t Hasher<ColorAttachment>::operator()(const ColorAttachment &info) const {
+uint32_t Hasher<ColorAttachment>::operator()(const ColorAttachment &info) const {
     return quickHashTrivialStruct(&info);
 }
 
@@ -50,7 +50,7 @@ bool operator==(const ColorAttachment &lhs, const ColorAttachment &rhs) {
 }
 
 template <>
-size_t Hasher<DepthStencilAttachment>::operator()(const DepthStencilAttachment &info) const {
+uint32_t Hasher<DepthStencilAttachment>::operator()(const DepthStencilAttachment &info) const {
     return quickHashTrivialStruct(&info);
 }
 
@@ -59,7 +59,7 @@ bool operator==(const DepthStencilAttachment &lhs, const DepthStencilAttachment 
 }
 
 template <>
-size_t Hasher<SubpassDependency>::operator()(const SubpassDependency &info) const {
+uint32_t Hasher<SubpassDependency>::operator()(const SubpassDependency &info) const {
     return quickHashTrivialStruct(&info);
 }
 
@@ -68,16 +68,16 @@ bool operator==(const SubpassDependency &lhs, const SubpassDependency &rhs) {
 }
 
 template <>
-size_t Hasher<SubpassInfo>::operator()(const SubpassInfo &info) const {
-    size_t seed = 8;
-    boost::hash_combine(seed, info.inputs);
-    boost::hash_combine(seed, info.colors);
-    boost::hash_combine(seed, info.resolves);
-    boost::hash_combine(seed, info.preserves);
-    boost::hash_combine(seed, info.depthStencil);
-    boost::hash_combine(seed, info.depthStencilResolve);
-    boost::hash_combine(seed, info.depthResolveMode);
-    boost::hash_combine(seed, info.stencilResolveMode);
+uint32_t Hasher<SubpassInfo>::operator()(const SubpassInfo &info) const {
+    uint32_t seed = 8;
+    hash_combine_32(seed, info.inputs);
+    hash_combine_32(seed, info.colors);
+    hash_combine_32(seed, info.resolves);
+    hash_combine_32(seed, info.preserves);
+    hash_combine_32(seed, info.depthStencil);
+    hash_combine_32(seed, info.depthStencilResolve);
+    hash_combine_32(seed, info.depthResolveMode);
+    hash_combine_32(seed, info.stencilResolveMode);
     return seed;
 }
 
@@ -93,12 +93,12 @@ bool operator==(const SubpassInfo &lhs, const SubpassInfo &rhs) {
 }
 
 template <>
-size_t Hasher<RenderPassInfo>::operator()(const RenderPassInfo &info) const {
-    size_t seed = 4;
-    boost::hash_combine(seed, info.colorAttachments);
-    boost::hash_combine(seed, info.depthStencilAttachment);
-    boost::hash_combine(seed, info.subpasses);
-    boost::hash_combine(seed, info.dependencies);
+uint32_t Hasher<RenderPassInfo>::operator()(const RenderPassInfo &info) const {
+    uint32_t seed = 4;
+    hash_combine_32(seed, info.colorAttachments);
+    hash_combine_32(seed, info.depthStencilAttachment);
+    hash_combine_32(seed, info.subpasses);
+    hash_combine_32(seed, info.dependencies);
     return seed;
 }
 
@@ -112,19 +112,19 @@ bool operator==(const RenderPassInfo &lhs, const RenderPassInfo &rhs) {
 template <>
 size_t Hasher<FramebufferInfo>::operator()(const FramebufferInfo &info) const {
     // render pass is mostly irrelevant
-    size_t seed;
+    uint32_t seed;
     if (info.depthStencilTexture) {
-        seed = (info.colorTextures.size() + 1) * 3;
-        boost::hash_combine(seed, info.depthStencilTexture);
-        boost::hash_combine(seed, info.depthStencilTexture->getRaw());
-        boost::hash_combine(seed, info.depthStencilTexture->getHash());
+        seed = static_cast<uint32_t>((info.colorTextures.size() + 1) * 3);
+        hash_combine_32(seed, info.depthStencilTexture);
+        hash_combine_32(seed, info.depthStencilTexture->getRaw());
+        hash_combine_32(seed, info.depthStencilTexture->getHash());
     } else {
-        seed = info.colorTextures.size() * 3;
+        seed = static_cast<uint32_t>(info.colorTextures.size() * 3);
     }
     for (auto* colorTexture : info.colorTextures) {
-        boost::hash_combine(seed, colorTexture);
-        boost::hash_combine(seed, colorTexture->getRaw());
-        boost::hash_combine(seed, colorTexture->getHash());
+        hash_combine_32(seed, colorTexture);
+        hash_combine_32(seed, colorTexture->getRaw());
+        hash_combine_32(seed, colorTexture->getHash());
     }
     return seed;
 }
@@ -155,7 +155,7 @@ bool operator==(const FramebufferInfo &lhs, const FramebufferInfo &rhs) {
 }
 
 template <>
-size_t Hasher<TextureInfo>::operator()(const TextureInfo &info) const {
+uint32_t Hasher<TextureInfo>::operator()(const TextureInfo &info) const {
     return quickHashTrivialStruct(&info);
 }
 
@@ -164,7 +164,7 @@ bool operator==(const TextureInfo &lhs, const TextureInfo &rhs) {
 }
 
 template <>
-size_t Hasher<TextureViewInfo>::operator()(const TextureViewInfo &info) const {
+uint32_t Hasher<TextureViewInfo>::operator()(const TextureViewInfo &info) const {
     return quickHashTrivialStruct(&info);
 }
 
@@ -173,7 +173,7 @@ bool operator==(const TextureViewInfo &lhs, const TextureViewInfo &rhs) {
 }
 
 template <>
-size_t Hasher<BufferInfo>::operator()(const BufferInfo &info) const {
+uint32_t Hasher<BufferInfo>::operator()(const BufferInfo &info) const {
     return quickHashTrivialStruct(&info);
 }
 
@@ -182,7 +182,7 @@ bool operator==(const BufferInfo &lhs, const BufferInfo &rhs) {
 }
 
 template <>
-size_t Hasher<SamplerInfo>::operator()(const SamplerInfo &info) const {
+uint32_t Hasher<SamplerInfo>::operator()(const SamplerInfo &info) const {
     // return quickHashTrivialStruct(&info);
 
     // the hash may be used to reconstruct the original struct
@@ -202,7 +202,7 @@ bool operator==(const SamplerInfo &lhs, const SamplerInfo &rhs) {
 }
 
 template <>
-size_t Hasher<GeneralBarrierInfo>::operator()(const GeneralBarrierInfo &info) const {
+uint32_t Hasher<GeneralBarrierInfo>::operator()(const GeneralBarrierInfo &info) const {
     return quickHashTrivialStruct(&info);
 }
 
@@ -211,7 +211,7 @@ bool operator==(const GeneralBarrierInfo &lhs, const GeneralBarrierInfo &rhs) {
 }
 
 template <>
-size_t Hasher<TextureBarrierInfo>::operator()(const TextureBarrierInfo &info) const {
+uint32_t Hasher<TextureBarrierInfo>::operator()(const TextureBarrierInfo &info) const {
     return quickHashTrivialStruct(&info);
 }
 

@@ -27,7 +27,7 @@
 #include "3d/assets/Morph.h"
 #include "3d/assets/Skeleton.h"
 #include "3d/misc/BufferBlob.h"
-#include "boost/container_hash/hash.hpp"
+#include "base/HashUtils.h"
 #include "core/DataView.h"
 #include "core/assets/RenderingSubMesh.h"
 #include "core/platform/Debug.h"
@@ -194,11 +194,11 @@ const Vec3 &Mesh::getMaxPosition() const {
     return _struct.maxPosition.has_value() ? _struct.maxPosition.value() : Vec3::ZERO;
 }
 
-uint64_t Mesh::getHash() {
+uint32_t Mesh::getHash() {
     if (_hash == 0) {
-        std::size_t seed = 666;
-        boost::hash_range(seed, _data.buffer()->getData(), _data.buffer()->getData() + _data.length());
-        _hash = static_cast<uint32_t>(seed);
+        uint32_t seed = 666;
+        hash_range_32(seed, _data.buffer()->getData(), _data.buffer()->getData() + _data.length());
+        _hash = seed;
     }
 
     return _hash;

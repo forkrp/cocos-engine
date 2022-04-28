@@ -37,12 +37,12 @@
 namespace cc {
 
 /* static */
-uint64_t Material::getHashForMaterial(Material *material) {
+uint32_t Material::getHashForMaterial(Material *material) {
     if (material == nullptr) {
         return 0;
     }
 
-    uint64_t    hash   = 0;
+    uint32_t    hash   = 0;
     const auto &passes = *material->_passes;
     for (const auto &pass : passes) {
         hash ^= pass->getHash();

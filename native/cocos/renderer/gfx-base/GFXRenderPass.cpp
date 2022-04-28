@@ -23,11 +23,10 @@
  THE SOFTWARE.
 ****************************************************************************/
 
-#include <boost/functional/hash.hpp>
-
 #include "GFXObject.h"
 #include "GFXRenderPass.h"
 #include "base/Utils.h"
+#include "base/HashUtils.h"
 #include "gfx-base/GFXDef-common.h"
 
 namespace cc {
@@ -40,21 +39,21 @@ RenderPass::RenderPass()
 RenderPass::~RenderPass() = default;
 
 // Based on render pass compatibility
-size_t RenderPass::computeHash() {
-    size_t seed = _colorAttachments.size() * 2 + 3;
+uint32_t RenderPass::computeHash() {
+    uint32_t seed = static_cast<uint32_t>(_colorAttachments.size() * 2 + 3);
     for (const ColorAttachment &ca : _colorAttachments) {
-        boost::hash_combine(seed, ca.format);
-        boost::hash_combine(seed, ca.sampleCount);
+        hash_combine_32(seed, ca.format);
+        hash_combine_32(seed, ca.sampleCount);
     }
     const auto &ds = _depthStencilAttachment;
-    boost::hash_combine(seed, ds.format);
-    boost::hash_combine(seed, ds.sampleCount);
+    hash_combine_32(seed, ds.format);
+    hash_combine_32(seed, ds.sampleCount);
 
-    boost::hash_combine(seed, _subpasses);
+    hash_combine_32(seed, _subpasses);
     return seed;
 }
 
-size_t RenderPass::computeHash(const RenderPassInfo &info) {
+uint32_t RenderPass::computeHash(const RenderPassInfo &info) {
     return Hasher<RenderPassInfo>()(info);
 }
 

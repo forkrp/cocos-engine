@@ -23,8 +23,6 @@
  THE SOFTWARE.
 ****************************************************************************/
 
-#include <boost/functional/hash.hpp>
-
 #include "GFXGeneralBarrier.h"
 #include "base/Utils.h"
 
@@ -37,7 +35,7 @@ GeneralBarrier::GeneralBarrier(const GeneralBarrierInfo &info)
     _hash = computeHash(info);
 }
 
-size_t GeneralBarrier::computeHash(const GeneralBarrierInfo &info) {
+uint32_t GeneralBarrier::computeHash(const GeneralBarrierInfo &info) {
     return Hasher<GeneralBarrierInfo>()(info);
 }
 

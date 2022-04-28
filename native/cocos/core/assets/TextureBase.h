@@ -165,12 +165,8 @@ public:
      * @en Gets the texture hash.
      * @zh 获取此贴图的哈希值。
      */
-    inline uint64_t getHash() const {
+    inline uint32_t getHash() const {
         return _textureHash;
-    }
-
-    inline double getHashForJS() const {
-        return static_cast<double>(getHash());
     }
 
     /**

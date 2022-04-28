@@ -31,7 +31,7 @@
 namespace cc {
 namespace pipeline {
 
-ccstd::unordered_map<size_t, IntrusivePtr<gfx::PipelineState>> PipelineStateManager::psoHashMap;
+ccstd::unordered_map<uint32_t, IntrusivePtr<gfx::PipelineState>> PipelineStateManager::psoHashMap;
 
 gfx::PipelineState *PipelineStateManager::getOrCreatePipelineState(const scene::Pass *  pass,
                                                                    gfx::Shader *        shader,
@@ -42,12 +42,12 @@ gfx::PipelineState *PipelineStateManager::getOrCreatePipelineState(const scene::
     const auto renderPassHash = renderPass->getHash();
     const auto iaHash         = inputAssembler->getAttributesHash();
     const auto shaderID       = shader->getTypedID();
-    auto       hash           = passHash ^ renderPassHash ^ iaHash ^ shaderID;
+    uint32_t   hash           = passHash ^ renderPassHash ^ iaHash ^ shaderID;
     if (subpass != 0) {
         hash = hash << subpass;
     }
 
-    auto *pso = psoHashMap[static_cast<size_t>(hash)].get();
+    auto *pso = psoHashMap[hash].get();
     if (!pso) {
         auto *pipelineLayout = pass->getPipelineLayout();
 
@@ -63,7 +63,7 @@ gfx::PipelineState *PipelineStateManager::getOrCreatePipelineState(const scene::
                                                                gfx::PipelineBindPoint::GRAPHICS,
                                                                subpass});
 
-        psoHashMap[static_cast<size_t>(hash)] = pso;
+        psoHashMap[hash] = pso;
     }
 
     return pso;

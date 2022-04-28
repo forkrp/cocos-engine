@@ -671,6 +671,19 @@ bool sevalue_to_native(const se::Value &from, cc::variant<Args...> *to, se::Obje
 
 template <typename T>
 bool sevalue_to_native(const se::Value &from, cc::optional<T> *to, se::Object *ctx); // NOLINT(readability-identifier-naming)
+
+template <typename T>
+inline bool sevalue_to_native(const se::Value &from, cc::optional<T> **to, se::Object *ctx) {// NOLINT(readability-identifier-naming)
+    static cc::optional<T> temp;
+    bool ret = sevalue_to_native(from, &temp, ctx);
+    if (ret) {
+        *to = &temp;
+    }
+    else {
+        *to = nullptr;
+    }
+    return ret;
+}
 /// ccstd::unordered_map<ccstd::string, V>
 template <typename V>
 bool sevalue_to_native(const se::Value &from, ccstd::unordered_map<ccstd::string, V> *to, se::Object *ctx); //NOLINT(readability-identifier-naming)
@@ -691,6 +704,11 @@ bool sevalue_to_native(const se::Value &from, ccstd::array<T, N> *to, se::Object
 
 template <typename T>
 bool sevalue_to_native(const se::Value &from, cc::IntrusivePtr<T> *to, se::Object *ctx); // NOLINT(readability-identifier-naming)
+
+template <typename T>
+inline bool sevalue_to_native(const se::Value &from, cc::IntrusivePtr<T> **to, se::Object *ctx) { // NOLINT(readability-identifier-naming)
+
+}
 
 //////////////////// ccstd::array
 

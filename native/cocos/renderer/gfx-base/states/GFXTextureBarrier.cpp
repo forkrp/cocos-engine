@@ -24,7 +24,7 @@
 ****************************************************************************/
 
 #include "GFXTextureBarrier.h"
-#include <boost/functional/hash.hpp>
+#include "base/HashUtils.h"
 #include "../GFXQueue.h"
 #include "base/Utils.h"
 
@@ -37,7 +37,7 @@ TextureBarrier::TextureBarrier(const TextureBarrierInfo &info)
     _hash = computeHash(info);
 }
 
-size_t TextureBarrier::computeHash(const TextureBarrierInfo &info) {
+uint32_t TextureBarrier::computeHash(const TextureBarrierInfo &info) {
     return Hasher<TextureBarrierInfo>()(info);
 }
 

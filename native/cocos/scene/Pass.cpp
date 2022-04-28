@@ -27,7 +27,7 @@
 
 #include <sstream>
 
-#include "boost/container_hash/hash.hpp"
+#include "base/HashUtils.h"
 #include "core/Root.h"
 #include "core/assets/TextureBase.h"
 #include "core/builtin/BuiltinResMgr.h"
@@ -107,7 +107,7 @@ void Pass::fillPipelineInfo(Pass *pass, const IPassInfoFull &info) {
 }
 
 /* static */
-uint64_t Pass::getPassHash(Pass *pass) {
+uint32_t Pass::getPassHash(Pass *pass) {
     const ccstd::string &shaderKey = ProgramLib::getInstance()->getKey(pass->getProgram(), pass->getDefines());
     std::stringstream    res;
     res << shaderKey << "," << static_cast<uint32_t>(pass->_primitive) << "," << static_cast<uint32_t>(pass->_dynamicStates);
@@ -116,9 +116,9 @@ uint64_t Pass::getPassHash(Pass *pass) {
     res << serializeRasterizerState(pass->_rs);
 
     ccstd::string str{res.str()};
-    std::size_t   seed = 666;
-    boost::hash_range(seed, str.begin(), str.end());
-    return static_cast<uint32_t>(seed);
+    uint32_t seed = 666;
+    hash_range_32(seed, str.begin(), str.end());
+    return seed;
 }
 
 Pass::Pass() : Pass(Root::getInstance()) {}
@@ -344,7 +344,7 @@ void Pass::resetTexture(const ccstd::string &name, index_t index /* = CC_INVALID
     gfx::Texture *                 texture     = textureBase != nullptr ? textureBase->getGFXTexture() : nullptr;
     cc::optional<gfx::SamplerInfo> samplerInfo;
     if (info != nullptr && info->samplerHash.has_value()) {
-        samplerInfo = gfx::Sampler::unpackFromHash(static_cast<size_t>(info->samplerHash.value()));
+        samplerInfo = gfx::Sampler::unpackFromHash(info->samplerHash.value());
     } else if (textureBase != nullptr) {
         samplerInfo = textureBase->getSamplerInfo();
     }

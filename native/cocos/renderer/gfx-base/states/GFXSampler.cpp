@@ -34,11 +34,11 @@ Sampler::Sampler(const SamplerInfo &info)
     _hash = computeHash(info);
 }
 
-size_t Sampler::computeHash(const SamplerInfo &info) {
+uint32_t Sampler::computeHash(const SamplerInfo &info) {
     return Hasher<SamplerInfo>()(info);
 }
 
-SamplerInfo Sampler::unpackFromHash(size_t hash) {
+SamplerInfo Sampler::unpackFromHash(uint32_t hash) {
     SamplerInfo info;
     info.minFilter     = static_cast<Filter>((hash & ((1 << 2) - 1)) >> 0);
     info.magFilter     = static_cast<Filter>((hash & ((1 << 2) - 1)) >> 2);

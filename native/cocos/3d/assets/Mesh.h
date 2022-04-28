@@ -210,8 +210,9 @@ public:
     void setAssetData(cc::ArrayBuffer *data) {
         _data = Uint8Array(data);
     }
-    const Uint8Array &getAssetData() {
-        return _data;
+
+    cc::ArrayBuffer* getAssetData() {
+        return _data.buffer();
     }
 
     /**
@@ -259,17 +260,13 @@ public:
      * @en The hash of the mesh
      * @zh 此网格的哈希值。
      */
-    uint64_t getHash();
-
-    inline double getHashForJS() {
-        return static_cast<double>(getHash());
-    }
+    uint32_t getHash();
 
     /**
      * @en Set the hash of the mesh
      * @zh 设置此网格的哈希值。
      */
-    void setHash(uint64_t hash) { _hash = hash; }
+    void setHash(uint32_t hash) { _hash = hash; }
 
     using JointBufferIndicesType = ccstd::vector<index_t>;
     /**
@@ -432,7 +429,7 @@ public:
 
 private:
     IStruct    _struct;
-    uint64_t   _hash{0};
+    uint32_t   _hash{0};
     Uint8Array _data;
 
     bool _initialized{false};

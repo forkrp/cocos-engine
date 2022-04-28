@@ -35,7 +35,7 @@ template <typename Index, typename Enable = std::enable_if_t<std::is_integral<In
 class IndexHandle {
 public:
     struct Hasher {
-        inline std::size_t operator()(IndexHandle const &s) const noexcept { return s._index; }
+        inline uint32_t operator()(IndexHandle const &s) const noexcept { return s._index; }
     };
 
     using IndexType = Index;

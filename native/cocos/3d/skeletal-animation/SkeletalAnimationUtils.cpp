@@ -171,7 +171,7 @@ void JointTexturePool::registerCustomTextureLayouts(const ccstd::vector<ICustomJ
 }
 
 cc::optional<IJointTextureHandle *> JointTexturePool::getDefaultPoseTexture(Skeleton *skeleton, Mesh *mesh, Node *skinningRoot) {
-    uint64_t                            hash = skeleton->getHash() ^ 0; // may not equal to skeleton.hash
+    uint32_t                            hash = skeleton->getHash() ^ 0; // may not equal to skeleton.hash
     cc::optional<IJointTextureHandle *> texture;
     if (_textureBuffers.find(hash) != _textureBuffers.end()) {
         texture = _textureBuffers[hash];
@@ -232,7 +232,7 @@ cc::optional<IJointTextureHandle *> JointTexturePool::getDefaultPoseTexture(Skel
     }
 
     ccstd::vector<geometry::AABB> bounds;
-    texture.value()->bounds[static_cast<uint32_t>(mesh->getHash())] = bounds;
+    texture.value()->bounds[mesh->getHash()] = bounds;
     geometry::AABB::fromPoints(v3Min, v3Max, &bounds[0]);
     if (buildTexture) {
         _pool->update(texture.value()->handle, textureBuffer.buffer());
@@ -244,7 +244,7 @@ cc::optional<IJointTextureHandle *> JointTexturePool::getDefaultPoseTexture(Skel
 
 // TODO(xwx): need to implement this function after define AnimationClip
 // cc::optional<IJointTextureHandle> JointTexturePool::getSequencePoseTexture(Skeleton *skeleton,AnimationClip *clip, Mesh *mesh, Node *skinningRoot) {
-//     uint64_t                           hash = skeleton->getHash() ^ clip->getHash();
+//     uint32_t                           hash = skeleton->getHash() ^ clip->getHash();
 //     cc::optional<IJointTextureHandle> texture;
 //     if (_textureBuffers.find(hash) != _textureBuffers.end()) {
 //         texture = _textureBuffers[hash];

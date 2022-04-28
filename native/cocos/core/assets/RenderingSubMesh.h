@@ -179,7 +179,7 @@ public:
     inline void  setMesh(Mesh *mesh) { _mesh = mesh; }
     inline Mesh *getMesh() const { return _mesh; }
 
-    inline void                          setSubMeshIdx(uint32_t idx) { _subMeshIdx = idx; }
+    inline void                          setSubMeshIdx(const cc::optional<uint32_t>& idx) { _subMeshIdx = idx; }
     inline const cc::optional<uint32_t> &getSubMeshIdx() const { return _subMeshIdx; }
 
 private:

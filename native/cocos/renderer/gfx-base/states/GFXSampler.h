@@ -35,15 +35,15 @@ class CC_DLL Sampler : public GFXObject {
 public:
     explicit Sampler(const SamplerInfo &info);
 
-    static size_t      computeHash(const SamplerInfo &info);
-    static SamplerInfo unpackFromHash(size_t hash);
+    static uint32_t      computeHash(const SamplerInfo &info);
+    static SamplerInfo unpackFromHash(uint32_t hash);
 
     inline const SamplerInfo &getInfo() const { return _info; }
-    inline const size_t &     getHash() const { return _hash; }
+    inline const uint32_t &   getHash() const { return _hash; }
 
 protected:
     SamplerInfo _info;
-    size_t      _hash{0U};
+    uint32_t    _hash{0U};
 };
 
 } // namespace gfx

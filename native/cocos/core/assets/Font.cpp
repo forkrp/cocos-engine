@@ -25,10 +25,10 @@
 
 #include "Font.h"
 #include <algorithm>
-#include <boost/functional/hash.hpp>
 #include "base/Data.h"
 #include "base/Log.h"
 #include "base/Macros.h"
+#include "base/HashUtils.h"
 #include "base/memory/Memory.h"
 #include "gfx-base/GFXTexture.h"
 #include "math/Math.h"
@@ -37,10 +37,10 @@
 
 namespace cc {
 
-std::size_t KerningHash::operator()(const KerningPair &k) const {
-    size_t seed = 2;
-    boost::hash_combine(seed, k.prevCode);
-    boost::hash_combine(seed, k.nextCode);
+uint32_t KerningHash::operator()(const KerningPair &k) const {
+    uint32_t seed = 2;
+    hash_combine_32(seed, k.prevCode);
+    hash_combine_32(seed, k.nextCode);
     return seed;
 }
 

@@ -23,11 +23,10 @@
  THE SOFTWARE.
 ****************************************************************************/
 
-#include <boost/functional/hash.hpp>
-
 #include "GFXBuffer.h"
 #include "GFXInputAssembler.h"
 #include "GFXObject.h"
+#include "base/HashUtils.h"
 
 namespace cc {
 namespace gfx {
@@ -38,15 +37,15 @@ InputAssembler::InputAssembler()
 
 InputAssembler::~InputAssembler() = default;
 
-size_t InputAssembler::computeAttributesHash() const {
-    size_t seed = _attributes.size() * 6;
+uint32_t InputAssembler::computeAttributesHash() const {
+    uint32_t seed = static_cast<uint32_t>(_attributes.size() * 6);
     for (const auto &attribute : _attributes) {
-        boost::hash_combine(seed, attribute.name);
-        boost::hash_combine(seed, attribute.format);
-        boost::hash_combine(seed, attribute.isNormalized);
-        boost::hash_combine(seed, attribute.stream);
-        boost::hash_combine(seed, attribute.isInstanced);
-        boost::hash_combine(seed, attribute.location);
+        hash_combine_32(seed, attribute.name);
+        hash_combine_32(seed, attribute.format);
+        hash_combine_32(seed, attribute.isNormalized);
+        hash_combine_32(seed, attribute.stream);
+        hash_combine_32(seed, attribute.isInstanced);
+        hash_combine_32(seed, attribute.location);
     }
     return seed;
 }

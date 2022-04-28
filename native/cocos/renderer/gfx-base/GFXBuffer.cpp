@@ -35,7 +35,7 @@ Buffer::Buffer()
 
 Buffer::~Buffer() = default;
 
-size_t Buffer::computeHash(const BufferInfo &info) {
+uint32_t Buffer::computeHash(const BufferInfo &info) {
     return Hasher<BufferInfo>()(info);
 }
 

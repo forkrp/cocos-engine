@@ -112,7 +112,7 @@ public:
      *
      * @param pass Handle of the pass info used to compute hash value.
      */
-    static uint64_t getPassHash(Pass *pass);
+    static uint32_t getPassHash(Pass *pass);
 
     Pass();
     explicit Pass(Root *root);
@@ -292,8 +292,7 @@ public:
     inline gfx::DynamicStateFlagBit      getDynamicStates() const { return _dynamicStates; }
     inline BatchingSchemes               getBatchingScheme() const { return _batchingScheme; }
     inline gfx::DescriptorSet *          getDescriptorSet() const { return _descriptorSet; }
-    inline uint64_t                      getHash() const { return _hash; }
-    inline double                        getHashForJS() const { return static_cast<double>(getHash()); }
+    inline uint32_t                      getHash() const { return _hash; }
     inline gfx::PipelineLayout *         getPipelineLayout() const { return _pipelineLayout; }
 
     // Only for UI
@@ -342,7 +341,7 @@ protected:
     Record<int32_t, IntrusivePtr<pipeline::InstancedBuffer>> _instancedBuffers;
     Record<int32_t, IntrusivePtr<pipeline::BatchedBuffer>>   _batchedBuffers;
 
-    uint64_t _hash{0};
+    uint32_t _hash{0};
     // external references
     Root *       _root{nullptr};
     gfx::Device *_device{nullptr};

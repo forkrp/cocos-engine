@@ -305,7 +305,7 @@ struct GLES3GPUInputAssembler {
     GLES3GPUBuffer *                     gpuIndirectBuffer = nullptr;
     GLES3GPUAttributeList                glAttribs;
     GLenum                               glIndexType = 0;
-    ccstd::unordered_map<size_t, GLuint> glVAOs;
+    ccstd::unordered_map<uint32_t, GLuint> glVAOs;
 };
 
 struct GLES3GPUGeneralBarrier {

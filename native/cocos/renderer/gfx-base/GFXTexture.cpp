@@ -24,8 +24,7 @@
 ****************************************************************************/
 
 #include "base/Utils.h"
-
-#include <boost/functional/hash.hpp>
+#include "base/HashUtils.h"
 #include "GFXSwapchain.h"
 #include "GFXTexture.h"
 
@@ -38,17 +37,19 @@ Texture::Texture()
 
 Texture::~Texture() = default;
 
-size_t Texture::computeHash(const TextureInfo &info) {
+uint32_t Texture::computeHash(const TextureInfo &info) {
     return Hasher<TextureInfo>()(info);
 }
 
-size_t Texture::computeHash(const TextureViewInfo &info) {
+uint32_t Texture::computeHash(const TextureViewInfo &info) {
     return Hasher<TextureViewInfo>()(info);
 }
 
-size_t Texture::computeHash(const Texture *texture) {
-    size_t hash = texture->isTextureView() ? computeHash(texture->getViewInfo()) : computeHash(texture->getInfo());
-    if (texture->_swapchain) boost::hash_combine(hash, texture->_swapchain->getObjectID());
+uint32_t Texture::computeHash(const Texture *texture) {
+    uint32_t hash = texture->isTextureView() ? computeHash(texture->getViewInfo()) : computeHash(texture->getInfo());
+    if (texture->_swapchain) {
+        hash_combine_32(hash, texture->_swapchain->getObjectID());
+    }
     return hash;
 }
 

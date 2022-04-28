@@ -1040,15 +1040,31 @@ bool sevalue_to_native(const se::Value &from, cc::variant<cc::monostate, cc::Mat
 
 // NOLINTNEXTLINE(readability-identifier-naming)
 bool sevalue_to_native(const se::Value &from, cc::ArrayBuffer *to, se::Object * /*ctx*/) {
-    assert(from.isObject());
+    CC_ASSERT(from.isObject());
     to->setJSArrayBuffer(from.toObject());
     return true;
 }
 bool sevalue_to_native(const se::Value &from, cc::ArrayBuffer **to, se::Object * /*ctx*/) {
-    assert(from.isObject());
-    *to = ccnew cc::ArrayBuffer();
-    (*to)->addRef();
-    (*to)->setJSArrayBuffer(from.toObject());
+    CC_ASSERT(from.isObject());
+    auto* obj = from.toObject();
+    CC_ASSERT((obj->isArrayBuffer() || obj->isTypedArray()));
+
+    auto* ab = ccnew cc::ArrayBuffer();
+    ab->addRef();
+    if (obj->isArrayBuffer()) {
+        ab->setJSArrayBuffer(obj);
+    }
+    else if (obj->isTypedArray()) {
+        se::Value bufferVal;
+        obj->getProperty("buffer", &bufferVal);
+        ab->setJSArrayBuffer(bufferVal.toObject());
+    }
+    else {
+        ab->release();
+        return false;
+    }
+
+    *to = ab;
     cc::DeferredReleasePool::add(*to);
     return true;
 }

@@ -62,8 +62,8 @@ class IJointTextureHandle {
 public:
     uint32_t                                                      pixelOffset{0};
     uint32_t                                                      refCount{0};
-    uint64_t                                                      clipHash{0};
-    uint64_t                                                      skeletonHash{0};
+    uint32_t                                                      clipHash{0};
+    uint32_t                                                      skeletonHash{0};
     bool                                                          readyToBeDeleted{false};
     ITextureBufferHandle                                          handle;
     ccstd::unordered_map<uint32_t, ccstd::vector<geometry::AABB>> bounds;

@@ -2503,7 +2503,7 @@ void cmdFuncGLES3BindState(GLES3Device *device, GLES3GPUPipelineState *gpuPipeli
         (isShaderChanged || gpuInputAssembler != gfxStateCache.gpuInputAssembler)) {
         gfxStateCache.gpuInputAssembler = gpuInputAssembler;
         if (USE_VAO) {
-            size_t hash  = gpuPipelineState->gpuShader->glProgram ^ device->constantRegistry()->currentBoundThreadID;
+            uint32_t hash  = gpuPipelineState->gpuShader->glProgram ^ device->constantRegistry()->currentBoundThreadID;
             GLuint glVAO = gpuInputAssembler->glVAOs[hash];
             if (!glVAO) {
                 GL_CHECK(glGenVertexArrays(1, &glVAO));

@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2019-2022 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2022 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos.com
 
@@ -25,24 +25,37 @@
 
 #pragma once
 
-#include "../GFXObject.h"
+#include <boost/functional/hash.hpp>
 
 namespace cc {
-namespace gfx {
 
-class CC_DLL TextureBarrier : public GFXObject {
-public:
-    explicit TextureBarrier(const TextureBarrierInfo &info);
+template <class T>
+inline void hash_combine_32(uint32_t& seed, T const& v)
+{
+    boost::hash<T> hasher;
+    seed = boost::hash_detail::hash_combine_impl<32>::fn(seed, hasher(v));
+}
 
-    static uint32_t computeHash(const TextureBarrierInfo &info);
+template <class It>
+inline uint32_t hash_range_32(It first, It last)
+{
+    uint32_t seed = 0;
 
-    inline const TextureBarrierInfo &getInfo() const { return _info; }
-    inline uint32_t getHash() const { return _hash; }
+    for(; first != last; ++first)
+    {
+        hash_combine_32<typename std::iterator_traits<It>::value_type>(seed, *first);
+    }
 
-protected:
-    TextureBarrierInfo _info;
-    uint32_t           _hash{0U};
-};
+    return seed;
+}
 
-} // namespace gfx
+template <class It>
+inline void hash_range_32(uint32_t& seed, It first, It last)
+{
+    for(; first != last; ++first)
+    {
+        hash_combine_32<typename std::iterator_traits<It>::value_type>(seed, *first);
+    }
+}
+
 } // namespace cc
