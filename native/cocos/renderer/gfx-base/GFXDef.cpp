@@ -110,7 +110,7 @@ bool operator==(const RenderPassInfo &lhs, const RenderPassInfo &rhs) {
 }
 
 template <>
-size_t Hasher<FramebufferInfo>::operator()(const FramebufferInfo &info) const {
+uint32_t Hasher<FramebufferInfo>::operator()(const FramebufferInfo &info) const {
     // render pass is mostly irrelevant
     uint32_t seed;
     if (info.depthStencilTexture) {
