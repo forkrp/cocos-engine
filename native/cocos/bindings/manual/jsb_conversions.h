@@ -851,6 +851,10 @@ bool sevalue_to_native(const se::Value &from, ccstd::vector<T> *to, se::Object *
 }
 
 ///////////////////// function
+///
+
+template <typename... Args>
+bool nativevalue_to_se_args_v(se::ValueArray &array, Args &...args); // NOLINT(readability-identifier-naming)
 
 template <typename R, typename... Args>
 inline bool sevalue_to_native(const se::Value &from, std::function<R(Args...)> *func, se::Object *self) { // NOLINT(readability-identifier-naming)
@@ -873,6 +877,30 @@ inline bool sevalue_to_native(const se::Value &from, std::function<R(Args...)> *
                 R rawRet = {};
                 sevalue_to_native(rval, &rawRet, self);
                 return rawRet;
+            }
+        };
+    } else {
+        return false;
+    }
+    return true;
+}
+
+template <typename... Args>
+inline bool sevalue_to_native(const se::Value &from, std::function<void(Args...)> *func, se::Object *self) { // NOLINT(readability-identifier-naming)
+    if (from.isObject() && from.toObject()->isFunction()) {
+        se::Object *callback = from.toObject();
+        self->attachObject(callback);
+        *func = [callback, self](Args... inargs) {
+            se::AutoHandleScope hs;
+            bool                ok = true;
+            se::ValueArray      args;
+            int                 idx = 0;
+            args.resize(sizeof...(Args));
+            nativevalue_to_se_args_v(args, inargs...);
+            se::Value rval;
+            bool      succeed = callback->call(args, self, &rval);
+            if (!succeed) {
+                se::ScriptEngine::getInstance()->clearException();
             }
         };
     } else {
