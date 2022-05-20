@@ -31,18 +31,18 @@
 namespace cc {
 namespace pipeline {
 
-ccstd::unordered_map<uint32_t, IntrusivePtr<gfx::PipelineState>> PipelineStateManager::psoHashMap;
+ccstd::unordered_map<HashHandle, IntrusivePtr<gfx::PipelineState>> PipelineStateManager::psoHashMap;
 
-gfx::PipelineState *PipelineStateManager::getOrCreatePipelineState(const scene::Pass *  pass,
-                                                                   gfx::Shader *        shader,
+gfx::PipelineState *PipelineStateManager::getOrCreatePipelineState(const scene::Pass *pass,
+                                                                   gfx::Shader *shader,
                                                                    gfx::InputAssembler *inputAssembler,
-                                                                   gfx::RenderPass *    renderPass,
-                                                                   uint                 subpass) {
-    const auto passHash       = pass->getHash();
+                                                                   gfx::RenderPass *renderPass,
+                                                                   uint subpass) {
+    const auto passHash = pass->getHash();
     const auto renderPassHash = renderPass->getHash();
-    const auto iaHash         = inputAssembler->getAttributesHash();
-    const auto shaderID       = shader->getTypedID();
-    uint32_t   hash           = passHash ^ renderPassHash ^ iaHash ^ shaderID;
+    const auto iaHash = inputAssembler->getAttributesHash();
+    const auto shaderID = shader->getTypedID();
+    auto hash = passHash ^ renderPassHash ^ iaHash ^ shaderID;
     if (subpass != 0) {
         hash = hash << subpass;
     }

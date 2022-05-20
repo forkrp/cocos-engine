@@ -35,8 +35,8 @@ namespace cc {
  */
 class Skeleton final : public Asset {
 public:
-    using Super          = Asset;
-    Skeleton()           = default;
+    using Super = Asset;
+    Skeleton() = default;
     ~Skeleton() override = default;
     /**
      * @en The path of all bones, the length always equals the length of [[bindposes]]
@@ -79,10 +79,10 @@ public:
     bool validate() const override;
 
 private:
-    ccstd::vector<ccstd::string>      _joints;
-    ccstd::vector<Mat4>               _bindposes;
+    ccstd::vector<ccstd::string> _joints;
+    ccstd::vector<Mat4> _bindposes;
     cc::optional<ccstd::vector<Mat4>> _invBindposes;
-    uint32_t                          _hash{0};
+    uint32_t _hash{0};
 };
 
 } // namespace cc

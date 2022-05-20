@@ -52,7 +52,7 @@ Root *Root::getInstance() {
 
 Root::Root(gfx::Device *device)
 : _device(device) {
-    instance        = this;
+    instance = this;
     _eventProcessor = new CallbacksInvoker();
     // TODO(minggo):
     //    this._dataPoolMgr = legacyCC.internal.DataPoolManager && new legacyCC.internal.DataPoolManager(device) as DataPoolManager;
@@ -62,8 +62,9 @@ Root::Root(gfx::Device *device)
 }
 
 Root::~Root() {
-    instance = nullptr;
+    destroy();
     CC_SAFE_DELETE(_eventProcessor);
+    instance = nullptr;
 }
 
 void Root::initialize(gfx::Swapchain *swapchain) {
@@ -75,18 +76,18 @@ void Root::initialize(gfx::Swapchain *swapchain) {
     colorAttachment.format = swapchain->getColorTexture()->getFormat();
     renderPassInfo.colorAttachments.emplace_back(colorAttachment);
 
-    auto &depthStencilAttachment          = renderPassInfo.depthStencilAttachment;
-    depthStencilAttachment.format         = swapchain->getDepthStencilTexture()->getFormat();
-    depthStencilAttachment.depthStoreOp   = gfx::StoreOp::DISCARD;
+    auto &depthStencilAttachment = renderPassInfo.depthStencilAttachment;
+    depthStencilAttachment.format = swapchain->getDepthStencilTexture()->getFormat();
+    depthStencilAttachment.depthStoreOp = gfx::StoreOp::DISCARD;
     depthStencilAttachment.stencilStoreOp = gfx::StoreOp::DISCARD;
 
     scene::IRenderWindowInfo info;
-    info.title          = ccstd::string{"rootMainWindow"};
-    info.width          = swapchain->getWidth();
-    info.height         = swapchain->getHeight();
+    info.title = ccstd::string{"rootMainWindow"};
+    info.width = swapchain->getWidth();
+    info.height = swapchain->getHeight();
     info.renderPassInfo = renderPassInfo;
-    info.swapchain      = swapchain;
-    _mainWindow         = createWindow(info);
+    info.swapchain = swapchain;
+    _mainWindow = createWindow(info);
 
     _curWindow = _mainWindow;
 
@@ -191,7 +192,7 @@ bool Root::setRenderPipeline(pipeline::RenderPipeline *rppl /* = nullptr*/) {
             isCreateDefaultPipeline = true;
         }
 
-        _pipeline        = rppl;
+        _pipeline = rppl;
         _pipelineRuntime = std::make_unique<RenderPipelineBridge>(rppl);
 
         // now cluster just enabled in deferred pipeline
@@ -259,15 +260,18 @@ void Root::frameMove(float deltaTime, int32_t totalFrames) {
     if (!cc::gfx::Device::getInstance()->isRendererAvailable()) {
         return;
     }
+
+    CCObject::deferredDestroy();
+
     _frameTime = deltaTime;
 
     ++_frameCount;
     _cumulativeTime += deltaTime;
     _fpsTime += deltaTime;
     if (_fpsTime > 1.0F) {
-        _fps        = _frameCount;
+        _fps = _frameCount;
         _frameCount = 0;
-        _fpsTime    = 0.0;
+        _fpsTime = 0.0;
     }
 
     for (const auto &scene : _scenes) {

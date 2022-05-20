@@ -17,6 +17,15 @@
 #ifndef JSB_FREE
 #define JSB_FREE(ptr) delete ptr
 #endif
+
+#if CC_DEBUG
+static bool js_render_getter_return_true(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    s.rval().setBoolean(true);
+    return true;
+}
+SE_BIND_PROP_GET(js_render_getter_return_true)
+#endif
 se::Object* __jsb_cc_render_PipelineRuntime_proto = nullptr; // NOLINT
 se::Class* __jsb_cc_render_PipelineRuntime_class = nullptr;  // NOLINT
 
@@ -251,6 +260,9 @@ bool js_register_render_PipelineRuntime(se::Object* obj) // NOLINT(readability-i
 {
     auto* cls = se::Class::create("PipelineRuntime", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineProperty("globalDSManager", _SE(js_render_PipelineRuntime_getGlobalDSManager_asGetter), nullptr);
     cls->defineProperty("descriptorSetLayout", _SE(js_render_PipelineRuntime_getDescriptorSetLayout_asGetter), nullptr);
     cls->defineProperty("pipelineSceneData", _SE(js_render_PipelineRuntime_getPipelineSceneData_asGetter), nullptr);
@@ -297,6 +309,9 @@ bool js_register_render_DescriptorHierarchy(se::Object* obj) // NOLINT(readabili
 {
     auto* cls = se::Class::create("DescriptorHierarchy", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addEffect", _SE(js_render_DescriptorHierarchy_addEffect));
     cls->install();
     JSBClassType::registerClass<cc::render::DescriptorHierarchy>(cls);
@@ -546,6 +561,9 @@ bool js_register_render_Setter(se::Object* obj) // NOLINT(readability-identifier
 {
     auto* cls = se::Class::create("Setter", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("setBuffer", _SE(js_render_Setter_setBuffer));
     cls->defineFunction("setColor", _SE(js_render_Setter_setColor));
     cls->defineFunction("setFloat", _SE(js_render_Setter_setFloat));
@@ -667,6 +685,9 @@ bool js_register_render_RasterQueueBuilder(se::Object* obj) // NOLINT(readabilit
 {
     auto* cls = se::Class::create("RasterQueueBuilder", obj, __jsb_cc_render_Setter_proto, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addFullscreenQuad", _SE(js_render_RasterQueueBuilder_addFullscreenQuad));
     cls->defineFunction("addScene", _SE(js_render_RasterQueueBuilder_addScene));
     cls->defineFunction("addSceneOfCamera", _SE(js_render_RasterQueueBuilder_addSceneOfCamera));
@@ -846,6 +867,9 @@ bool js_register_render_RasterPassBuilder(se::Object* obj) // NOLINT(readability
 {
     auto* cls = se::Class::create("RasterPassBuilder", obj, __jsb_cc_render_Setter_proto, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addComputeView", _SE(js_render_RasterPassBuilder_addComputeView));
     cls->defineFunction("addFullscreenQuad", _SE(js_render_RasterPassBuilder_addFullscreenQuad));
     cls->defineFunction("addQueue", _SE(js_render_RasterPassBuilder_addQueue));
@@ -948,6 +972,9 @@ bool js_register_render_ComputeQueueBuilder(se::Object* obj) // NOLINT(readabili
 {
     auto* cls = se::Class::create("ComputeQueueBuilder", obj, __jsb_cc_render_Setter_proto, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addDispatch", _SE(js_render_ComputeQueueBuilder_addDispatch));
     cls->install();
     JSBClassType::registerClass<cc::render::ComputeQueueBuilder>(cls);
@@ -1122,6 +1149,9 @@ bool js_register_render_ComputePassBuilder(se::Object* obj) // NOLINT(readabilit
 {
     auto* cls = se::Class::create("ComputePassBuilder", obj, __jsb_cc_render_Setter_proto, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addComputeView", _SE(js_render_ComputePassBuilder_addComputeView));
     cls->defineFunction("addDispatch", _SE(js_render_ComputePassBuilder_addDispatch));
     cls->defineFunction("addQueue", _SE(js_render_ComputePassBuilder_addQueue));
@@ -1161,6 +1191,9 @@ bool js_register_render_MovePassBuilder(se::Object* obj) // NOLINT(readability-i
 {
     auto* cls = se::Class::create("MovePassBuilder", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addPair", _SE(js_render_MovePassBuilder_addPair));
     cls->install();
     JSBClassType::registerClass<cc::render::MovePassBuilder>(cls);
@@ -1198,6 +1231,9 @@ bool js_register_render_CopyPassBuilder(se::Object* obj) // NOLINT(readability-i
 {
     auto* cls = se::Class::create("CopyPassBuilder", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addPair", _SE(js_render_CopyPassBuilder_addPair));
     cls->install();
     JSBClassType::registerClass<cc::render::CopyPassBuilder>(cls);
@@ -1330,6 +1366,9 @@ bool js_register_render_SceneVisitor(se::Object* obj) // NOLINT(readability-iden
 {
     auto* cls = se::Class::create("SceneVisitor", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineProperty("pipelineSceneData", _SE(js_render_SceneVisitor_getPipelineSceneData_asGetter), nullptr);
     cls->defineFunction("bindInputAssembler", _SE(js_render_SceneVisitor_bindInputAssembler));
     cls->defineFunction("bindPipelineState", _SE(js_render_SceneVisitor_bindPipelineState));
@@ -1417,6 +1456,9 @@ bool js_register_render_SceneTask(se::Object* obj) // NOLINT(readability-identif
 {
     auto* cls = se::Class::create("SceneTask", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineProperty("taskType", _SE(js_render_SceneTask_getTaskType_asGetter), nullptr);
     cls->defineFunction("join", _SE(js_render_SceneTask_join));
     cls->defineFunction("start", _SE(js_render_SceneTask_start));
@@ -1460,6 +1502,9 @@ bool js_register_render_SceneTransversal(se::Object* obj) // NOLINT(readability-
 {
     auto* cls = se::Class::create("SceneTransversal", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("transverse", _SE(js_render_SceneTransversal_transverse));
     cls->install();
     JSBClassType::registerClass<cc::render::SceneTransversal>(cls);
@@ -1779,6 +1824,9 @@ bool js_register_render_Pipeline(se::Object* obj) // NOLINT(readability-identifi
 {
     auto* cls = se::Class::create("Pipeline", obj, __jsb_cc_render_PipelineRuntime_proto, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineFunction("addComputePass", _SE(js_render_Pipeline_addComputePass));
     cls->defineFunction("addCopyPass", _SE(js_render_Pipeline_addCopyPass));
     cls->defineFunction("addDepthStencil", _SE(js_render_Pipeline_addDepthStencil));
@@ -1846,6 +1894,9 @@ bool js_register_render_Factory(se::Object* obj) // NOLINT(readability-identifie
 {
     auto* cls = se::Class::create("Factory", obj, nullptr, nullptr);
 
+#if CC_DEBUG
+    cls->defineStaticProperty("isJSBClass", _SE(js_render_getter_return_true), nullptr);
+#endif
     cls->defineStaticFunction("createDescriptorHierarchy", _SE(js_render_Factory_createDescriptorHierarchy_static));
     cls->defineStaticFunction("createPipeline", _SE(js_render_Factory_createPipeline_static));
     cls->defineFinalizeFunction(_SE(js_cc_render_Factory_finalize));

@@ -51,9 +51,9 @@ uint32_t InputAssembler::computeAttributesHash() const {
 }
 
 void InputAssembler::initialize(const InputAssemblerInfo &info) {
-    _attributes     = info.attributes;
-    _vertexBuffers  = info.vertexBuffers;
-    _indexBuffer    = info.indexBuffer;
+    _attributes = info.attributes;
+    _vertexBuffers = info.vertexBuffers;
+    _indexBuffer = info.indexBuffer;
     _indirectBuffer = info.indirectBuffer;
     _attributesHash = computeAttributesHash();
 
@@ -61,8 +61,8 @@ void InputAssembler::initialize(const InputAssemblerInfo &info) {
         _drawInfo.indexCount = _indexBuffer->getCount();
         _drawInfo.firstIndex = 0;
     } else if (!_vertexBuffers.empty()) {
-        _drawInfo.vertexCount  = _vertexBuffers[0]->getCount();
-        _drawInfo.firstVertex  = 0;
+        _drawInfo.vertexCount = _vertexBuffers[0]->getCount();
+        _drawInfo.firstVertex = 0;
         _drawInfo.vertexOffset = 0;
     }
 
@@ -76,7 +76,7 @@ void InputAssembler::destroy() {
     _attributesHash = 0U;
 
     _vertexBuffers.clear();
-    _indexBuffer    = nullptr;
+    _indexBuffer = nullptr;
     _indirectBuffer = nullptr;
 
     _drawInfo = DrawInfo();

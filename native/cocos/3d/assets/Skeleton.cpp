@@ -54,7 +54,7 @@ uint32_t Skeleton::getHash() {
                  << ibm.m[12] << " " << ibm.m[13] << " " << ibm.m[14] << " " << ibm.m[15] << "\n";
         }
         ccstd::string str{sstr.str()};
-        uint32_t   seed = 666;
+        uint32_t seed = 666;
         hash_range_32(seed, str.begin(), str.end());
         _hash = seed;
     }

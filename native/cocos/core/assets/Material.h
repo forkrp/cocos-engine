@@ -333,7 +333,7 @@ protected:
             auto *pPatchArray = cc::get_if<ccstd::vector<T2>>(&patch);
             if (pPatchArray != nullptr) {
                 const auto &patchArray = *pPatchArray;
-                size_t      len        = patchArray.size();
+                size_t len = patchArray.size();
                 cur.resize(len);
 
                 for (size_t i = 0; i < len; ++i) {

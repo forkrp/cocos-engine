@@ -36,28 +36,28 @@ public:
     RenderPass();
     ~RenderPass() override;
 
-    static uint32_t computeHash(const RenderPassInfo &info);
+    static HashHandle computeHash(const RenderPassInfo &info);
 
     void initialize(const RenderPassInfo &info);
     void destroy();
 
-    inline const ColorAttachmentList &   getColorAttachments() const { return _colorAttachments; }
+    inline const ColorAttachmentList &getColorAttachments() const { return _colorAttachments; }
     inline const DepthStencilAttachment &getDepthStencilAttachment() const { return _depthStencilAttachment; }
-    inline const SubpassInfoList &       getSubpasses() const { return _subpasses; }
-    inline const SubpassDependencyList & getDependencies() const { return _dependencies; }
-    inline uint32_t                        getHash() const { return _hash; }
+    inline const SubpassInfoList &getSubpasses() const { return _subpasses; }
+    inline const SubpassDependencyList &getDependencies() const { return _dependencies; }
+    inline HashHandle getHash() const { return _hash; }
 
 protected:
-    uint32_t computeHash();
+    HashHandle computeHash();
 
     virtual void doInit(const RenderPassInfo &info) = 0;
-    virtual void doDestroy()                        = 0;
+    virtual void doDestroy() = 0;
 
-    ColorAttachmentList    _colorAttachments;
+    ColorAttachmentList _colorAttachments;
     DepthStencilAttachment _depthStencilAttachment;
-    SubpassInfoList        _subpasses;
-    SubpassDependencyList  _dependencies;
-    uint32_t               _hash = 0;
+    SubpassInfoList _subpasses;
+    SubpassDependencyList _dependencies;
+    HashHandle _hash = 0;
 };
 
 } // namespace gfx
