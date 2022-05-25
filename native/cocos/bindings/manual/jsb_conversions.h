@@ -892,13 +892,13 @@ inline bool sevalue_to_native(const se::Value &from, std::function<void(Args...)
         self->attachObject(callback);
         *func = [callback, self](Args... inargs) {
             se::AutoHandleScope hs;
-            bool                ok = true;
-            se::ValueArray      args;
-            int                 idx = 0;
+            bool ok = true;
+            se::ValueArray args;
+            int idx = 0;
             args.resize(sizeof...(Args));
             nativevalue_to_se_args_v(args, inargs...);
             se::Value rval;
-            bool      succeed = callback->call(args, self, &rval);
+            bool succeed = callback->call(args, self, &rval);
             if (!succeed) {
                 se::ScriptEngine::getInstance()->clearException();
             }
