@@ -41,13 +41,13 @@
 %attribute(cc::gfx::Texture, uint32_t, height, getHeight);
 %attribute(cc::gfx::Texture, cc::gfx::Format, format, getFormat);
 %attribute(cc::gfx::Texture, uint32_t, size, getSize);
-%attribute(cc::gfx::Texture, uint32_t, hash, getHash);
+%attribute(cc::gfx::Texture, ccstd::hash_t, hash, getHash);
 
 // Queue
 %attribute(cc::gfx::Queue, cc::gfx::QueueType, type, getType);
 
 // RenderPass
-%attribute(cc::gfx::RenderPass, uint32_t, hash, getHash);
+%attribute(cc::gfx::RenderPass, ccstd::hash_t, hash, getHash);
 
 // DescriptorSet
 %attribute(cc::gfx::DescriptorSet, cc::gfx::DescriptorSetLayout*, layout, getLayout);
@@ -99,7 +99,7 @@
 
 // Sampler
 %attribute(cc::gfx::Sampler, const cc::gfx::SamplerInfo&, info, getInfo);
-%attribute(cc::gfx::Sampler, uint32_t, hash, getHash);
+%attribute(cc::gfx::Sampler, ccstd::hash_t, hash, getHash);
 
 // Swapchain
 %attribute(cc::gfx::Swapchain, uint32_t, width, getWidth);

@@ -103,7 +103,7 @@
 %attribute(cc::scene::Pass, cc::gfx::DynamicStateFlagBit, dynamicStates, getDynamicStates);
 %attribute(cc::scene::Pass, cc::scene::BatchingSchemes, batchingScheme, getBatchingScheme);
 %attribute(cc::scene::Pass, cc::gfx::DescriptorSet *, descriptorSet, getDescriptorSet);
-%attribute(cc::scene::Pass, uint32_t, hash, getHash);
+%attribute(cc::scene::Pass, ccstd::hash_t, hash, getHash);
 %attribute(cc::scene::Pass, cc::gfx::PipelineLayout*, pipelineLayout, getPipelineLayout);
 
 %attribute(cc::PassInstance, scene::Pass*, parent, getParent);

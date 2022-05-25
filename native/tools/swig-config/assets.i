@@ -79,8 +79,8 @@ namespace cc {
 %attribute(cc::SimpleTexture, uint32_t, mipmapLevel, mipmapLevel);
 %attribute(cc::RenderTexture, cc::scene::RenderWindow*, window, getWindow);
 
-%attribute(cc::Mesh, uint32_t, _hash, getHash);
-%attribute(cc::Mesh, uint32_t, hash, getHash);
+%attribute(cc::Mesh, ccstd::hash_t, _hash, getHash);
+%attribute(cc::Mesh, ccstd::hash_t, hash, getHash);
 %attribute(cc::Mesh, cc::Uint8Array&, data, getData);
 %attribute(cc::Mesh, cc::Uint8Array&, _data, getData);
 %attribute(cc::Mesh, cc::Mesh::JointBufferIndicesType&, jointBufferIndices, getJointBufferIndices);
@@ -93,11 +93,11 @@ namespace cc {
 %attribute(cc::Material, cc::EffectAsset*, effectAsset, getEffectAsset, setEffectAsset);
 %attribute(cc::Material, ccstd::string, effectName, getEffectName);
 %attribute(cc::Material, uint32_t, technique, getTechniqueIndex);
-%attribute(cc::Material, uint32_t, hash, getHash);
+%attribute(cc::Material, ccstd::hash_t, hash, getHash);
 %attribute(cc::Material, cc::Material*, parent, getParent);
 
 %attribute(cc::RenderingSubMesh, cc::Mesh*, mesh, getMesh, setMesh);
-%attribute(cc::RenderingSubMesh, cc::optional<uint32_t>&, subMeshIdx, getSubMeshIdx, setSubMeshIdx);
+%attribute(cc::RenderingSubMesh, ccstd::optional<uint32_t>&, subMeshIdx, getSubMeshIdx, setSubMeshIdx);
 %attribute(cc::RenderingSubMesh, ccstd::vector<cc::IFlatBuffer>&, flatBuffers, getFlatBuffers, setFlatBuffers);
 %attribute(cc::RenderingSubMesh, ccstd::vector<cc::IFlatBuffer>&, _flatBuffers, getFlatBuffers, setFlatBuffers);
 %attribute(cc::RenderingSubMesh, cc::gfx::BufferList&, jointMappedBuffers, getJointMappedBuffers);
@@ -107,8 +107,8 @@ namespace cc {
 
 %attribute(cc::Skeleton, ccstd::vector<ccstd::string>&, joints, getJoints, setJoints);
 %attribute(cc::Skeleton, ccstd::vector<ccstd::string>&, _joints, getJoints, setJoints);
-%attribute(cc::Skeleton, uint32_t, hash, getHash, setHash);
-%attribute(cc::Skeleton, uint32_t, _hash, getHash, setHash);
+%attribute(cc::Skeleton, ccstd::hash_t, hash, getHash, setHash);
+%attribute(cc::Skeleton, ccstd::hash_t, _hash, getHash, setHash);
 
 %attribute(cc::EffectAsset, ccstd::vector<cc::ITechniqueInfo> &, techniques, getTechniques, setTechniques);
 %attribute(cc::EffectAsset, ccstd::vector<cc::IShaderInfo> &, shaders, getShaders, setShaders);
