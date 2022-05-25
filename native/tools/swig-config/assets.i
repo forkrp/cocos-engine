@@ -160,6 +160,7 @@ namespace cc {
 %include "core/assets/RenderingSubMesh.h"
 %include "core/builtin/BuiltinResMgr.h"
 %include "3d/assets/Morph.h"
+%include "3d/assets/MorphRendering.h"
 %include "3d/assets/Mesh.h"
 %include "3d/assets/Skeleton.h"
 %include "3d/misc/CreateMesh.h"
