@@ -23,10 +23,11 @@
  THE SOFTWARE.
 ****************************************************************************/
 
+#include "base/std/hash/hash.h"
+
 #include "GFXBuffer.h"
 #include "GFXInputAssembler.h"
 #include "GFXObject.h"
-#include "base/HashUtils.h"
 
 namespace cc {
 namespace gfx {
@@ -37,15 +38,15 @@ InputAssembler::InputAssembler()
 
 InputAssembler::~InputAssembler() = default;
 
-uint32_t InputAssembler::computeAttributesHash() const {
-    uint32_t seed = static_cast<uint32_t>(_attributes.size() * 6);
+ccstd::hash_t InputAssembler::computeAttributesHash() const {
+    ccstd::hash_t seed = static_cast<uint32_t>(_attributes.size()) * 6;
     for (const auto &attribute : _attributes) {
-        hash_combine_32(seed, attribute.name);
-        hash_combine_32(seed, attribute.format);
-        hash_combine_32(seed, attribute.isNormalized);
-        hash_combine_32(seed, attribute.stream);
-        hash_combine_32(seed, attribute.isInstanced);
-        hash_combine_32(seed, attribute.location);
+        ccstd::hash_combine(seed, attribute.name);
+        ccstd::hash_combine(seed, attribute.format);
+        ccstd::hash_combine(seed, attribute.isNormalized);
+        ccstd::hash_combine(seed, attribute.stream);
+        ccstd::hash_combine(seed, attribute.isInstanced);
+        ccstd::hash_combine(seed, attribute.location);
     }
     return seed;
 }

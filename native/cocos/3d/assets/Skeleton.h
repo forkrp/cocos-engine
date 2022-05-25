@@ -72,8 +72,8 @@ public:
      * @en Gets the hash of the skeleton asset
      * @zh 获取骨骼资源的哈希值
      */
-    HashHandle getHash();
-    void setHash(HashHandle hash) { _hash = hash; }
+    ccstd::hash_t getHash();
+    void setHash(ccstd::hash_t hash) { _hash = hash; }
 
     bool destroy() override;
     bool validate() const override;
@@ -81,8 +81,8 @@ public:
 private:
     ccstd::vector<ccstd::string> _joints;
     ccstd::vector<Mat4> _bindposes;
-    cc::optional<ccstd::vector<Mat4>> _invBindposes;
-    HashHandle _hash{0};
+    ccstd::optional<ccstd::vector<Mat4>> _invBindposes;
+    ccstd::hash_t _hash{0U};
 };
 
 } // namespace cc

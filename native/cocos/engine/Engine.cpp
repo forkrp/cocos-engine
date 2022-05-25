@@ -126,7 +126,7 @@ Engine::~Engine() {
     // Profiler depends on DebugRenderer, should delete it after deleting Profiler,
     // and delete DebugRenderer after RenderPipeline::destroy which destroy DebugRenderer.
     delete _debugRenderer;
-    
+
     //TODO(): Delete some global objects.
 
     FreeTypeFontFace::destroyFreeType();
@@ -292,23 +292,22 @@ int32_t Engine::restartVM() {
     _scheduler->unscheduleAll();
 
     _scriptEngine->cleanup();
-    CC_SAFE_DESTROY_AND_DELETE(_gfxDevice);
     cc::EventDispatcher::destroy();
-
-    // Should re-create ProgramLib as shaders may change after restart. For example,
-    // program update resources and do restart.
-    delete _programLib;
-    _programLib = ccnew ProgramLib;
-
-    // Should reinitialize builtin resources as _programLib will be re-created.
-    delete _builtinResMgr;
-    _builtinResMgr = ccnew BuiltinResMgr;
-
     CCObject::deferredDestroy();
+
+    delete _programLib;
+    delete _builtinResMgr;
+    CC_SAFE_DESTROY_AND_DELETE(_gfxDevice);
 
     // remove all listening events
     offAll();
     // start
+    _gfxDevice = gfx::DeviceManager::create();
+    // Should re-create ProgramLib as shaders may change after restart. For example,
+    // program update resources and do restart.
+    _programLib = ccnew ProgramLib;
+    // Should reinitialize builtin resources as _programLib will be re-created.
+    _builtinResMgr = ccnew BuiltinResMgr;
     cc::EventDispatcher::init();
     CC_CURRENT_APPLICATION()->init();
 
@@ -370,6 +369,8 @@ bool Engine::dispatchWindowEvent(const WindowEvent &ev) {
     } else if (ev.type == WindowEvent::Type::SIZE_CHANGED ||
                ev.type == WindowEvent::Type::RESIZED) {
         cc::EventDispatcher::dispatchResizeEvent(ev.width, ev.height);
+        auto *w = CC_GET_PLATFORM_INTERFACE(ISystemWindow);
+        w->setViewSize(ev.width, ev.height);
         isHandled = true;
     } else if (ev.type == WindowEvent::Type::HIDDEN ||
                ev.type == WindowEvent::Type::MINIMIZED) {

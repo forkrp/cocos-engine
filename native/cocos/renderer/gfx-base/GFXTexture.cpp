@@ -24,9 +24,10 @@
 ****************************************************************************/
 
 #include "base/Utils.h"
-#include "base/HashUtils.h"
+
 #include "GFXSwapchain.h"
 #include "GFXTexture.h"
+#include "base/std/hash/hash.h"
 
 namespace cc {
 namespace gfx {
@@ -37,19 +38,17 @@ Texture::Texture()
 
 Texture::~Texture() = default;
 
-uint32_t Texture::computeHash(const TextureInfo &info) {
+ccstd::hash_t Texture::computeHash(const TextureInfo &info) {
     return Hasher<TextureInfo>()(info);
 }
 
-uint32_t Texture::computeHash(const TextureViewInfo &info) {
+ccstd::hash_t Texture::computeHash(const TextureViewInfo &info) {
     return Hasher<TextureViewInfo>()(info);
 }
 
-uint32_t Texture::computeHash(const Texture *texture) {
-    uint32_t hash = texture->isTextureView() ? computeHash(texture->getViewInfo()) : computeHash(texture->getInfo());
-    if (texture->_swapchain) {
-        hash_combine_32(hash, texture->_swapchain->getObjectID());
-    }
+ccstd::hash_t Texture::computeHash(const Texture *texture) {
+    ccstd::hash_t hash = texture->isTextureView() ? computeHash(texture->getViewInfo()) : computeHash(texture->getInfo());
+    if (texture->_swapchain) ccstd::hash_combine(hash, texture->_swapchain->getObjectID());
     return hash;
 }
 

@@ -28,7 +28,7 @@
 #include <iomanip>
 #include <sstream>
 
-#include "base/HashUtils.h"
+#include "base/std/hash/hash.h"
 
 namespace cc {
 
@@ -42,7 +42,7 @@ const ccstd::vector<Mat4> &Skeleton::getInverseBindposes() {
     return *_invBindposes;
 }
 
-uint32_t Skeleton::getHash() {
+ccstd::hash_t Skeleton::getHash() {
     // hashes should already be computed offline, but if not, make one
     if (!_hash) {
         std::stringstream sstr;
@@ -54,8 +54,8 @@ uint32_t Skeleton::getHash() {
                  << ibm.m[12] << " " << ibm.m[13] << " " << ibm.m[14] << " " << ibm.m[15] << "\n";
         }
         ccstd::string str{sstr.str()};
-        uint32_t seed = 666;
-        hash_range_32(seed, str.begin(), str.end());
+        ccstd::hash_t seed = 666;
+        ccstd::hash_range(seed, str.begin(), str.end());
         _hash = seed;
     }
     return _hash;

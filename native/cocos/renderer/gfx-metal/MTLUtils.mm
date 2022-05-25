@@ -40,7 +40,7 @@ namespace cc {
 namespace gfx {
 namespace {
 
-ccstd::unordered_map<HashHandle, PipelineState *> pipelineMap;
+ccstd::unordered_map<size_t, PipelineState *> pipelineMap;
 ccstd::unordered_map<size_t, RenderPass *> renderPassMap;
 
 EShLanguage getShaderStage(ShaderStageFlagBit type) {
@@ -389,7 +389,7 @@ gfx::Shader *createShader(CCMTLDevice *device, CCMTLRenderPass *renderPass) {
 }
 
 CCMTLGPUPipelineState *getClearRenderPassPipelineState(CCMTLDevice *device, RenderPass *curPass) {
-    uint32_t rpHash = curPass->getHash();
+    ccstd::hash_t rpHash = curPass->getHash();
     const auto iter = pipelineMap.find(rpHash);
     if (iter != pipelineMap.end()) {
         auto *ccMtlPiplineState = static_cast<CCMTLPipelineState *>(iter->second);

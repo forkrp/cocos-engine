@@ -36,7 +36,7 @@ Framebuffer::Framebuffer()
 
 Framebuffer::~Framebuffer() = default;
 
-uint32_t Framebuffer::computeHash(const FramebufferInfo &info) {
+ccstd::hash_t Framebuffer::computeHash(const FramebufferInfo &info) {
     return Hasher<FramebufferInfo>()(info);
 }
 
