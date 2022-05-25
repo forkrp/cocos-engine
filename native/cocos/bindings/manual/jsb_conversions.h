@@ -512,7 +512,7 @@ template <typename T>
 constexpr bool is_jsb_object_v = is_jsb_object<typename std::remove_const<T>::type>::value; // NOLINT
 
 #define JSB_REGISTER_OBJECT_TYPE(...) \
-    template <>                     \
+    template <>                       \
     struct is_jsb_object<__VA_ARGS__> : std::true_type {}
 
 template <typename Out, typename In>
@@ -1162,7 +1162,7 @@ inline bool nativevalue_to_se(const ccstd::vector<T> *from, se::Value &to, se::O
 }
 
 template <typename T>
-inline bool nativevalue_to_se(ccstd::vector<T> * const from, se::Value &to, se::Object *ctx) {
+inline bool nativevalue_to_se(ccstd::vector<T> *const from, se::Value &to, se::Object *ctx) {
     return nativevalue_to_se(*from, to, ctx);
 }
 
