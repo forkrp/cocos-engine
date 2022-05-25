@@ -253,7 +253,7 @@ struct GLES2GPUInputAssembler {
     GLES2GPUBuffer *gpuIndirectBuffer = nullptr;
     GLES2GPUAttributeList glAttribs;
     GLenum glIndexType = 0;
-    ccstd::unordered_map<HashHandle, GLuint> glVAOs;
+    ccstd::unordered_map<size_t, GLuint> glVAOs;
 };
 
 struct GLES2GPURenderPass {

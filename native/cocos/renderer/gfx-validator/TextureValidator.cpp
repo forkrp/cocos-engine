@@ -35,8 +35,8 @@ namespace gfx {
 namespace {
 struct EnumHasher final {
     template <typename T, typename Enable = std::enable_if_t<std::is_enum<T>::value>>
-    uint32_t operator()(const T &v) const {
-        return static_cast<uint32_t>(v);
+    size_t operator()(const T &v) const {
+        return static_cast<size_t>(v);
     }
 };
 
