@@ -123,8 +123,8 @@
 %rename(_updateInstancedAttributes) cc::scene::Model::updateInstancedAttributes;
 %rename(_getInstancedAttributeIndex) cc::scene::Model::getInstancedAttributeIndex;
 
-%rename(_load) cc::scene::Scene::load;
-%rename(_activate) cc::scene::Scene::activate;
+%rename(_load) cc::Scene::load;
+%rename(_activate) cc::Scene::activate;
 
 %rename(_initPassFromTarget) cc::scene::Pass::initPassFromTarget;
 
