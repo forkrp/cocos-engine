@@ -47,17 +47,86 @@
 #include "bindings/auto/jsb_render_auto.h"
 %}
 
+%ignore cc::scene::Pass::getBlocks;
+
 %ignore cc::Node::setRTSInternal;
 %ignore cc::Node::setRTS;
 %ignore cc::scene::Camera::syncCameraEditor;
 //FIXME: These methods binding code will generate SwigValueWrapper type which is not supported now.
 %ignore cc::scene::Model::getLocalData; 
+%ignore cc::scene::Model::getEventProcessor;
+%ignore cc::scene::Model::getOctreeNode;
+%ignore cc::scene::Model::setOctreeNode;
+%ignore cc::scene::Model::updateOctree;
+
+%ignore cc::scene::SkinningModel::uploadJointData;
+%ignore cc::scene::RenderScene::updateBatches;
+%ignore cc::scene::BakedSkinningModel::updateInstancedJointTextureInfo;
+%ignore cc::scene::BakedSkinningModel::updateModelBounds;
+
+%ignore cc::Node::setLayerPtr;
+%ignore cc::Node::setUIPropsTransformDirtyCallback;
+%ignore cc::Node::rotate;
+%ignore cc::Node::setUserData;
+%ignore cc::Node::getUserData;
+%ignore cc::Node::getChildren;
+%ignore cc::Node::rotateForJS;
+%ignore cc::Node::setScale;
+%ignore cc::Node::setRotation;
+%ignore cc::Node::setRotationFromEuler;
+%ignore cc::Node::setPosition;
+%ignore cc::Node::isActiveInHierarchy;
+%ignore cc::Node::setActiveInHierarchy;
+%ignore cc::Node::setActiveInHierarchyPtr;
+%ignore cc::Node::getUIProps;
+%ignore cc::Node::getPosition;
+%ignore cc::Node::getRotation;
+%ignore cc::Node::getScale;
+%ignore cc::Node::getEulerAngles;
+%ignore cc::Node::getForward;
+%ignore cc::Node::getUp;
+%ignore cc::Node::getRight;
+%ignore cc::Node::getWorldPosition;
+%ignore cc::Node::getWorldRotation;
+%ignore cc::Node::getWorldScale;
+%ignore cc::Node::getWorldMatrix;
+%ignore cc::Node::getWorldRS;
+%ignore cc::Node::getWorldRT;
+
+%ignore cc::scene::Camera::screenPointToRay;
+%ignore cc::scene::Camera::screenToWorld;
+%ignore cc::scene::Camera::worldToScreen;
+%ignore cc::scene::Camera::worldMatrixToScreen;
+%ignore cc::scene::Camera::syncCameraEditor;
+
 %ignore cc::JointTexturePool::getDefaultPoseTexture;
 //
 %ignore cc::Layers::addLayer;
 %ignore cc::Layers::deleteLayer;
 %ignore cc::Layers::nameToLayer;
 %ignore cc::Layers::layerToName;
+
+%rename(IInstancedAttributeBlock) cc::scene::InstancedAttributeBlock;
+
+%rename(_initialize) cc::Root::initialize;
+%rename(resetHasChangedFlags) cc::Node::resetChangedFlags;
+%rename(_parentInternal) cc::Node::_parent;
+%rename(_updateSiblingIndex) cc::Node::updateSiblingIndex;
+%rename(_onPreDestroyBase) cc::Node::onPreDestroyBase;
+%rename(_onPreDestroy) cc::Node::onPreDestroy;
+
+%rename(_enabled) cc::scene::FogInfo::_isEnabled;
+%rename(cpp_keyword_register) cc::ProgramLib::registerEffect;
+
+%rename(_initLocalDescriptors) cc::scene::Model::initLocalDescriptors;
+%rename(_updateLocalDescriptors) cc::scene::Model::updateLocalDescriptors;
+%rename(_updateInstancedAttributes) cc::scene::Model::updateInstancedAttributes;
+%rename(_getInstancedAttributeIndex) cc::scene::Model::getInstancedAttributeIndex;
+
+%rename(_load) cc::scene::Scene::load;
+%rename(_activate) cc::scene::Scene::activate;
+
+%rename(_initPassFromTarget) cc::scene::Pass::initPassFromTarget;
 
 //TODO: %attribute code needs to be generated from ts file automatically.
 %attribute(cc::Root, cc::gfx::Device*, device, getDevice, setDevice);
@@ -314,7 +383,6 @@
 %attribute(cc::scene::AmbientInfo, cc::Color&, skyLightingColor, getSkyLightingColor, setSkyLightingColor);
 %attribute(cc::scene::AmbientInfo, cc::Color&, groundLightingColor, getGroundLightingColor, setGroundLightingColor);
 
-%rename(_enabled) cc::scene::FogInfo::_isEnabled;
 %attribute(cc::scene::FogInfo, cc::scene::FogType, type, getType, setType);
 %attribute(cc::scene::FogInfo, cc::Color&, fogColor, getFogColor, setFogColor);
 %attribute(cc::scene::FogInfo, bool, enabled, isEnabled, setEnabled);
