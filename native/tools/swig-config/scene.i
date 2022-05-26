@@ -285,7 +285,6 @@
 
 %attribute(cc::scene::RenderScene, ccstd::string&, name, getName);
 %attribute(cc::scene::RenderScene, ccstd::vector<cc::IntrusivePtr<cc::scene::Camera>>&, cameras, getCameras);
-%attribute(cc::scene::RenderScene, cc::scene::DirectionalLight*, mainLight, getMainLight, setMainLight);
 %attribute(cc::scene::RenderScene, ccstd::vector<cc::IntrusivePtr<cc::scene::SphereLight>>&, sphereLights, getSphereLights);
 %attribute(cc::scene::RenderScene, ccstd::vector<cc::IntrusivePtr<cc::scene::SpotLight>>&, spotLights, getSpotLights);
 %attribute(cc::scene::RenderScene, ccstd::vector<cc::IntrusivePtr<cc::scene::Model>>&, models, getModels);
@@ -432,7 +431,6 @@
 %import "core/data/Object.h"
 %import "renderer/pipeline/RenderPipeline.h"
 %import "renderer/core/PassUtils.h"
-%import "scene/Define.h"
 
 %import "core/assets/Asset.h"
 %import "core/assets/TextureBase.h"
