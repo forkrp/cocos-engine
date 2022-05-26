@@ -106,7 +106,7 @@
 %attribute(cc::scene::Pass, ccstd::hash_t, hash, getHash);
 %attribute(cc::scene::Pass, cc::gfx::PipelineLayout*, pipelineLayout, getPipelineLayout);
 
-%attribute(cc::PassInstance, scene::Pass*, parent, getParent);
+%attribute(cc::PassInstance, cc::scene::Pass*, parent, getParent);
 
 %attribute(cc::Node, ccstd::string &, uuid, getUuid);
 %attribute(cc::Node, float, angle, getAngle, setAngle);
@@ -264,6 +264,83 @@
 %attribute(cc::scene::Model, cc::scene::Model::Type, type, getType, setType);
 %attribute(cc::scene::Model, cc::scene::InstancedAttributeBlock&, instancedAttributes, getInstancedAttributeBlock, setInstancedAttributeBlock);
 %attribute(cc::scene::Model, bool, isDynamicBatching, isDynamicBatching, setDynamicBatching);
+
+%attribute(cc::scene::SubModel, std::shared_ptr<ccstd::vector<cc::IntrusivePtr<cc::scene::Pass>>> &, passes, getPasses, setPasses);
+%attribute(cc::scene::SubModel, ccstd::vector<cc::IntrusivePtr<cc::gfx::Shader>> &, shaders, getShaders, setShaders);
+%attribute(cc::scene::SubModel, cc::RenderingSubMesh*, subMesh, getSubMesh, setSubMesh);
+%attribute(cc::scene::SubModel, cc::pipeline::RenderPriority, priority, getPriority, setPriority);
+%attribute(cc::scene::SubModel, cc::gfx::InputAssembler *, inputAssembler, getInputAssembler, setInputAssembler);
+%attribute(cc::scene::SubModel, cc::gfx::DescriptorSet *, descriptorSet, getDescriptorSet, setDescriptorSet);
+%attribute(cc::scene::SubModel, ccstd::vector<cc::scene::IMacroPatch> &, patches, getPatches);
+%attribute(cc::scene::SubModel, cc::gfx::Shader*, planarInstanceShader, getPlanarInstanceShader, setPlanarInstanceShader);
+%attribute(cc::scene::SubModel, cc::gfx::Shader*, planarShader, getPlanarShader, setPlanarShader);
+
+%attribute(cc::scene::ShadowsInfo, bool, enabled, isEnabled, setEnabled);
+%attribute(cc::scene::ShadowsInfo, cc::scene::ShadowType, type, getType, setType);
+%attribute(cc::scene::ShadowsInfo, cc::Vec3&, normal, getNormal, setNormal);
+%attribute(cc::scene::ShadowsInfo, float, distance, getDistance, setDistance);
+%attribute(cc::scene::ShadowsInfo, cc::Color&, shadowColor, getShadowColor, setShadowColor);
+// %attribute(cc::scene::ShadowsInfo, cc::Vec3&, planeDirection, getPlaneDirection, setPlaneDirection);
+// %attribute(cc::scene::ShadowsInfo, float, planeHeight, getPlaneHeight, setPlaneHeight);
+%attribute(cc::scene::ShadowsInfo, uint32_t, maxReceived, getMaxReceived, setMaxReceived);
+%attribute(cc::scene::ShadowsInfo, float, shadowMapSize, getShadowMapSize, setShadowMapSize);
+%attribute(cc::scene::ShadowsInfo, cc::Vec2&, size, getSize);
+
+%attribute(cc::scene::Shadows, bool, enabled, isEnabled, setEnabled);
+%attribute(cc::scene::Shadows, cc::scene::ShadowType, type, getType, setType);
+%attribute(cc::scene::Shadows, cc::Vec3&, normal, getNormal, setNormal);
+%attribute(cc::scene::Shadows, float, distance, getDistance, setDistance);
+%attribute(cc::scene::Shadows, cc::Color&, shadowColor, getShadowColor, setShadowColor);
+%attribute(cc::scene::Shadows, uint32_t, maxReceived, getMaxReceived, setMaxReceived);
+%attribute(cc::scene::Shadows, cc::Vec2&, size, getSize, setSize);
+%attribute(cc::scene::Shadows, bool, shadowMapDirty, isShadowMapDirty, setShadowMapDirty);
+%attribute(cc::scene::Shadows, cc::Mat4&, matLight, getMatLight);
+%attribute(cc::scene::Shadows, cc::Material*, material, getMaterial);
+%attribute(cc::scene::Shadows, cc::Material*, instancingMaterial, getInstancingMaterial);
+%attribute(cc::scene::Shadows, float, shadowCameraFar, getShadowCameraFar, setShadowCameraFar);
+%attribute(cc::scene::Shadows, cc::Mat4&, matShadowView, getMatShadowView, setMatShadowView);
+%attribute(cc::scene::Shadows, cc::Mat4&, matShadowProj, getMatShadowProj, setMatShadowProj);
+%attribute(cc::scene::Shadows, cc::Mat4&, matShadowViewProj, getMatShadowViewProj, setMatShadowViewProj);
+
+%attribute_writeonly(cc::scene::AmbientInfo, cc::Vec4&, skyColor, setSkyColor);
+%attribute(cc::scene::AmbientInfo, float, skyIllum, getSkyIllum, setSkyIllum);
+%attribute_writeonly(cc::scene::AmbientInfo, cc::Vec4&, groundAlbedo, setGroundAlbedo);
+%attribute(cc::scene::AmbientInfo, cc::Vec4&, _skyColor, getSkyColorHDR, setSkyColorHDR);
+%attribute(cc::scene::AmbientInfo, float, _skyIllum, getSkyIllumHDR, setSkyIllumHDR);
+%attribute(cc::scene::AmbientInfo, cc::Vec4&, _groundAlbedo, getGroundAlbedoHDR, setGroundAlbedoHDR);
+%attribute(cc::scene::AmbientInfo, cc::Vec4&, skyColorLDR, getSkyColorLDR);
+%attribute(cc::scene::AmbientInfo, cc::Vec4&, groundAlbedoLDR, getGroundAlbedoLDR);
+%attribute(cc::scene::AmbientInfo, float, skyIllumLDR, getSkyIllumLDR);
+%attribute(cc::scene::AmbientInfo, cc::Color&, skyLightingColor, getSkyLightingColor, setSkyLightingColor);
+%attribute(cc::scene::AmbientInfo, cc::Color&, groundLightingColor, getGroundLightingColor, setGroundLightingColor);
+
+%rename(_enabled) cc::scene::FogInfo::_isEnabled;
+%attribute(cc::scene::FogInfo, cc::scene::FogType, type, getType, setType);
+%attribute(cc::scene::FogInfo, cc::Color&, fogColor, getFogColor, setFogColor);
+%attribute(cc::scene::FogInfo, bool, enabled, isEnabled, setEnabled);
+%attribute(cc::scene::FogInfo, bool, accurate, isAccurate, setAccurate);
+%attribute(cc::scene::FogInfo, float, fogDensity, getFogDensity, setFogDensity);
+%attribute(cc::scene::FogInfo, float, fogStart, getFogStart, setFogStart);
+%attribute(cc::scene::FogInfo, float, fogEnd, getFogEnd, setFogEnd);
+%attribute(cc::scene::FogInfo, float, fogAtten, getFogAtten, setFogAtten);
+%attribute(cc::scene::FogInfo, float, fogTop, getFogTop, setFogTop);
+%attribute(cc::scene::FogInfo, float, fogRange, getFogRange, setFogRange);
+
+%attribute(cc::scene::SkyboxInfo, TextureCube*, _envmap, getEnvmapForJS, setEnvmapForJS);
+%attribute(cc::scene::SkyboxInfo, bool, applyDiffuseMap, isApplyDiffuseMap, setApplyDiffuseMap);
+%attribute(cc::scene::SkyboxInfo, bool, enabled, isEnabled, setEnabled);
+%attribute(cc::scene::SkyboxInfo, bool, useIBL, isUseIBL, setUseIBL);
+%attribute(cc::scene::SkyboxInfo, bool, useHDR, isUseHDR, setUseHDR);
+%attribute(cc::scene::SkyboxInfo, TextureCube*, envmap, getEnvmap, setEnvmap);
+%attribute(cc::scene::SkyboxInfo, TextureCube*, diffuseMap, getDiffuseMap, setDiffuseMap);
+%attribute(cc::scene::SkyboxInfo, cc::scene::EnvironmentLightingType, envLightingType, getEnvLightingType, setEnvLightingType);
+
+%attribute(cc::scene::OctreeInfo, bool, enabled, isEnabled, setEnabled);
+%attribute(cc::scene::OctreeInfo, Vec3&, minPos, getMinPos, setMinPos);
+%attribute(cc::scene::OctreeInfo, Vec3&, maxPos, getMaxPos, setMaxPos);
+%attribute(cc::scene::OctreeInfo, uint32_t, depth, getDepth, setDepth);
+
+%attribute(cc::scene::Scene, bool, autoReleaseAssets, isAutoReleaseAssets, setAutoReleaseAssets);
 
 %import "base/Macros.h"
 %import "base/TypeDef.h"
