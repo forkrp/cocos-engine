@@ -169,7 +169,6 @@ public:
 
     void activate(Ambient *resource);
 
-
 private:
     // @serializable
     // @formerlySerializedAs('_skyColor'));
