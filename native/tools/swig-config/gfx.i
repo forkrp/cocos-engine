@@ -16,27 +16,27 @@
 
 // Device
 %attribute(cc::gfx::Device, cc::gfx::API, gfxAPI, getGfxAPI);
-%attribute(cc::gfx::Device, const ccstd::string&, deviceName, getDeviceName);
+%attribute(cc::gfx::Device, ccstd::string&, deviceName, getDeviceName);
 %attribute(cc::gfx::Device, cc::gfx::MemoryStatus&, memoryStatus, getMemoryStatus);
 %attribute(cc::gfx::Device, cc::gfx::Queue*, queue, getQueue);
 %attribute(cc::gfx::Device, cc::gfx::CommandBuffer*, commandBuffer, getCommandBuffer);
-%attribute(cc::gfx::Device, const ccstd::string&, renderer, getRenderer);
-%attribute(cc::gfx::Device, const ccstd::string&, vendor, getVendor);
+%attribute(cc::gfx::Device, ccstd::string&, renderer, getRenderer);
+%attribute(cc::gfx::Device, ccstd::string&, vendor, getVendor);
 %attribute(cc::gfx::Device, uint32_t, numDrawCalls, getNumDrawCalls);
 %attribute(cc::gfx::Device, uint32_t, numInstances, getNumInstances);
 %attribute(cc::gfx::Device, uint32_t, numTris, getNumTris);
-%attribute(cc::gfx::Device, const cc::gfx::DeviceCaps&, capabilities, getCapabilities);
+%attribute(cc::gfx::Device, cc::gfx::DeviceCaps&, capabilities, getCapabilities);
 
 // Shader
-%attribute(cc::gfx::Shader, const ccstd::string&, name, getName);
-%attribute(cc::gfx::Shader, const cc::gfx::ShaderStageList&, stages, getStages);
-%attribute(cc::gfx::Shader, const cc::gfx::AttributeList&, attributes, getAttributes);
-%attribute(cc::gfx::Shader, const cc::gfx::UniformBlockList&, blocks, getBlocks);
-%attribute(cc::gfx::Shader, const cc::gfx::UniformSamplerList&, samplers, getSamplers);
+%attribute(cc::gfx::Shader, ccstd::string&, name, getName);
+%attribute(cc::gfx::Shader, cc::gfx::ShaderStageList&, stages, getStages);
+%attribute(cc::gfx::Shader, cc::gfx::AttributeList&, attributes, getAttributes);
+%attribute(cc::gfx::Shader, cc::gfx::UniformBlockList&, blocks, getBlocks);
+%attribute(cc::gfx::Shader, cc::gfx::UniformSamplerList&, samplers, getSamplers);
 
 // Texture
-%attribute(cc::gfx::Texture, const cc::gfx::TextureInfo&, info, getInfo);
-%attribute(cc::gfx::Texture, const cc::gfx::TextureViewInfo&, viewInfo, getViewInfo);
+%attribute(cc::gfx::Texture, cc::gfx::TextureInfo&, info, getInfo);
+%attribute(cc::gfx::Texture, cc::gfx::TextureViewInfo&, viewInfo, getViewInfo);
 %attribute(cc::gfx::Texture, uint32_t, width, getWidth);
 %attribute(cc::gfx::Texture, uint32_t, height, getHeight);
 %attribute(cc::gfx::Texture, cc::gfx::Format, format, getFormat);
@@ -56,20 +56,20 @@
 %attribute(cc::gfx::PipelineState, cc::gfx::Shader*, shader, getShader);
 %attribute(cc::gfx::PipelineState, cc::gfx::PrimitiveMode, primitive, getPrimitive);
 %attribute(cc::gfx::PipelineState, cc::gfx::PipelineBindPoint, bindPoint, getBindPoint);
-%attribute(cc::gfx::PipelineState, const cc::gfx::InputState&, inputState, getInputState);
-%attribute(cc::gfx::PipelineState, const cc::gfx::RasterizerState&, rasterizerState, getRasterizerState);
-%attribute(cc::gfx::PipelineState, const cc::gfx::DepthStencilState&, depthStencilState, getDepthStencilState);
-%attribute(cc::gfx::PipelineState, const cc::gfx::BlendState&, blendState, getBlendState);
-%attribute(cc::gfx::PipelineState, const cc::gfx::RenderPass*, renderPass, getRenderPass);
+%attribute(cc::gfx::PipelineState, cc::gfx::InputState&, inputState, getInputState);
+%attribute(cc::gfx::PipelineState, cc::gfx::RasterizerState&, rasterizerState, getRasterizerState);
+%attribute(cc::gfx::PipelineState, cc::gfx::DepthStencilState&, depthStencilState, getDepthStencilState);
+%attribute(cc::gfx::PipelineState, cc::gfx::BlendState&, blendState, getBlendState);
+%attribute(cc::gfx::PipelineState, cc::gfx::RenderPass*, renderPass, getRenderPass);
 
 // InputAssembler
-%attribute(cc::gfx::InputAssembler, const cc::gfx::BufferList&, vertexBuffers, getVertexBuffers);
-%attribute(cc::gfx::InputAssembler, const cc::gfx::AttributeList&, attributes, getAttributes);
+%attribute(cc::gfx::InputAssembler, cc::gfx::BufferList&, vertexBuffers, getVertexBuffers);
+%attribute(cc::gfx::InputAssembler, cc::gfx::AttributeList&, attributes, getAttributes);
 %attribute(cc::gfx::InputAssembler, cc::gfx::Buffer*, indexBuffer, getIndexBuffer);
 %attribute(cc::gfx::InputAssembler, cc::gfx::Buffer*, indirectBuffer, getIndirectBuffer);
 %attribute(cc::gfx::InputAssembler, uint32_t, attributesHash, getAttributesHash);
 
-%attribute(cc::gfx::InputAssembler, const cc::gfx::DrawInfo&, drawInfo, getDrawInfo, setDrawInfo);
+%attribute(cc::gfx::InputAssembler, cc::gfx::DrawInfo&, drawInfo, getDrawInfo, setDrawInfo);
 %attribute(cc::gfx::InputAssembler, uint32_t, vertexCount, getVertexCount, setVertexCount);
 %attribute(cc::gfx::InputAssembler, uint32_t, firstVertex, getFirstVertex, setFirstVertex);
 %attribute(cc::gfx::InputAssembler, uint32_t, indexCount, getIndexCount, setIndexCount);
@@ -86,7 +86,7 @@
 
 // Framebuffer
 %attribute(cc::gfx::Framebuffer, cc::gfx::RenderPass*, renderPass, getRenderPass);
-%attribute(cc::gfx::Framebuffer, const cc::gfx::TextureList&, colorTextures, getColorTextures);
+%attribute(cc::gfx::Framebuffer, cc::gfx::TextureList&, colorTextures, getColorTextures);
 %attribute(cc::gfx::Framebuffer, cc::gfx::Texture*, depthStencilTexture, getDepthStencilTexture);
 
 // Buffer
@@ -98,7 +98,7 @@
 %attribute(cc::gfx::Buffer, cc::gfx::BufferFlags, flags, getFlags);
 
 // Sampler
-%attribute(cc::gfx::Sampler, const cc::gfx::SamplerInfo&, info, getInfo);
+%attribute(cc::gfx::Sampler, cc::gfx::SamplerInfo&, info, getInfo);
 %attribute(cc::gfx::Sampler, ccstd::hash_t, hash, getHash);
 
 // Swapchain
