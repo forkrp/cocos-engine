@@ -53,4 +53,12 @@ renderSceneProto.removeBatch = function (batch: DrawBatch2D) {
     oldRemoveBatch.call(this, batch.native);
 };
 
+Object.defineProperty(renderSceneProto, 'mainLight', {
+    enumerable: true,
+    configurable: true,
+    get() {
+        return this.getMainLight();
+    }
+});
+
 export const RenderScene = jsb.RenderScene;
