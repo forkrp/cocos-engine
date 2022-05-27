@@ -72,7 +72,7 @@ namespace cc {
 %attribute_writeonly(cc::ICanvasRenderingContext2D, ccstd::string&, textAlign, setTextAlign);
 %attribute_writeonly(cc::ICanvasRenderingContext2D, ccstd::string&, textBaseline, setTextBaseline);
 
-%attribute(cc::CCObject, const ccstd::string&, name, getName, setName);
+%attribute(cc::CCObject, ccstd::string&, name, getName, setName);
 %attribute(cc::CCObject, cc::CCObject::Flags, hideFlags, getHideFlags, setHideFlags);
 %attribute(cc::CCObject, bool, replicated, isReplicated, setReplicated);
 %attribute(cc::CCObject, bool, isValid, isValid);
