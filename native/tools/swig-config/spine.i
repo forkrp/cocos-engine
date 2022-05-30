@@ -16,8 +16,6 @@
 #include "bindings/auto/jsb_spine_auto.h"
 %}
 
-%feature("novaluewrapper") spine::Vector<float>;
-
 %ignore *::rtti;
 %ignore spine::SkeletonCache::SegmentData;
 %ignore spine::SkeletonCache::BoneData;
@@ -174,6 +172,11 @@
 %ignore spine::SkeletonDataMgr::releaseByUUID;
 %ignore spine::SkeletonCacheAnimation::render;
 %ignore spine::SkeletonCacheAnimation::getRenderOrder;
+
+%rename(create) spine::SkeletonAnimation::createWithFile;
+%rename(setCompleteListenerNative) spine::SkeletonAnimation::setCompleteListener;
+%rename(setTrackCompleteListenerNative) spine::SkeletonAnimation::setTrackCompleteListener;
+%rename(create) spine::SkeletonRenderer::createWithFile;
 
 %import "editor-support/spine/dll.h"
 %import "editor-support/spine/RTTI.h"
