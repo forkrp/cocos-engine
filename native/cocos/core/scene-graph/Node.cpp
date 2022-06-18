@@ -242,7 +242,7 @@ void Node::setParent(Node *parent, bool isKeepWorld /* = false */) {
     Node *oldParent = _parent;
     Node *newParent = parent;
 #if CC_DEBUG > 0
-    if (oldParent && (oldParent->_objFlags & Flags::DEACTIVATING) == Flags::DEACTIVATING) {
+    if (oldParent && (oldParent->getObjFlags() & Flags::DEACTIVATING) == Flags::DEACTIVATING) {
         debug::errorID(3821);
     }
 #endif
@@ -251,7 +251,7 @@ void Node::setParent(Node *parent, bool isKeepWorld /* = false */) {
     onSetParent(oldParent, isKeepWorld);
     emit(NodeEventType::PARENT_CHANGED, oldParent);
     if (oldParent) {
-        if (!(oldParent->_objFlags & Flags::DESTROYING)) {
+        if (!(oldParent->getObjFlags() & Flags::DESTROYING)) {
             index_t removeAt = getIdxOfChild(oldParent->_children, this);
             // TODO(): DEV
             /*if (DEV && removeAt < 0) {
@@ -268,7 +268,7 @@ void Node::setParent(Node *parent, bool isKeepWorld /* = false */) {
     }
     if (newParent) {
 #if CC_DEBUG > 0
-        if ((newParent->_objFlags & Flags::DEACTIVATING) == Flags::DEACTIVATING) {
+        if ((newParent->getObjFlags() & Flags::DEACTIVATING) == Flags::DEACTIVATING) {
             debug::errorID(3821);
         }
 #endif
@@ -393,8 +393,8 @@ void Node::walk(const WalkCallback &preFunc, const WalkCallback &postFunc) {
 
 bool Node::onPreDestroyBase() {
     Flags destroyingFlag = Flags::DESTROYING;
-    _objFlags |= destroyingFlag;
-    bool destroyByParent = (!!_parent) && (!!(_parent->_objFlags & destroyingFlag));
+    setObjFlags(getObjFlags() | destroyingFlag);
+    bool destroyByParent = (!!_parent) && (!!(_parent->getObjFlags() & destroyingFlag));
 #if CC_EDITOR
     if (!destroyByParent) {
         this->notifyEditorAttached(false);
@@ -499,7 +499,7 @@ void Node::setSiblingIndex(index_t index) {
     if (!_parent) {
         return;
     }
-    if (!!(_parent->_objFlags & Flags::DEACTIVATING)) {
+    if (!!(_parent->getObjFlags() & Flags::DEACTIVATING)) {
         debug::errorID(3821);
         return;
     }
@@ -549,7 +549,7 @@ Node *Node::getChildByPath(const ccstd::string &path) const {
 //
 
 void Node::setPositionInternal(float x, float y, float z, bool calledFromJS) {
-    _localPosition.set(x, y, z);
+    _layout->localPosition.set(x, y, z);
     invalidateChildren(TransformBit::POSITION);
 
     if (_eventMask & TRANSFORM_ON) {
@@ -562,7 +562,7 @@ void Node::setPositionInternal(float x, float y, float z, bool calledFromJS) {
 }
 
 void Node::setRotationInternal(float x, float y, float z, float w, bool calledFromJS) {
-    _localRotation.set(x, y, z, w);
+    _layout->localRotation.set(x, y, z, w);
     _eulerDirty = true;
 
     invalidateChildren(TransformBit::ROTATION);
@@ -578,7 +578,7 @@ void Node::setRotationInternal(float x, float y, float z, float w, bool calledFr
 
 void Node::setRotationFromEuler(float x, float y, float z) {
     _euler.set(x, y, z);
-    Quaternion::fromEuler(x, y, z, &_localRotation);
+    Quaternion::fromEuler(x, y, z, &_layout->localRotation);
     _eulerDirty = false;
     invalidateChildren(TransformBit::ROTATION);
     if (_eventMask & TRANSFORM_ON) {
@@ -589,7 +589,7 @@ void Node::setRotationFromEuler(float x, float y, float z) {
 }
 
 void Node::setScaleInternal(float x, float y, float z, bool calledFromJS) {
-    _localScale.set(x, y, z);
+    _layout->localScale.set(x, y, z);
 
     invalidateChildren(TransformBit::SCALE);
     if (_eventMask & TRANSFORM_ON) {
@@ -626,38 +626,38 @@ void Node::updateWorldTransform() { //NOLINT(misc-no-recursion)
         auto *currChild = child;
         if (curr) {
             if (dirtyBits & static_cast<uint32_t>(TransformBit::POSITION)) {
-                currChild->_worldPosition.transformMat4(currChild->_localPosition, curr->getWorldMatrix());
-                currChild->_worldMatrix.m[12] = currChild->_worldPosition.x;
-                currChild->_worldMatrix.m[13] = currChild->_worldPosition.y;
-                currChild->_worldMatrix.m[14] = currChild->_worldPosition.z;
+                currChild->_layout->worldPosition.transformMat4(currChild->_layout->localPosition, curr->getWorldMatrix());
+                currChild->_layout->worldMatrix.m[12] = currChild->_layout->worldPosition.x;
+                currChild->_layout->worldMatrix.m[13] = currChild->_layout->worldPosition.y;
+                currChild->_layout->worldMatrix.m[14] = currChild->_layout->worldPosition.z;
             }
             if (dirtyBits & static_cast<uint32_t>(TransformBit::RS)) {
-                Mat4::fromRTS(currChild->_localRotation, currChild->_localPosition, currChild->_localScale, &currChild->_worldMatrix);
-                Mat4::multiply(curr->getWorldMatrix(), currChild->_worldMatrix, &currChild->_worldMatrix);
+                Mat4::fromRTS(currChild->_layout->localRotation, currChild->_layout->localPosition, currChild->_layout->localScale, &currChild->_layout->worldMatrix);
+                Mat4::multiply(curr->getWorldMatrix(), currChild->_layout->worldMatrix, &currChild->_layout->worldMatrix);
                 if (dirtyBits & static_cast<uint32_t>(TransformBit::ROTATION)) {
-                    Quaternion::multiply(curr->getWorldRotation(), currChild->_localRotation, &currChild->_worldRotation);
+                    Quaternion::multiply(curr->getWorldRotation(), currChild->_layout->localRotation, &currChild->_layout->worldRotation);
                 }
-                quat = currChild->_worldRotation;
+                quat = currChild->_layout->worldRotation;
                 quat.conjugate();
                 Mat3::fromQuat(quat, &mat3);
-                Mat3::fromMat4(currChild->_worldMatrix, &m43);
+                Mat3::fromMat4(currChild->_layout->worldMatrix, &m43);
                 Mat3::multiply(mat3, m43, &mat3);
-                currChild->_worldScale.set(mat3.m[0], mat3.m[4], mat3.m[8]);
+                currChild->_layout->worldScale.set(mat3.m[0], mat3.m[4], mat3.m[8]);
             }
         } else if (child) {
             if (dirtyBits & static_cast<uint32_t>(TransformBit::POSITION)) {
-                currChild->_worldPosition.set(currChild->_localPosition);
-                currChild->_worldMatrix.m[12] = currChild->_worldPosition.x;
-                currChild->_worldMatrix.m[13] = currChild->_worldPosition.y;
-                currChild->_worldMatrix.m[14] = currChild->_worldPosition.z;
+                currChild->_layout->worldPosition.set(currChild->_layout->localPosition);
+                currChild->_layout->worldMatrix.m[12] = currChild->_layout->worldPosition.x;
+                currChild->_layout->worldMatrix.m[13] = currChild->_layout->worldPosition.y;
+                currChild->_layout->worldMatrix.m[14] = currChild->_layout->worldPosition.z;
             }
             if (dirtyBits & static_cast<uint32_t>(TransformBit::RS)) {
                 if (dirtyBits & static_cast<uint32_t>(TransformBit::ROTATION)) {
-                    currChild->_worldRotation.set(currChild->_localRotation);
+                    currChild->_layout->worldRotation.set(currChild->_layout->localRotation);
                 }
                 if (dirtyBits & static_cast<uint32_t>(TransformBit::SCALE)) {
-                    currChild->_worldScale.set(currChild->_localScale);
-                    Mat4::fromRTS(currChild->_worldRotation, currChild->_worldPosition, currChild->_worldScale, &currChild->_worldMatrix);
+                    currChild->_layout->worldScale.set(currChild->_layout->localScale);
+                    Mat4::fromRTS(currChild->_layout->worldRotation, currChild->_layout->worldPosition, currChild->_layout->worldScale, &currChild->_layout->worldMatrix);
                 }
             }
         }
@@ -668,12 +668,12 @@ void Node::updateWorldTransform() { //NOLINT(misc-no-recursion)
 
 const Mat4 &Node::getWorldMatrix() const { //NOLINT(misc-no-recursion)
     const_cast<Node *>(this)->updateWorldTransform();
-    return _worldMatrix;
+    return _layout->worldMatrix;
 }
 
 Mat4 Node::getWorldRS() {
     updateWorldTransform();
-    Mat4 target{_worldMatrix};
+    Mat4 target{_layout->worldMatrix};
     target.m[12] = target.m[13] = target.m[14] = 0;
     return target;
 }
@@ -681,7 +681,7 @@ Mat4 Node::getWorldRS() {
 Mat4 Node::getWorldRT() {
     updateWorldTransform();
     Mat4 target;
-    Mat4::fromRT(_worldRotation, _worldPosition, &target);
+    Mat4::fromRT(_layout->worldRotation, _layout->worldPosition, &target);
     return target;
 }
 
@@ -711,14 +711,14 @@ void Node::invalidateChildren(TransformBit dirtyBit) {
 }
 
 void Node::setWorldPosition(float x, float y, float z) {
-    _worldPosition.set(x, y, z);
+    _layout->worldPosition.set(x, y, z);
     if (_parent) {
         _parent->updateWorldTransform();
         Mat4 invertWMat{_parent->getWorldMatrix()};
         invertWMat.inverse();
-        _localPosition.transformMat4(_worldPosition, invertWMat);
+        _layout->localPosition.transformMat4(_layout->worldPosition, invertWMat);
     } else {
-        _localPosition.set(_worldPosition);
+        _layout->localPosition.set(_layout->worldPosition);
     }
     notifyLocalPositionUpdated();
 
@@ -731,17 +731,17 @@ void Node::setWorldPosition(float x, float y, float z) {
 
 const Vec3 &Node::getWorldPosition() const {
     const_cast<Node *>(this)->updateWorldTransform();
-    return _worldPosition;
+    return _layout->worldPosition;
 }
 
 void Node::setWorldRotation(float x, float y, float z, float w) {
-    _worldRotation.set(x, y, z, w);
+    _layout->worldRotation.set(x, y, z, w);
     if (_parent) {
         _parent->updateWorldTransform();
-        _localRotation.set(_parent->getWorldRotation().getConjugated());
-        _localRotation.multiply(_worldRotation);
+        _layout->localRotation.set(_parent->getWorldRotation().getConjugated());
+        _layout->localRotation.multiply(_layout->worldRotation);
     } else {
-        _localRotation.set(_worldRotation);
+        _layout->localRotation.set(_layout->worldRotation);
     }
 
     _eulerDirty = true;
@@ -757,11 +757,11 @@ void Node::setWorldRotation(float x, float y, float z, float w) {
 
 const Quaternion &Node::getWorldRotation() const { //NOLINT(misc-no-recursion)
     const_cast<Node *>(this)->updateWorldTransform();
-    return _worldRotation;
+    return _layout->worldRotation;
 }
 
 void Node::setWorldScale(float x, float y, float z) {
-    _worldScale.set(x, y, z);
+    _layout->worldScale.set(x, y, z);
     if (_parent != nullptr) {
         _parent->updateWorldTransform();
         Mat3 mat3;
@@ -770,17 +770,17 @@ void Node::setWorldScale(float x, float y, float z) {
         Mat3::fromMat4(_parent->getWorldMatrix(), &b);
         Mat3::multiply(mat3, b, &mat3);
         Mat3 mat3Scaling;
-        mat3Scaling.m[0] = _worldScale.x;
-        mat3Scaling.m[4] = _worldScale.y;
-        mat3Scaling.m[8] = _worldScale.z;
+        mat3Scaling.m[0] = _layout->worldScale.x;
+        mat3Scaling.m[4] = _layout->worldScale.y;
+        mat3Scaling.m[8] = _layout->worldScale.z;
 
         mat3.inverse();
         Mat3::multiply(mat3Scaling, mat3, &mat3);
-        _localScale.x = Vec3{mat3.m[0], mat3.m[1], mat3.m[2]}.length();
-        _localScale.y = Vec3{mat3.m[3], mat3.m[4], mat3.m[5]}.length();
-        _localScale.z = Vec3{mat3.m[6], mat3.m[7], mat3.m[8]}.length();
+        _layout->localScale.x = Vec3{mat3.m[0], mat3.m[1], mat3.m[2]}.length();
+        _layout->localScale.y = Vec3{mat3.m[3], mat3.m[4], mat3.m[5]}.length();
+        _layout->localScale.z = Vec3{mat3.m[6], mat3.m[7], mat3.m[8]}.length();
     } else {
-        _localScale = _worldScale;
+        _layout->localScale = _layout->worldScale;
     }
 
     notifyLocalScaleUpdated();
@@ -793,12 +793,12 @@ void Node::setWorldScale(float x, float y, float z) {
 
 const Vec3 &Node::getWorldScale() const {
     const_cast<Node *>(this)->updateWorldTransform();
-    return _worldScale;
+    return _layout->worldScale;
 }
 
 void Node::setAngle(float val) {
     _euler.set(0, 0, val);
-    Quaternion::createFromAngleZ(val, &_localRotation);
+    Quaternion::createFromAngleZ(val, &_layout->localRotation);
     _eulerDirty = false;
     invalidateChildren(TransformBit::ROTATION);
     if (_eventMask & TRANSFORM_ON) {
@@ -821,12 +821,12 @@ void Node::onSetParent(Node *oldParent, bool keepWorldTransform) {
             parent->updateWorldTransform();
             Mat4 mTemp{Mat4::IDENTITY}; // cjh FIXME: the logic is different from ts version.
             Mat4::inverseTranspose(parent->getWorldMatrix(), &mTemp);
-            mTemp *= _worldMatrix;
+            mTemp *= _layout->worldMatrix;
 
         } else {
-            _localPosition.set(_worldPosition);
-            _localRotation.set(_worldRotation);
-            _localScale.set(_worldScale);
+            _layout->localPosition.set(_layout->worldPosition);
+            _layout->localRotation.set(_layout->worldRotation);
+            _layout->localScale.set(_layout->worldScale);
         }
 
         notifyLocalPositionRotationScaleUpdated();
@@ -839,14 +839,14 @@ void Node::rotate(const Quaternion &rot, NodeSpace ns /* = NodeSpace::LOCAL*/, b
     Quaternion qTempA{rot};
     qTempA.normalize();
     if (ns == NodeSpace::LOCAL) {
-        _localRotation *= qTempA;
+        _layout->localRotation *= qTempA;
     } else if (ns == NodeSpace::WORLD) {
         Quaternion qTempB{Quaternion::identity()};
-        qTempB = qTempA * _worldRotation;
-        qTempA = _worldRotation;
+        qTempB = qTempA * _layout->worldRotation;
+        qTempA = _layout->worldRotation;
         qTempA.inverse();
         qTempB = qTempA * qTempB;
-        _localRotation = _localRotation * qTempB;
+        _layout->localRotation = _layout->localRotation * qTempB;
     }
     _eulerDirty = true;
     invalidateChildren(TransformBit::ROTATION);
@@ -884,7 +884,7 @@ void Node::inverseTransformPoint(Vec3 &out, const Vec3 &p) {
 }
 
 void Node::setMatrix(const Mat4 &val) {
-    val.decompose(&_localScale, &_localRotation, &_localPosition);
+    val.decompose(&_layout->localScale, &_layout->localRotation, &_layout->localPosition);
     notifyLocalPositionRotationScaleUpdated();
 
     invalidateChildren(TransformBit::TRS);
@@ -895,12 +895,12 @@ void Node::setMatrix(const Mat4 &val) {
 }
 
 void Node::setWorldRotationFromEuler(float x, float y, float z) {
-    Quaternion::fromEuler(x, y, z, &_worldRotation);
+    Quaternion::fromEuler(x, y, z, &_layout->worldRotation);
     if (_parent) {
         _parent->updateWorldTransform();
-        _localRotation = _parent->getWorldRotation().getConjugated() * _worldRotation;
+        _layout->localRotation = _parent->getWorldRotation().getConjugated() * _layout->worldRotation;
     } else {
-        _localRotation = _worldRotation;
+        _layout->localRotation = _layout->worldRotation;
     }
     _eulerDirty = true;
 
@@ -916,15 +916,15 @@ void Node::setRTSInternal(Quaternion *rot, Vec3 *pos, Vec3 *scale, bool calledFr
     uint32_t dirtyBit = 0;
     if (rot) {
         dirtyBit |= static_cast<uint32_t>(TransformBit::ROTATION);
-        _localRotation = *rot;
+        _layout->localRotation = *rot;
         _eulerDirty = true;
     }
     if (pos) {
-        _localPosition = *pos;
+        _layout->localPosition = *pos;
         dirtyBit |= static_cast<uint32_t>(TransformBit::POSITION);
     }
     if (scale) {
-        _localScale = *scale;
+        _layout->localScale = *scale;
         dirtyBit |= static_cast<uint32_t>(TransformBit::SCALE);
     }
 
@@ -958,23 +958,23 @@ void Node::clearNodeArray() {
 void Node::translate(const Vec3 &trans, NodeSpace ns) {
     Vec3 v3Temp{trans};
     if (ns == NodeSpace::LOCAL) {
-        v3Temp.transformQuat(_localRotation);
-        _localPosition.x += v3Temp.x;
-        _localPosition.y += v3Temp.y;
-        _localPosition.z += v3Temp.z;
+        v3Temp.transformQuat(_layout->localRotation);
+        _layout->localPosition.x += v3Temp.x;
+        _layout->localPosition.y += v3Temp.y;
+        _layout->localPosition.z += v3Temp.z;
     } else if (ns == NodeSpace::WORLD) {
         if (_parent) {
             Quaternion qTemp = _parent->getWorldRotation();
             qTemp.inverse();
             v3Temp.transformQuat(qTemp);
-            Vec3 scale{_worldScale};
-            _localPosition.x += v3Temp.x / scale.x;
-            _localPosition.y += v3Temp.y / scale.y;
-            _localPosition.z += v3Temp.z / scale.z;
+            Vec3 scale{_layout->worldScale};
+            _layout->localPosition.x += v3Temp.x / scale.x;
+            _layout->localPosition.y += v3Temp.y / scale.y;
+            _layout->localPosition.z += v3Temp.z / scale.z;
         } else {
-            _localPosition.x += trans.x;
-            _localPosition.y += trans.y;
-            _localPosition.z += trans.z;
+            _layout->localPosition.x += trans.x;
+            _layout->localPosition.y += trans.y;
+            _layout->localPosition.z += trans.z;
         }
     }
 
@@ -1033,5 +1033,10 @@ void Node::_setChildren(ccstd::vector<IntrusivePtr<Node>> &&children) {
 }
 
 //
+
+void Node::_initWithData(uint8_t *data, uint8_t *flagChunk) {
+    _layout = reinterpret_cast<NodeLayout *>(data);
+    _flagChunk = reinterpret_cast<uint32_t *>(flagChunk);
+}
 
 } // namespace cc

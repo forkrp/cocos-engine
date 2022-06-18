@@ -119,13 +119,19 @@ public:
 
     //cjh    public declare [editorExtrasTag]: unknown;
 
-    Flags _objFlags{Flags::ZERO};
+//cjhm    Flags _objFlags{Flags::ZERO};
+private:
+    Flags *_objFlags{nullptr};
+public:
     ccstd::string _name;
 
     explicit CCObject(ccstd::string name = "");
     ~CCObject() override;
 
     // MEMBER
+
+    inline Flags getObjFlags() const { return *_objFlags; }
+    inline void setObjFlags(Flags flags) { *_objFlags = flags; }
 
     /**
      * @en The name of the object.
@@ -221,6 +227,8 @@ public:
 
     virtual ccstd::string toString() const { return ""; };
 
+    void _initObjFlags(uint8_t *objFlags);
+
 protected:
     virtual bool onPreDestroy() {
         // FIXME: need reture value
@@ -231,28 +239,28 @@ protected:
 CC_ENUM_BITWISE_OPERATORS(CCObject::Flags);
 
 inline bool CCObject::isValid() const {
-    return !(_objFlags & Flags::DESTROYED);
+    return !(*_objFlags & Flags::DESTROYED);
 }
 
 inline void CCObject::setHideFlags(Flags hideFlags) {
     Flags flags = hideFlags & Flags::ALL_HIDE_MASKS;
-    _objFlags = (_objFlags & ~Flags::ALL_HIDE_MASKS) | flags;
+    *_objFlags = (*_objFlags & ~Flags::ALL_HIDE_MASKS) | flags;
 }
 
 inline CCObject::Flags CCObject::getHideFlags() const {
-    return _objFlags & Flags::ALL_HIDE_MASKS;
+    return *_objFlags & Flags::ALL_HIDE_MASKS;
 }
 
 inline void CCObject::setReplicated(bool value) {
     if (value) {
-        _objFlags |= Flags::IS_REPLICATED;
+        *_objFlags |= Flags::IS_REPLICATED;
     } else {
-        _objFlags &= ~Flags::IS_REPLICATED;
+        *_objFlags &= ~Flags::IS_REPLICATED;
     }
 }
 
 inline bool CCObject::isReplicated() const {
-    return !!(_objFlags & Flags::IS_REPLICATED);
+    return !!(*_objFlags & Flags::IS_REPLICATED);
 }
 
 /*

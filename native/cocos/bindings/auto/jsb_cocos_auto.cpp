@@ -2400,6 +2400,25 @@ bool js_register_engine_Color(se::Object* obj) // NOLINT(readability-identifier-
 se::Object* __jsb_cc_CCObject_proto = nullptr; // NOLINT
 se::Class* __jsb_cc_CCObject_class = nullptr;  // NOLINT
 
+static bool js_engine_CCObject__initObjFlags(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
+    SE_PRECONDITION2(cobj, false, "js_engine_CCObject__initObjFlags : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        HolderType<unsigned char*, false> arg0 = {};
+        ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+        SE_PRECONDITION2(ok, false, "js_engine_CCObject__initObjFlags : Error processing arguments");
+        cobj->_initObjFlags(arg0.value());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_engine_CCObject__initObjFlags)
+
 static bool js_engine_CCObject_destroy(se::State& s) // NOLINT(readability-identifier-naming)
 {
     auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
@@ -2451,7 +2470,7 @@ static bool js_engine_CCObject_getHideFlags(se::State& s) // NOLINT(readability-
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_GET(js_engine_CCObject_getHideFlags)
+SE_BIND_FUNC(js_engine_CCObject_getHideFlags)
 
 static bool js_engine_CCObject_getName(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -2472,6 +2491,25 @@ static bool js_engine_CCObject_getName(se::State& s) // NOLINT(readability-ident
 }
 SE_BIND_FUNC_AS_PROP_GET(js_engine_CCObject_getName)
 
+static bool js_engine_CCObject_getObjFlags(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
+    SE_PRECONDITION2(cobj, false, "js_engine_CCObject_getObjFlags : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        auto result = static_cast<int>(cobj->getObjFlags());
+        ok &= nativevalue_to_se(result, s.rval(), nullptr /*ctx*/);
+        SE_PRECONDITION2(ok, false, "js_engine_CCObject_getObjFlags : Error processing arguments");
+        SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_engine_CCObject_getObjFlags)
+
 static bool js_engine_CCObject_isReplicated(se::State& s) // NOLINT(readability-identifier-naming)
 {
     auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
@@ -2489,7 +2527,7 @@ static bool js_engine_CCObject_isReplicated(se::State& s) // NOLINT(readability-
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_GET(js_engine_CCObject_isReplicated)
+SE_BIND_FUNC(js_engine_CCObject_isReplicated)
 
 static bool js_engine_CCObject_isValid(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -2508,7 +2546,7 @@ static bool js_engine_CCObject_isValid(se::State& s) // NOLINT(readability-ident
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_GET(js_engine_CCObject_isValid)
+SE_BIND_FUNC(js_engine_CCObject_isValid)
 
 static bool js_engine_CCObject_setHideFlags(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -2527,7 +2565,7 @@ static bool js_engine_CCObject_setHideFlags(se::State& s) // NOLINT(readability-
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_SET(js_engine_CCObject_setHideFlags)
+SE_BIND_FUNC(js_engine_CCObject_setHideFlags)
 
 static bool js_engine_CCObject_setName(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -2548,6 +2586,25 @@ static bool js_engine_CCObject_setName(se::State& s) // NOLINT(readability-ident
 }
 SE_BIND_FUNC_AS_PROP_SET(js_engine_CCObject_setName)
 
+static bool js_engine_CCObject_setObjFlags(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
+    SE_PRECONDITION2(cobj, false, "js_engine_CCObject_setObjFlags : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 1) {
+        HolderType<cc::CCObject::Flags, false> arg0 = {};
+        ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+        SE_PRECONDITION2(ok, false, "js_engine_CCObject_setObjFlags : Error processing arguments");
+        cobj->setObjFlags(arg0.value());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_engine_CCObject_setObjFlags)
+
 static bool js_engine_CCObject_setReplicated(se::State& s) // NOLINT(readability-identifier-naming)
 {
     auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
@@ -2565,7 +2622,7 @@ static bool js_engine_CCObject_setReplicated(se::State& s) // NOLINT(readability
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_SET(js_engine_CCObject_setReplicated)
+SE_BIND_FUNC(js_engine_CCObject_setReplicated)
 
 static bool js_engine_CCObject_toString(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -2598,33 +2655,6 @@ static bool js_engine_CCObject_deferredDestroy_static(se::State& s) // NOLINT(re
     return false;
 }
 SE_BIND_FUNC(js_engine_CCObject_deferredDestroy_static)
-
-static bool js_engine_CCObject_get__objFlags(se::State& s) // NOLINT(readability-identifier-naming)
-{
-    auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
-    SE_PRECONDITION2(cobj, false, "js_engine_CCObject_get__objFlags : Invalid Native Object");
-
-    CC_UNUSED bool ok = true;
-    se::Value jsret;
-    ok &= nativevalue_to_se(cobj->_objFlags, jsret, s.thisObject() /*ctx*/);
-    s.rval() = jsret;
-    SE_HOLD_RETURN_VALUE(cobj->_objFlags, s.thisObject(), s.rval());
-    return true;
-}
-SE_BIND_PROP_GET(js_engine_CCObject_get__objFlags)
-
-static bool js_engine_CCObject_set__objFlags(se::State& s) // NOLINT(readability-identifier-naming)
-{
-    const auto& args = s.args();
-    auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
-    SE_PRECONDITION2(cobj, false, "js_engine_CCObject_set__objFlags : Invalid Native Object");
-
-    CC_UNUSED bool ok = true;
-    ok &= sevalue_to_native(args[0], &cobj->_objFlags, s.thisObject());
-    SE_PRECONDITION2(ok, false, "js_engine_CCObject_set__objFlags : Error processing new value");
-    return true;
-}
-SE_BIND_PROP_SET(js_engine_CCObject_set__objFlags)
 
 static bool js_engine_CCObject_get__name(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -2676,14 +2706,18 @@ bool js_register_engine_CCObject(se::Object* obj) // NOLINT(readability-identifi
 #if CC_DEBUG
     cls->defineStaticProperty("isJSBClass", _SE(js_engine_getter_return_true), nullptr);
 #endif
-    cls->defineProperty("_objFlags", _SE(js_engine_CCObject_get__objFlags), _SE(js_engine_CCObject_set__objFlags));
     cls->defineProperty("_name", _SE(js_engine_CCObject_get__name), _SE(js_engine_CCObject_set__name));
     cls->defineProperty("name", _SE(js_engine_CCObject_getName_asGetter), _SE(js_engine_CCObject_setName_asSetter));
-    cls->defineProperty("hideFlags", _SE(js_engine_CCObject_getHideFlags_asGetter), _SE(js_engine_CCObject_setHideFlags_asSetter));
-    cls->defineProperty("replicated", _SE(js_engine_CCObject_isReplicated_asGetter), _SE(js_engine_CCObject_setReplicated_asSetter));
-    cls->defineProperty("isValid", _SE(js_engine_CCObject_isValid_asGetter), nullptr);
+    cls->defineFunction("_initObjFlags", _SE(js_engine_CCObject__initObjFlags));
     cls->defineFunction("_destroy", _SE(js_engine_CCObject_destroy));
     cls->defineFunction("_destroyImmediate", _SE(js_engine_CCObject_destroyImmediate));
+    cls->defineFunction("getHideFlags", _SE(js_engine_CCObject_getHideFlags));
+    cls->defineFunction("getObjFlags", _SE(js_engine_CCObject_getObjFlags));
+    cls->defineFunction("isReplicated", _SE(js_engine_CCObject_isReplicated));
+    cls->defineFunction("isValid", _SE(js_engine_CCObject_isValid));
+    cls->defineFunction("setHideFlags", _SE(js_engine_CCObject_setHideFlags));
+    cls->defineFunction("setObjFlags", _SE(js_engine_CCObject_setObjFlags));
+    cls->defineFunction("setReplicated", _SE(js_engine_CCObject_setReplicated));
     cls->defineFunction("toString", _SE(js_engine_CCObject_toString));
     cls->defineStaticFunction("deferredDestroy", _SE(js_engine_CCObject_deferredDestroy_static));
     cls->defineFinalizeFunction(_SE(js_cc_CCObject_finalize));

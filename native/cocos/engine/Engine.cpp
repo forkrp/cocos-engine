@@ -261,12 +261,12 @@ void Engine::tick() {
 
         // iOS/macOS use its own fps limitation algorithm.
 #if (CC_PLATFORM == CC_PLATFORM_ANDROID || CC_PLATFORM == CC_PLATFORM_WINDOWS || CC_PLATFORM == CC_PLATFORM_OHOS)
-        if (dtNS < static_cast<double>(_prefererredNanosecondsPerFrame)) {
-            CC_PROFILE(EngineSleep);
-            std::this_thread::sleep_for(
-                std::chrono::nanoseconds(_prefererredNanosecondsPerFrame - static_cast<int64_t>(dtNS)));
-            dtNS = static_cast<double>(_prefererredNanosecondsPerFrame);
-        }
+//cjh        if (dtNS < static_cast<double>(_prefererredNanosecondsPerFrame)) {
+//            CC_PROFILE(EngineSleep);
+//            std::this_thread::sleep_for(
+//                std::chrono::nanoseconds(_prefererredNanosecondsPerFrame - static_cast<int64_t>(dtNS)));
+//            dtNS = static_cast<double>(_prefererredNanosecondsPerFrame);
+//        }
 #endif
 
         prevTime = std::chrono::steady_clock::now();
@@ -285,6 +285,8 @@ void Engine::tick() {
     }
 
     CC_PROFILER_END_FRAME;
+    printJSBInvoke();
+    clearRecordJSBInvoke();
 }
 
 void Engine::doRestart() {

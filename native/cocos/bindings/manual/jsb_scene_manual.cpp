@@ -187,14 +187,14 @@ static void registerActiveInHierarchyArr(cc::Node *node, se::Object *jsObject) {
 }
 
 static void registerLayerArr(cc::Node *node, se::Object *jsObject) {
-    se::Value layerArrVal;
-    bool ok = jsObject->getProperty("_layerArr", &layerArrVal);
-    CC_ASSERT(ok && layerArrVal.isObject() && layerArrVal.toObject()->isTypedArray() && layerArrVal.toObject()->getTypedArrayType() == se::Object::TypedArrayType::UINT32);
-
-    uint8_t *pLayerArrValData = nullptr;
-    ok = layerArrVal.toObject()->getTypedArrayData(&pLayerArrValData, nullptr);
-    CC_ASSERT(ok);
-    node->setLayerPtr(reinterpret_cast<uint32_t *>(pLayerArrValData));
+//cjhm    se::Value layerArrVal;
+//    bool ok = jsObject->getProperty("_layerArr", &layerArrVal);
+//    CC_ASSERT(ok && layerArrVal.isObject() && layerArrVal.toObject()->isTypedArray() && layerArrVal.toObject()->getTypedArrayType() == se::Object::TypedArrayType::UINT32);
+//
+//    uint8_t *pLayerArrValData = nullptr;
+//    ok = layerArrVal.toObject()->getTypedArrayData(&pLayerArrValData, nullptr);
+//    CC_ASSERT(ok);
+//    node->setLayerPtr(reinterpret_cast<uint32_t *>(pLayerArrValData));
 }
 
 static void registerLocalPositionRotationScaleUpdated(cc::Node *node, se::Object *jsObject) {

@@ -172,8 +172,16 @@ extern se::Class * __jsb_cc_CCObject_class; // NOLINT
 
 bool js_register_cc_CCObject(se::Object *obj); // NOLINT
 
+SE_DECLARE_FUNC(js_engine_CCObject__initObjFlags);
 SE_DECLARE_FUNC(js_engine_CCObject_destroy);
 SE_DECLARE_FUNC(js_engine_CCObject_destroyImmediate);
+SE_DECLARE_FUNC(js_engine_CCObject_getHideFlags);
+SE_DECLARE_FUNC(js_engine_CCObject_getObjFlags);
+SE_DECLARE_FUNC(js_engine_CCObject_isReplicated);
+SE_DECLARE_FUNC(js_engine_CCObject_isValid);
+SE_DECLARE_FUNC(js_engine_CCObject_setHideFlags);
+SE_DECLARE_FUNC(js_engine_CCObject_setObjFlags);
+SE_DECLARE_FUNC(js_engine_CCObject_setReplicated);
 SE_DECLARE_FUNC(js_engine_CCObject_toString);
 SE_DECLARE_FUNC(js_engine_CCObject_deferredDestroy);
 SE_DECLARE_FUNC(js_engine_CCObject_CCObject);

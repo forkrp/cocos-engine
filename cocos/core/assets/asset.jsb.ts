@@ -50,6 +50,7 @@ applyMixins(jsb.Asset, [CallbacksInvoker]);
 const assetProto: any = jsb.Asset.prototype;
 
 assetProto._ctor = function () {
+    jsb.CCObject.prototype._ctor.apply(this, arguments);
     this._ref = 0;
     this.__nativeRefs = {};
     this.__jsb_ref_id = undefined;

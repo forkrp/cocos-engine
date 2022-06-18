@@ -28,6 +28,9 @@ import { property } from '../data/decorators/property';
 import { legacyCC } from '../global-exports';
 import { _applyDecoratedDescriptor } from '../data/utils/decorator-jsb-utils';
 import { baseNodePolyfill } from './base-node-dev';
+
+declare const jsb: any;
+
 const baseNodeProto: any = jsb.BaseNode.prototype;
 
 baseNodeProto.createNode = null!;
@@ -88,6 +91,7 @@ const clsDecorator = ccclass('cc.BaseNode');
 // });
 //
 baseNodeProto._ctor = function () {
+    jsb.CCObject.prototype._ctor.apply(this, arguments);
 //     // _initializerDefineProperty(_this, "_parent", _descriptor$o, _assertThisInitialized(_this));
 //     // _initializerDefineProperty(_this, "_children", _descriptor2$h, _assertThisInitialized(_this));
 //     // _initializerDefineProperty(_this, "_active", _descriptor3$b, _assertThisInitialized(_this));

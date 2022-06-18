@@ -198,7 +198,7 @@ class CCObject implements EditorExtendableObject {
     /**
      * @internal
      */
-    public _objFlags: number;
+    public declare _objFlags: number;
     protected _name: string;
 
     constructor (name = '') {
@@ -692,11 +692,36 @@ declare const jsb: any;
 if (JSB) {
     copyAllProperties(CCObject, jsb.CCObject, ['prototype', 'length', 'name']);
     copyAllProperties(CCObject.prototype, jsb.CCObject.prototype,
-        ['constructor', 'name', 'hideFlags', 'replicated', 'isValid']);
+        ['constructor', 'name', '_objFlags']);
 
     // @ts-expect-error TS2629
     // eslint-disable-next-line no-class-assign
     CCObject = jsb.CCObject;
+
+    jsb.CCObject.prototype._objFlagsArr = null;
+    Object.defineProperty(jsb.CCObject.prototype, '_objFlags', {
+        configurable: true,
+        enumerable: true,
+        get () {
+            if (!this._objFlagsArr) {
+                this._objFlagsArr = new Uint32Array(jsb.createExternalArrayBuffer(4));
+                this._initObjFlags(this._objFlagsArr);
+            }
+            return this._objFlagsArr[0];
+        },
+        set (val) {
+            if (!this._objFlagsArr) {
+                this._objFlagsArr = new Uint32Array(jsb.createExternalArrayBuffer(4));
+                this._initObjFlags(this._objFlagsArr);
+            }
+            this._objFlagsArr[0] = val;
+        },
+    });
+
+    jsb.CCObject.prototype._ctor = function() {
+        this._objFlagsArr = new Uint32Array(jsb.createExternalArrayBuffer(4));
+        this._initObjFlags(this._objFlagsArr);
+    };
 }
 
 legacyCC.Object = CCObject;

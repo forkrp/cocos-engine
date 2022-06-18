@@ -24,6 +24,7 @@
 ****************************************************************************/
 
 #include "HelperMacros.h"
+#include "base/std/container/unordered_map.h"
 
 #if defined(RECORD_JSB_INVOKING)
 

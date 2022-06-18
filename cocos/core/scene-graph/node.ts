@@ -23,19 +23,17 @@
  THE SOFTWARE.
 */
 
-import {
-    ccclass, editable, serializable, type,
-} from 'cc.decorator';
-import { EDITOR } from 'internal:constants';
-import { Layers } from './layers';
-import { NodeUIProperties } from './node-ui-properties';
-import { legacyCC } from '../global-exports';
-import { BaseNode, TRANSFORM_ON } from './base-node';
-import { approx, EPSILON, Mat3, Mat4, Quat, Vec3 } from '../math';
-import { NodeSpace, TransformBit } from './node-enum';
-import { NodeEventType } from './node-event';
-import { CustomSerializable, editorExtrasTag, SerializationContext, SerializationOutput, serializeTag } from '../data';
-import { warnID } from '../platform/debug';
+import {ccclass, editable, serializable, type,} from 'cc.decorator';
+import {EDITOR} from 'internal:constants';
+import {Layers} from './layers';
+import {NodeUIProperties} from './node-ui-properties';
+import {legacyCC} from '../global-exports';
+import {BaseNode, TRANSFORM_ON} from './base-node';
+import {approx, EPSILON, Mat3, Mat4, Quat, Vec3} from '../math';
+import {NodeSpace, TransformBit} from './node-enum';
+import {NodeEventType} from './node-event';
+import {CustomSerializable, editorExtrasTag, SerializationContext, SerializationOutput, serializeTag} from '../data';
+import {warnID} from '../platform/debug';
 
 const v3_a = new Vec3();
 const q_a = new Quat();
@@ -210,8 +208,7 @@ export class Node extends BaseNode implements CustomSerializable {
         const [chunk, offset] = bookOfChange.alloc();
         this._hasChangedFlagsChunk = chunk;
         this._hasChangedFlagsOffset = offset;
-        const flagBuffer = new Uint32Array(chunk.buffer, chunk.byteOffset + offset * 4, 1);
-        this._hasChangedFlags = flagBuffer;
+        this._hasChangedFlags = new Uint32Array(chunk.buffer, chunk.byteOffset + offset * 4, 1);
 
         this._pos = new Vec3();
         this._rot = new Quat();

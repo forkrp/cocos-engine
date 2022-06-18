@@ -96,14 +96,14 @@ void Batcher2d::walk(Node* node) {
                 }
             }
 
-            if (node->getChangedFlags()) {
+            if (curNode->getChangedFlags()) {
                 fillVertexBuffers(entity);
             }
             fillIndexBuffers(entity);
         }
 
         auto& children = curNode->getChildren();
-        for (index_t i = children.size() - 1; i >= 0; i--) {
+        for (index_t i = static_cast<index_t>(children.size() - 1); i >= 0; i--) {
             assert(length < 1000000);
             nodeStack[length++] = children[i];
         }
@@ -151,7 +151,7 @@ void Batcher2d::generateBatch(RenderEntity* entity) {
 }
 
 void Batcher2d::resetRenderStates() {
-    _currMaterial = new Material();
+    _currMaterial = nullptr;
     _currTexture = nullptr;
     _currTextureHash = 0;
     _currSampler = nullptr;
@@ -243,7 +243,7 @@ void Batcher2d::reset() {
     _indexStart = 0;
     _currHash = 0;
     _currLayer = 0;
-    _currMaterial = new Material();
+    _currMaterial = nullptr;
     _currTexture = nullptr;
     _currSampler = nullptr;
 

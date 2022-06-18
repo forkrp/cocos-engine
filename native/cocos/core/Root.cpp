@@ -328,6 +328,8 @@ void Root::frameMove(float deltaTime, int32_t totalFrames) {
 
     _eventProcessor->emit(EventTypesToJS::ROOT_BATCH2D_RESET, this);
     // cjh TODO:    if (this._batcher) this._batcher.reset();
+
+    Node::clearNodeArray();
 }
 
 scene::RenderWindow *Root::createWindow(scene::IRenderWindowInfo &info) {

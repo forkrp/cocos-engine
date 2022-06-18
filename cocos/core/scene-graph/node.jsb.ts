@@ -19,37 +19,27 @@
  THE SOFTWARE.
 */
 
-import { ccclass, editable, serializable, type } from 'cc.decorator';
-import {
-    _applyDecoratedDescriptor,
-    _assertThisInitialized,
-    _initializerDefineProperty,
-} from '../data/utils/decorator-jsb-utils';
+import {ccclass, editable, serializable, type} from 'cc.decorator';
+import {_applyDecoratedDescriptor,} from '../data/utils/decorator-jsb-utils';
 
-import { legacyCC } from '../global-exports';
-import { errorID, getError } from '../platform/debug';
-import { Component } from '../components/component';
-import { NodeEventType } from './node-event';
-import { CCObject } from '../data/object';
-import { NodeUIProperties } from './node-ui-properties';
-import { NodeSpace, TransformBit } from './node-enum';
-import { Mat4, Quat, Vec3 } from '../math';
-import { NodeEventProcessor } from './node-event-processor';
-import { Layers } from './layers';
-import { SerializationContext, SerializationOutput, serializeTag } from '../data';
-import { EDITOR } from '../default-constants';
-import { _tempFloatArray } from './utils.jsb';
+import {legacyCC} from '../global-exports';
+import {errorID, getError} from '../platform/debug';
+import {Component} from '../components/component';
+import {NodeEventType} from './node-event';
+import {NodePool, NodeView, NULL_HANDLE} from '../renderer/core/memory-pools';
+import {CCObject} from '../data/object';
+import {NodeUIProperties} from './node-ui-properties';
+import {NodeSpace, TransformBit} from './node-enum';
+import {Mat4, Quat, Vec3} from '../math';
+import {NodeEventProcessor} from './node-event-processor';
+import {Layers} from './layers';
+import {SerializationContext, SerializationOutput, serializeTag} from '../data';
+import {EDITOR} from '../default-constants';
+import {_tempFloatArray} from './utils.jsb';
 
-import {
-    applyMountedChildren,
-    applyMountedComponents, applyPropertyOverrides,
-    applyRemovedComponents, applyTargetOverrides,
-    createNodeWithPrefab,
-    generateTargetMap,
-} from '../utils/prefab/utils';
-import { getClassByName, isChildClassOf } from '../utils/js-typed';
-import { syncNodeValues } from "../utils/jsb-utils";
-import { BaseNode } from "./base-node";
+import {getClassByName, isChildClassOf} from '../utils/js-typed';
+import {syncNodeValues} from "../utils/jsb-utils";
+import {BaseNode} from "./base-node";
 
 declare const jsb: any;
 
@@ -57,6 +47,77 @@ export const Node = jsb.Node;
 // @ts-ignore
 export type Node = jsb.Node;
 legacyCC.Node = Node;
+
+const dirtyNodes: any[] = [];
+const view_tmp:[Uint32Array, number] = [] as any;
+
+class BookOfChange {
+    private _chunks: Uint32Array[] = [];
+    private _freelists: number[][] = [];
+
+    // these should match with native: cocos/renderer/pipeline/helper/SharedMemory.h Node.getHasChangedFlags
+    private static CAPACITY_PER_CHUNK = 256;
+
+    constructor () {
+        this._createChunk();
+    }
+
+    public alloc () {
+        const chunkCount = this._freelists.length;
+        for (let i = 0; i < chunkCount; ++i) {
+            if (!this._freelists[i].length) continue;
+            return this._createView(i);
+        }
+        this._createChunk();
+        return this._createView(chunkCount);
+    }
+
+    public free (view: Uint32Array, idx: number) {
+        const chunkCount = this._freelists.length;
+        for (let i = 0; i < chunkCount; ++i) {
+            if (this._chunks[i] !== view) continue;
+            this._freelists[i].push(idx);
+            return;
+        }
+    }
+
+    public clear () {
+        const chunkCount = this._chunks.length;
+        for (let i = 0; i < chunkCount; ++i) {
+            this._chunks[i].fill(0);
+        }
+    }
+
+    private _createChunk () {
+        this._chunks.push(new Uint32Array(BookOfChange.CAPACITY_PER_CHUNK));
+        const freelist: number[] = [];
+        for (let i = BookOfChange.CAPACITY_PER_CHUNK - 1; i >= 0; i--) freelist.push(i);
+        this._freelists.push(freelist);
+    }
+
+    private _createView (chunkIdx: number): [Uint32Array, number] {
+        view_tmp[0] = this._chunks[chunkIdx];
+        view_tmp[1] = this._freelists[chunkIdx].pop()!;
+        return view_tmp;
+    }
+}
+
+const bookOfChange = new BookOfChange();
+
+Node.resetHasChangedFlags = function resetHasChangedFlags () {
+    bookOfChange.clear();
+};
+
+Node.ClearFrame = 0;
+Node.ClearRound = 1000;
+Node.clearNodeArray = function clearNodeArray () {
+    if (Node.ClearFrame < Node.ClearRound && !EDITOR) {
+        Node.ClearFrame++;
+    } else {
+        Node.ClearFrame = 0;
+        dirtyNodes.length = 0;
+    }
+}
 
 const clsDecorator = ccclass('cc.Node');
 
@@ -91,8 +152,7 @@ const TRANSFORMBIT_TRS = TransformBit.TRS;
 const nodeProto: any = jsb.Node.prototype;
 export const TRANSFORM_ON = 1 << 0;
 const Destroying = CCObject.Flags.Destroying;
-
-
+const DontDestroy = CCObject.Flags.DontDestroy;
 
 Node._setTempFloatArray(_tempFloatArray.buffer);
 
@@ -236,8 +296,7 @@ nodeProto.on = function (type, callback, target, useCapture: any = false) {
     switch (type) {
         case NodeEventType.TRANSFORM_CHANGED:
 
-            // this._eventMask |= TRANSFORM_ON;
-            this.setEventMask(this.getEventMask() | ~TRANSFORM_ON);
+            this._eventMask |= TRANSFORM_ON;
             if (!(this._registeredNodeEventTypeMask & REGISTERED_EVENT_MASK_TRANSFORM_CHANGED)) {
                 this._registerOnTransformChanged();
                 this._registeredNodeEventTypeMask |= REGISTERED_EVENT_MASK_TRANSFORM_CHANGED;
@@ -287,8 +346,7 @@ nodeProto.off = function (type: string, callback?, target?, useCapture = false) 
     if (!hasListeners) {
         switch (type) {
             case NodeEventType.TRANSFORM_CHANGED:
-                // this._eventMask &= ~TRANSFORM_ON;
-                this.setEventMask(this.getEventMask() & ~TRANSFORM_ON);
+                this._eventMask &= ~TRANSFORM_ON;
                 break;
             default:
                 break;
@@ -314,10 +372,8 @@ nodeProto.hasEventListener = function (type: string, callback?, target?: unknown
 
 nodeProto.targetOff = function (target: string | unknown) {
     // Check for event mask reset
-    const eventMask = this.getEventMask();
-    if ((eventMask & TRANSFORM_ON) && !this._eventProcessor.hasEventListener(NodeEventType.TRANSFORM_CHANGED)) {
-        // this._eventMask &= ~TRANSFORM_ON;
-        this.setEventMask(eventMask & ~TRANSFORM_ON);
+    if ((this._eventMask & TRANSFORM_ON) && !this._eventProcessor.hasEventListener(NodeEventType.TRANSFORM_CHANGED)) {
+        this._eventMask &= ~TRANSFORM_ON;
     }
 };
 
@@ -448,6 +504,15 @@ nodeProto._onPreDestroy = function _onPreDestroy () {
         comps[i]._destroyImmediate();
     }
 
+    //
+    if (this._nodeHandle) {
+        NodePool.free(this._nodeHandle);
+        this._nodeHandle = NULL_HANDLE;
+    }
+    this._nativeObj = null;
+
+    bookOfChange.free(this._hasChangedFlagsChunk, this._hasChangedFlagsOffset);
+    //
     return ret;
 };
 
@@ -660,7 +725,13 @@ nodeProto.setPosition = function setPosition (val: Readonly<Vec3> | number, y?: 
         this._lpos.y = _tempFloatArray[2] = y as number;
         this._lpos.z = _tempFloatArray[3] = z as number;
     }
-    oldSetPosition.call(this);
+
+    this.invalidateChildren(TransformBit.POSITION);
+    if (this._eventMask & TRANSFORM_ON) {
+        this.emit(NodeEventType.TRANSFORM_CHANGED, TransformBit.POSITION);
+    }
+
+    //cjh oldSetPosition.call(this);
 };
 
 nodeProto.getRotation = function (out?: Quat): Quat {
@@ -872,29 +943,29 @@ Object.defineProperty(nodeProto, 'worldScale', {
     },
 });
 
-Object.defineProperty(nodeProto, '_pos', {
-    configurable: true,
-    enumerable: true,
-    get (): Readonly<Vec3> {
-        return this.getWorldPosition();
-    }
-});
-
-Object.defineProperty(nodeProto, '_rot', {
-    configurable: true,
-    enumerable: true,
-    get (): Readonly<Quat> {
-        return this.getWorldRotation();
-    }
-});
-
-Object.defineProperty(nodeProto, '_scale', {
-    configurable: true,
-    enumerable: true,
-    get (): Readonly<Vec3> {
-        return this.getWorldScale();
-    }
-});
+// Object.defineProperty(nodeProto, '_pos', {
+//     configurable: true,
+//     enumerable: true,
+//     get (): Readonly<Vec3> {
+//         return this.getWorldPosition();
+//     }
+// });
+//
+// Object.defineProperty(nodeProto, '_rot', {
+//     configurable: true,
+//     enumerable: true,
+//     get (): Readonly<Quat> {
+//         return this.getWorldRotation();
+//     }
+// });
+//
+// Object.defineProperty(nodeProto, '_scale', {
+//     configurable: true,
+//     enumerable: true,
+//     get (): Readonly<Vec3> {
+//         return this.getWorldScale();
+//     }
+// });
 
 Object.defineProperty(nodeProto, 'eulerAngles', {
     configurable: true,
@@ -915,13 +986,13 @@ Object.defineProperty(nodeProto, 'worldMatrix', {
     },
 });
 
-Object.defineProperty(nodeProto, '_mat', {
-    configurable: true,
-    enumerable: true,
-    get (): Readonly<Mat4> {
-        return this.getWorldMatrix();
-    },
-});
+//cjh Object.defineProperty(nodeProto, '_mat', {
+//     configurable: true,
+//     enumerable: true,
+//     get (): Readonly<Mat4> {
+//         return this.getWorldMatrix();
+//     },
+// });
 
 Object.defineProperty(nodeProto, 'activeInHierarchy', {
     configurable: true,
@@ -949,10 +1020,11 @@ Object.defineProperty(nodeProto, 'layer', {
     configurable: true,
     enumerable: true,
     get () {
-        return this._layerArr[0];
+        return this._layer;
     },
     set (v) {
-        this._layerArr[0] = v;
+        this._layer = v;
+        this._nativeLayer[0] = this._layer;
         if (this._uiProps && this._uiProps.uiComp) {
             this._uiProps.uiComp.setNodeDirty();
             this._uiProps.uiComp.markForUpdateRenderData();
@@ -961,16 +1033,16 @@ Object.defineProperty(nodeProto, 'layer', {
     },
 });
 
-Object.defineProperty(nodeProto, '_layer', {
-    configurable: true,
-    enumerable: true,
-    get () {
-        return this._layerArr[0];
-    },
-    set (v) {
-        this._layerArr[0] = v;
-    },
-});
+//cjhm Object.defineProperty(nodeProto, '_layer', {
+//     configurable: true,
+//     enumerable: true,
+//     get () {
+//         return this._layerArr[0];
+//     },
+//     set (v) {
+//         this._layerArr[0] = v;
+//     },
+// });
 
 Object.defineProperty(nodeProto, 'forward', {
     configurable: true,
@@ -1058,6 +1130,32 @@ Object.defineProperty(nodeProto, 'scene', {
     }
 });
 
+Object.defineProperty(nodeProto, 'hasChangedFlags', {
+    configurable: true,
+    enumerable: true,
+    get () {
+        this._hasChangedFlagsChunk[this._hasChangedFlagsOffset] as TransformBit;
+    },
+    set (val) {
+        this._hasChangedFlagsChunk[this._hasChangedFlagsOffset] = val;
+    },
+});
+
+Object.defineProperty(nodeProto, '_persistNode', {
+    configurable: true,
+    enumerable: true,
+    get() {
+        return (this._objFlags & DontDestroy) > 0;
+    },
+    set(value) {
+        if (value) {
+            this._objFlags |= DontDestroy;
+        } else {
+            this._objFlags &= ~DontDestroy;
+        }
+    }
+});
+
 nodeProto.rotate = function (rot: Quat, ns?: NodeSpace): void {
     _tempFloatArray[1] = rot.x;
     _tempFloatArray[2] = rot.y;
@@ -1122,8 +1220,10 @@ nodeProto._onActiveNode = function (shouldActiveNow: boolean) {
 };
 
 nodeProto._onBatchCreated = function (dontSyncChildPrefab: boolean) {
+    this._nativeLayer[0] = this._layer;
+
     this.hasChangedFlags = TRANSFORMBIT_TRS;
-    this._dirtyFlags |= TRANSFORMBIT_TRS;
+    this._dirtyFlags[0] |= TRANSFORMBIT_TRS;
     const children = this._children;
     const len = children.length;
     let child;
@@ -1333,6 +1433,37 @@ _applyDecoratedDescriptor(_class2$v.prototype, 'layer', [editable], Object.getOw
 //
 nodeProto._ctor = function (name?: string) {
     BaseNode.prototype._ctor.apply(this, arguments);
+    this._eventMask = 0;
+    this._layer = Layers.Enum.DEFAULT;
+    const [chunk, offset] = bookOfChange.alloc();
+    this._hasChangedFlagsChunk = chunk;
+    this._hasChangedFlagsOffset = offset;
+    this._hasChangedFlags = new Uint32Array(chunk.buffer, chunk.byteOffset + offset * 4, 1);
+
+    // new node
+    this._nodeHandle = NodePool.alloc();
+    this._pos = new Vec3(NodePool.getTypedArray(this._nodeHandle, NodeView.WORLD_POSITION) as any);
+    this._rot = new Quat(NodePool.getTypedArray(this._nodeHandle, NodeView.WORLD_ROTATION) as any);
+    this._scale = new Vec3(NodePool.getTypedArray(this._nodeHandle, NodeView.WORLD_SCALE) as any);
+
+    this._lpos = new Vec3(NodePool.getTypedArray(this._nodeHandle, NodeView.LOCAL_POSITION) as any);
+    this._lrot = new Quat(NodePool.getTypedArray(this._nodeHandle, NodeView.LOCAL_ROTATION) as any);
+    this._lscale = new Vec3(NodePool.getTypedArray(this._nodeHandle, NodeView.LOCAL_SCALE) as any);
+
+    this._mat = new Mat4(NodePool.getTypedArray(this._nodeHandle, NodeView.WORLD_MATRIX) as any);
+    this._nativeLayer = NodePool.getTypedArray(this._nodeHandle, NodeView.LAYER) as Uint32Array;
+    this._dirtyFlags = NodePool.getTypedArray(this._nodeHandle, NodeView.DIRTY_FLAG) as Uint32Array;
+
+    this._scale.set(1, 1, 1);
+    this._lscale.set(1, 1, 1);
+
+    this._nativeLayer[0] = this._layer;
+
+    this._hasChangedFlags = new Uint32Array(chunk.buffer, chunk.byteOffset + offset * 4, 1);
+
+    this._initWithData(NodePool.getBuffer(this._nodeHandle), this._hasChangedFlags);
+    //
+
     this.__nativeRefs = {};
     this.__jsb_ref_id = undefined;
     this._iN$t = null;
@@ -1342,8 +1473,8 @@ nodeProto._ctor = function (name?: string) {
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
     this._activeInHierarchyArr = new Uint8Array(jsb.createExternalArrayBuffer(1));
-    this._layerArr = new Uint32Array(jsb.createExternalArrayBuffer(4));
-    this._layerArr[0] = Layers.Enum.DEFAULT;
+    // this._layerArr = new Uint32Array(jsb.createExternalArrayBuffer(4));
+    // this._layerArr[0] = Layers.Enum.DEFAULT;
     this._scene = null;
     this._prefab = null;
     // record scene's id when set this node as persist node
@@ -1387,9 +1518,9 @@ nodeProto._ctor = function (name?: string) {
     this._children = [];
     // this._isChildrenRedefined = false;
 
-    this._lpos = new Vec3();
-    this._lrot = new Quat();
-    this._lscale = new Vec3(1, 1, 1);
+    //cjh this._lpos = new Vec3();
+    // this._lrot = new Quat();
+    // this._lscale = new Vec3(1, 1, 1);
     this._euler = new Vec3();
 
     // inner use properties
@@ -1449,3 +1580,55 @@ nodeProto.getWorldRT = function (out?: Mat4) {
     Mat4.copy(target, worldRT);
     return target;
 };
+
+nodeProto.invalidateChildren = function invalidateChildren (dirtyBit: TransformBit) {
+    let i = 0;
+    let j = 0;
+    let l = 0;
+    let cur: this;
+    let c : this;
+    let flag = 0;
+    let children:this[];
+    let hasChangedFlags = 0;
+    const childDirtyBit = dirtyBit | TransformBit.POSITION;
+
+    // NOTE: inflate function
+    // ```
+    // this._setDirtyNode(0, this);
+    // ```
+    dirtyNodes[0] = this;
+
+    while (i >= 0) {
+        cur = dirtyNodes[i--];
+        hasChangedFlags = cur._hasChangedFlags[0];
+        flag =  cur._dirtyFlags[0];
+        if (cur.isValid && (flag & hasChangedFlags & dirtyBit) !== dirtyBit) {
+            // NOTE: inflate procedure
+            // ```
+            // cur._dirtyFlags |= dirtyBit;
+            // ```
+            flag |= dirtyBit;
+            cur._dirtyFlags[0] = flag;
+
+            // NOTE: inflate attribute accessor
+            // ```
+            // cur.hasChangedFlags = hasChangedFlags | dirtyBit;
+            // ```
+            cur._hasChangedFlags[0] = hasChangedFlags | dirtyBit;
+
+            children = cur._children;
+            l = children.length;
+            for (j = 0; j < l; j++) {
+                c = children[j];
+                // NOTE: inflate function
+                // ```
+                // this._setDirtyNode(0, c);
+                // ```
+                dirtyNodes[++i] = c;
+            }
+        }
+        dirtyBit = childDirtyBit;
+    }
+}
+
+

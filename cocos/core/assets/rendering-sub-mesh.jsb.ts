@@ -55,7 +55,6 @@ const renderingSubMeshProto = RenderingSubMesh.prototype;
 
 renderingSubMeshProto._ctor = function (vertexBuffers: Buffer[], attributes: Attribute[], primitiveMode: PrimitiveMode,
     indexBuffer: Buffer | null = null, indirectBuffer: Buffer | null = null) {
-    jsb.Asset.prototype._ctor.apply(this, arguments);
     this._attributes = attributes;
     this._vertexBuffers = vertexBuffers;
     this._indexBuffer = indexBuffer;

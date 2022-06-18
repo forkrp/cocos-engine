@@ -58,6 +58,19 @@ using EventType = NodeEventType;
  */
 using TransformDirtyBit = TransformBit;
 
+// This struct defines the memory layout shared between JS and C++.
+struct NodeLayout {
+    uint32_t       dirtyFlag{0};
+    uint32_t       layer{0};
+    Vec3       worldScale;
+    Vec3       worldPosition;
+    Quaternion worldRotation;
+    Mat4       worldMatrix;
+    Vec3       localScale;
+    Vec3       localPosition;
+    Quaternion localRotation;
+};
+
 class Node : public BaseNode {
 public:
     class UserData : public RefCounted {
@@ -244,11 +257,11 @@ public:
     void setSiblingIndex(index_t index);
 
     inline bool isPersistNode() const {
-        return static_cast<FlagBits>(_objFlags & Flags::DONT_DESTROY) > 0;
+        return static_cast<FlagBits>(getObjFlags() & Flags::DONT_DESTROY) > 0;
     }
 
     inline void setPersistNode(bool val) {
-        val ? _objFlags |= Flags::DONT_DESTROY : _objFlags &= ~Flags::DONT_DESTROY;
+        val ? setObjFlags(getObjFlags() | Flags::DONT_DESTROY) : setObjFlags(getObjFlags() & ~Flags::DONT_DESTROY);
     }
 
     inline const ccstd::string &getUuid() const {
@@ -299,18 +312,18 @@ public:
      * @param position Target position
      */
     inline void setPosition(const Vec3 &pos) { setPosition(pos.x, pos.y, pos.z); }
-    inline void setPosition(float x, float y) { setPosition(x, y, _localPosition.z); }
+    inline void setPosition(float x, float y) { setPosition(x, y, _layout->localPosition.z); }
     inline void setPosition(float x, float y, float z) { setPositionInternal(x, y, z, false); }
-    inline void setPositionInternal(float x, float y, bool calledFromJS) { setPositionInternal(x, y, _localPosition.z, calledFromJS); }
+    inline void setPositionInternal(float x, float y, bool calledFromJS) { setPositionInternal(x, y, _layout->localPosition.z, calledFromJS); }
     void setPositionInternal(float x, float y, float z, bool calledFromJS);
-    inline void setPositionForJS(float x, float y, float z) { _localPosition.set(x, y, z); }
+    inline void setPositionForJS(float x, float y, float z) { _layout->localPosition.set(x, y, z); }
     /**
      * @en Get position in local coordinate system, please try to pass `out` vector and reuse it to avoid garbage.
      * @zh 获取本地坐标，注意，尽可能传递复用的 [[Vec3]] 以避免产生垃圾。
      * @param out Set the result to out vector
      * @return If `out` given, the return value equals to `out`, otherwise a new vector will be generated and return
      */
-    const Vec3 &getPosition() const { return _localPosition; }
+    const Vec3 &getPosition() const { return _layout->localPosition; }
 
     /**
      * @en Set rotation in local coordinate system with a quaternion representing the rotation
@@ -320,7 +333,7 @@ public:
     inline void setRotation(const Quaternion &rotation) { setRotation(rotation.x, rotation.y, rotation.z, rotation.w); }
     inline void setRotation(float x, float y, float z, float w) { setRotationInternal(x, y, z, w, false); }
     void setRotationInternal(float x, float y, float z, float w, bool calledFromJS);
-    inline void setRotationForJS(float x, float y, float z, float w) { _localRotation.set(x, y, z, w); }
+    inline void setRotationForJS(float x, float y, float z, float w) { _layout->localRotation.set(x, y, z, w); }
 
     inline void setEulerAngles(const Vec3 &val) { setRotationFromEuler(val.x, val.y, val.z); }
     inline void setRotationFromEuler(const Vec3 &val) { setRotationFromEuler(val.x, val.y, val.z); }
@@ -333,7 +346,7 @@ public:
      * @param out Set the result to out quaternion
      * @return If `out` given, the return value equals to `out`, otherwise a new quaternion will be generated and return
      */
-    const Quaternion &getRotation() const { return _localRotation; }
+    const Quaternion &getRotation() const { return _layout->localRotation; }
 
     /**
      * @en Set scale in local coordinate system
@@ -341,18 +354,18 @@ public:
      * @param scale Target scale
      */
     inline void setScale(const Vec3 &scale) { setScale(scale.x, scale.y, scale.z); }
-    inline void setScale(float x, float y) { setScale(x, y, _localScale.z); }
+    inline void setScale(float x, float y) { setScale(x, y, _layout->localScale.z); }
     inline void setScale(float x, float y, float z) { setScaleInternal(x, y, z, false); }
-    inline void setScaleInternal(float x, float y, bool calledFromJS) { setScaleInternal(x, y, _localScale.z, calledFromJS); }
+    inline void setScaleInternal(float x, float y, bool calledFromJS) { setScaleInternal(x, y, _layout->localScale.z, calledFromJS); }
     void setScaleInternal(float x, float y, float z, bool calledFromJS);
-    inline void setScaleForJS(float x, float y, float z) { _localScale.set(x, y, z); }
+    inline void setScaleForJS(float x, float y, float z) { _layout->localScale.set(x, y, z); }
     /**
      * @en Get scale in local coordinate system, please try to pass `out` vector and reuse it to avoid garbage.
      * @zh 获取本地缩放，注意，尽可能传递复用的 [[Vec3]] 以避免产生垃圾。
      * @param out Set the result to out vector
      * @return If `out` given, the return value equals to `out`, otherwise a new vector will be generated and return
      */
-    const Vec3 &getScale() const { return _localScale; }
+    const Vec3 &getScale() const { return _layout->localScale; }
 
     /**
      * @en Inversely transform a point from world coordinate system to local coordinate system.
@@ -470,7 +483,7 @@ public:
 
     inline const Vec3 &getEulerAngles() {
         if (_eulerDirty) {
-            Quaternion::toEuler(_localRotation, false, &_euler);
+            Quaternion::toEuler(_layout->localRotation, false, &_euler);
             _eulerDirty = false;
         }
         return _euler;
@@ -482,19 +495,19 @@ public:
 
     inline Vec3 getForward() {
         Vec3 forward{0, 0, -1};
-        forward.transformQuat(_worldRotation);
+        forward.transformQuat(_layout->worldRotation);
         return forward;
     }
 
     inline Vec3 getUp() {
         Vec3 up{0, 1, 0};
-        up.transformQuat(_worldRotation);
+        up.transformQuat(_layout->worldRotation);
         return up;
     }
 
     inline Vec3 getRight() {
         Vec3 right{1, 0, 0};
-        right.transformQuat(_worldRotation);
+        right.transformQuat(_layout->worldRotation);
         return right;
     }
 
@@ -502,17 +515,17 @@ public:
      * @en Whether the node's transformation have changed during the current frame.
      * @zh 这个节点的空间变换信息在当前帧内是否有变过？
      */
-    inline uint32_t getChangedFlags() const { return _flagChange; }
-    inline void setChangedFlags(uint32_t value) { _flagChange = value; }
+    inline uint32_t getChangedFlags() const { return *_flagChunk; }
+    inline void setChangedFlags(uint32_t value) { *_flagChunk = value; }
 
-    inline void setDirtyFlag(uint32_t value) { _dirtyFlag = value; }
-    inline uint32_t getDirtyFlag() const { return _dirtyFlag; }
+    inline void setDirtyFlag(uint32_t value) { _layout->dirtyFlag = value; }
+    inline uint32_t getDirtyFlag() const { return _layout->dirtyFlag; }
     inline void setLayer(uint32_t layer) {
-        _layerArr[0] = layer;
+        _layout->layer = layer;
         emit(NodeEventType::LAYER_CHANGED, layer);
     }
-    inline uint32_t getLayer() const { return _layerArr[0]; }
-    inline void setLayerPtr(uint32_t *ptr) { _layerArr = ptr; }
+    inline uint32_t getLayer() const { return _layout->layer; }
+//cjhm    inline void setLayerPtr(uint32_t *ptr) { _layerArr = ptr; }
 
     //    inline NodeUiProperties *getUIProps() const { return _uiProps.get(); }
 
@@ -619,6 +632,8 @@ public:
     bool onPreDestroy() override;
     bool onPreDestroyBase();
 
+    void _initWithData(uint8_t * data, uint8_t* flagChunk);
+
 protected:
     void onSetParent(Node *oldParent, bool keepWorldTransform);
 
@@ -640,22 +655,22 @@ protected:
 
 private:
     inline void notifyLocalPositionUpdated() {
-        emit(EventTypesToJS::NODE_LOCAL_POSITION_UPDATED, _localPosition.x, _localPosition.y, _localPosition.z);
+        emit(EventTypesToJS::NODE_LOCAL_POSITION_UPDATED, _layout->localPosition.x, _layout->localPosition.y, _layout->localPosition.z);
     }
 
     inline void notifyLocalRotationUpdated() {
-        emit(EventTypesToJS::NODE_LOCAL_ROTATION_UPDATED, _localRotation.x, _localRotation.y, _localRotation.z, _localRotation.w);
+        emit(EventTypesToJS::NODE_LOCAL_ROTATION_UPDATED, _layout->localRotation.x, _layout->localRotation.y, _layout->localRotation.z, _layout->localRotation.w);
     }
 
     inline void notifyLocalScaleUpdated() {
-        emit(EventTypesToJS::NODE_LOCAL_SCALE_UPDATED, _localScale.x, _localScale.y, _localScale.z);
+        emit(EventTypesToJS::NODE_LOCAL_SCALE_UPDATED, _layout->localScale.x, _layout->localScale.y, _layout->localScale.z);
     }
 
     inline void notifyLocalPositionRotationScaleUpdated() {
         emit(EventTypesToJS::NODE_LOCAL_POSITION_ROTATION_SCALE_UPDATED,
-             _localPosition.x, _localPosition.y, _localPosition.z,
-             _localRotation.x, _localRotation.y, _localRotation.z, _localRotation.w,
-             _localScale.x, _localScale.y, _localScale.z);
+             _layout->localPosition.x, _layout->localPosition.y, _layout->localPosition.z,
+             _layout->localRotation.x, _layout->localRotation.y, _layout->localRotation.z, _layout->localRotation.w,
+             _layout->localScale.x, _layout->localScale.y, _layout->localScale.z);
     }
 
 protected:
@@ -665,17 +680,17 @@ protected:
     uint32_t _eventMask{0};
 
     Mat4 _rtMat{Mat4::IDENTITY};
-    cc::Mat4 _worldMatrix{Mat4::IDENTITY};
+//    cc::Mat4 _worldMatrix{Mat4::IDENTITY};
 
-    uint32_t _flagChange{0};
-    uint32_t _dirtyFlag{0};
+//    uint32_t _flagChange{0};
+//    uint32_t _dirtyFlag{0};
 
     bool _eulerDirty{false};
     //    IntrusivePtr<NodeUiProperties> _uiProps;
     //    bool _activeInHierarchy{false};
     // Shared memory with JS.
     uint8_t *_activeInHierarchyArr{nullptr};
-    uint32_t *_layerArr{nullptr};
+//    uint32_t *_layerArr{nullptr};
 
 public:
     std::function<void(index_t)> onSiblingIndexChanged{nullptr};
@@ -687,14 +702,17 @@ public:
 
 private:
     ccstd::vector<IntrusivePtr<Node>> _children;
-    // local transform
-    cc::Vec3 _localPosition{Vec3::ZERO};
-    cc::Quaternion _localRotation{Quaternion::identity()};
-    cc::Vec3 _localScale{Vec3::ONE};
-    // world transform
-    cc::Vec3 _worldPosition{Vec3::ZERO};
-    cc::Quaternion _worldRotation{Quaternion::identity()};
-    cc::Vec3 _worldScale{Vec3::ONE};
+
+    NodeLayout* _layout{nullptr};
+    uint32_t* _flagChunk{nullptr};
+//    // local transform
+//    cc::Vec3 _localPosition{Vec3::ZERO};
+//    cc::Quaternion _localRotation{Quaternion::identity()};
+//    cc::Vec3 _localScale{Vec3::ONE};
+//    // world transform
+//    cc::Vec3 _worldPosition{Vec3::ZERO};
+//    cc::Quaternion _worldRotation{Quaternion::identity()};
+//    cc::Vec3 _worldScale{Vec3::ONE};
     //
     Vec3 _euler{0, 0, 0};
 

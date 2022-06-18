@@ -79,6 +79,27 @@ bool js_register_scene_BaseNode(se::Object* obj) // NOLINT(readability-identifie
 se::Object* __jsb_cc_Node_proto = nullptr; // NOLINT
 se::Class* __jsb_cc_Node_class = nullptr;  // NOLINT
 
+static bool js_scene_Node__initWithData(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::Node>(s);
+    SE_PRECONDITION2(cobj, false, "js_scene_Node__initWithData : Invalid Native Object");
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 2) {
+        HolderType<unsigned char*, false> arg0 = {};
+        HolderType<unsigned char*, false> arg1 = {};
+        ok &= sevalue_to_native(args[0], &arg0, s.thisObject());
+        ok &= sevalue_to_native(args[1], &arg1, s.thisObject());
+        SE_PRECONDITION2(ok, false, "js_scene_Node__initWithData : Error processing arguments");
+        cobj->_initWithData(arg0.value(), arg1.value());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+    return false;
+}
+SE_BIND_FUNC(js_scene_Node__initWithData)
+
 static bool js_scene_Node__setChildren(se::State& s) // NOLINT(readability-identifier-naming)
 {
     auto* cobj = SE_THIS_OBJECT<cc::Node>(s);
@@ -168,7 +189,7 @@ static bool js_scene_Node_getChangedFlags(se::State& s) // NOLINT(readability-id
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_GET(js_scene_Node_getChangedFlags)
+SE_BIND_FUNC(js_scene_Node_getChangedFlags)
 
 static bool js_scene_Node_getChildByName(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -253,7 +274,7 @@ static bool js_scene_Node_getDirtyFlag(se::State& s) // NOLINT(readability-ident
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_GET(js_scene_Node_getDirtyFlag)
+SE_BIND_FUNC(js_scene_Node_getDirtyFlag)
 
 static bool js_scene_Node_getEventMask(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -488,7 +509,7 @@ static bool js_scene_Node_isPersistNode(se::State& s) // NOLINT(readability-iden
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_GET(js_scene_Node_isPersistNode)
+SE_BIND_FUNC(js_scene_Node_isPersistNode)
 
 static bool js_scene_Node_lookAt(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -813,7 +834,7 @@ static bool js_scene_Node_setChangedFlags(se::State& s) // NOLINT(readability-id
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_SET(js_scene_Node_setChangedFlags)
+SE_BIND_FUNC(js_scene_Node_setChangedFlags)
 
 static bool js_scene_Node_setDirtyFlag(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -832,7 +853,7 @@ static bool js_scene_Node_setDirtyFlag(se::State& s) // NOLINT(readability-ident
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_SET(js_scene_Node_setDirtyFlag)
+SE_BIND_FUNC(js_scene_Node_setDirtyFlag)
 
 static bool js_scene_Node_setEulerAngles(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -974,7 +995,7 @@ static bool js_scene_Node_setPersistNode(se::State& s) // NOLINT(readability-ide
     SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
     return false;
 }
-SE_BIND_FUNC_AS_PROP_SET(js_scene_Node_setPersistNode)
+SE_BIND_FUNC(js_scene_Node_setPersistNode)
 
 static bool js_scene_Node_setPositionForJS(se::State& s) // NOLINT(readability-identifier-naming)
 {
@@ -1845,16 +1866,16 @@ bool js_register_scene_Node(se::Object* obj) // NOLINT(readability-identifier-na
     cls->defineProperty("uuid", _SE(js_scene_Node_getUuid_asGetter), nullptr);
     cls->defineProperty("angle", _SE(js_scene_Node_getAngle_asGetter), _SE(js_scene_Node_setAngle_asSetter));
     cls->defineProperty("matrix", nullptr, _SE(js_scene_Node_setMatrix_asSetter));
-    cls->defineProperty("hasChangedFlags", _SE(js_scene_Node_getChangedFlags_asGetter), _SE(js_scene_Node_setChangedFlags_asSetter));
     cls->defineProperty("active", _SE(js_scene_Node_isActive_asGetter), _SE(js_scene_Node_setActive_asSetter));
-    cls->defineProperty("_persistNode", _SE(js_scene_Node_isPersistNode_asGetter), _SE(js_scene_Node_setPersistNode_asSetter));
-    cls->defineProperty("_dirtyFlags", _SE(js_scene_Node_getDirtyFlag_asGetter), _SE(js_scene_Node_setDirtyFlag_asSetter));
+    cls->defineFunction("_initWithData", _SE(js_scene_Node__initWithData));
     cls->defineFunction("_setChildren", _SE(js_scene_Node__setChildren));
     cls->defineFunction("addChild", _SE(js_scene_Node_addChild));
     cls->defineFunction("destroyAllChildren", _SE(js_scene_Node_destroyAllChildren));
+    cls->defineFunction("getChangedFlags", _SE(js_scene_Node_getChangedFlags));
     cls->defineFunction("getChildByName", _SE(js_scene_Node_getChildByName));
     cls->defineFunction("getChildByPath", _SE(js_scene_Node_getChildByPath));
     cls->defineFunction("getChildByUuid", _SE(js_scene_Node_getChildByUuid));
+    cls->defineFunction("getDirtyFlag", _SE(js_scene_Node_getDirtyFlag));
     cls->defineFunction("getEventMask", _SE(js_scene_Node_getEventMask));
     cls->defineFunction("getLayer", _SE(js_scene_Node_getLayer));
     cls->defineFunction("getParent", _SE(js_scene_Node_getParent));
@@ -1864,6 +1885,7 @@ bool js_register_scene_Node(se::Object* obj) // NOLINT(readability-identifier-na
     cls->defineFunction("invalidateChildren", _SE(js_scene_Node_invalidateChildren));
     cls->defineFunction("inverseTransformPoint", _SE(js_scene_Node_inverseTransformPoint));
     cls->defineFunction("isChildOf", _SE(js_scene_Node_isChildOf));
+    cls->defineFunction("isPersistNode", _SE(js_scene_Node_isPersistNode));
     cls->defineFunction("lookAt", _SE(js_scene_Node_lookAt));
     cls->defineFunction("off", _SE(js_scene_Node_off));
     cls->defineFunction("onPostActivated", _SE(js_scene_Node_onPostActivated));
@@ -1874,11 +1896,14 @@ bool js_register_scene_Node(se::Object* obj) // NOLINT(readability-identifier-na
     cls->defineFunction("removeChild", _SE(js_scene_Node_removeChild));
     cls->defineFunction("removeFromParent", _SE(js_scene_Node_removeFromParent));
     cls->defineFunction("resumeSystemEvents", _SE(js_scene_Node_resumeSystemEvents));
+    cls->defineFunction("setChangedFlags", _SE(js_scene_Node_setChangedFlags));
+    cls->defineFunction("setDirtyFlag", _SE(js_scene_Node_setDirtyFlag));
     cls->defineFunction("setEulerAngles", _SE(js_scene_Node_setEulerAngles));
     cls->defineFunction("setEventMask", _SE(js_scene_Node_setEventMask));
     cls->defineFunction("setForward", _SE(js_scene_Node_setForward));
     cls->defineFunction("setLayer", _SE(js_scene_Node_setLayer));
     cls->defineFunction("setParent", _SE(js_scene_Node_setParent));
+    cls->defineFunction("setPersistNode", _SE(js_scene_Node_setPersistNode));
     cls->defineFunction("setPositionForJS", _SE(js_scene_Node_setPositionForJS));
     cls->defineFunction("setPositionInternal", _SE(js_scene_Node_setPositionInternal));
     cls->defineFunction("setRTSInternal", _SE(js_scene_Node_setRTSInternal));

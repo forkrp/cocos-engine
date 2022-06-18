@@ -47,8 +47,8 @@ namespace scene {
         uint32_t hashFactor = 0;
         _shaders.clear();
         if (_passes.size() < passes->size()) {
-            uint32_t num = passes->size() - _passes.size();
-            for (uint32_t i = 0; i < num; ++i) {
+            size_t num = passes->size() - _passes.size();
+            for (size_t i = 0; i < num; ++i) {
                 _passes.emplace_back(ccnew scene::Pass(Root::getInstance()));
             }
         }

@@ -39,7 +39,7 @@ void CCObject::deferredDestroy() {
     auto deleteCount = static_cast<int32_t>(objectsToDestroy.size());
     for (size_t i = 0; i < deleteCount; ++i) {
         CCObject *obj = objectsToDestroy[i];
-        if (!(obj->_objFlags & Flags::DESTROYED)) {
+        if (!(obj->getObjFlags() & Flags::DESTROYED)) {
             obj->destroyImmediate();
             obj->release();
         }
@@ -80,7 +80,7 @@ bool CCObject::destroy() {
      }
      */
 
-    if (static_cast<bool>(_objFlags & Flags::TO_DESTROY)) {
+    if (static_cast<bool>(*_objFlags & Flags::TO_DESTROY)) {
         //NOTE: Should not return false because _objFlags is already set to TO_DESTROY in TS.
         // And Scene::destroy depends on the return value. Refer to:
         /*
@@ -97,12 +97,12 @@ bool CCObject::destroy() {
         return true;
     }
 
-    if (static_cast<bool>(_objFlags & Flags::DESTROYED)) {
+    if (static_cast<bool>(*_objFlags & Flags::DESTROYED)) {
         debug::warnID(5000);
         return false;
     }
 
-    _objFlags |= Flags::TO_DESTROY;
+    *_objFlags |= Flags::TO_DESTROY;
     addRef();
     objectsToDestroy.emplace_back(this);
 
@@ -111,7 +111,7 @@ bool CCObject::destroy() {
 }
 
 void CCObject::destroyImmediate() {
-    if (static_cast<bool>(_objFlags & Flags::DESTROYED)) {
+    if (static_cast<bool>(*_objFlags & Flags::DESTROYED)) {
         debug::errorID(5000);
         return;
     }
@@ -120,7 +120,11 @@ void CCObject::destroyImmediate() {
 
     // NOTE: native has been use smart pointer, not needed to implement 'destruct' interface, remove 'destruct' reference code
 
-    _objFlags |= Flags::DESTROYED;
+    *_objFlags |= Flags::DESTROYED;
+}
+
+void CCObject::_initObjFlags(uint8_t *objFlags) {
+    _objFlags = reinterpret_cast<Flags*>(objFlags);
 }
 
 bool isObjectValid(CCObject *value, bool strictMode /* = false*/) {
@@ -128,7 +132,7 @@ bool isObjectValid(CCObject *value, bool strictMode /* = false*/) {
         return false;
     }
 
-    return !(value->_objFlags & (strictMode ? (CCObject::Flags::DESTROYED | CCObject::Flags::TO_DESTROY) : CCObject::Flags::DESTROYED));
+    return !(value->getObjFlags() & (strictMode ? (CCObject::Flags::DESTROYED | CCObject::Flags::TO_DESTROY) : CCObject::Flags::DESTROYED));
 }
 
 } // namespace cc
