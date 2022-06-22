@@ -301,8 +301,7 @@ void Mesh::initialize() {
                     if (vertexCount < 65536) {
                         dstStride >>= 1; // Reduce to short.
                         dstSize >>= 1;
-                    }
-                    else if (!gfxDevice->hasFeature(gfx::Feature::ELEMENT_INDEX_UINT)) {
+                    } else if (!gfxDevice->hasFeature(gfx::Feature::ELEMENT_INDEX_UINT)) {
                         continue; // Ignore this primitive
                     }
                 }
@@ -319,8 +318,8 @@ void Mesh::initialize() {
                 const uint8_t *ib = buffer.buffer()->getData() + idxView.offset;
                 if (idxView.stride != dstStride) {
                     uint32_t ib16BitLength = idxView.length >> 1;
-                    auto *ib16Bit = static_cast<uint16_t*>(CC_MALLOC(ib16BitLength));
-                    const auto *ib32Bit = reinterpret_cast<const uint32_t*>(ib);
+                    auto *ib16Bit = static_cast<uint16_t *>(CC_MALLOC(ib16BitLength));
+                    const auto *ib32Bit = reinterpret_cast<const uint32_t *>(ib);
                     for (uint32_t j = 0, len = idxView.count; j < len; ++j) {
                         ib16Bit[j] = ib32Bit[j];
                     }
@@ -944,8 +943,8 @@ bool Mesh::copyIndices(index_t primitiveIndex, TypedArray &outputArray) {
     return true;
 }
 
-const gfx::FormatInfo* Mesh::readAttributeFormat(index_t primitiveIndex, const char *attributeName) {
-    const gfx::FormatInfo* result = nullptr;
+const gfx::FormatInfo *Mesh::readAttributeFormat(index_t primitiveIndex, const char *attributeName) {
+    const gfx::FormatInfo *result = nullptr;
 
     accessAttribute(primitiveIndex, attributeName, [&](const IVertexBundle &vertexBundle, uint32_t iAttribute) {
         const gfx::Format format = vertexBundle.attributes[iAttribute].format;
@@ -1110,17 +1109,13 @@ void Mesh::updateVertexFormat() {
                 if (formatInfo.name == "RGB32F") {
                     attributeIndicsNeedConvert.emplace_back(attributeIndex);
                     attribute.format = gfx::Format::RGB16F;
-#if (CC_PLATFORM == CC_PLATFORM_IOS) || (CC_PLATFORM == CC_PLATFORM_MACOS)
+    #if (CC_PLATFORM == CC_PLATFORM_IOS) || (CC_PLATFORM == CC_PLATFORM_MACOS)
                     dstStride -= 4; // metal needs 4 bytes alignment
-#else
+    #else
                     dstStride -= 6;
-#endif
+    #endif
                 }
-            } else if (attribute.name == gfx::ATTR_NAME_TEX_COORD || attribute.name == gfx::ATTR_NAME_TEX_COORD1
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD2 || attribute.name == gfx::ATTR_NAME_TEX_COORD3
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD4 || attribute.name == gfx::ATTR_NAME_TEX_COORD5
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD6 || attribute.name == gfx::ATTR_NAME_TEX_COORD7
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD8) {
+            } else if (attribute.name == gfx::ATTR_NAME_TEX_COORD || attribute.name == gfx::ATTR_NAME_TEX_COORD1 || attribute.name == gfx::ATTR_NAME_TEX_COORD2 || attribute.name == gfx::ATTR_NAME_TEX_COORD3 || attribute.name == gfx::ATTR_NAME_TEX_COORD4 || attribute.name == gfx::ATTR_NAME_TEX_COORD5 || attribute.name == gfx::ATTR_NAME_TEX_COORD6 || attribute.name == gfx::ATTR_NAME_TEX_COORD7 || attribute.name == gfx::ATTR_NAME_TEX_COORD8) {
                 if (formatInfo.name == "RG32F") {
                     attributeIndicsNeedConvert.emplace_back(attributeIndex);
                     attribute.format = gfx::Format::RG16F;
@@ -1177,14 +1172,13 @@ void Mesh::updateVertexFormat() {
                         pDst[2] = z;
                         uint32_t advance = (formatInfo.size >> 1);
 
-#if (CC_PLATFORM == CC_PLATFORM_IOS) || (CC_PLATFORM == CC_PLATFORM_MACOS)
+    #if (CC_PLATFORM == CC_PLATFORM_IOS) || (CC_PLATFORM == CC_PLATFORM_MACOS)
                         pDst[3] = 0;
                         advance += (formatInfo.size >> 1) % 4;
-#endif
+    #endif
                         dstIndex += advance;
                         wroteBytes += advance;
-                    }
-                        break;
+                    } break;
                     case gfx::Format::RG32F: {
                         float *pValue = reinterpret_cast<float *>(srcIndex);
                         //                    assert(pValue[0] <= 1.1f);
@@ -1203,8 +1197,7 @@ void Mesh::updateVertexFormat() {
 
                         dstIndex += (formatInfo.size >> 1);
                         wroteBytes += (formatInfo.size >> 1);
-                    }
-                        break;
+                    } break;
                     case gfx::Format::RGBA32F: {
                         float *pValue = reinterpret_cast<float *>(srcIndex);
 
@@ -1222,8 +1215,7 @@ void Mesh::updateVertexFormat() {
 
                         dstIndex += (formatInfo.size >> 1);
                         wroteBytes += (formatInfo.size >> 1);
-                    }
-                        break;
+                    } break;
                     default:
                         break;
                 }
