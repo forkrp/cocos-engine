@@ -83,7 +83,7 @@ bool RenderPipeline::activate(gfx::Swapchain * /*swapchain*/) {
     _descriptorSet = _globalDSManager->getGlobalDescriptorSet();
     _pipelineUBO->activate(_device, this);
     _pipelineSceneData->activate(_device);
-    CC_DEBUG_RENDERER->activate(_device);
+//cjh    CC_DEBUG_RENDERER->activate(_device);
 
     // generate macros here rather than construct func because _clusterEnabled
     // switch may be changed in root.ts setRenderPipeline() function which is after
@@ -150,7 +150,7 @@ bool RenderPipeline::destroy() {
     CC_SAFE_DESTROY_AND_DELETE(_globalDSManager);
     CC_SAFE_DESTROY_AND_DELETE(_pipelineUBO);
     CC_SAFE_DESTROY_NULL(_pipelineSceneData);
-    CC_DEBUG_RENDERER->destroy();
+//cjh    CC_DEBUG_RENDERER->destroy();
 
     for (auto *const queryPool : _queryPools) {
         queryPool->destroy();

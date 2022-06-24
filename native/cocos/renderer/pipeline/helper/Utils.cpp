@@ -76,7 +76,7 @@ void renderDebugRenderer(gfx::RenderPass *renderPass, gfx::CommandBuffer *cmdBuf
         return;
     }
 
-    CC_DEBUG_RENDERER->render(renderPass, cmdBuff, sceneData);
+//cjh    CC_DEBUG_RENDERER->render(renderPass, cmdBuff, sceneData);
 }
 
 } // namespace pipeline

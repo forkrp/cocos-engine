@@ -40,6 +40,10 @@ namespace cc {
 
 namespace {
 
+uint32_t totalReleaseDataBytes = 0;
+uint32_t totalDataBytes = 0;
+uint32_t dataBytesSendToGPU = 0;
+
 uint32_t getOffset(const gfx::AttributeList &attributes, index_t attributeIndex) {
     uint32_t result = 0;
     for (index_t i = 0; i < attributeIndex; ++i) {
@@ -276,6 +280,9 @@ void Mesh::initialize() {
             return;
         }
 
+        totalDataBytes += _data.byteLength();
+        CC_LOG_INFO("cjh totalDataBytes: %u", totalDataBytes);
+
         auto &buffer = _data;
         gfx::Device *gfxDevice = gfx::Device::getInstance();
         RefVector<gfx::Buffer *> vertexBuffers{createVertexBuffers(gfxDevice, buffer.buffer())};
@@ -296,16 +303,22 @@ void Mesh::initialize() {
                 uint32_t dstSize = idxView.length;
                 uint32_t vertexCount = _struct.vertexBundles[prim.vertexBundelIndices[0]].view.count;
 
-#if CC_OPTIMIZE_MESH_DATA
+
                 if (dstStride == 4) {
+#if CC_OPTIMIZE_MESH_DATA
                     if (vertexCount < 65536) {
                         dstStride >>= 1; // Reduce to short.
                         dstSize >>= 1;
                     } else if (!gfxDevice->hasFeature(gfx::Feature::ELEMENT_INDEX_UINT)) {
                         continue; // Ignore this primitive
                     }
-                }
+#else
+                    if (!gfxDevice->hasFeature(gfx::Feature::ELEMENT_INDEX_UINT)) {
+                        continue; // Ignore this primitive
+                    }
 #endif
+                }
+
 
                 indexBuffer = gfxDevice->createBuffer(gfx::BufferInfo{
                     gfx::BufferUsageBit::INDEX,
@@ -323,9 +336,13 @@ void Mesh::initialize() {
                     for (uint32_t j = 0, len = idxView.count; j < len; ++j) {
                         ib16Bit[j] = ib32Bit[j];
                     }
+                    dataBytesSendToGPU += ib16BitLength;
+                    CC_LOG_INFO("cjh dataBytesSendToGPU: %u", dataBytesSendToGPU);
                     indexBuffer->update(ib16Bit, ib16BitLength);
                     CC_FREE(ib16Bit);
                 } else {
+                    dataBytesSendToGPU += dstSize;
+                    CC_LOG_INFO("cjh dataBytesSendToGPU: %u", dataBytesSendToGPU);
                     indexBuffer->update(ib);
                 }
             }
@@ -1104,9 +1121,8 @@ void Mesh::updateVertexFormat() {
 
         uint32_t attributeIndex = 0;
         for (auto &attribute : attributes) {
-            auto &formatInfo = gfx::GFX_FORMAT_INFOS[static_cast<uint32_t>(attribute.format)];
             if (attribute.name == gfx::ATTR_NAME_NORMAL) {
-                if (formatInfo.name == "RGB32F") {
+                if (attribute.format == gfx::Format::RGB32F) {
                     attributeIndicsNeedConvert.emplace_back(attributeIndex);
                     attribute.format = gfx::Format::RGB16F;
     #if (CC_PLATFORM == CC_PLATFORM_IOS) || (CC_PLATFORM == CC_PLATFORM_MACOS)
@@ -1115,14 +1131,18 @@ void Mesh::updateVertexFormat() {
                     dstStride -= 6;
     #endif
                 }
-            } else if (attribute.name == gfx::ATTR_NAME_TEX_COORD || attribute.name == gfx::ATTR_NAME_TEX_COORD1 || attribute.name == gfx::ATTR_NAME_TEX_COORD2 || attribute.name == gfx::ATTR_NAME_TEX_COORD3 || attribute.name == gfx::ATTR_NAME_TEX_COORD4 || attribute.name == gfx::ATTR_NAME_TEX_COORD5 || attribute.name == gfx::ATTR_NAME_TEX_COORD6 || attribute.name == gfx::ATTR_NAME_TEX_COORD7 || attribute.name == gfx::ATTR_NAME_TEX_COORD8) {
-                if (formatInfo.name == "RG32F") {
+            } else if (attribute.name == gfx::ATTR_NAME_TEX_COORD || attribute.name == gfx::ATTR_NAME_TEX_COORD1
+                       || attribute.name == gfx::ATTR_NAME_TEX_COORD2 || attribute.name == gfx::ATTR_NAME_TEX_COORD3
+                       || attribute.name == gfx::ATTR_NAME_TEX_COORD4 || attribute.name == gfx::ATTR_NAME_TEX_COORD5
+                       || attribute.name == gfx::ATTR_NAME_TEX_COORD6 || attribute.name == gfx::ATTR_NAME_TEX_COORD7
+                       || attribute.name == gfx::ATTR_NAME_TEX_COORD8) {
+                if (attribute.format == gfx::Format::RG32F) {
                     attributeIndicsNeedConvert.emplace_back(attributeIndex);
                     attribute.format = gfx::Format::RG16F;
                     dstStride -= 4;
                 }
             } else if (attribute.name == gfx::ATTR_NAME_TANGENT) {
-                if (formatInfo.name == "RGBA32F") {
+                if (attribute.format == gfx::Format::RGBA32F) {
                     attributeIndicsNeedConvert.emplace_back(attributeIndex);
                     attribute.format = gfx::Format::RGBA16F;
                     dstStride -= 8;
@@ -1244,6 +1264,8 @@ gfx::BufferList Mesh::createVertexBuffers(gfx::Device *gfxDevice, ArrayBuffer *d
                                                       vertexBundle.view.length,
                                                       vertexBundle.view.stride});
 
+        dataBytesSendToGPU += vertexBundle.view.length;
+        CC_LOG_INFO("cjh dataBytesSendToGPU: %u", dataBytesSendToGPU);
         vertexBuffer->update(data->getData() + vertexBundle.view.offset, vertexBundle.view.length);
         buffers.emplace_back(vertexBuffer);
     }
@@ -1267,6 +1289,8 @@ void Mesh::releaseMeshDataWhenPossible() {
 }
 
 void Mesh::releaseMeshData() {
+    totalReleaseDataBytes += _data.byteLength();
+    CC_LOG_INFO("cjh Mesh totalReleaseDataBytes: %u", totalReleaseDataBytes);
 #if CC_OPTIMIZE_MESH_DATA
     _data.clear();
 #endif
