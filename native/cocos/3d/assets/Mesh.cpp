@@ -1155,9 +1155,6 @@ void Mesh::updateVertexFormat() {
             return;
         }
 
-        uint32_t padding = dstStride % 4;
-        CC_ASSERT(padding == 0);
-
         for (uint32_t i = 0; i < count; ++i) {
             uint8_t *srcIndex = data + offset + i * stride;
             uint8_t *dstIndex = data + offset + i * dstStride;
