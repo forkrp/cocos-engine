@@ -32,23 +32,28 @@ namespace cc {
 class JSBNativeDataHolder final {
 public:
     JSBNativeDataHolder() = default;
-    explicit JSBNativeDataHolder(uint8_t* data) : _data(data) {};
+    explicit JSBNativeDataHolder(uint8_t* data, uint32_t byteLength) : _data(data), _byteLength(byteLength) {};
 
     ~JSBNativeDataHolder() {
-        if (_data != nullptr) {
-            free(_data); // Remove data in destructor
-        }
+        destroy();
     }
 
     inline void setData(uint8_t* data) { _data = data; }
     inline uint8_t* getData() const { return _data; }
 
     inline void destroy() { // Also support to invoke destroy method to free memory before garbage collection
-        free(_data);
-        _data = nullptr;
+        if (_data != nullptr) {
+            static uint32_t releasedBytes = 0;
+            releasedBytes += _byteLength;
+            printf("cjh data released: %u\n", releasedBytes);
+            free(_data);
+            _data = nullptr;
+            _byteLength = 0;
+        }
     }
 
 private:
     uint8_t* _data{nullptr};
+    uint32_t _byteLength{0};
 };
 } // namespace cc

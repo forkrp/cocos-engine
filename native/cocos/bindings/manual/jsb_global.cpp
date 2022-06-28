@@ -585,7 +585,7 @@ bool jsb_global_load_image(const ccstd::string &path, const se::Value &callbackV
                 if (loadSucceed) {
                     se::HandleObject retObj(se::Object::createPlainObject());
                     auto *obj = se::Object::createObjectWithClass(__jsb_cc_JSBNativeDataHolder_class);
-                    auto *nativeObj = JSB_MAKE_PRIVATE_OBJECT(cc::JSBNativeDataHolder, imgInfo->data);
+                    auto *nativeObj = JSB_MAKE_PRIVATE_OBJECT(cc::JSBNativeDataHolder, imgInfo->data, imgInfo->length);
                     obj->setPrivateObject(nativeObj);
                     retObj->setProperty("data", se::Value(obj));
                     retObj->setProperty("width", se::Value(imgInfo->width));
