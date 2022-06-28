@@ -25,7 +25,9 @@
 
 #include "renderer/pipeline/helper/Utils.h"
 #include "renderer/pipeline/PipelineStateManager.h"
+#if CC_USE_DEBUG_RENDERER
 #include "profiler/DebugRenderer.h"
+#endif
 #include "gfx-base/GFXSwapchain.h"
 #include "pipeline/Define.h"
 #include "scene/Camera.h"
@@ -71,13 +73,15 @@ void renderProfiler(gfx::RenderPass *renderPass, gfx::CommandBuffer *cmdBuff, sc
     }
 }
 
+#if CC_USE_DEBUG_RENDERER
 void renderDebugRenderer(gfx::RenderPass *renderPass, gfx::CommandBuffer *cmdBuff, PipelineSceneData *sceneData, const scene::Camera *camera) {
     if (camera != profilerCamera) {
         return;
     }
 
-//cjh    CC_DEBUG_RENDERER->render(renderPass, cmdBuff, sceneData);
+   CC_DEBUG_RENDERER->render(renderPass, cmdBuff, sceneData);
 }
+#endif
 
 } // namespace pipeline
 } // namespace cc
