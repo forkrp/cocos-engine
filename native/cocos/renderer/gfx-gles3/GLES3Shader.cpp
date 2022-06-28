@@ -57,7 +57,7 @@ void GLES3Shader::doInit(const ShaderInfo & /*info*/) {
 
     cmdFuncGLES3CreateShader(GLES3Device::getInstance(), _gpuShader);
 
-    for (auto &stage : _gpuShader->gpuStages){
+    for (auto &stage : _gpuShader->gpuStages) {
         stage.source.clear();
         stage.source.shrink_to_fit();
     }

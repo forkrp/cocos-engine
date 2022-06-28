@@ -303,7 +303,6 @@ void Mesh::initialize() {
                 uint32_t dstSize = idxView.length;
                 uint32_t vertexCount = _struct.vertexBundles[prim.vertexBundelIndices[0]].view.count;
 
-
                 if (dstStride == 4) {
 #if CC_OPTIMIZE_MESH_DATA
                     if (vertexCount < 65536) {
@@ -318,7 +317,6 @@ void Mesh::initialize() {
                     }
 #endif
                 }
-
 
                 indexBuffer = gfxDevice->createBuffer(gfx::BufferInfo{
                     gfx::BufferUsageBit::INDEX,
@@ -1131,11 +1129,7 @@ void Mesh::updateVertexFormat() {
                     dstStride -= 6;
     #endif
                 }
-            } else if (attribute.name == gfx::ATTR_NAME_TEX_COORD || attribute.name == gfx::ATTR_NAME_TEX_COORD1
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD2 || attribute.name == gfx::ATTR_NAME_TEX_COORD3
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD4 || attribute.name == gfx::ATTR_NAME_TEX_COORD5
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD6 || attribute.name == gfx::ATTR_NAME_TEX_COORD7
-                       || attribute.name == gfx::ATTR_NAME_TEX_COORD8) {
+            } else if (attribute.name == gfx::ATTR_NAME_TEX_COORD || attribute.name == gfx::ATTR_NAME_TEX_COORD1 || attribute.name == gfx::ATTR_NAME_TEX_COORD2 || attribute.name == gfx::ATTR_NAME_TEX_COORD3 || attribute.name == gfx::ATTR_NAME_TEX_COORD4 || attribute.name == gfx::ATTR_NAME_TEX_COORD5 || attribute.name == gfx::ATTR_NAME_TEX_COORD6 || attribute.name == gfx::ATTR_NAME_TEX_COORD7 || attribute.name == gfx::ATTR_NAME_TEX_COORD8) {
                 if (attribute.format == gfx::Format::RG32F) {
                     attributeIndicsNeedConvert.emplace_back(attributeIndex);
                     attribute.format = gfx::Format::RG16F;
