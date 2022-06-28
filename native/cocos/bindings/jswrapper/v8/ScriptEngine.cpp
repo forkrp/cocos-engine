@@ -34,8 +34,8 @@
     #include "Object.h"
     #include "Utils.h"
     #include "base/std/container/unordered_map.h"
-    #include "plugins/bus/EventBus.h"
     #include "platform/FileUtils.h"
+    #include "plugins/bus/EventBus.h"
 
     #include <sstream>
 
