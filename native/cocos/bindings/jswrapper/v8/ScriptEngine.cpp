@@ -381,9 +381,9 @@ void ScriptEngine::onPromiseRejectCallback(v8::PromiseRejectMessage msg) {
     if (!value.IsEmpty()) {
         // prepend error object to stack message
         //v8::MaybeLocal<v8::String> maybeStr = value->ToString(isolate->GetCurrentContext());
-        if (value->IsString()) {  
+        if (value->IsString()) {
             v8::Local<v8::String> str = value->ToString(isolate->GetCurrentContext()).ToLocalChecked();
-            
+
             v8::String::Utf8Value valueUtf8(isolate, str);
             auto *strp = *valueUtf8;
             if (strp == nullptr) {
@@ -629,7 +629,6 @@ void ScriptEngine::cleanup() {
         oldConsoleAssert.setUndefined();
 
     #if SE_ENABLE_INSPECTOR
-
         if (_env != nullptr) {
             _env->inspector_agent()->Disconnect();
             _env->inspector_agent()->Stop();
