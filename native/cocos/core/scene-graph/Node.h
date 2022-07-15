@@ -110,6 +110,7 @@ public:
     void walk(const WalkCallback &preFunc);
     void walk(const WalkCallback &preFunc, const WalkCallback &postFunc);
 
+#ifndef SWIGCOCOS
     template <typename Target, typename... Args>
     void on(const CallbacksInvoker::KeyType &type, void (Target::*memberFn)(Args...), Target *target, bool useCapture = false);
 
@@ -654,11 +655,11 @@ private:
              _localScale.x, _localScale.y, _localScale.z);
     }
 
-#if CC_EDITOR
+    #if CC_EDITOR
     inline void notifyEditorAttached(bool attached) {
         emit(EventTypesToJS::NODE_EDITOR_ATTACHED, attached);
     }
-#endif
+    #endif
 
     // increase on every frame, used to identify the frame
     static uint32_t globalFlagChangeVersion;
@@ -852,5 +853,7 @@ template <typename Target, typename... Args>
 bool Node::hasEventListener(const CallbacksInvoker::KeyType &type, void (Target::*memberFn)(Args...), Target *target) const {
     return _eventProcessor->hasEventListener(type, memberFn, target);
 }
+
+#endif // SWIGCOCOS
 
 } // namespace cc
