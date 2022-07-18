@@ -49,9 +49,10 @@
 %rename(_data) cc::IMemoryImageSource::data;
 %rename(_compressed) cc::IMemoryImageSource::compressed;
 
+%rename(buffer) cc::BufferAsset::getBuffer;
+
 namespace cc {
 %ignore Asset::createNode; //FIXME: swig needs to support std::function
-%ignore BufferAsset::getBuffer;
 // %ignore IMemoryImageSource::data;
 %ignore SimpleTexture::uploadDataWithArrayBuffer;
 %ignore TextureCube::_mipmaps;
@@ -69,7 +70,7 @@ namespace cc {
 %attribute(cc::ImageAsset, cc::PixelFormat, format, getFormat, setFormat);
 %attribute(cc::ImageAsset, ccstd::string&, url, getUrl, setUrl);
 
-%attribute(cc::BufferAsset, cc::ArrayBuffer*, buffer, getBuffer);
+%attribute(cc::BufferAsset, cc::ArrayBuffer*, _nativeAsset, getNativeAssetForJS, setNativeAssetForJS);
 
 %attribute(cc::TextureBase, bool, isCompressed, isCompressed);
 %attribute(cc::TextureBase, uint32_t, _width, getWidth, setWidth);
@@ -90,6 +91,8 @@ namespace cc {
 %attribute(cc::Mesh, cc::Mesh::RenderingSubMeshList&, renderingSubMeshes, getRenderingSubMeshes);
 %attribute(cc::Mesh, uint32_t, subMeshCount, getSubMeshCount);
 %attribute(cc::Mesh, cc::ArrayBuffer*, _nativeAsset, getAssetData, setAssetData);
+%attribute(cc::Mesh, bool, _allowDataAccess, isAllowDataAccess, setAllowDataAccess);
+%attribute(cc::Mesh, bool, allowDataAccess, isAllowDataAccess, setAllowDataAccess);
 
 %attribute(cc::Material, cc::EffectAsset*, effectAsset, getEffectAsset, setEffectAsset);
 %attribute(cc::Material, ccstd::string, effectName, getEffectName);
@@ -110,10 +113,16 @@ namespace cc {
 %attribute(cc::Skeleton, ccstd::vector<ccstd::string>&, _joints, getJoints, setJoints);
 %attribute(cc::Skeleton, ccstd::hash_t, hash, getHash, setHash);
 %attribute(cc::Skeleton, ccstd::hash_t, _hash, getHash, setHash);
+%attribute(cc::Skeleton, ccstd::vector<cc::Mat4>&, _invBindposes, getInverseBindposes);
+%attribute(cc::Skeleton, ccstd::vector<cc::Mat4>&, invBindposes, getInverseBindposes);
 
 %attribute(cc::EffectAsset, ccstd::vector<cc::ITechniqueInfo> &, techniques, getTechniques, setTechniques);
 %attribute(cc::EffectAsset, ccstd::vector<cc::IShaderInfo> &, shaders, getShaders, setShaders);
 %attribute(cc::EffectAsset, ccstd::vector<cc::IPreCompileInfo> &, combinations, getCombinations, setCombinations);
+
+%attribute(cc::TextureCube, cc::TextureCubeMipmapAtlasInfo&, mipmapAtlas, getMipmapAtlas, setMipmapAtlas);
+%attribute(cc::TextureCube, cc::ITextureCubeMipmap*, image, getImage, setImage);
+%attribute(cc::TextureCube, ccstd::vector<cc::ITextureCubeMipmap> &, mipmaps, getMipmaps, setMipmaps);
 
 
 %import "base/Macros.h"
