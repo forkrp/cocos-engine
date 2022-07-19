@@ -15,5 +15,9 @@
 #include "bindings/auto/jsb_audio_auto.h"
 %}
 
+%ignore cc::AudioEngine::getPCMHeader;
+%ignore cc::AudioEngine::getOriginalPCMBuffer;
+%ignore cc::AudioEngine::getPCMBufferByFormat;
+
 %import "audio/include/Export.h"
 %include "audio/include/AudioEngine.h"

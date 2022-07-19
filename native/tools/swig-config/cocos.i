@@ -9,16 +9,19 @@
 #include "bindings/manual/jsb_conversions.h"
 
 #include "core/data/Object.h"
+#include "core/data/JSBNativeDataHolder.h"
 #include "platform/interfaces/modules/canvas/CanvasRenderingContext2D.h"
 #include "platform/interfaces/modules/Device.h"
 #include "platform/FileUtils.h"
 #include "platform/SAXParser.h"
 #include "math/Vec2.h"
 #include "math/Color.h"
+#include "profiler/DebugRenderer.h"
 %}
 
 %{
 #include "bindings/auto/jsb_cocos_auto.h"
+#include "bindings/auto/jsb_gfx_auto.h"
 %}
 
 %rename(_destroy) cc::CCObject::destroy;
@@ -58,6 +61,15 @@ namespace cc {
 %ignore SAXParser::endElement;
 %ignore SAXParser::textHandler;
 
+%ignore DebugRenderer::activate;
+%ignore DebugRenderer::render;
+%ignore DebugRenderer::destroy;
+
+%ignore DebugFontInfo;
+
+%ignore JSBNativeDataHolder::getData;
+%ignore JSBNativeDataHolder::setData;
+
 }
 
 %attribute_writeonly(cc::ICanvasRenderingContext2D, float, width, setWidth);
@@ -90,6 +102,8 @@ namespace cc {
 %import "platform/interfaces/modules/INetwork.h"
 
 %include "core/data/Object.h"
+%include "core/data/JSBNativeDataHolder.h"
+
 %include "platform/interfaces/modules/canvas/ICanvasRenderingContext2D.h"
 %include "platform/interfaces/modules/canvas/CanvasRenderingContext2D.h"
 %include "platform/interfaces/modules/Device.h"
@@ -97,3 +111,6 @@ namespace cc {
 %include "platform/SAXParser.h"
 %include "math/Vec2.h"
 %include "math/Color.h"
+
+%include "profiler/DebugRenderer.h"
+
