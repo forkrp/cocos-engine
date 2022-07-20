@@ -144,15 +144,38 @@
 %ignore dragonBones::ArmatureData::addAnimation;
 %ignore dragonBones::ArmatureData::getSortedBones;
 %ignore dragonBones::ArmatureData::getSortedSlots;
+
 %ignore dragonBones::ArmatureData::canvas;
 %ignore dragonBones::ArmatureData::userData;
 %ignore dragonBones::ArmatureData::defaultActions;
 %ignore dragonBones::ArmatureData::actions;
+%ignore dragonBones::ArmatureData::type;
+%ignore dragonBones::ArmatureData::cacheFrameRate;
+%ignore dragonBones::ArmatureData::scale;
+%ignore dragonBones::ArmatureData::aabb;
+%ignore dragonBones::ArmatureData::animationNames;
+%ignore dragonBones::ArmatureData::sortedBones;
+%ignore dragonBones::ArmatureData::sortedSlots;
+%ignore dragonBones::ArmatureData::bones;
+%ignore dragonBones::ArmatureData::slots;
+%ignore dragonBones::ArmatureData::constraints;
+%ignore dragonBones::ArmatureData::skins;
+%ignore dragonBones::ArmatureData::animations;
+%ignore dragonBones::ArmatureData::defaultSkin;
+%ignore dragonBones::ArmatureData::defaultAnimation;
+%ignore dragonBones::ArmatureData::parent;
 
 %ignore dragonBones::BoneData::getData;
 %ignore dragonBones::BoneData::getUserData;
 %ignore dragonBones::BoneData::setUserData;
 %ignore dragonBones::BoneData::getTypeIndex;
+%ignore dragonBones::BoneData::userData;
+%ignore dragonBones::BoneData::inheritTranslation;
+%ignore dragonBones::BoneData::inheritRotation;
+%ignore dragonBones::BoneData::inheritScale;
+%ignore dragonBones::BoneData::inheritReflection;
+%ignore dragonBones::BoneData::length;
+%ignore dragonBones::BoneData::transform;
 %ignore dragonBones::BoneData::userData;
 
 %ignore dragonBones::SlotData::getUserData;
@@ -186,7 +209,21 @@
 
 %ignore dragonBones::TextureAtlasData::getTextures;
 %ignore dragonBones::TextureAtlasData::copyFrom;
+%ignore dragonBones::TextureAtlasData::autoSearch;
+%ignore dragonBones::TextureAtlasData::format;
+%ignore dragonBones::TextureAtlasData::width;
+%ignore dragonBones::TextureAtlasData::height;
+%ignore dragonBones::TextureAtlasData::scale;
+%ignore dragonBones::TextureAtlasData::imagePath;
+%ignore dragonBones::TextureAtlasData::textures;
 
+%ignore dragonBones::DragonBonesData::autoSearch;
+%ignore dragonBones::DragonBonesData::frameRate;
+%ignore dragonBones::DragonBonesData::version;
+%ignore dragonBones::DragonBonesData::frameIndices;
+%ignore dragonBones::DragonBonesData::cachedFrames;
+%ignore dragonBones::DragonBonesData::armatureNames;
+%ignore dragonBones::DragonBonesData::armatures;
 %ignore dragonBones::DragonBonesData::binary;
 %ignore dragonBones::DragonBonesData::intArray;
 %ignore dragonBones::DragonBonesData::floatArray;
@@ -194,7 +231,6 @@
 %ignore dragonBones::DragonBonesData::frameFloatArray;
 %ignore dragonBones::DragonBonesData::frameArray;
 %ignore dragonBones::DragonBonesData::timelineArray;
-
 %ignore dragonBones::DragonBonesData::userData;
 %ignore dragonBones::DragonBonesData::getUserData;
 %ignore dragonBones::DragonBonesData::setUserData;
@@ -219,6 +255,11 @@
 %ignore dragonBones::EventObject::actionDataToInstance;
 
 %ignore dragonBones::TextureData::copyFrom;
+%ignore dragonBones::TextureData::rotated;
+%ignore dragonBones::TextureData::name;
+%ignore dragonBones::TextureData::region;
+%ignore dragonBones::TextureData::frame;
+%ignore dragonBones::TextureData::parent;
 
 %ignore dragonBones::CCTextureAtlasData::setRenderTexture;
 %ignore dragonBones::CCTextureAtlasData::getRenderTexture;
