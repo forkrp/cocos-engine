@@ -85,6 +85,7 @@
 %ignore dragonBones::Slot::getRawDisplay;
 %ignore dragonBones::Slot::getMeshDisplay;
 %ignore dragonBones::Slot::setDisplay;
+%ignore dragonBones::Slot::setDisplayList;
 %ignore dragonBones::Slot::_updateBlendMode;
 %ignore dragonBones::Slot::_updateVisible;
 %ignore dragonBones::Slot::_setDisplayIndex;
@@ -95,6 +96,14 @@
 %ignore dragonBones::Slot::_displayData;
 %ignore dragonBones::Slot::_deformVertices;
 %ignore dragonBones::Slot::_cachedFrameIndices;
+%ignore dragonBones::Slot::_colorDirty;
+%ignore dragonBones::Slot::_blendMode;
+%ignore dragonBones::Slot::_pivotX;
+%ignore dragonBones::Slot::_pivotY;
+%ignore dragonBones::Slot::_colorTransform;
+%ignore dragonBones::Slot::_slotData;
+%ignore dragonBones::Slot::_rawDisplay;
+%ignore dragonBones::Slot::_meshDisplay;
 
 %ignore dragonBones::AnimationState::init;
 %ignore dragonBones::AnimationState::copyFrom;
@@ -106,6 +115,11 @@
 %ignore dragonBones::CCSlot::getClassTypeIndex;
 %ignore dragonBones::CCSlot::getTypeIndex;
 %ignore dragonBones::CCSlot::worldVerts;
+%ignore dragonBones::CCSlot::worldMatrix;
+%ignore dragonBones::CCSlot::_worldMatDirty;
+%ignore dragonBones::CCSlot::triangles;
+%ignore dragonBones::CCSlot::color;
+%ignore dragonBones::CCSlot::boundsRect;
 
 %ignore dragonBones::Transform::operator=;
 %ignore dragonBones::Transform::fromMatrix;
@@ -188,6 +202,7 @@
 %ignore dragonBones::SlotData::getTypeIndex;
 %ignore dragonBones::SlotData::color;
 %ignore dragonBones::SlotData::userData;
+%ignore dragonBones::SlotData::DEFAULT_COLOR;
 
 %ignore dragonBones::AnimationData::getActionTimeline;
 %ignore dragonBones::AnimationData::setActionTimeline;
@@ -201,6 +216,20 @@
 %ignore dragonBones::AnimationData::getConstraintTimelines;
 %ignore dragonBones::AnimationData::getClassTypeIndex;
 %ignore dragonBones::AnimationData::getTypeIndex;
+%ignore dragonBones::AnimationData::frameIntOffset;
+%ignore dragonBones::AnimationData::frameFloatOffset;
+%ignore dragonBones::AnimationData::frameOffset;
+%ignore dragonBones::AnimationData::scale;
+%ignore dragonBones::AnimationData::cacheFrameRate;
+%ignore dragonBones::AnimationData::cachedFrames;
+%ignore dragonBones::AnimationData::boneTimelines;
+%ignore dragonBones::AnimationData::slotTimelines;
+%ignore dragonBones::AnimationData::constraintTimelines;
+%ignore dragonBones::AnimationData::boneCachedFrameIndices;
+%ignore dragonBones::AnimationData::slotCachedFrameIndices;
+%ignore dragonBones::AnimationData::actionTimeline;
+%ignore dragonBones::AnimationData::zOrderTimeline;
+%ignore dragonBones::AnimationData::parent;
 
 %ignore dragonBones::BaseObject::getClassTypeIndex;
 %ignore dragonBones::BaseObject::setObjectRecycleOrDestroyCallback;
@@ -244,6 +273,8 @@
 %ignore dragonBones::SkinData::getDisplays;
 %ignore dragonBones::SkinData::getSlotDisplays;
 %ignore dragonBones::SkinData::getTypeIndex;
+%ignore dragonBones::SkinData::displays;
+%ignore dragonBones::SkinData::parent;
 
 %ignore dragonBones::Bone::getTypeIndex;
 %ignore dragonBones::Bone::_cachedFrameIndices;
