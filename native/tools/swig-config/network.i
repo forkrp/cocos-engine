@@ -16,15 +16,13 @@
 #include "bindings/auto/jsb_network_auto.h"
 %}
 
-%ignore cc::network::Downloader::createDownloadDataTask;
-%ignore cc::network::Downloader::createDownloadFileTask;
+%ignore cc::network::Downloader::createDataTask;
+%ignore cc::network::Downloader::createDownloadTask;
 %ignore cc::network::Downloader::abort;
-%ignore cc::network::Downloader::setOnTaskError;
-%ignore cc::network::Downloader::setOnFileTaskSuccess;
-%ignore cc::network::Downloader::onDataTaskSuccess;
-%ignore cc::network::Downloader::onFileTaskSuccess;
-%ignore cc::network::Downloader::onTaskProgress;
-%ignore cc::network::Downloader::onTaskError;
+%ignore cc::network::Downloader::setOnError;
+%ignore cc::network::Downloader::setOnSuccess;
+
+%attribute_writeonly(cc::network::Downloader, std::function<void(const DownloadTask &, uint32_t, uint32_t, uint32_t)>&, onProgress, setOnProgress);
 
 %import "base/Macros.h"
 

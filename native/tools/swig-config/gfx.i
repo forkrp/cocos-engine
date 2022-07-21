@@ -135,6 +135,11 @@ namespace cc { namespace gfx {
 %ignore DescriptorSetLayout::descriptorIndices;
 %ignore DescriptorSetLayout::getDescriptorIndices;
 
+%ignore DescriptorSet::DescriptorSet;
+%ignore DescriptorSet::forceUpdate;
+
+%ignore BufferBarrier::BufferBarrier;
+
 %ignore CommandBuffer::execute;
 %ignore CommandBuffer::updateBuffer;
 %ignore CommandBuffer::copyBuffersToTexture;
@@ -169,6 +174,7 @@ namespace cc { namespace gfx {
 %include "renderer/gfx-base/states/GFXGeneralBarrier.h"
 %include "renderer/gfx-base/states/GFXSampler.h"
 %include "renderer/gfx-base/states/GFXTextureBarrier.h"
+%include "renderer/gfx-base/states/GFXBufferBarrier.h"
 
 %include "renderer/gfx-base/GFXDevice.h"
 

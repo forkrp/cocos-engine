@@ -72,32 +72,18 @@
 %attribute(cc::UIMeshBuffer, float*, vData, getVData, setVData);
 %attribute(cc::UIMeshBuffer, uint16_t*, iData, getIData, setIData);
 
-%attribute(cc::RenderDrawInfo, index_t, bufferId, getBufferId, setBufferId);
-%attribute(cc::RenderDrawInfo, index_t, accId, getAccId, setAccId);
-%attribute(cc::RenderDrawInfo, uint32_t, vertexOffset, getVertexOffset, setVertexOffset);
-%attribute(cc::RenderDrawInfo, uint32_t, indexOffset, getIndexOffset, setIndexOffset);
 %attribute(cc::RenderDrawInfo, float*, vbBuffer, getVbBuffer, setVbBuffer);
 %attribute(cc::RenderDrawInfo, uint16_t*, ibBuffer, getIbBuffer, setIbBuffer);
 %attribute(cc::RenderDrawInfo, float*, vDataBuffer, getVDataBuffer, setVDataBuffer);
 %attribute(cc::RenderDrawInfo, uint16_t*, iDataBuffer, getIDataBuffer, setIDataBuffer);
-%attribute(cc::RenderDrawInfo, uint32_t, vbCount, getVbCount, setVbCount);
-%attribute(cc::RenderDrawInfo, uint32_t, ibCount, getIbCount, setIbCount);
-%attribute(cc::RenderDrawInfo, bool, vertDirty, getVertDirty, setVertDirty);
-%attribute(cc::RenderDrawInfo, ccstd::hash_t, dataHash, getDataHash, setDataHash);
-%attribute(cc::RenderDrawInfo, bool, isMeshBuffer, getIsMeshBuffer, setIsMeshBuffer);
 %attribute(cc::RenderDrawInfo, cc::Material*, material, getMaterial, setMaterial);
 %attribute(cc::RenderDrawInfo, cc::gfx::Texture*, texture, getTexture, setTexture);
-%attribute(cc::RenderDrawInfo, uint32_t, textureHash, getTextureHash, setTextureHash);
 %attribute(cc::RenderDrawInfo, cc::gfx::Sampler*, sampler, getSampler, setSampler);
-%attribute(cc::RenderDrawInfo, uint32_t, blendHash, getBlendHash, setBlendHash);
 %attribute(cc::RenderDrawInfo, cc::scene::Model*, model, getModel, setModel);
-%attribute(cc::RenderDrawInfo, uint32_t, drawInfoType, getDrawInfoType, setDrawInfoType);
 
 %attribute(cc::RenderEntity, cc::Node*, node, getNode, setNode);
 %attribute(cc::RenderEntity, uint32_t, staticDrawInfoSize, getStaticDrawInfoSize, setStaticDrawInfoSize);
 %attribute(cc::RenderEntity, uint32_t, stencilStage, getStencilStage, setStencilStage);
-%attribute(cc::RenderEntity, cc::Material*, customMaterial, getCustomMaterial, setCustomMaterial);
-%attribute(cc::RenderEntity, cc::Material*, commitModelMaterial, getCommitModelMaterial, setCommitModelMaterial);
 %attribute(cc::RenderEntity, bool, isMask, getIsMask, setIsMask);
 %attribute(cc::RenderEntity, bool, isSubMask, getIsSubMask, setIsSubMask);
 %attribute(cc::RenderEntity, bool, isMaskInverted, getIsMaskInverted, setIsMaskInverted);

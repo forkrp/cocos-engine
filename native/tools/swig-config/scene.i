@@ -45,9 +45,11 @@
 #include "bindings/auto/jsb_geometry_auto.h"
 #include "bindings/auto/jsb_assets_auto.h"
 #include "bindings/auto/jsb_render_auto.h"
+#include "bindings/auto/jsb_cocos_auto.h"
 %}
 
 %ignore cc::scene::Pass::getBlocks;
+%ignore cc::scene::Pass::initPassFromTarget;
 
 %ignore cc::Node::setRTSInternal;
 %ignore cc::Node::setRTS;
@@ -60,7 +62,13 @@
 %ignore cc::scene::Model::updateOctree;
 
 %ignore cc::scene::SkinningModel::uploadJointData;
+
 %ignore cc::scene::RenderScene::updateBatches;
+%ignore cc::scene::RenderScene::addBatch;
+%ignore cc::scene::RenderScene::removeBatch;
+%ignore cc::scene::RenderScene::removeBatches;
+%ignore cc::scene::RenderScene::getBatches;
+
 %ignore cc::scene::BakedSkinningModel::updateInstancedJointTextureInfo;
 %ignore cc::scene::BakedSkinningModel::updateModelBounds;
 
@@ -98,6 +106,11 @@
 %ignore cc::scene::Camera::worldToScreen;
 %ignore cc::scene::Camera::worldMatrixToScreen;
 %ignore cc::scene::Camera::syncCameraEditor;
+%ignore cc::scene::Camera::getMatView;
+%ignore cc::scene::Camera::getMatProj;
+%ignore cc::scene::Camera::getMatProjInv;
+%ignore cc::scene::Camera::getMatViewProj;
+%ignore cc::scene::Camera::getMatViewProjInv;
 
 %ignore cc::JointTexturePool::getDefaultPoseTexture;
 //
@@ -126,7 +139,7 @@
 %rename(_load) cc::Scene::load;
 %rename(_activate) cc::Scene::activate;
 
-%rename(_initPassFromTarget) cc::scene::Pass::initPassFromTarget;
+
 
 //TODO: %attribute code needs to be generated from ts file automatically.
 %attribute(cc::Root, cc::gfx::Device*, device, getDevice, setDevice);
@@ -181,9 +194,7 @@
 %attribute(cc::Node, float, angle, getAngle, setAngle);
 %attribute_writeonly(cc::Node, Mat4&, matrix, setMatrix);
 %attribute(cc::Node, uint32_t, hasChangedFlags, getChangedFlags, setChangedFlags);
-%attribute(cc::Node, bool, active, isActive, setActive);
 %attribute(cc::Node, bool, _persistNode, isPersistNode, setPersistNode);
-%attribute(cc::Node, uint32_t, _dirtyFlags, getDirtyFlag, setDirtyFlag);
 
 %attribute(cc::scene::Ambient, cc::Vec4&, skyColor, getSkyColor, setSkyColor);
 %attribute(cc::scene::Ambient, float, skyIllum, getSkyIllum, setSkyIllum);
@@ -215,6 +226,10 @@
 %attribute(cc::scene::DirectionalLight, float, shadowNear, getShadowNear, setShadowNear);
 %attribute(cc::scene::DirectionalLight, float, shadowFar, getShadowFar, setShadowFar);
 %attribute(cc::scene::DirectionalLight, float, shadowOrthoSize, getShadowOrthoSize, setShadowOrthoSize);
+%attribute(cc::scene::DirectionalLight, CSMLevel, csmLevel, getCSMLevel, setCSMLevel);
+%attribute(cc::scene::DirectionalLight, bool, csmNeedUpdate, isCSMNeedUpdate, setCSMNeedUpdate);
+%attribute(cc::scene::DirectionalLight, float, csmLayerLambda, getCSMLayerLambda, setCSMLayerLambda);
+%attribute(cc::scene::DirectionalLight, CSMOptimizationMode, csmOptimizationMode, getCSMOptimizationMode, setCSMOptimizationMode);
 
 %attribute(cc::scene::SpotLight, Vec3&, position, getPosition);
 %attribute(cc::scene::SpotLight, float, range, getRange, setRange);
@@ -325,6 +340,8 @@
 %attribute(cc::scene::Model, bool, isInstancingEnabled, isInstancingEnabled);
 %attribute(cc::scene::Model, bool, receiveShadow, isReceiveShadow, setReceiveShadow);
 %attribute(cc::scene::Model, bool, castShadow, isCastShadow, setCastShadow);
+%attribute(cc::scene::Model, float, shadowBias, getShadowBias, setShadowBias);
+%attribute(cc::scene::Model, float, shadowNormalBias, getShadowNormalBias, setShadowNormalBias);
 %attribute(cc::scene::Model, cc::Node*, node, getNode, setNode);
 %attribute(cc::scene::Model, cc::Node*, transform, getTransform, setTransform);
 %attribute(cc::scene::Model, cc::Layers::Enum, visFlags, getVisFlags, setVisFlags);
@@ -332,6 +349,7 @@
 %attribute(cc::scene::Model, cc::scene::Model::Type, type, getType, setType);
 %attribute(cc::scene::Model, cc::scene::InstancedAttributeBlock&, instancedAttributes, getInstancedAttributeBlock, setInstancedAttributeBlock);
 %attribute(cc::scene::Model, bool, isDynamicBatching, isDynamicBatching, setDynamicBatching);
+%attribute(cc::scene::Model, uint32_t, priority, getPriority, setPriority);
 
 %attribute(cc::scene::SubModel, std::shared_ptr<ccstd::vector<cc::IntrusivePtr<cc::scene::Pass>>> &, passes, getPasses, setPasses);
 %attribute(cc::scene::SubModel, ccstd::vector<cc::IntrusivePtr<cc::gfx::Shader>> &, shaders, getShaders, setShaders);
@@ -348,11 +366,10 @@
 %attribute(cc::scene::ShadowsInfo, cc::Vec3&, normal, getNormal, setNormal);
 %attribute(cc::scene::ShadowsInfo, float, distance, getDistance, setDistance);
 %attribute(cc::scene::ShadowsInfo, cc::Color&, shadowColor, getShadowColor, setShadowColor);
-// %attribute(cc::scene::ShadowsInfo, cc::Vec3&, planeDirection, getPlaneDirection, setPlaneDirection);
-// %attribute(cc::scene::ShadowsInfo, float, planeHeight, getPlaneHeight, setPlaneHeight);
+%attribute(cc::scene::ShadowsInfo, cc::Vec3&, planeDirection, getPlaneDirection, setPlaneDirection);
+%attribute(cc::scene::ShadowsInfo, float, planeHeight, getPlaneHeight, setPlaneHeight);
 %attribute(cc::scene::ShadowsInfo, uint32_t, maxReceived, getMaxReceived, setMaxReceived);
 %attribute(cc::scene::ShadowsInfo, float, shadowMapSize, getShadowMapSize, setShadowMapSize);
-%attribute(cc::scene::ShadowsInfo, cc::Vec2&, size, getSize);
 
 %attribute(cc::scene::Shadows, bool, enabled, isEnabled, setEnabled);
 %attribute(cc::scene::Shadows, cc::scene::ShadowType, type, getType, setType);
@@ -365,10 +382,6 @@
 %attribute(cc::scene::Shadows, cc::Mat4&, matLight, getMatLight);
 %attribute(cc::scene::Shadows, cc::Material*, material, getMaterial);
 %attribute(cc::scene::Shadows, cc::Material*, instancingMaterial, getInstancingMaterial);
-%attribute(cc::scene::Shadows, float, shadowCameraFar, getShadowCameraFar, setShadowCameraFar);
-%attribute(cc::scene::Shadows, cc::Mat4&, matShadowView, getMatShadowView, setMatShadowView);
-%attribute(cc::scene::Shadows, cc::Mat4&, matShadowProj, getMatShadowProj, setMatShadowProj);
-%attribute(cc::scene::Shadows, cc::Mat4&, matShadowViewProj, getMatShadowViewProj, setMatShadowViewProj);
 
 %attribute_writeonly(cc::scene::AmbientInfo, cc::Vec4&, skyColor, setSkyColor);
 %attribute(cc::scene::AmbientInfo, float, skyIllum, getSkyIllum, setSkyIllum);
@@ -485,7 +498,6 @@
 %include "scene/SubModel.h"
 %include "scene/Pass.h"
 %include "scene/RenderScene.h"
-%include "scene/DrawBatch2D.h"
 %include "scene/RenderWindow.h"
 %include "scene/Camera.h"
 %include "scene/Ambient.h"
