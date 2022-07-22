@@ -88,6 +88,7 @@
 %attribute(cc::RenderEntity, bool, isMask, getIsMask, setIsMask);
 %attribute(cc::RenderEntity, bool, isSubMask, getIsSubMask, setIsSubMask);
 %attribute(cc::RenderEntity, bool, isMaskInverted, getIsMaskInverted, setIsMaskInverted);
+%attribute(cc::RenderEntity, bool, useLocal, getUseLocal, setUseLocal);
 
 %import "base/Macros.h"
 %import "base/TypeDef.h"

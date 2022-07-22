@@ -14,6 +14,7 @@
 
 %{
 #include "bindings/auto/jsb_spine_auto.h"
+using namespace spine;
 %}
 
 %ignore *::rtti;
@@ -46,6 +47,7 @@
 %ignore spine::IkConstraintTimeline::IkConstraintTimeline;
 %ignore spine::MeshAttachment::MeshAttachment;
 %ignore spine::Polygon::Polygon;
+%ignore spine::Polygon::_vertices;
 %ignore spine::PathAttachment::PathAttachment;
 %ignore spine::PathConstraint::PathConstraint;
 %ignore spine::PathConstraintData::PathConstraintData;
@@ -243,6 +245,6 @@
 %include "editor-support/spine-creator-support/SkeletonRenderer.h"
 %include "editor-support/spine-creator-support/SkeletonAnimation.h"
 %include "editor-support/spine-creator-support/SkeletonDataMgr.h"
-%include "editor-support/spine-creator-support/SkeletonCache.h"
+// %include "editor-support/spine-creator-support/SkeletonCache.h"
 %include "editor-support/spine-creator-support/SkeletonCacheAnimation.h"
 %include "editor-support/spine-creator-support/SkeletonCacheMgr.h"
