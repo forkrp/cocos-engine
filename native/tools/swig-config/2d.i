@@ -20,6 +20,7 @@
 #include "bindings/auto/jsb_2d_auto.h"
 #include "bindings/auto/jsb_scene_auto.h"
 #include "bindings/auto/jsb_gfx_auto.h"
+#include "bindings/auto/jsb_assets_auto.h"
 %}
 
 %ignore UserData;

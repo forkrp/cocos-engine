@@ -103,6 +103,9 @@ using namespace cc;
 %attribute(cc::pipeline::BloomStage, int, iterations, getIterations, setIterations);
 
 
+
+#define CC_USE_GEOMETRY_RENDERER 1
+
 %import "base/Macros.h"
 %import "base/TypeDef.h"
 %import "base/memory/Memory.h"

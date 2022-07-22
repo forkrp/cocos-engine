@@ -46,6 +46,9 @@
 #include "bindings/auto/jsb_assets_auto.h"
 #include "bindings/auto/jsb_render_auto.h"
 #include "bindings/auto/jsb_cocos_auto.h"
+#include "bindings/auto/jsb_2d_auto.h"
+
+using namespace cc;
 %}
 
 %ignore cc::scene::Pass::getBlocks;
@@ -119,6 +122,10 @@
 %ignore cc::Layers::nameToLayer;
 %ignore cc::Layers::layerToName;
 
+%ignore cc::JointInfo;
+%ignore cc::BakedJointInfo;
+%ignore cc::ITemplateInfo;
+
 %rename(IInstancedAttributeBlock) cc::scene::InstancedAttributeBlock;
 
 %rename(_initialize) cc::Root::initialize;
@@ -155,7 +162,9 @@
 %attribute(cc::Root, uint32_t, fps, getFps);
 %attribute(cc::Root, uint32_t, fixedFPS, getFixedFPS, setFixedFPS);
 %attribute(cc::Root, bool, useDeferredPipeline, isUsingDeferredPipeline);
+%attribute(cc::Root, bool, usesCustomPipeline, usesCustomPipeline);
 %attribute(cc::Root, cc::render::PipelineRuntime *, pipeline, getPipeline);
+%attribute(cc::Root, cc::render::Pipeline*, customPipeline, getCustomPipeline);
 
 %attribute(cc::scene::RenderWindow, uint32_t, width, getWidth);
 %attribute(cc::scene::RenderWindow, uint32_t, height, getHeight);
@@ -203,7 +212,7 @@
 %attribute(cc::scene::Ambient, uint8_t, mipmapCount, getMipmapCount, setMipmapCount);
 
 %attribute(cc::scene::Light, bool, baked, isBaked, setBaked);
-%attribute(cc::scene::Light, Vec3&, color, getColor, setColor);
+%attribute(cc::scene::Light, cc::Vec3&, color, getColor, setColor);
 %attribute(cc::scene::Light, bool, useColorTemperature, isUseColorTemperature, setUseColorTemperature);
 %attribute(cc::scene::Light, float, colorTemperature, getColorTemperature, setColorTemperature);
 %attribute(cc::scene::Light, cc::Node*, node, getNode, setNode);
@@ -211,12 +220,12 @@
 %attribute(cc::scene::Light, ccstd::string&, name, getName, setName);
 %attribute(cc::scene::Light, cc::scene::RenderScene*, scene, getScene);
 
-%attribute(cc::scene::DirectionalLight, Vec3&, direction, getDirection, setDirection);
+%attribute(cc::scene::DirectionalLight, cc::Vec3&, direction, getDirection, setDirection);
 %attribute(cc::scene::DirectionalLight, float, illuminance, getIlluminance, setIlluminance);
 %attribute(cc::scene::DirectionalLight, float, illuminanceHDR, getIlluminanceHDR, setIlluminanceHDR);
 %attribute(cc::scene::DirectionalLight, float, illuminanceLDR, getIlluminanceLDR, setIlluminanceLDR);
 %attribute(cc::scene::DirectionalLight, bool, shadowEnabled, isShadowEnabled, setShadowEnabled);
-%attribute(cc::scene::DirectionalLight, float, shadowPcf, getShadowPcf, setShadowPcf);
+%attribute(cc::scene::DirectionalLight, cc::scene::PCFType, shadowPcf, getShadowPcf, setShadowPcf);
 %attribute(cc::scene::DirectionalLight, float, shadowBias, getShadowBias, setShadowBias);
 %attribute(cc::scene::DirectionalLight, float, shadowNormalBias, getShadowNormalBias, setShadowNormalBias);
 %attribute(cc::scene::DirectionalLight, float, shadowSaturation, getShadowSaturation, setShadowSaturation);
@@ -226,17 +235,17 @@
 %attribute(cc::scene::DirectionalLight, float, shadowNear, getShadowNear, setShadowNear);
 %attribute(cc::scene::DirectionalLight, float, shadowFar, getShadowFar, setShadowFar);
 %attribute(cc::scene::DirectionalLight, float, shadowOrthoSize, getShadowOrthoSize, setShadowOrthoSize);
-%attribute(cc::scene::DirectionalLight, CSMLevel, csmLevel, getCSMLevel, setCSMLevel);
+%attribute(cc::scene::DirectionalLight, cc::scene::CSMLevel, csmLevel, getCSMLevel, setCSMLevel);
 %attribute(cc::scene::DirectionalLight, bool, csmNeedUpdate, isCSMNeedUpdate, setCSMNeedUpdate);
 %attribute(cc::scene::DirectionalLight, float, csmLayerLambda, getCSMLayerLambda, setCSMLayerLambda);
-%attribute(cc::scene::DirectionalLight, CSMOptimizationMode, csmOptimizationMode, getCSMOptimizationMode, setCSMOptimizationMode);
+%attribute(cc::scene::DirectionalLight, cc::scene::CSMOptimizationMode, csmOptimizationMode, getCSMOptimizationMode, setCSMOptimizationMode);
 
-%attribute(cc::scene::SpotLight, Vec3&, position, getPosition);
+%attribute(cc::scene::SpotLight, cc::Vec3&, position, getPosition);
 %attribute(cc::scene::SpotLight, float, range, getRange, setRange);
 %attribute(cc::scene::SpotLight, float, luminance, getLuminance, setLuminance);
 %attribute(cc::scene::SpotLight, float, luminanceHDR, getLuminanceHDR, setLuminanceHDR);
 %attribute(cc::scene::SpotLight, float, luminanceLDR, getLuminanceLDR, setLuminanceLDR);
-%attribute(cc::scene::SpotLight, Vec3&, direction, getDirection);
+%attribute(cc::scene::SpotLight, cc::Vec3&, direction, getDirection);
 %attribute(cc::scene::SpotLight, float, spotAngle, getSpotAngle, setSpotAngle);
 %attribute(cc::scene::SpotLight, float, angle, getAngle);
 %attribute(cc::scene::SpotLight, cc::geometry::AABB&, aabb, getAABB);
@@ -247,7 +256,7 @@
 %attribute(cc::scene::SpotLight, float, shadowNormalBias, getShadowNormalBias, setShadowNormalBias);
 %attribute(cc::scene::SpotLight, float, size, getSize, setSize);
 
-%attribute(cc::scene::SphereLight, Vec3&, position, getPosition, setPosition);
+%attribute(cc::scene::SphereLight, cc::Vec3&, position, getPosition, setPosition);
 %attribute(cc::scene::SphereLight, float, size, getSize, setSize);
 %attribute(cc::scene::SphereLight, float, range, getRange, setRange);
 %attribute(cc::scene::SphereLight, float, luminance, getLuminance, setLuminance);
@@ -265,11 +274,6 @@
 %attribute(cc::scene::Camera, uint32_t, width, getWidth);
 %attribute(cc::scene::Camera, uint32_t, height, getHeight);
 %attribute(cc::scene::Camera, float, aspect, getAspect);
-%attribute(cc::scene::Camera, cc::Mat4&, matView, getMatView);
-%attribute(cc::scene::Camera, cc::Mat4&, matProj, getMatProj);
-%attribute(cc::scene::Camera, cc::Mat4&, matProjInv, getMatProjInv);
-%attribute(cc::scene::Camera, cc::Mat4&, matViewProj, getMatViewProj);
-%attribute(cc::scene::Camera, cc::Mat4&, matViewProjInv, getMatViewProjInv);
 %attribute(cc::scene::Camera, cc::scene::RenderScene*, scene, getScene);
 %attribute(cc::scene::Camera, ccstd::string&, name, getName);
 %attribute(cc::scene::Camera, cc::scene::RenderWindow*, window, getWindow, setWindow);
@@ -281,7 +285,7 @@
 %attribute(cc::scene::Camera, float, fov, getFov, setFov);
 %attribute(cc::scene::Camera, float, nearClip, getNearClip, setNearClip);
 %attribute(cc::scene::Camera, float, farClip, getFarClip, setFarClip);
-%attribute(cc::scene::Camera, cc::Vec4&, viewport, getViewport, setViewport);
+%attribute(cc::scene::Camera, cc::Rect&, viewport, getViewport, setViewport);
 %attribute(cc::scene::Camera, float, orthoHeight, getOrthoHeight, setOrthoHeight);
 %attribute(cc::scene::Camera, cc::gfx::Color&, clearColor, getClearColor, setClearColor);
 %attribute(cc::scene::Camera, float, clearDepth, getClearDepth, setClearDepth);
@@ -289,7 +293,7 @@
 %attribute(cc::scene::Camera, float, clearStencil, getClearStencil, setClearStencil);
 %attribute(cc::scene::Camera, bool, enabled, isEnabled, setEnabled);
 %attribute(cc::scene::Camera, float, exposure, getExposure);
-%attribute(cc::scene::Camera, cc::geometry::Frustum, frustum, getFrustum, setFrustum);
+%attribute(cc::scene::Camera, cc::geometry::Frustum&, frustum, getFrustum, setFrustum);
 %attribute(cc::scene::Camera, bool, isWindowSize, isWindowSize, setWindowSize);
 %attribute(cc::scene::Camera, uint32_t, priority, getPriority, setPriority);
 %attribute(cc::scene::Camera, float, screenScale, getScreenScale, setScreenScale);
@@ -363,8 +367,6 @@
 
 %attribute(cc::scene::ShadowsInfo, bool, enabled, isEnabled, setEnabled);
 %attribute(cc::scene::ShadowsInfo, cc::scene::ShadowType, type, getType, setType);
-%attribute(cc::scene::ShadowsInfo, cc::Vec3&, normal, getNormal, setNormal);
-%attribute(cc::scene::ShadowsInfo, float, distance, getDistance, setDistance);
 %attribute(cc::scene::ShadowsInfo, cc::Color&, shadowColor, getShadowColor, setShadowColor);
 %attribute(cc::scene::ShadowsInfo, cc::Vec3&, planeDirection, getPlaneDirection, setPlaneDirection);
 %attribute(cc::scene::ShadowsInfo, float, planeHeight, getPlaneHeight, setPlaneHeight);
@@ -483,8 +485,8 @@
 %include "core/scene-graph/Scene.h"
 %include "core/scene-graph/SceneGlobals.h"
 %include "core/Root.h"
-%include "core/animation/SkeletalAnimationUtils.h"
-%include "3d/skeletal-animation/SkeletalAnimationUtils.h"
+// %include "core/animation/SkeletalAnimationUtils.h"
+// %include "3d/skeletal-animation/SkeletalAnimationUtils.h"
 
 %include "scene/Define.h"
 %include "scene/Light.h"
