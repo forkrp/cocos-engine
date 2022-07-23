@@ -2,18 +2,13 @@
 
 %insert(header_file) %{
 #pragma once
-%}
-
-%insert(header_file) %{
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
-
 #include "2d/renderer/RenderDrawInfo.h"
 #include "2d/renderer/UIMeshBuffer.h"
 #include "2d/renderer/Batcher2d.h"
 #include "2d/renderer/RenderEntity.h"
 #include "2d/renderer/UIModelProxy.h"
-
 %}
 
 %{
@@ -81,6 +76,7 @@
 %attribute(cc::RenderDrawInfo, cc::gfx::Texture*, texture, getTexture, setTexture);
 %attribute(cc::RenderDrawInfo, cc::gfx::Sampler*, sampler, getSampler, setSampler);
 %attribute(cc::RenderDrawInfo, cc::scene::Model*, model, getModel, setModel);
+%attribute(cc::RenderDrawInfo, cc::Node*, subNode, getSubNode, setSubNode);
 
 %attribute(cc::RenderEntity, cc::Node*, node, getNode, setNode);
 %attribute(cc::RenderEntity, uint32_t, staticDrawInfoSize, getStaticDrawInfoSize, setStaticDrawInfoSize);

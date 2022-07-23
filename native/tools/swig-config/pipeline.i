@@ -2,20 +2,14 @@
 
 %insert(header_file) %{
 #pragma once
-%}
-
-%insert(header_file) %{
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
-
 #include "renderer/pipeline/forward/ForwardPipeline.h"
 #include "renderer/pipeline/forward/ForwardFlow.h"
 #include "renderer/pipeline/forward/ForwardStage.h"
-
 #include "renderer/pipeline/shadow/ShadowFlow.h"
 #include "renderer/pipeline/shadow/ShadowStage.h"
 #include "renderer/pipeline/shadow/CSMLayers.h"
-
 #include "renderer/pipeline/GlobalDescriptorSetManager.h"
 #include "renderer/pipeline/InstancedBuffer.h"
 #include "renderer/pipeline/deferred/DeferredPipeline.h"

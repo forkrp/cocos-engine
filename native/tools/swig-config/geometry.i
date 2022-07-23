@@ -2,14 +2,9 @@
 
 %insert(header_file) %{
 #pragma once
-%}
-
-%insert(header_file) %{
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
-
 #include "core/geometry/Geometry.h"
-
 %}
 
 %{

@@ -2,12 +2,8 @@
 
 %insert(header_file) %{
 #pragma once
-%}
-
-%insert(header_file) %{
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
-
 #include "core/assets/Asset.h"
 #include "core/assets/BufferAsset.h"
 #include "core/assets/EffectAsset.h"
@@ -25,7 +21,6 @@
 #include "bindings/auto/jsb_cocos_auto.h"
 #include "bindings/auto/jsb_gfx_auto.h"
 #include "bindings/auto/jsb_scene_auto.h"
-
 #include "renderer/core/PassUtils.h"
 #include "renderer/gfx-base/GFXDef-common.h"
 #include "renderer/pipeline/Define.h"

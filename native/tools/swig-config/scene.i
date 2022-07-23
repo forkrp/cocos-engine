@@ -2,12 +2,8 @@
 
 %insert(header_file) %{
 #pragma once
-%}
-
-%insert(header_file) %{
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
-
 #include "core/Root.h"
 #include "core/scene-graph/Node.h"
 #include "core/scene-graph/Scene.h"
@@ -33,7 +29,6 @@
 #include "3d/models/MorphModel.h"
 #include "3d/models/SkinningModel.h"
 #include "3d/models/BakedSkinningModel.h"
-
 #include "renderer/core/ProgramLib.h"
 #include "scene/Octree.h"
 %}
