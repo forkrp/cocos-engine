@@ -46,16 +46,14 @@
 
 %rename(buffer) cc::BufferAsset::getBuffer;
 
-namespace cc {
-%ignore Asset::createNode; //FIXME: swig needs to support std::function
-// %ignore IMemoryImageSource::data;
-%ignore SimpleTexture::uploadDataWithArrayBuffer;
-%ignore TextureCube::_mipmaps;
-// %ignore Mesh::copyAttribute; //TODO:
-// %ignore Mesh::copyIndices;//TODO:
-%ignore Material::setProperty;
-%ignore ImageAsset::setData;
-}
+%ignore cc::Asset::createNode; //FIXME: swig needs to support std::function
+// %ignore cc::IMemoryImageSource::data;
+%ignore cc::SimpleTexture::uploadDataWithArrayBuffer;
+%ignore cc::TextureCube::_mipmaps;
+// %ignore cc::Mesh::copyAttribute;
+// %ignore cc::Mesh::copyIndices;
+%ignore cc::Material::setProperty;
+%ignore cc::ImageAsset::setData;
 
 %attribute(cc::Asset, ccstd::string&, _uuid, getUuid, setUuid);
 %attribute(cc::Asset, ccstd::string, nativeUrl, getNativeUrl);
