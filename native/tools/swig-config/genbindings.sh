@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# exit this script if any commmand fails
+set -e
+
 swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_2d_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/2d.i
 
 swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_assets_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/assets.i

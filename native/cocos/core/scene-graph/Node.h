@@ -196,6 +196,8 @@ public:
 
     void targetOff(const CallbacksInvoker::KeyType &type);
 
+#endif // SWIGCOCOS
+
     bool destroy() override {
         if (CCObject::destroy()) {
             setActive(false);
@@ -713,6 +715,8 @@ template <typename T>
 bool Node::isNode(T *obj) {
     return dynamic_cast<Node *>(obj) != nullptr && dynamic_cast<Scene *>(obj) == nullptr;
 }
+
+#ifndef SWIGCOCOS
 
 template <typename... Args>
 void Node::emit(const CallbacksInvoker::KeyType &type, Args &&...args) {

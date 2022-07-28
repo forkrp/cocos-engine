@@ -66,8 +66,8 @@ public:
         FAIL_TO_UPDATE
     };
 
-    const static std::string VERSION_ID;
-    const static std::string MANIFEST_ID;
+    static const std::string VERSION_ID;
+    static const std::string MANIFEST_ID;
 
     using VersionCompareHandle = std::function<int(const std::string &, const std::string &)>;
     using VerifyCallback = std::function<bool(const std::string &, Manifest::Asset)>;

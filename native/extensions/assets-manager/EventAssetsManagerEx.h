@@ -93,9 +93,8 @@ public:
     /** Constructor */
     EventAssetsManagerEx(const std::string &eventName, cc::extension::AssetsManagerEx *manager, const EventCode &code, std::string assetId = "", std::string message = "", int curleCode = 0, int curlmCode = 0);
 
-private:
     ~EventAssetsManagerEx() override = default;
-
+private:
     EventCode _code;
 
     cc::extension::AssetsManagerEx *_manager;
