@@ -113,11 +113,6 @@
 %attribute(cc::EffectAsset, ccstd::vector<cc::IShaderInfo> &, shaders, getShaders, setShaders);
 %attribute(cc::EffectAsset, ccstd::vector<cc::IPreCompileInfo> &, combinations, getCombinations, setCombinations);
 
-%attribute(cc::TextureCube, cc::TextureCubeMipmapAtlasInfo&, mipmapAtlas, getMipmapAtlas, setMipmapAtlas);
-%attribute(cc::TextureCube, cc::ITextureCubeMipmap*, image, getImage, setImage);
-%attribute(cc::TextureCube, ccstd::vector<cc::ITextureCubeMipmap> &, mipmaps, getMipmaps, setMipmaps);
-
-
 %import "base/Macros.h"
 %import "base/TypeDef.h"
 %import "base/Ptr.h"
