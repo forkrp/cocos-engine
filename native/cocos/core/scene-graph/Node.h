@@ -657,11 +657,11 @@ private:
              _localScale.x, _localScale.y, _localScale.z);
     }
 
-    #if CC_EDITOR
+#if CC_EDITOR
     inline void notifyEditorAttached(bool attached) {
         emit(EventTypesToJS::NODE_EDITOR_ATTACHED, attached);
     }
-    #endif
+#endif
 
     // increase on every frame, used to identify the frame
     static uint32_t globalFlagChangeVersion;
