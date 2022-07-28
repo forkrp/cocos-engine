@@ -91,7 +91,7 @@ public:
     int getTotalFiles() const;
 
     /** Constructor */
-    EventAssetsManagerEx(const std::string &eventName, cc::extension::AssetsManagerEx *manager, const EventCode &code, std::string assetId = "", std::string message = "", int curleCode = 0, int curlmCode = 0);
+    EventAssetsManagerEx(const std::string &eventName, cc::extension::AssetsManagerEx *manager, EventCode code, std::string assetId = "", std::string message = "", int curleCode = 0, int curlmCode = 0);
 
     ~EventAssetsManagerEx() override = default;
 
