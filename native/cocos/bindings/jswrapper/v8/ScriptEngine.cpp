@@ -775,10 +775,10 @@ bool ScriptEngine::start(v8::Isolate *isolate) {
 
 void ScriptEngine::garbageCollect() {
     int objSize = __objectMap ? static_cast<int>(__objectMap->size()) : -1;
-    SE_LOGD("GC begin ..., (js->native map) size: %d, all objects: %d\n", (int)NativePtrToObjectMap::size(), objSize);
+//    SE_LOGD("GC begin ..., (js->native map) size: %d, all objects: %d\n", (int)NativePtrToObjectMap::size(), objSize);
     _gcFunc->call({}, nullptr);
     objSize = __objectMap ? static_cast<int>(__objectMap->size()) : -1;
-    SE_LOGD("GC end ..., (js->native map) size: %d, all objects: %d\n", (int)NativePtrToObjectMap::size(), objSize);
+//    SE_LOGD("GC end ..., (js->native map) size: %d, all objects: %d\n", (int)NativePtrToObjectMap::size(), objSize);
 }
 
 bool ScriptEngine::isGarbageCollecting() const {

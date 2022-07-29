@@ -2558,6 +2558,26 @@ static bool js_engine_CCObject_getName(se::State& s) // NOLINT(readability-ident
 }
 SE_BIND_FUNC_AS_PROP_GET(js_engine_CCObject_getName)
 
+static bool js_engine_CCObject_getSharedFlags(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
+    // SE_PRECONDITION2(cobj, false, "Invalid Native Object");
+    if (nullptr == cobj) return true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    CC_UNUSED bool ok = true;
+    if (argc == 0) {
+        se::Object* result = cobj->getSharedFlags();
+        ok &= nativevalue_to_se(result, s.rval(), nullptr /*ctx*/);
+        SE_PRECONDITION2(ok, false, "Error processing arguments");
+        SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    return false;
+}
+SE_BIND_FUNC(js_engine_CCObject_getSharedFlags)
+
 static bool js_engine_CCObject_isReplicated(se::State& s) // NOLINT(readability-identifier-naming)
 {
     auto* cobj = SE_THIS_OBJECT<cc::CCObject>(s);
@@ -2778,6 +2798,7 @@ bool js_register_engine_CCObject(se::Object* obj) // NOLINT(readability-identifi
     cls->defineProperty("isValid", _SE(js_engine_CCObject_isValid_asGetter), nullptr);
     cls->defineFunction("_destroy", _SE(js_engine_CCObject_destroy));
     cls->defineFunction("_destroyImmediate", _SE(js_engine_CCObject_destroyImmediate));
+    cls->defineFunction("getSharedFlags", _SE(js_engine_CCObject_getSharedFlags));
     cls->defineFunction("toString", _SE(js_engine_CCObject_toString));
     cls->defineStaticFunction("deferredDestroy", _SE(js_engine_CCObject_deferredDestroy_static));
     cls->defineFinalizeFunction(_SE(js_cc_CCObject_finalize));

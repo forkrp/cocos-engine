@@ -177,6 +177,7 @@ bool js_register_cc_CCObject(se::Object *obj); // NOLINT
 
 SE_DECLARE_FUNC(js_engine_CCObject_destroy);
 SE_DECLARE_FUNC(js_engine_CCObject_destroyImmediate);
+SE_DECLARE_FUNC(js_engine_CCObject_getSharedFlags);
 SE_DECLARE_FUNC(js_engine_CCObject_toString);
 SE_DECLARE_FUNC(js_engine_CCObject_deferredDestroy);
 SE_DECLARE_FUNC(js_engine_CCObject_CCObject);

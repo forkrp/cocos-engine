@@ -692,7 +692,27 @@ declare const jsb: any;
 if (JSB) {
     copyAllProperties(CCObject, jsb.CCObject, ['prototype', 'length', 'name']);
     copyAllProperties(CCObject.prototype, jsb.CCObject.prototype,
-        ['constructor', 'name', 'hideFlags', 'replicated', 'isValid']);
+        ['constructor', 'name']);
+
+    jsb.CCObject.prototype._sharedObjFlags = null;
+
+    Object.defineProperty(jsb.CCObject.prototype, "_objFlags", {
+        enumerable: true,
+        configurable: true,
+        get () {
+            if (this._sharedObjFlags == null) {
+                this._sharedObjFlags = new Uint32Array(this.getSharedFlags());
+            }
+            return this._sharedObjFlags[0];
+        },
+        set (v) {
+            if (this._sharedObjFlags == null) {
+                this._sharedObjFlags = new Uint32Array(this.getSharedFlags());
+            }
+            this._sharedObjFlags[0] = v;
+        }
+    });
+
 
     // @ts-expect-error TS2629
     // eslint-disable-next-line no-class-assign

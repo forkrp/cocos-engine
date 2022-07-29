@@ -55,6 +55,8 @@ void CCObject::deferredDestroy() {
 
 CCObject::CCObject(ccstd::string name /* = ""*/)
 : _name(std::move(name)) {
+    static_assert(sizeof(Flags) == sizeof(uint32_t), "Wrong Flags size");
+    _sharedFlags.initialize(&_objFlags, sizeof(_objFlags));
 }
 
 CCObject::~CCObject() = default;

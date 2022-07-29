@@ -27,6 +27,8 @@
 
 #if defined(RECORD_JSB_INVOKING)
 
+#include "base/std/container/unordered_map.h"
+
 namespace {
 bool cmp(const std::pair<const char *, std::tuple<int, uint64_t>> &a, const std::pair<const char *, std::tuple<int, uint64_t>> &b) {
     return std::get<1>(a.second) > std::get<1>(b.second);

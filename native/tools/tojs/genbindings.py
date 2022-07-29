@@ -14,22 +14,22 @@ else:
 
 defaultSections = [
     'cocos',
-    'video',
-    'webview',
-    'audio' ,
-    'extension',
-    'network',
-    'gfx',
-    'pipeline',
-    'render',
-    'spine',
-    'editor_support',
-    'dragonbones',
-    'physics',
-    'scene',
-    'geometry',
-    'assets',
-    '2d'
+    # 'video',
+    # 'webview',
+    # 'audio' ,
+    # 'extension',
+    # 'network',
+    # 'gfx',
+    # 'pipeline',
+    # 'render',
+    # 'spine',
+    # 'editor_support',
+    # 'dragonbones',
+    # 'physics',
+    # 'scene',
+    # 'geometry',
+    # 'assets',
+    # '2d'
 ]
 
 projectRoot = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))

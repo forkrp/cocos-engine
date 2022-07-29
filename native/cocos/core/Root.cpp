@@ -41,6 +41,8 @@
 #include "scene/DirectionalLight.h"
 #include "scene/SpotLight.h"
 
+#include "bindings/jswrapper/SeApi.h"
+
 namespace cc {
 
 namespace {
@@ -307,6 +309,7 @@ void Root::resetCumulativeTime() {
 }
 
 void Root::frameMove(float deltaTime, int32_t totalFrames) {
+//    se::ScriptEngine::getInstance()->garbageCollect();
     CCObject::deferredDestroy();
 
     _frameTime = deltaTime;
@@ -374,6 +377,9 @@ void Root::frameMove(float deltaTime, int32_t totalFrames) {
     if (_batcher != nullptr) {
         _batcher->reset();
     }
+
+//    printJSBInvoke();
+//    clearRecordJSBInvoke();
 }
 
 scene::RenderWindow *Root::createWindow(scene::IRenderWindowInfo &info) {

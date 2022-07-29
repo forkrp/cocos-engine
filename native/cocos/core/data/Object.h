@@ -31,6 +31,12 @@
 #include "base/RefCounted.h"
 #include "base/TypeDef.h"
 
+#include "bindings/utils/BindingUtils.h"
+
+namespace se {
+class Object;
+}
+
 namespace cc {
 
 /**
@@ -221,11 +227,16 @@ public:
 
     virtual ccstd::string toString() const { return ""; };
 
+    inline se::Object *getSharedFlags() const { return _sharedFlags.getSharedArrayBufferObject(); }
+
 protected:
     virtual bool onPreDestroy() {
         // FIXME: need reture value
         return true;
     }
+
+private:
+    bindings::NativeMemorySharedToScriptActor _sharedFlags;
 };
 
 CC_ENUM_BITWISE_OPERATORS(CCObject::Flags);
