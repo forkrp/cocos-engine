@@ -141,7 +141,7 @@ using namespace cc;
 %rename(_load) cc::Scene::load;
 %rename(_activate) cc::Scene::activate;
 
-
+%rename(_updatePassHash) cc::scene::Pass::updatePassHash;
 
 //TODO: %attribute code needs to be generated from ts file automatically.
 %attribute(cc::Root, cc::gfx::Device*, device, getDevice, setDevice);

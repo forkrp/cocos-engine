@@ -44,7 +44,6 @@
 %ignore cc::RenderDrawInfo::getSize;
 %ignore cc::RenderDrawInfo::getEnumDrawInfoType;
 
-
 %ignore cc::Batcher2d::addVertDirtyRenderer;
 %ignore cc::Batcher2d::getMeshBuffer;
 %ignore cc::Batcher2d::getDevice;
@@ -54,7 +53,10 @@
 %ignore cc::Batcher2d::generateBatch;
 %ignore cc::Batcher2d::resetRenderStates;
 %ignore cc::Batcher2d::handleDrawInfo;
-
+%ignore cc::Batcher2d::handleComponentDraw;
+%ignore cc::Batcher2d::handleModelDraw;
+%ignore cc::Batcher2d::handleIADraw;
+%ignore cc::Batcher2d::handleSubNode;
 
 %ignore cc::RenderEntity::getDynamicRenderDrawInfo;
 %ignore cc::RenderEntity::getDynamicRenderDrawInfos;
