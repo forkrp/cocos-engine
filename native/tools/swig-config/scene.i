@@ -417,7 +417,7 @@ using namespace cc;
 %attribute(cc::scene::OctreeInfo, Vec3&, maxPos, getMaxPos, setMaxPos);
 %attribute(cc::scene::OctreeInfo, uint32_t, depth, getDepth, setDepth);
 
-%attribute(cc::scene::Scene, bool, autoReleaseAssets, isAutoReleaseAssets, setAutoReleaseAssets);
+%attribute(cc::Scene, bool, autoReleaseAssets, isAutoReleaseAssets, setAutoReleaseAssets);
 
 %import "base/Macros.h"
 %import "base/TypeDef.h"

@@ -35,6 +35,7 @@
 %ignore cc::UIMeshBuffer::setDirty;
 %ignore cc::UIMeshBuffer::getFloatsPerVertex;
 %ignore cc::UIMeshBuffer::setFloatsPerVertex;
+%ignore cc::UIMeshBuffer::getAttributes;
 
 %ignore cc::RenderDrawInfo::getBatcher;
 %ignore cc::RenderDrawInfo::setBatcher;
@@ -66,9 +67,12 @@
 %ignore cc::RenderEntity::isEnabled;
 %ignore cc::RenderEntity::getEnumStencilStage;
 %ignore cc::RenderEntity::setEnumStencilStage;
+%ignore cc::RenderEntity::getVBColorDirty;
+%ignore cc::RenderEntity::setVBColorDirty;
 
 %attribute(cc::UIMeshBuffer, float*, vData, getVData, setVData);
 %attribute(cc::UIMeshBuffer, uint16_t*, iData, getIData, setIData);
+%attribute(cc::UIMeshBuffer, bool, useLinkData, getUseLinkData, setUseLinkData);
 
 %attribute(cc::RenderDrawInfo, float*, vbBuffer, getVbBuffer, setVbBuffer);
 %attribute(cc::RenderDrawInfo, uint16_t*, ibBuffer, getIbBuffer, setIbBuffer);
