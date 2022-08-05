@@ -143,6 +143,8 @@ using namespace cc;
 
 %rename(_updatePassHash) cc::scene::Pass::updatePassHash;
 
+%module_macro(CC_USE_GEOMETRY_RENDERER) cc::scene::Camera::geometryRenderer;
+
 //TODO: %attribute code needs to be generated from ts file automatically.
 %attribute(cc::Root, cc::gfx::Device*, device, getDevice, setDevice);
 %attribute(cc::Root, cc::gfx::Device*, _device, getDevice, setDevice);

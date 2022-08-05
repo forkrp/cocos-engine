@@ -23,6 +23,8 @@ using namespace cc;
 using namespace cc::render;
 %}
 
+%module_macro(CC_USE_GEOMETRY_RENDERER) cc::render::PipelineRuntime::geometryRenderer;
+
 %attribute(cc::render::PipelineRuntime, cc::gfx::Device*, device, getDevice);
 %attribute(cc::render::PipelineRuntime, cc::pipeline::GlobalDSManager *, globalDSManager, getGlobalDSManager);
 %attribute(cc::render::PipelineRuntime, cc::gfx::DescriptorSetLayout*, descriptorSetLayout, getDescriptorSetLayout);

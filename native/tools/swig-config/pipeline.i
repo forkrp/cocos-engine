@@ -72,6 +72,14 @@ using namespace cc;
 %ignore cc::pipeline::CSMLayers::getLayers;
 %ignore cc::pipeline::CSMLayers::getSpecialLayer;
 
+%ignore cc::pipeline::GeometryRendererInfo;
+%ignore cc::pipeline::GeometryRenderer::activate;
+%ignore cc::pipeline::GeometryRenderer::render;
+%ignore cc::pipeline::GeometryRenderer::destroy;
+
+%module_macro(CC_USE_GEOMETRY_RENDERER) cc::pipeline::GeometryRenderer;
+%module_macro(CC_USE_GEOMETRY_RENDERER) cc::pipeline::RenderPipeline::geometryRenderer;
+
 %attribute(cc::pipeline::RenderPipeline, cc::pipeline::GlobalDSManager*, globalDSManager, getGlobalDSManager);
 %attribute(cc::pipeline::RenderPipeline, cc::gfx::DescriptorSet*, descriptorSet, getDescriptorSet);
 %attribute(cc::pipeline::RenderPipeline, cc::gfx::DescriptorSetLayout*, descriptorSetLayout, getDescriptorSetLayout);

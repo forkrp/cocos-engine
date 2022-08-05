@@ -148,6 +148,21 @@ namespace cc { namespace gfx {
 
 }} // namespace cc { namespace gfx {
 
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createCommandBuffer);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createQueue);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createQueryPool);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createSwapchain);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createBuffer);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createTexture);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createShader);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createInputAssembler);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createRenderPass);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createFramebuffer);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createDescriptorSet);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createDescriptorSetLayout);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createPipelineLayout);
+%release_returned_cpp_object_in_gc(cc::gfx::Device::createPipelineState);
+
 %import "base/Macros.h"
 %import "base/memory/Memory.h"
 

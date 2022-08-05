@@ -62,6 +62,7 @@ namespace cc {
 %ignore DebugRenderer::destroy;
 
 %ignore DebugFontInfo;
+%ignore DebugRendererInfo;
 
 %ignore JSBNativeDataHolder::getData;
 %ignore JSBNativeDataHolder::setData;
@@ -84,6 +85,9 @@ namespace cc {
 %attribute(cc::CCObject, cc::CCObject::Flags, hideFlags, getHideFlags, setHideFlags);
 %attribute(cc::CCObject, bool, replicated, isReplicated, setReplicated);
 %attribute(cc::CCObject, bool, isValid, isValid);
+
+%module_macro(CC_USE_DEBUG_RENDERER) cc::DebugTextInfo;
+%module_macro(CC_USE_DEBUG_RENDERER) cc::DebugRenderer;
 
 %import "base/Macros.h"
 %import "base/memory/Memory.h"
