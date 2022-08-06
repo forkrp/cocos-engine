@@ -3,40 +3,41 @@
 # exit this script if any commmand fails
 set -e
 
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_2d_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/2d.i
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+COCOS_NATIVE_ROOT=$( realpath "$DIR/../../" )
 
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_assets_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/assets.i
+echo $COCOS_NATIVE_ROOT
 
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_audio_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/audio.i
+SWIG_ROOT=/Users/james/projects/cocos-creator/swig
+export PATH=$SWIG_ROOT/build:$SWIG_ROOT/build/Debug:$PATH
+export SWIG_LIB=$SWIG_ROOT/Lib
 
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_cocos_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/cocos.i
+# Array pretending to be a Pythonic dictionary
+ARRAY=( 
+	"2d.i:jsb_2d_auto.cpp"
+    "assets.i:jsb_assets_auto.cpp"
+    "audio.i:jsb_audio_auto.cpp"
+    "cocos.i:jsb_cocos_auto.cpp"
+    "dragonbones.i:jsb_dragonbones_auto.cpp"
+    "editor_support.i:jsb_editor_support_auto.cpp"
+    "extension.i:jsb_extension_auto.cpp"
+    "geometry.i:jsb_geometry_auto.cpp"
+    "gfx.i:jsb_gfx_auto.cpp"
+    "network.i:jsb_network_auto.cpp"
+    "physics.i:jsb_physics_auto.cpp"
+    "pipeline.i:jsb_pipeline_auto.cpp"
+    "scene.i:jsb_scene_auto.cpp"
+    "spine.i:jsb_spine_auto.cpp"
+    "webview.i:jsb_webview_auto.cpp"
+    "video.i:jsb_video_auto.cpp"
+    "renderer.i:jsb_render_auto.cpp"
+)
 
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_dragonbones_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/dragonbones.i
-
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_editor_support_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/editor_support.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_extension_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/extension.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_geometry_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/geometry.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_gfx_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/gfx.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_network_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/network.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_physics_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/physics.i
-
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_pipeline_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/pipeline.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_scene_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/scene.i
-
-
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_spine_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/spine.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_webview_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/webview.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_video_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/video.i
-
-swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native -I/Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos -o /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/cocos/bindings/auto/jsb_render_auto.cpp /Users/james/Project/cocos/cocos-creator/cocos-editor/resources/3d/engine/native/tools/swig-config/renderer.i
+for animal in "${ARRAY[@]}" ; do
+    KEY="${animal%%:*}"
+    VALUE="${animal##*:}"
+    # printf "%s likes to %s.\n" "$KEY" "$VALUE"
+    swig -c++ -cocos -fvirtual -noexcept -cpperraswarn -D__clang__ -Dfinal= -DCC_PLATFORM=3 -Dconstexpr=const -DCC_PLATFORM_ANDROID=3 \
+    -I$SWIG_ROOT/build -I$COCOS_NATIVE_ROOT -I$COCOS_NATIVE_ROOT/cocos \
+    -o $COCOS_NATIVE_ROOT/cocos/bindings/auto/$VALUE $COCOS_NATIVE_ROOT/tools/swig-config/$KEY
+done
