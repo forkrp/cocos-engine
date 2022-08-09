@@ -15,23 +15,27 @@ echo $COCOS_NATIVE_ROOT
 
 # mac
 
-# SWIG_ROOT=/Users/james/Project/cocos/swig
-# export SWIG_EXE=$SWIG_ROOT/build/Release/swig
+if [ "$host_os" == "darwin" ]; then
+    SWIG_ROOT=/Users/james/Project/cocos/swig
+    export SWIG_EXE=$SWIG_ROOT/build/Release/swig
+fi
 
 # linux
 
-SWIG_ROOT=/home/james/projects/swig
+if [ "$host_os" == "linux" ]; then
+    SWIG_ROOT=/home/james/projects/swig
 
-# linux release
+    # linux release
 
-export SWIG_EXE=$SWIG_ROOT/build/install/bin/swig
-export SWIG_LIB=$SWIG_ROOT/build/install/share/swig/4.1.0
+    export SWIG_EXE=$SWIG_ROOT/build/install/bin/swig
+    export SWIG_LIB=$SWIG_ROOT/build/install/share/swig/4.1.0
 
-# linux debug
+    # linux debug
 
-# export SWIG_EXE=$SWIG_ROOT/build/swig
-# export SWIG_LIB=$SWIG_ROOT/build
-# export SWIG_LIB2=$SWIG_ROOT/Lib/javascript/cocos
-# export SWIG_LIB3=$SWIG_ROOT/Lib
+    # export SWIG_EXE=$SWIG_ROOT/build/swig
+    # export SWIG_LIB=$SWIG_ROOT/build
+    # export SWIG_LIB2=$SWIG_ROOT/Lib/javascript/cocos
+    # export SWIG_LIB3=$SWIG_ROOT/Lib
+fi
 
 ./lua-${host_os} genbindings.lua
