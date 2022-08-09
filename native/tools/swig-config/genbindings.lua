@@ -1,15 +1,43 @@
-local pathEnv = os.getenv('PATH')
-local swigLibEnv = os.getenv('SWIG_LIB')
+local PATH = os.getenv('PATH')
+local SWIG_LIB = os.getenv('SWIG_LIB')
 local COCOS_NATIVE_ROOT = os.getenv('COCOS_NATIVE_ROOT')
 local SWIG_ROOT = os.getenv('SWIG_ROOT')
 
+local all_dirs = {
+    SWIG_LIB,
+    COCOS_NATIVE_ROOT,
+    SWIG_ROOT
+}
+
+--- Check if a file or directory exists in this path
+function exists(file)
+   local ok, err, code = os.rename(file, file)
+   if not ok then
+      if code == 13 then
+         -- Permission denied, but it exists
+         return true
+      end
+   end
+   return ok, err
+end
+
+--- Check if a directory exists in this path
+function isdir(path)
+   -- "/" works on both Unix and Windows
+   return exists(path.."/")
+end
+
 print('COCOS_NATIVE_ROOT: ' .. COCOS_NATIVE_ROOT)
-print('PATH: ' .. pathEnv)
-print('SWIG_LIB: ' .. swigLibEnv)
+print('PATH: ' .. PATH)
+print('SWIG_LIB: ' .. SWIG_LIB)
 print('SWIG_ROOT: ' .. SWIG_ROOT)
 
-local ret = os.execute('echo1 hello')
-print('os.execute returns: ' .. tostring(ret))
+for _, dir in ipairs(all_dirs) do
+    if not isdir(dir) then
+        print(string.format('(%s) does not exist!', dir))
+        return
+    end
+end
 
 local swig_config_map = {
     { '2d.i', 'jsb_2d_auto.cpp' },
