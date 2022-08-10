@@ -18,6 +18,9 @@ echo $COCOS_NATIVE_ROOT
 if [ "$host_os" == "darwin" ]; then
     SWIG_ROOT=/Users/james/Project/cocos/swig
     export SWIG_EXE=$SWIG_ROOT/build/Release/swig
+    export SWIG_LIB=$SWIG_ROOT/build
+    export SWIG_LIB2=$SWIG_ROOT/Lib/javascript/cocos
+    export SWIG_LIB3=$SWIG_ROOT/Lib
 fi
 
 # linux
