@@ -1,7 +1,5 @@
 @echo %off
 
-rem SET PATH=%PATH%;c:\whatever\else
-
 set DIR=%~dp0
 set COCOS_NATIVE_ROOT=%DIR%..\..
 
@@ -15,5 +13,3 @@ set SWIG_EXE=%SWIG_ROOT%/bin/swig
 set SWIG_LIB=%SWIG_ROOT%/share/swig/4.1.0
 
 .\lua.exe genbindings.lua
-
-pause

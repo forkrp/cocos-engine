@@ -30,9 +30,9 @@ jobs:
         run: |
           EXT_VERSION=test-swig
           git clone --branch $EXT_VERSION --depth 1 https://github.com/dumganhar/cocos-engine-external native/external
-      - name: Install deps
-        run: |
-          choco install --forcex86 vulkan-sdk
+      # - name: Install deps
+      #   run: |
+      #     choco install --forcex86 vulkan-sdk
       - name: Generate bindings
         run: |
           cd ./native/tools/swig-config
