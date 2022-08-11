@@ -218,7 +218,7 @@ jobs:
 
       - name: Generate bindings
         run: |
-          sudo spctl master-disable
+          sudo spctl --master-disable
           cd ./native/tools/swig-config
           ./genbindings.sh
       # - uses: nttld/setup-ndk@v1
