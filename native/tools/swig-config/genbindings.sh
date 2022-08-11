@@ -15,39 +15,23 @@ export COCOS_NATIVE_ROOT=$( abspath "$DIR/../../" )
 
 echo $COCOS_NATIVE_ROOT
 
-# mac
-
-if [ "$host_os" == "darwin" ]; then
-    cc_host="mac"
-    # release
-    SWIG_ROOT=$COCOS_NATIVE_ROOT/external/mac/bin/swig
-    export SWIG_EXE=$SWIG_ROOT/bin/swig
-    export SWIG_LIB=$SWIG_ROOT/share/swig/4.1.0
-
-    # debug
-    # SWIG_ROOT=/Users/james/Project/cocos/swig
-    # export SWIG_EXE=$SWIG_ROOT/build/Release/swig
-    # export SWIG_LIB=$SWIG_ROOT/build
-    # export SWIG_LIB2=$SWIG_ROOT/Lib/javascript/cocos
-    # export SWIG_LIB3=$SWIG_ROOT/Lib
-fi
-
-# linux
-
 if [ "$host_os" == "linux" ]; then
     cc_host="linux"
-    # release
-    SWIG_ROOT=$COCOS_NATIVE_ROOT/external/mac/bin/swig
-    export SWIG_EXE=$SWIG_ROOT/bin/swig
-    export SWIG_LIB=$SWIG_ROOT/share/swig/4.1.0
-
-    # debug
-    # SWIG_ROOT=/home/james/projects/swig
-    # export SWIG_EXE=$SWIG_ROOT/build/swig
-    # export SWIG_LIB=$SWIG_ROOT/build
-    # export SWIG_LIB2=$SWIG_ROOT/Lib/javascript/cocos
-    # export SWIG_LIB3=$SWIG_ROOT/Lib
 fi
 
+
+SWIG_ROOT=$COCOS_NATIVE_ROOT/external/${cc_host}/bin/swig
+export SWIG_EXE=$SWIG_ROOT/bin/swig
+export SWIG_LIB=$SWIG_ROOT/share/swig/4.1.0
+
+# debug linux
+# SWIG_ROOT=/home/james/projects/swig
+# debug mac
+# SWIG_ROOT=/Users/james/Project/cocos/swig
+
+# export SWIG_EXE=$SWIG_ROOT/build/swig
+# export SWIG_LIB=$SWIG_ROOT/build
+# export SWIG_LIB2=$SWIG_ROOT/Lib/javascript/cocos
+# export SWIG_LIB3=$SWIG_ROOT/Lib
 
 $COCOS_NATIVE_ROOT/external/${cc_host}/bin/lua/lua genbindings.lua
