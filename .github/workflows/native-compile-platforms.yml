@@ -214,7 +214,7 @@ jobs:
       - name: Download external libraries
         shell: bash
         run: |
-          git clone --branch test-swig --depth 1 https://github.com/cocos/cocos-engine-external native/external
+          git clone --branch test-swig --depth 1 https://github.com/dumganhar/cocos-engine-external native/external
 
       - name: Generate bindings
         run: |
