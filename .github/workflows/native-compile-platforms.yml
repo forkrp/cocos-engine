@@ -30,38 +30,38 @@ jobs:
         run: |
           EXT_VERSION=test-swig
           git clone --branch $EXT_VERSION --depth 1 https://github.com/dumganhar/cocos-engine-external native/external
-      # - name: Install deps
-      #   run: |
-      #     choco install --forcex86 vulkan-sdk
+      - name: Install deps
+        run: |
+          choco install --forcex86 vulkan-sdk
       - name: Generate bindings
         run: |
           cd ./native/tools/swig-config
           echo "Create auto-generated jsbinding glue codes."
           cmd.exe  /c '.\genbindings.bat'
-      # - name: Compile win64
-      #   shell: bash
-      #   env:
-      #     COCOS_ENGINE_DEV: 1
-      #   run: |
-      #     cd $GITHUB_WORKSPACE/templates/windows
-      #     echo "message(STATUS \"hook before \${CC_TARGET_NAME}\")" >> Pre-Sample.cmake
-      #     echo "message(STATUS \"hook after \${CC_TARGET_NAME}\")" >> Post-Sample.cmake
-      #     mkdir -p build-win64/proj
-      #     touch build-win64/proj/cfg.cmake
-      #     echo "set(CC_USE_GLES3 ON)" >> build-win64/proj/cfg.cmake
-      #     echo "set(CC_USE_VULKAN ON)" >> build-win64/proj/cfg.cmake
-      #     echo "set(CC_USE_GLES2 ON)" >> build-win64/proj/cfg.cmake
-      #     echo "set(USE_SPINE OFF)" >> build-win64/proj/cfg.cmake
-      #     echo "set(USE_DRAGONBONES OFF)" >> build-win64/proj/cfg.cmake
-      #     echo "set(USE_WEBSOCKET_SERVER ON)" >> build-win64/proj/cfg.cmake
-      #     echo "set(CMAKE_CXX_STANDARD_REQUIRED ON)" >> build-win64/proj/cfg.cmake
-      #     mkdir build-win64/assets
-      #     cd build-win64
-      #     RES_DIR=${GITHUB_WORKSPACE//\\//}/templates/windows/build-win64
-      #     COCOS_X_PATH=${GITHUB_WORKSPACE//\\//}/native
-      #     cmake ../ -G"Visual Studio 16 2019" -DRES_DIR=$RES_DIR -DCOCOS_X_PATH=$COCOS_X_PATH -Ax64
-      #     cmake --build . --config Release
-      #     echo "Compile Win64 Release Done!"
+      - name: Compile win64
+        shell: bash
+        env:
+          COCOS_ENGINE_DEV: 1
+        run: |
+          cd $GITHUB_WORKSPACE/templates/windows
+          echo "message(STATUS \"hook before \${CC_TARGET_NAME}\")" >> Pre-Sample.cmake
+          echo "message(STATUS \"hook after \${CC_TARGET_NAME}\")" >> Post-Sample.cmake
+          mkdir -p build-win64/proj
+          touch build-win64/proj/cfg.cmake
+          echo "set(CC_USE_GLES3 ON)" >> build-win64/proj/cfg.cmake
+          echo "set(CC_USE_VULKAN ON)" >> build-win64/proj/cfg.cmake
+          echo "set(CC_USE_GLES2 ON)" >> build-win64/proj/cfg.cmake
+          echo "set(USE_SPINE OFF)" >> build-win64/proj/cfg.cmake
+          echo "set(USE_DRAGONBONES OFF)" >> build-win64/proj/cfg.cmake
+          echo "set(USE_WEBSOCKET_SERVER ON)" >> build-win64/proj/cfg.cmake
+          echo "set(CMAKE_CXX_STANDARD_REQUIRED ON)" >> build-win64/proj/cfg.cmake
+          mkdir build-win64/assets
+          cd build-win64
+          RES_DIR=${GITHUB_WORKSPACE//\\//}/templates/windows/build-win64
+          COCOS_X_PATH=${GITHUB_WORKSPACE//\\//}/native
+          cmake ../ -G"Visual Studio 16 2019" -DRES_DIR=$RES_DIR -DCOCOS_X_PATH=$COCOS_X_PATH -Ax64
+          cmake --build . --config Release
+          echo "Compile Win64 Release Done!"
 
   # compile_android_minimal:
   #   name: "Android Minimal"
