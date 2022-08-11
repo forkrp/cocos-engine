@@ -92,11 +92,16 @@
 %import "base/TypeDef.h"
 %import "base/Ptr.h"
 %import "base/memory/Memory.h"
+%import "base/RefCounted.h"
 
+%import "renderer/gfx-base/GFXObject.h"
 %import "renderer/gfx-base/GFXDef-common.h"
 %import "renderer/gfx-base/GFXInputAssembler.h"
 
+%import "core/data/Object.h"
+%import "core/assets/Asset.h"
 %import "core/assets/Material.h"
+%import "core/scene-graph/BaseNode.h"
 %import "core/scene-graph/Node.h"
 
 %import "2d/renderer/StencilManager.h"
