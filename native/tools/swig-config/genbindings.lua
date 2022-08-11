@@ -44,6 +44,7 @@ print('SWIG_EXE: ' .. tostring(SWIG_EXE))
 for _, path in ipairs(all_paths) do
     if path ~= nil and not exists(path) then
         print(string.format('(%s) does not exist!', path))
+        os.exit(-2)
         return
     end
 end
