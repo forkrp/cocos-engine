@@ -100,6 +100,7 @@ for _, config in ipairs(swig_config_map) do
 	print('command execute returns: ' .. tostring(r))
 	if r ~= true then
 		print(string.format('ERROR: execute command (%s) failed!', command))
+        os.exit(-1)
 		break
 	end
 end
