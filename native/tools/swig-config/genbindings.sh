@@ -19,6 +19,10 @@ if [ "$host_os" == "linux" ]; then
     cc_host="linux"
 fi
 
+if [ "$host_os" == "darwin" ]; then
+    cc_host="mac"
+fi
+
 
 SWIG_ROOT=$COCOS_NATIVE_ROOT/external/${cc_host}/bin/swig
 export SWIG_EXE=$SWIG_ROOT/bin/swig
