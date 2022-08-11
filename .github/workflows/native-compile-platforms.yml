@@ -217,8 +217,9 @@ jobs:
           git clone --branch test-swig --depth 1 https://github.com/cocos/cocos-engine-external native/external
 
       - name: Generate bindings
-        cd ./native/tools/swig-config
-        ./genbindings.sh
+        run: |
+          cd ./native/tools/swig-config
+          ./genbindings.sh
       # - uses: nttld/setup-ndk@v1
       #   id: setup-ndk
       #   with:
