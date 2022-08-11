@@ -18,6 +18,7 @@ echo $COCOS_NATIVE_ROOT
 # mac
 
 if [ "$host_os" == "darwin" ]; then
+    cc_host="mac"
     # release
     SWIG_ROOT=$COCOS_NATIVE_ROOT/external/mac/bin/swig
     export SWIG_EXE=$SWIG_ROOT/bin/swig
@@ -34,6 +35,7 @@ fi
 # linux
 
 if [ "$host_os" == "linux" ]; then
+    cc_host="linux"
     # release
     SWIG_ROOT=$COCOS_NATIVE_ROOT/external/mac/bin/swig
     export SWIG_EXE=$SWIG_ROOT/bin/swig
@@ -47,4 +49,5 @@ if [ "$host_os" == "linux" ]; then
     # export SWIG_LIB3=$SWIG_ROOT/Lib
 fi
 
-./lua-${host_os} genbindings.lua
+
+$COCOS_NATIVE_ROOT/external/${cc_host}/bin/lua/lua genbindings.lua

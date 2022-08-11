@@ -12,4 +12,4 @@ set SWIG_ROOT=%COCOS_NATIVE_ROOT%/external/win64/bin/swig
 set SWIG_EXE=%SWIG_ROOT%/bin/swig.exe
 set SWIG_LIB=%SWIG_ROOT%/share/swig/4.1.0
 
-.\lua.exe genbindings.lua
+%COCOS_NATIVE_ROOT%/external/win64/bin/lua/lua.exe genbindings.lua
