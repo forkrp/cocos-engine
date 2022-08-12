@@ -23,8 +23,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __cocos2d_libs__CCEventAssetsManagerEx__
-#define __cocos2d_libs__CCEventAssetsManagerEx__
+#pragma once
 
 #include <string>
 #include "base/RefCounted.h"
@@ -111,4 +110,3 @@ private:
 
 NS_CC_EXT_END
 
-#endif /* defined(__cocos2d_libs__CCEventAssetsManagerEx__) */

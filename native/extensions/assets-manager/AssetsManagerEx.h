@@ -24,8 +24,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#ifndef __AssetsManagerEx__
-#define __AssetsManagerEx__
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -411,5 +410,3 @@ private:
 };
 
 NS_CC_EXT_END
-
-#endif /* defined(__AssetsManagerEx__) */
