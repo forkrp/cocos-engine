@@ -23,13 +23,11 @@ jobs:
         with:
           ndk-version: r21e
           add-to-path: false
-      - name: Run genbindings.py
-        env:
-          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      - name: Run genbindings.sh
         run: |
-          python3 -m pip install PyYAML==5.4.1 Cheetah3
-          python3 ./native/tools/tojs/genbindings.py
-          rm ./native/tools/tojs/userconf.ini
+          cd ./native/tools/swig-config
+          ./genbindings.sh
+          git status
       - name: Update builtin-res 
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
