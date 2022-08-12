@@ -1,5 +1,10 @@
+// Define module
+// target_namespace means the name exported to JS, could be same as which in other modules
+// engine at the last means the suffix of binding function name, different modules should use unique name
+// Note: doesn't support number prefix
 %module(target_namespace="jsb") engine
 
+// Insert code at the beginning of generated header file (.h)
 %insert(header_file) %{
 #pragma once
 #include "bindings/jswrapper/SeApi.h"
@@ -15,20 +20,27 @@
 #include "profiler/DebugRenderer.h"
 %}
 
+// Insert code at the beginning of generated source file (.cpp)
 %{
 #include "bindings/auto/jsb_cocos_auto.h"
 #include "bindings/auto/jsb_gfx_auto.h"
 %}
 
-%rename(_destroy) cc::CCObject::destroy;
-%rename(_destroyImmediate) cc::CCObject::destroyImmediate;
+// ----- Ignore Section Begin ------
+// Brief: Classes, methods or attributes need to be ignored
+//
+// Usage:
+//
+//  %ignore your_namespace::your_class_name;
+//  %ignore your_namespace::your_class_name::your_method_name;
+//  %ignore your_namespace::your_class_name::your_attribute_name;
+//
+// Note: 
+//  1. 'Ignore Section' should be placed before attribute definition and %import/%include
+//  2. namespace is needed
+//
 
 namespace cc {
-
-// %rename(CanvasRenderingContext2D) ICanvasRenderingContext2D;
-// %rename(CanvasGradient) ICanvasGradient;
-%rename(PlistParser) SAXParser;
-
 %ignore ICanvasRenderingContext2D::Delegate;
 %ignore ICanvasRenderingContext2D::setCanvasBufferUpdatedCallback;
 %ignore ICanvasRenderingContext2D::fillText;
@@ -69,6 +81,58 @@ namespace cc {
 
 }
 
+
+
+// ----- Rename Section ------
+// Brief: Classes, methods or attributes needs to be renamed
+//
+// Usage:
+//
+//  %rename(rename_to_name) your_namespace::original_class_name;
+//  %rename(rename_to_name) your_namespace::original_class_name::method_name;
+//  %rename(rename_to_name) your_namespace::original_class_name::attribute_name;
+// 
+// Note:
+//  1. 'Rename Section' should be placed before attribute definition and %import/%include
+//  2. namespace is needed
+
+%rename(_destroy) cc::CCObject::destroy;
+%rename(_destroyImmediate) cc::CCObject::destroyImmediate;
+// %rename(CanvasRenderingContext2D) cc::ICanvasRenderingContext2D;
+// %rename(CanvasGradient) cc::ICanvasGradient;
+%rename(PlistParser) cc::SAXParser;
+
+
+
+// ----- Module Macro Section ------
+// Brief: Generated code should be wrapped inside a macro
+// Usage:
+//  1. Configure for class
+//    %module_macro(CC_USE_GEOMETRY_RENDERER) cc::pipeline::GeometryRenderer;
+//  2. Configure for member function or attribute
+//    %module_macro(CC_USE_GEOMETRY_RENDERER) cc::pipeline::RenderPipeline::geometryRenderer;
+// Note: Should be placed before 'Attribute Section'
+
+%module_macro(CC_USE_DEBUG_RENDERER) cc::DebugTextInfo;
+%module_macro(CC_USE_DEBUG_RENDERER) cc::DebugRenderer;
+
+
+// ----- Attribute Section ------
+// Brief: Define attributes ( JS properties with getter and setter )
+// Usage:
+//  1. Define an attribute without setter
+//    %attribute(your_namespace::your_class_name, cpp_member_variable_type, js_property_name, cpp_getter_name)
+//  2. Define an attribute with getter and setter
+//    %attribute(your_namespace::your_class_name, cpp_member_variable_type, js_property_name, cpp_getter_name, cpp_setter_name)
+//  3. Define an attribute without getter
+//    %attribute_writeonly(your_namespace::your_class_name, cpp_member_variable_type, js_property_name, cpp_setter_name)
+//
+// Note:
+//  1. Don't need to add 'const' prefix for cpp_member_variable_type 
+//  2. The return type of getter should keep the same as the type of setter's parameter
+//  3. If using reference, add '&' suffix for cpp_member_variable_type to avoid generated code using value assignment
+//  4. 'Attribute Section' should be placed before 'Import Section' and 'Include Section'
+//
 %attribute_writeonly(cc::ICanvasRenderingContext2D, float, width, setWidth);
 %attribute_writeonly(cc::ICanvasRenderingContext2D, float, height, setHeight);
 %attribute_writeonly(cc::ICanvasRenderingContext2D, float, lineWidth, setLineWidth);
@@ -86,9 +150,11 @@ namespace cc {
 %attribute(cc::CCObject, bool, replicated, isReplicated, setReplicated);
 %attribute(cc::CCObject, bool, isValid, isValid);
 
-%module_macro(CC_USE_DEBUG_RENDERER) cc::DebugTextInfo;
-%module_macro(CC_USE_DEBUG_RENDERER) cc::DebugRenderer;
-
+// ----- Import Section ------
+// Brief: Import header files which are depended by 'Include Section'
+// Note: 
+//   %import "your_header_file.h" will not generate code for that header file
+//
 %import "base/Macros.h"
 %import "base/memory/Memory.h"
 %import "base/Data.h"
@@ -101,6 +167,10 @@ namespace cc {
 %import "platform/interfaces/modules/ISystem.h"
 %import "platform/interfaces/modules/INetwork.h"
 
+
+
+// ----- Include Section ------
+// Brief: Include header files in which classes and methods will be bound
 %include "core/data/Object.h"
 %include "core/data/JSBNativeDataHolder.h"
 

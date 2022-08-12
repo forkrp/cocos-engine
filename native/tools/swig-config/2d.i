@@ -1,6 +1,7 @@
 // Define module
-// target_namespace means the name exported to JS
-// native2d at the last means the suffix of binding function name
+// target_namespace means the name exported to JS, could be same as which in other modules
+// native2d at the last means the suffix of binding function name, different modules should use unique name
+// Note: doesn't support number prefix
 %module(target_namespace="n2d") native2d
 
 // Insert code at the beginning of generated header file (.h)
@@ -23,7 +24,7 @@
 #include "bindings/auto/jsb_assets_auto.h"
 %}
 
-// ----- Ignore Section Begin ------
+// ----- Ignore Section ------
 // Brief: Classes, methods or attributes need to be ignored
 //
 // Usage:
@@ -89,9 +90,7 @@
 %ignore cc::RenderEntity::getVBColorDirty;
 %ignore cc::RenderEntity::setVBColorDirty;
 
-// ----- Ignore Section End ------
-
-// ----- Rename Section Begin ------
+// ----- Rename Section ------
 // Brief: Classes, methods or attributes needs to be renamed
 //
 // Usage:
@@ -104,9 +103,20 @@
 //  1. 'Rename Section' should be placed before attribute definition and %import/%include
 //  2. namespace is needed
 
-// ----- Rename Section End ------
 
-// ----- Attribute Section Begin ------
+// ----- Module Macro Section ------
+// Brief: Generated code should be wrapped inside a macro
+// Usage:
+//  1. Configure for class
+//    %module_macro(CC_USE_GEOMETRY_RENDERER) cc::pipeline::GeometryRenderer;
+//  2. Configure for member function or attribute
+//    %module_macro(CC_USE_GEOMETRY_RENDERER) cc::pipeline::RenderPipeline::geometryRenderer;
+// Note: Should be placed before 'Attribute Section'
+
+// Write your code bellow
+
+
+// ----- Attribute Section ------
 // Brief: Define attributes ( JS properties with getter and setter )
 // Usage:
 //  1. Define an attribute without setter
@@ -121,7 +131,7 @@
 //  2. The return type of getter should keep the same as the type of setter's parameter
 //  3. If using reference, add '&' suffix for cpp_member_variable_type to avoid generated code using value assignment
 //  4. 'Attribute Section' should be placed before 'Import Section' and 'Include Section'
-//   
+//
 %attribute(cc::UIMeshBuffer, float*, vData, getVData, setVData);
 %attribute(cc::UIMeshBuffer, uint16_t*, iData, getIData, setIData);
 %attribute(cc::UIMeshBuffer, bool, useLinkData, getUseLinkData, setUseLinkData);
@@ -140,9 +150,7 @@
 %attribute(cc::RenderEntity, uint32_t, staticDrawInfoSize, getStaticDrawInfoSize, setStaticDrawInfoSize);
 %attribute(cc::RenderEntity, uint32_t, stencilStage, getStencilStage, setStencilStage);
 
-// ----- Attribute Section End ------
-
-// ----- Import Section Begin ------
+// ----- Import Section ------
 // Brief: Import header files which are depended by 'Include Section'
 // Note: 
 //   %import "your_header_file.h" will not generate code for that header file
@@ -166,14 +174,10 @@
 %import "2d/renderer/StencilManager.h"
 %import "math/Color.h"
 
-// ----- Import Section End ------
-
-// ----- Include Section Begin ------
+// ----- Include Section ------
 // Brief: Include header files in which classes and methods will be bound
 %include "2d/renderer/UIMeshBuffer.h"
 %include "2d/renderer/RenderDrawInfo.h"
 %include "2d/renderer/RenderEntity.h"
 %include "2d/renderer/UIModelProxy.h"
 %include "2d/renderer/Batcher2d.h"
-
-// ----- Include Section End ------
