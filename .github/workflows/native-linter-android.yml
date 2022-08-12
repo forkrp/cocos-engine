@@ -34,7 +34,7 @@ jobs:
       - name: Download external
         run: |
           EXT_VERSION=test-swig
-          git clone --branch $EXT_VERSION --depth 1 https://github.com/cocos-creator/engine-native-external native/external
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/dumganhar/cocos-engine-external native/external
       - uses: nttld/setup-ndk@v1
         id: setup-ndk
         with:
