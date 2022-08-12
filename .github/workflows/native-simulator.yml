@@ -2,6 +2,7 @@ name: <Native> Simulator
 
 #on: [pull_request]
 on:
+  push:
   pull_request:
     paths:
     - 'native/**'
@@ -23,16 +24,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.x"
-
       - name: npm install
         run: |
           npm install
-      - name: download external libraries
+      # - name: download external libraries
+      #   run: |
+      #     node ./utils/download-deps.js
+
+      - name: Download external libraries
+        shell: bash
         run: |
-          node ./utils/download-deps.js
+          EXT_VERSION=test-swig
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/dumganhar/cocos-engine-external external
+
       - name: install vulkan-sdk
         run: |
           choco install vulkan-sdk
@@ -62,9 +66,15 @@ jobs:
         run: |
           npm install
           npm install gulp -g
+      # - name: Download external libraries
+      #   run: |
+      #     node ./utils/download-deps.js
+
       - name: Download external libraries
         run: |
-          node ./utils/download-deps.js
+          EXT_VERSION=test-swig
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/dumganhar/cocos-engine-external external
+
       - name: Generate bindings
         run: |
           cd ./tools/swig-config

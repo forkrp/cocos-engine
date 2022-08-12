@@ -1,6 +1,7 @@
 name: <Native> Run Tests
 
 on:
+  push:
   pull_request:
     paths:
     - 'templates/**'
@@ -22,11 +23,16 @@ jobs:
         working-directory: ${{github.workspace}}/native
     steps:
       - uses: actions/checkout@v2
-      - name: Downlad external libraties
+      # - name: Downlad external libraties
+      #   run: |
+      #     npm install
+      #     npm install gulp -g
+      #     node ./utils/download-deps.js
+    - name: Download external libraries
+        shell: bash
         run: |
-          npm install
-          npm install gulp -g
-          node ./utils/download-deps.js
+          EXT_VERSION=test-swig
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/dumganhar/cocos-engine-external external
       - name: Generate bindings
         run: |
           cd ./tools/swig-config
@@ -57,11 +63,17 @@ jobs:
         working-directory: ${{github.workspace}}/native
     steps:
       - uses: actions/checkout@v2
-      - name: Downlad external libraties
+      # - name: Downlad external libraties
+      #   run: |
+      #     npm install
+      #     npm install gulp -g
+      #     node ./utils/download-deps.js
+
+      - name: Download external libraries
+        shell: bash
         run: |
-          npm install
-          npm install gulp -g
-          node ./utils/download-deps.js
+          EXT_VERSION=test-swig
+          git clone --branch $EXT_VERSION --depth 1 https://github.com/dumganhar/cocos-engine-external external
 
       - name: Generate bindings
         run: |
