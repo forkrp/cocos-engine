@@ -1,5 +1,9 @@
+// Define module
+// target_namespace means the name exported to JS
+// native2d at the last means the suffix of binding function name
 %module(target_namespace="n2d") native2d
 
+// Insert code at the beginning of generated header file (.h)
 %insert(header_file) %{
 #pragma once
 #include "bindings/jswrapper/SeApi.h"
@@ -11,12 +15,27 @@
 #include "2d/renderer/UIModelProxy.h"
 %}
 
+// Insert code at the beginning of generated source file (.cpp)
 %{
 #include "bindings/auto/jsb_2d_auto.h"
 #include "bindings/auto/jsb_scene_auto.h"
 #include "bindings/auto/jsb_gfx_auto.h"
 #include "bindings/auto/jsb_assets_auto.h"
 %}
+
+// ----- Ignore Section Begin ------
+// Brief: Classes, methods or attributes need to be ignored
+//
+// Usage:
+//
+//  %ignore your_namespace::your_class_name;
+//  %ignore your_namespace::your_class_name::your_method_name;
+//  %ignore your_namespace::your_class_name::your_attribute_name;
+//
+// Note: 
+//  1. 'Ignore Section' should be placed before attribute definition and %import/%include
+//  2. namespace is needed
+//
 
 %ignore UserData;
 
@@ -70,6 +89,39 @@
 %ignore cc::RenderEntity::getVBColorDirty;
 %ignore cc::RenderEntity::setVBColorDirty;
 
+// ----- Ignore Section End ------
+
+// ----- Rename Section Begin ------
+// Brief: Classes, methods or attributes needs to be renamed
+//
+// Usage:
+//
+//  %rename(rename_to_name) your_namespace::original_class_name;
+//  %rename(rename_to_name) your_namespace::original_class_name::method_name;
+//  %rename(rename_to_name) your_namespace::original_class_name::attribute_name;
+// 
+// Note:
+//  1. 'Rename Section' should be placed before attribute definition and %import/%include
+//  2. namespace is needed
+
+// ----- Rename Section End ------
+
+// ----- Attribute Section Begin ------
+// Brief: Define attributes ( JS properties with getter and setter )
+// Usage:
+//  1. Define an attribute without setter
+//    %attribute(your_namespace::your_class_name, cpp_member_variable_type, js_property_name, cpp_getter_name)
+//  2. Define an attribute with getter and setter
+//    %attribute(your_namespace::your_class_name, cpp_member_variable_type, js_property_name, cpp_getter_name, cpp_setter_name)
+//  3. Define an attribute without getter
+//    %attribute_writeonly(your_namespace::your_class_name, cpp_member_variable_type, js_property_name, cpp_setter_name)
+//
+// Note:
+//  1. Don't need to add 'const' prefix for cpp_member_variable_type 
+//  2. The return type of getter should keep the same as the type of setter's parameter
+//  3. If using reference, add '&' suffix for cpp_member_variable_type to avoid generated code using value assignment
+//  4. 'Attribute Section' should be placed before 'Import Section' and 'Include Section'
+//   
 %attribute(cc::UIMeshBuffer, float*, vData, getVData, setVData);
 %attribute(cc::UIMeshBuffer, uint16_t*, iData, getIData, setIData);
 %attribute(cc::UIMeshBuffer, bool, useLinkData, getUseLinkData, setUseLinkData);
@@ -88,6 +140,13 @@
 %attribute(cc::RenderEntity, uint32_t, staticDrawInfoSize, getStaticDrawInfoSize, setStaticDrawInfoSize);
 %attribute(cc::RenderEntity, uint32_t, stencilStage, getStencilStage, setStencilStage);
 
+// ----- Attribute Section End ------
+
+// ----- Import Section Begin ------
+// Brief: Import header files which are depended by 'Include Section'
+// Note: 
+//   %import "your_header_file.h" will not generate code for that header file
+//
 %import "base/Macros.h"
 %import "base/TypeDef.h"
 %import "base/Ptr.h"
@@ -107,8 +166,14 @@
 %import "2d/renderer/StencilManager.h"
 %import "math/Color.h"
 
+// ----- Import Section End ------
+
+// ----- Include Section Begin ------
+// Brief: Include header files in which classes and methods will be bound
 %include "2d/renderer/UIMeshBuffer.h"
 %include "2d/renderer/RenderDrawInfo.h"
 %include "2d/renderer/RenderEntity.h"
 %include "2d/renderer/UIModelProxy.h"
 %include "2d/renderer/Batcher2d.h"
+
+// ----- Include Section End ------
