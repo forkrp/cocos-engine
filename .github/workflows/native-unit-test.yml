@@ -28,7 +28,7 @@ jobs:
       #     npm install
       #     npm install gulp -g
       #     node ./utils/download-deps.js
-    - name: Download external libraries
+      - name: Download external libraries
         shell: bash
         run: |
           EXT_VERSION=test-swig
