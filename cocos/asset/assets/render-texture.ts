@@ -30,6 +30,7 @@ import { Texture, ColorAttachment, DepthStencilAttachment, GeneralBarrierInfo, A
 import { RenderWindow, IRenderWindowInfo } from '../../render-scene/core/render-window';
 import { Root } from '../../root';
 import { TextureBase } from './texture-base';
+import { IArchive } from '../../core/serialization';
 
 export interface IRenderTextureCreateInfo {
     name?: string;
@@ -138,6 +139,13 @@ export class RenderTexture extends TextureBase {
         super._deserialize(data.base, handle);
     }
 
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._width = ar.uint32(this._width, 'w');
+        this._height = ar.uint32(this._height, 'h');
+        this._name = ar.str(this._name, 'n');
+    }
+
     // To be compatible with material property interface
     /**
      * @en Gets the related [[gfx.Texture]] resource, it's also the color attachment for the render window
@@ -208,7 +216,7 @@ export class RenderTexture extends TextureBase {
      * @param height @en The pixel height @zh 像素高度
      * @param buffer @en The buffer to hold pixel data @zh 像素缓存
      */
-    public readPixels (x = 0, y = 0, width?: number, height?: number, buffer?: Uint8Array) : Uint8Array | null {
+    public readPixels (x = 0, y = 0, width?: number, height?: number, buffer?: Uint8Array): Uint8Array | null {
         width = width || this.width;
         height = height || this.height;
         const gfxTexture = this.getGFXTexture();

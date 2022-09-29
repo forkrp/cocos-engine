@@ -1,8 +1,8 @@
 /****************************************************************************
  Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos.com
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
@@ -10,10 +10,10 @@
  not use Cocos Creator software for developing other software or tools that's
  used for developing games. You are not granted to publish, distribute,
  sublicense, and/or sell copies of Cocos Creator.
- 
+
  The software or tools in this License Agreement are licensed, not sold.
  Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,10 +29,26 @@
 #include "core/scene-graph/Node.h"
 #include "scene/Pass.h"
 
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
+
 namespace cc {
 namespace scene {
 
 // ShadowInfo
+
+CC_IMPL_SERIALIZE(ShadowsInfo)
+
+template <class Archive>
+void ShadowsInfo::serialize(Archive &ar) {
+    CC_SERIALIZE(_enabled);
+    CC_SERIALIZE(_type);
+    CC_SERIALIZE(_normal);
+    CC_SERIALIZE(_distance);
+    CC_SERIALIZE(_shadowColor);
+    CC_SERIALIZE(_maxReceived);
+    CC_SERIALIZE(_size);
+}
 
 void ShadowsInfo::setEnabled(bool val) {
     if (_enabled == val) {

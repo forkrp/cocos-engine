@@ -31,6 +31,7 @@
 #include "base/RefCounted.h"
 #include "core/Root.h"
 #include "core/assets/TextureCube.h"
+#include "serialization/ISerializable.h"
 
 namespace cc {
 
@@ -75,7 +76,8 @@ class Skybox;
  */
 // @ccclass('cc.SkyboxInfo')
 // @help('i18n:cc.Skybox')
-class SkyboxInfo : public RefCounted {
+class SkyboxInfo : public RefCounted, public ISerializable {
+    CC_DECLARE_SERIALIZE()
 public:
     SkyboxInfo(/* args */);
     ~SkyboxInfo() override;

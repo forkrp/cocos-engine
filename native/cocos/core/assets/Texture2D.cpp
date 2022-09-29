@@ -170,45 +170,6 @@ void Texture2D::releaseTexture() {
     destroy();
 }
 
-ccstd::any Texture2D::serialize(const ccstd::any & /*ctxForExporting*/) {
-    //    if (EDITOR || TEST) {
-    //        return {
-    //            base: super._serialize(ctxForExporting),
-    //            mipmaps: this._mipmaps.map((mipmap) => {
-    //                if (!mipmap || !mipmap._uuid) {
-    //                    return null;
-    //                }
-    //                if (ctxForExporting && ctxForExporting._compressUuid) {
-    //                    // ctxForExporting.dependsOn('_textureSource', texture); TODO
-    //                    return EditorExtends.UuidUtils.compressUuid(mipmap._uuid, true);
-    //                }
-    //                return mipmap._uuid;
-    //            }),
-    //        };
-    //    }
-    return nullptr;
-}
-
-void Texture2D::deserialize(const ccstd::any &serializedData, const ccstd::any &handle) {
-    const auto *data = ccstd::any_cast<ITexture2DSerializeData>(&serializedData);
-    if (data == nullptr) {
-        CC_LOG_WARNING("serializedData is not ITexture2DSerializeData");
-        return;
-    }
-    Super::deserialize(data->base, handle);
-
-    _mipmaps.resize(data->mipmaps.size());
-    for (size_t i = 0; i < data->mipmaps.size(); ++i) {
-        // Prevent resource load failed
-        _mipmaps[i] = ccnew ImageAsset();
-        if (data->mipmaps[i].empty()) {
-            continue;
-        }
-        ccstd::string mipmapUUID = data->mipmaps[i];
-        //cjh TODO:        handle.result.push(this._mipmaps, `${i}`, mipmapUUID, js.getClassId(ImageAsset));
-    }
-}
-
 gfx::TextureInfo Texture2D::getGfxTextureCreateInfo(gfx::TextureUsageBit usage, gfx::Format format, uint32_t levelCount, gfx::TextureFlagBit flags) {
     gfx::TextureInfo texInfo;
     texInfo.type = gfx::TextureType::TEX2D;

@@ -28,6 +28,7 @@ import { Asset } from '../assets/asset';
 import { MissingScript } from '../../misc/missing-script';
 import { deserialize, Details } from '../../serialization/deserialize';
 import { error, js } from '../../core';
+import { JsonInputArchive } from '../serialization';
 import { dependMap, nativeDependMap } from './depend-maps';
 import { decodeUuid } from './helper';
 
@@ -61,10 +62,18 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
 
     let asset: Asset;
     try {
-        asset = deserialize(json, tdInfo, {
-            classFinder,
-            customEnv: options,
-        }) as Asset;
+        if ((Array.isArray(json) && json[0].__type__ === 'cc.SceneAsset') || json.__type__ === 'cc.EffectAsset' || json.__type__ === 'cc.Material') {
+            const ar = new JsonInputArchive();
+            asset = ar.start(json, tdInfo, {
+                classFinder,
+                customEnv: options,
+            }) as Asset;
+        } else {
+            asset = deserialize(json, tdInfo, {
+                classFinder,
+                customEnv: options,
+            }) as Asset;
+        }
     } catch (e) {
         error(e);
         Details.pool.put(tdInfo);

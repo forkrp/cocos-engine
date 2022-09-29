@@ -39,6 +39,8 @@ import { Texture } from '../../gfx';
 import { builtinResMgr } from '../../asset/asset-manager/builtin-res-mgr';
 import { settings, Settings } from '../../core/settings';
 
+import { IArchive, ISerializable } from '../../core/serialization';
+
 const { property, ccclass, help, executeInEditMode, executionOrder, menu, tooltip, visible, type,
     formerlySerializedAs, serializable, editable, disallowAnimation } = _decorator;
 
@@ -103,7 +105,7 @@ export enum ReflectionProbeType {
  * @zh 模型烘焙设置
  */
 @ccclass('cc.ModelBakeSettings')
-class ModelBakeSettings extends EventTarget {
+class ModelBakeSettings extends EventTarget implements ISerializable {
     /**
      * @en The event which will be triggered when the useLightProbe is changed.
      * @zh useLightProbe属性修改时触发的事件
@@ -132,6 +134,7 @@ class ModelBakeSettings extends EventTarget {
     protected _castShadow = false;
     @formerlySerializedAs('_recieveShadow')
     protected _receiveShadow = false;
+
     @serializable
     protected _lightmapSize = 64;
 
@@ -147,6 +150,21 @@ class ModelBakeSettings extends EventTarget {
     @serializable
     public _probeCubemap: TextureCube | null = null;
     public _probePlanarmap: Texture | null = null;
+
+    serialize (ar: IArchive): void {
+        this.texture = ar.serializableObj(this.texture, 'texture');
+        this.uvParam = ar.serializableObj(this.uvParam, 'uvParam');
+        this._bakeable = ar.boolean(this._bakeable, '_bakeable');
+        this._castShadow = ar.boolean(this._castShadow, '_castShadow');
+        this._receiveShadow = ar.boolean(this._receiveShadow, '_receiveShadow');
+        this._receiveShadow = ar.boolean(this._receiveShadow, '_recieveShadow');
+        this._lightmapSize = ar.uint16(this._lightmapSize, '_lightmapSize');
+        this._useLightProbe = ar.boolean(this._useLightProbe, '_useLightProbe');
+        this._bakeToLightProbe = ar.boolean(this._bakeToLightProbe, '_bakeToLightProbe');
+        this._reflectionProbeType = ar.uint8(this._reflectionProbeType, '_reflectionProbeType');
+        this._bakeToReflectionProbe = ar.boolean(this._bakeToReflectionProbe, '_bakeToReflectionProbe');
+        this._probeCubemap = ar.serializableObj(this._probeCubemap, '_probeCubemap');
+    }
 
     /**
      * @en Whether the model is static and bake-able with light map.
@@ -320,6 +338,17 @@ export class MeshRenderer extends ModelRenderer {
 
     // @serializable
     private _subMeshShapesWeights: number[][] = [];
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this.bakeSettings = ar.serializableObj(this.bakeSettings, 'bakeSettings');
+        this._mesh = ar.serializableObj(this._mesh, '_mesh');
+        this._shadowCastingMode = ar.uint8(this._shadowCastingMode, '_shadowCastingMode');
+        this._shadowReceivingMode = ar.uint8(this._shadowReceivingMode, '_shadowReceivingMode');
+        this._shadowBias = ar.float32(this._shadowBias, '_shadowBias');
+        this._shadowNormalBias = ar.float32(this._shadowNormalBias, '_shadowNormalBias');
+        this._enableMorph = ar.boolean(this._enableMorph, '_enableMorph');
+    }
 
     /**
      * @en Local shadow bias for real time lighting.

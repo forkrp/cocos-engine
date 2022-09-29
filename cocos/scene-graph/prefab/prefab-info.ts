@@ -5,6 +5,7 @@ import { Prefab } from './prefab';
 import { CCObject } from '../../core/data';
 import { Component } from '../component';
 import { Node } from '../node';
+import { IArchive, ISerializable } from '../../serialization';
 
 function compareStringArray (array1: string[] | undefined, array2: string[] | undefined) {
     if (!array1 || !array2) {
@@ -19,13 +20,17 @@ function compareStringArray (array1: string[] | undefined, array2: string[] | un
 }
 
 @ccclass('cc.TargetInfo')
-export class TargetInfo {
+export class TargetInfo implements ISerializable {
     // as the target's fileId in prefab asset,used to find the target when prefab expanded.
     @serializable
     public localID: string[] = [];
+
+    serialize (ar: IArchive): void {
+        this.localID = ar.strArray(this.localID, 'localID');
+    }
 }
 @ccclass('cc.TargetOverrideInfo')
-export class TargetOverrideInfo {
+export class TargetOverrideInfo implements ISerializable {
     @serializable
     @type(CCObject)
     public source: Component | Node | null = null;
@@ -42,18 +47,30 @@ export class TargetOverrideInfo {
     @serializable
     @type(TargetInfo)
     public targetInfo: TargetInfo | null = null;
+
+    serialize (ar: IArchive): void {
+        this.source = ar.serializableObj(this.source, 'source');
+        this.sourceInfo = ar.serializableObj(this.sourceInfo, 'sourceInfo');
+        this.propertyPath = ar.strArray(this.propertyPath, 'propertyPath');
+        this.target = ar.serializableObj(this.target, 'target');
+        this.targetInfo = ar.serializableObj(this.targetInfo, 'targetInfo');
+    }
 }
 
 @ccclass('cc.CompPrefabInfo')
-export class CompPrefabInfo {
+export class CompPrefabInfo implements ISerializable {
     // To identify current component in a prefab asset, so only needs to be unique.
     @serializable
     @editable
     public fileId = '';
+
+    serialize (ar: IArchive): void {
+        this.fileId = ar.str(this.fileId, 'fileId');
+    }
 }
 
 @ccclass('CCPropertyOverrideInfo')
-export class PropertyOverrideInfo {
+export class PropertyOverrideInfo implements ISerializable {
     @serializable
     @type(TargetInfo)
     public targetInfo: TargetInfo | null = null;
@@ -69,10 +86,16 @@ export class PropertyOverrideInfo {
                 && compareStringArray(this.propertyPath, propPath);
         }
     }
+
+    serialize (ar: IArchive): void {
+        this.targetInfo = ar.serializableObj(this.targetInfo, 'targetInfo');
+        this.propertyPath = ar.strArray(this.propertyPath, 'propertyPath');
+        this.value = ar.anyValue(this.value, 'value');
+    }
 }
 
 @ccclass('cc.MountedChildrenInfo')
-export class MountedChildrenInfo {
+export class MountedChildrenInfo implements ISerializable {
     @serializable
     @type(TargetInfo)
     public targetInfo: TargetInfo | null = null;
@@ -86,10 +109,15 @@ export class MountedChildrenInfo {
             return compareStringArray(this.targetInfo?.localID, localID);
         }
     }
+
+    serialize (ar: IArchive): void {
+        this.targetInfo = ar.serializableObj(this.targetInfo, 'targetInfo');
+        this.nodes = ar.serializableObjArray(this.nodes, 'nodes');
+    }
 }
 
 @ccclass('cc.MountedComponentsInfo')
-export class MountedComponentsInfo {
+export class MountedComponentsInfo implements ISerializable {
     @serializable
     @type(TargetInfo)
     public targetInfo: TargetInfo | null = null;
@@ -103,6 +131,11 @@ export class MountedComponentsInfo {
             return compareStringArray(this.targetInfo?.localID, localID);
         }
     }
+
+    serialize (ar: IArchive): void {
+        this.targetInfo = ar.serializableObj(this.targetInfo, 'targetInfo');
+        this.components = ar.serializableObjArray(this.components, 'components');
+    }
 }
 
 /**
@@ -110,7 +143,7 @@ export class MountedComponentsInfo {
  * @internal
  */
 @ccclass('cc.PrefabInstance')
-export class PrefabInstance {
+export class PrefabInstance implements ISerializable {
     // Identify current prefabInstance;
     @serializable
     public fileId = '';
@@ -172,19 +205,28 @@ export class PrefabInstance {
             }
         }
     }
+
+    serialize (ar: IArchive): void {
+        this.fileId = ar.str(this.fileId, 'fileId');
+        this.prefabRootNode = ar.serializableObj(this.prefabRootNode, 'prefabRootNode');
+        this.mountedChildren = ar.serializableObjArray(this.mountedChildren, 'mountedChildren');
+        this.mountedComponents = ar.serializableObjArray(this.mountedComponents, 'mountedComponents');
+        this.propertyOverrides = ar.serializableObjArray(this.propertyOverrides, 'propertyOverrides');
+        this.removedComponents = ar.serializableObjArray(this.removedComponents, 'removedComponents');
+    }
 }
 
 @ccclass('cc.PrefabInfo')
-export class PrefabInfo {
+export class PrefabInfo implements ISerializable {
     // the most top node of this prefab in the scene
     @serializable
     @type(Node)
-    public root?: Node;
+    public root: Node | null = null;
 
     // reference to the prefab asset file.
     // In Editor, only asset._uuid is usable because asset will be changed.
     @serializable
-    public asset?: Prefab;
+    public asset: Prefab | null = null;
 
     // prefabInfo's id,unique in the asset.
     @serializable
@@ -194,16 +236,25 @@ export class PrefabInfo {
     // Instance of a prefabAsset
     @serializable
     @type(PrefabInstance)
-    public instance?: PrefabInstance;
+    public instance: PrefabInstance | null = null;
 
     @serializable
     @type([TargetOverrideInfo])
-    public targetOverrides?: TargetOverrideInfo[];
+    public targetOverrides: TargetOverrideInfo[] = [];
 
     // record outMost prefabInstance nodes in descendants
     // collected when saving sceneAsset or prefabAsset
     @serializable
-    public nestedPrefabInstanceRoots?: Node[];
+    public nestedPrefabInstanceRoots: Node[] = [];
+
+    public serialize (ar: IArchive): void {
+        this.root = ar.serializableObj(this.root, 'root');
+        this.asset = ar.serializableObj(this.asset, 'asset');
+        this.fileId = ar.str(this.fileId, 'fileId');
+        this.instance = ar.serializableObj(this.instance, 'instance');
+        this.targetOverrides = ar.serializableObjArray(this.targetOverrides, 'targetOverrides');
+        this.nestedPrefabInstanceRoots = ar.serializableObjArray(this.nestedPrefabInstanceRoots, 'nestedPrefabInstanceRoots');
+    }
 }
 
 cclegacy._PrefabInfo = PrefabInfo;

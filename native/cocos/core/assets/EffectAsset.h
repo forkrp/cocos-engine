@@ -38,12 +38,15 @@
 #include "renderer/gfx-base/GFXDef.h"
 #include "renderer/pipeline/Define.h"
 
+#include "serialization/SerializationTrait.h"
 
 namespace cc {
 
 using IPropertyHandleInfo = std::tuple<ccstd::string, uint32_t, gfx::Type>;
 
-using IPropertyValue = ccstd::optional<ccstd::variant<ccstd::vector<float>, ccstd::string>>;
+using IPropertyValueInternal = ccstd::variant<ccstd::vector<float>, ccstd::string>;
+using IPropertyValue = ccstd::optional<IPropertyValueInternal>;
+
 
 using IPropertyEditorValueType = ccstd::variant<ccstd::monostate, ccstd::string, bool, float, ccstd::vector<float>>;
 using IPropertyEditorInfo = ccstd::unordered_map<ccstd::string, IPropertyEditorValueType>;
@@ -55,6 +58,15 @@ struct IPropertyInfo {
     IPropertyValue value;                            // default value
     ccstd::optional<bool> linear;                    // whether to convert the input to linear space first before applying
     IPropertyEditorInfo editor; // NOTE: used only by editor.
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(type);
+        CC_SERIALIZE(handleInfo);
+        CC_SERIALIZE(samplerHash);
+        CC_SERIALIZE(value);
+        CC_SERIALIZE(linear);
+    }
 };
 
 struct IPassInfoFull;
@@ -74,6 +86,24 @@ struct RasterizerStateInfo {
     ccstd::optional<float> depthBiasClamp;
     ccstd::optional<float> depthBiasSlop;
     ccstd::optional<float> lineWidth;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(isDiscard);
+        CC_SERIALIZE(isFrontFaceCCW);
+        CC_SERIALIZE(depthBiasEnabled);
+        CC_SERIALIZE(isDepthClip);
+        CC_SERIALIZE(isMultisample);
+
+        CC_SERIALIZE(polygonMode);
+        CC_SERIALIZE(shadeModel);
+        CC_SERIALIZE(cullMode);
+
+        CC_SERIALIZE(depthBias);
+        CC_SERIALIZE(depthBiasClamp);
+        CC_SERIALIZE(depthBiasSlop);
+        CC_SERIALIZE(lineWidth);
+    }
 
     void fromGFXRasterizerState(const gfx::RasterizerState &rs) {
         isDiscard = rs.isDiscard;
@@ -154,6 +184,31 @@ struct DepthStencilStateInfo {
     ccstd::optional<gfx::StencilOp> stencilZFailOpBack;
     ccstd::optional<gfx::StencilOp> stencilPassOpBack;
     ccstd::optional<uint32_t> stencilRefBack;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(depthTest);
+        CC_SERIALIZE(depthWrite);
+        CC_SERIALIZE(stencilTestFront);
+        CC_SERIALIZE(stencilTestBack);
+
+        CC_SERIALIZE(depthFunc);
+        CC_SERIALIZE(stencilFuncFront);
+        CC_SERIALIZE(stencilReadMaskFront);
+        CC_SERIALIZE(stencilWriteMaskFront);
+        CC_SERIALIZE(stencilFailOpFront);
+        CC_SERIALIZE(stencilZFailOpFront);
+        CC_SERIALIZE(stencilPassOpFront);
+        CC_SERIALIZE(stencilRefFront);
+
+        CC_SERIALIZE(stencilFuncBack);
+        CC_SERIALIZE(stencilReadMaskBack);
+        CC_SERIALIZE(stencilWriteMaskBack);
+        CC_SERIALIZE(stencilFailOpBack);
+        CC_SERIALIZE(stencilZFailOpBack);
+        CC_SERIALIZE(stencilPassOpBack);
+        CC_SERIALIZE(stencilRefBack);
+    }
 
     void fromGFXDepthStencilState(const gfx::DepthStencilState &ds) {
         depthTest = ds.depthTest;
@@ -250,6 +305,18 @@ struct BlendTargetInfo {
     ccstd::optional<gfx::BlendOp> blendAlphaEq;
     ccstd::optional<gfx::ColorMask> blendColorMask;
 
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(blend);
+        CC_SERIALIZE(blendSrc);
+        CC_SERIALIZE(blendDst);
+        CC_SERIALIZE(blendEq);
+        CC_SERIALIZE(blendSrcAlpha);
+        CC_SERIALIZE(blendDstAlpha);
+        CC_SERIALIZE(blendAlphaEq);
+        CC_SERIALIZE(blendColorMask);
+    }
+
     void fromGFXBlendTarget(const gfx::BlendTarget &target) {
         blend = target.blend;
         blendSrc = target.blendSrc;
@@ -296,6 +363,14 @@ struct BlendStateInfo {
     ccstd::optional<bool> isIndepend;
     ccstd::optional<gfx::Color> blendColor;
     ccstd::optional<BlendTargetInfoList> targets;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(isA2C);
+        CC_SERIALIZE(isIndepend);
+        CC_SERIALIZE(blendColor);
+        CC_SERIALIZE(targets);
+    }
 
     void fromGFXBlendState(const gfx::BlendState &bs) {
         isA2C = bs.isA2C;
@@ -350,6 +425,18 @@ struct IPassStates {
     explicit IPassStates(const IPassInfoFull &o);
     IPassStates &operator=(const IPassInfoFull &o);
     void overrides(const IPassInfoFull &o);
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(priority);
+        CC_SERIALIZE(primitive);
+        CC_SERIALIZE(stage);
+        CC_SERIALIZE(rasterizerState);
+        CC_SERIALIZE(depthStencilState);
+        CC_SERIALIZE(blendState);
+        CC_SERIALIZE(dynamicStates);
+        CC_SERIALIZE(phase);
+    }
 };
 using PassOverrides = IPassStates;
 
@@ -393,6 +480,26 @@ struct IPassInfoFull final { // cjh } : public IPassInfo {
         phase = o.phase;
         return *this;
     }
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(priority);
+        CC_SERIALIZE(primitive);
+        CC_SERIALIZE(stage);
+        CC_SERIALIZE(rasterizerState);
+        CC_SERIALIZE(depthStencilState);
+        CC_SERIALIZE(blendState);
+        CC_SERIALIZE(dynamicStates);
+        CC_SERIALIZE(phase);
+        CC_SERIALIZE(program);
+        CC_SERIALIZE(embeddedMacros);
+        CC_SERIALIZE(propertyIndex);
+        ar.serialize(switch_, "switch");
+        CC_SERIALIZE(properties);
+        CC_SERIALIZE(passIndex);
+        CC_SERIALIZE(defines);
+        CC_SERIALIZE(stateOverrides);
+    }
 };
 
 using IPassInfo = IPassInfoFull;
@@ -400,6 +507,12 @@ using IPassInfo = IPassInfoFull;
 struct ITechniqueInfo {
     ccstd::vector<IPassInfoFull> passes;
     ccstd::optional<ccstd::string> name;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(passes);
+        CC_SERIALIZE(name);
+    }
 };
 
 struct IBlockInfo {
@@ -410,6 +523,14 @@ struct IBlockInfo {
     gfx::ShaderStageFlags stageFlags{gfx::ShaderStageFlags::NONE};
 
     ccstd::vector<ccstd::string> defines;
+    
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(binding);
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(members);
+        CC_SERIALIZE(stageFlags);
+    }
 };
 
 struct ISamplerTextureInfo {
@@ -419,6 +540,15 @@ struct ISamplerTextureInfo {
     uint32_t count{0};
     gfx::ShaderStageFlags stageFlags{gfx::ShaderStageFlags::NONE};
     ccstd::vector<ccstd::string> defines; // NOTE: used in Editor only
+    
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(binding);
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(type);
+        CC_SERIALIZE(count);
+        CC_SERIALIZE(stageFlags);
+    }
 };
 
 struct ITextureInfo {
@@ -428,6 +558,16 @@ struct ITextureInfo {
     gfx::Type type{gfx::Type::UNKNOWN};
     uint32_t count{0};
     gfx::ShaderStageFlags stageFlags{gfx::ShaderStageFlags::NONE};
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(set);
+        CC_SERIALIZE(binding);
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(type);
+        CC_SERIALIZE(count);
+        CC_SERIALIZE(stageFlags);
+    }
 };
 
 struct ISamplerInfo {
@@ -436,6 +576,15 @@ struct ISamplerInfo {
     ccstd::string name;
     uint32_t count{0};
     gfx::ShaderStageFlags stageFlags{gfx::ShaderStageFlags::NONE};
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(set);
+        CC_SERIALIZE(binding);
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(count);
+        CC_SERIALIZE(stageFlags);
+    }
 };
 
 struct IBufferInfo {
@@ -443,6 +592,14 @@ struct IBufferInfo {
     ccstd::string name;
     gfx::MemoryAccess memoryAccess{gfx::MemoryAccess::NONE};
     gfx::ShaderStageFlags stageFlags{gfx::ShaderStageFlags::NONE};
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(binding);
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(memoryAccess);
+        CC_SERIALIZE(stageFlags);
+    }
 };
 
 struct IImageInfo {
@@ -452,6 +609,16 @@ struct IImageInfo {
     uint32_t count{0};
     gfx::MemoryAccess memoryAccess{gfx::MemoryAccess::NONE};
     gfx::ShaderStageFlags stageFlags{gfx::ShaderStageFlags::NONE};
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(binding);
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(type);
+        CC_SERIALIZE(count);
+        CC_SERIALIZE(memoryAccess);
+        CC_SERIALIZE(stageFlags);
+    }
 };
 
 struct IInputAttachmentInfo {
@@ -460,6 +627,15 @@ struct IInputAttachmentInfo {
     ccstd::string name;
     uint32_t count{0};
     gfx::ShaderStageFlags stageFlags{gfx::ShaderStageFlags::NONE};
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(set);
+        CC_SERIALIZE(binding);
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(count);
+        CC_SERIALIZE(stageFlags);
+    }
 };
 
 struct IAttributeInfo {
@@ -471,6 +647,17 @@ struct IAttributeInfo {
     uint32_t location{0U};
 
     ccstd::vector<ccstd::string> defines;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(format);
+        CC_SERIALIZE(isNormalized);
+        CC_SERIALIZE(stream);
+        CC_SERIALIZE(isInstanced);
+        CC_SERIALIZE(location);
+        CC_SERIALIZE(defines);
+    }
 };
 
 struct IDefineInfo {
@@ -481,11 +668,26 @@ struct IDefineInfo {
     ccstd::optional<ccstd::string> defaultVal;
     ccstd::optional<ccstd::vector<ccstd::string>> defines; // NOTE: it's only used in Editor
     ccstd::optional<ccstd::unordered_map<ccstd::string, bool>> editor; // NOTE: it's only used in Editor
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(type);
+        CC_SERIALIZE(range);
+        CC_SERIALIZE(options);
+        CC_SERIALIZE(defaultVal);
+    }
 };
 
 struct IBuiltin {
     ccstd::string name;
     ccstd::vector<ccstd::string> defines;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(defines);
+    }
 };
 
 struct IBuiltinInfo {
@@ -493,6 +695,14 @@ struct IBuiltinInfo {
     ccstd::vector<IBuiltin> blocks;
     ccstd::vector<IBuiltin> samplerTextures;
     ccstd::vector<IBuiltin> images;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(buffers);
+        CC_SERIALIZE(blocks);
+        CC_SERIALIZE(samplerTextures);
+        CC_SERIALIZE(images);
+    }
 };
 
 using BuiltinsStatisticsType = ccstd::unordered_map<ccstd::string, int32_t>;
@@ -501,6 +711,13 @@ struct IBuiltins {
     IBuiltinInfo globals;
     IBuiltinInfo locals;
     BuiltinsStatisticsType statistics;
+    
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(globals);
+        CC_SERIALIZE(locals);
+        CC_SERIALIZE(statistics);
+    }
 };
 
 struct IDescriptorInfo {
@@ -512,11 +729,29 @@ struct IDescriptorInfo {
     ccstd::vector<IBufferInfo> buffers;
     ccstd::vector<IImageInfo> images;
     ccstd::vector<IInputAttachmentInfo> subpassInputs;
+    
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(rate);
+        CC_SERIALIZE(blocks);
+        CC_SERIALIZE(samplerTextures);
+        CC_SERIALIZE(samplers);
+        CC_SERIALIZE(textures);
+        CC_SERIALIZE(buffers);
+        CC_SERIALIZE(images);
+        CC_SERIALIZE(subpassInputs);
+    }
 };
 
 struct IShaderSource {
     ccstd::string vert;
     ccstd::string frag;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(vert);
+        CC_SERIALIZE(frag);
+    }
 };
 
 struct IShaderInfo {
@@ -543,12 +778,32 @@ struct IShaderInfo {
         if (version == "glsl4") return &glsl4;
         return nullptr;
     }
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(hash);
+        CC_SERIALIZE(glsl4);
+        CC_SERIALIZE(glsl3);
+        CC_SERIALIZE(glsl1);
+        CC_SERIALIZE(builtins);
+        CC_SERIALIZE(defines);
+        CC_SERIALIZE(attributes);
+        CC_SERIALIZE(blocks);
+        CC_SERIALIZE(samplerTextures);
+        CC_SERIALIZE(samplers);
+        CC_SERIALIZE(textures);
+        CC_SERIALIZE(buffers);
+        CC_SERIALIZE(images);
+        CC_SERIALIZE(subpassInputs);
+    }
 };
 
 using IPreCompileInfoValueType = ccstd::variant<ccstd::vector<bool>, ccstd::vector<int32_t>, ccstd::vector<ccstd::string>>;
 using IPreCompileInfo = ccstd::unordered_map<ccstd::string, IPreCompileInfoValueType>;
 
 class EffectAsset final : public Asset {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = Asset;
 
@@ -654,6 +909,68 @@ protected:
     friend class ProgramLib;
     friend class MaterialInstance;
     friend class BuiltinResMgr;
+};
+
+template <>
+struct SerializationTrait<IPropertyValueInternal> : SerializationTraitBase<IPropertyValueInternal> {
+    static void serialize(IPropertyValueInternal &data, JsonInputArchive &ar) {
+        const auto *currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        if (currentNode->IsArray()) {
+            ccstd::vector<float> arr;
+            SerializationTrait<ccstd::vector<float>>::serialize(arr, ar);
+            data = std::move(arr);
+        } else if (currentNode->IsString()) {
+            ccstd::string str;
+            SerializationTrait<ccstd::string>::serialize(str, ar);
+            data = std::move(str);
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue &data, BinaryInputArchive &ar) {
+    }
+};
+
+template <>
+struct SerializationTrait<IPreCompileInfoValueType> : SerializationTraitBase<IPreCompileInfoValueType> {
+    static void serialize(IPreCompileInfoValueType &data, JsonInputArchive &ar) {
+        const auto *currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        if (currentNode->IsArray()) {
+            const auto &jsonArr = currentNode->GetArray();
+            if (jsonArr.Size() > 0) {
+                const auto &first = jsonArr[0];
+                if (first.IsBool()) {
+                    ccstd::vector<bool> arr;
+                    SerializationTrait<ccstd::vector<bool>>::serialize(arr, ar);
+                    data = std::move(arr);
+                } else if (first.IsNumber()) {
+                    ccstd::vector<int32_t> arr;
+                    SerializationTrait<ccstd::vector<int32_t>>::serialize(arr, ar);
+                    data = std::move(arr);
+                } else if (first.IsString()) {
+                    ccstd::vector<ccstd::string> arr;
+                    SerializationTrait<ccstd::vector<ccstd::string>>::serialize(arr, ar);
+                    data = std::move(arr);
+                } else {
+                    assert(false);
+                }
+            }
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue &data, BinaryInputArchive &ar) {
+    }
 };
 
 } // namespace cc

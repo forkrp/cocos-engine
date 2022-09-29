@@ -33,6 +33,7 @@ import { MacroRecord, MaterialProperty } from '../../render-scene/core/pass-util
 import { Color, warnID, Vec4, cclegacy } from '../../core';
 import { SRGBToLinear } from '../../rendering/pipeline-funcs';
 import { Renderer } from '../../misc/renderer';
+import { IArchive } from '../../core/serialization';
 
 const v4_1 = new Vec4();
 
@@ -120,6 +121,15 @@ export class Material extends Asset {
 
     constructor () {
         super();
+    }
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._effectAsset = ar.serializableObj(this._effectAsset, '_effectAsset');
+        this._techIdx = ar.uint32(this._techIdx, '_techIdx');
+        this._defines = ar.plainObjArray(this._defines, '_defines');
+        this._states = ar.plainObjArray(this._states, '_states');
+        this._props = ar.plainObj(this._props, '_props');
     }
 
     /**

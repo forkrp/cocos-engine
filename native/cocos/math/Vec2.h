@@ -301,8 +301,8 @@ public:
     inline void set(const Vec2 &p1, const Vec2 &p2);
 
     /**
-    * Sets the elements of this vector to zero.
-    */
+     * Sets the elements of this vector to zero.
+     */
     inline void setZero();
 
     /**
@@ -476,7 +476,7 @@ public:
      @since v2.1.4
      */
     inline float getLengthSq() const {
-        return dot(*this); //x*x + y*y;
+        return dot(*this); // x*x + y*y;
     };
 
     /** Calculates the square distance between two points (not calling sqrt() )
@@ -604,6 +604,12 @@ public:
 
     static inline Vec2 forAngle(const float a) {
         return Vec2(cosf(a), sinf(a));
+    }
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(x, "x");
+        ar.serialize(y, "y");
     }
 
     /** A general line-line intersection test

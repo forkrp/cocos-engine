@@ -151,12 +151,12 @@ public:
     inline void add(const Vec3 &v);
 
     /**
-    * Adds the elements of this vector to the specified values.
-    *
-    * @param xx The add x coordinate.
-    * @param yy The add y coordinate.
-    * @param zz The add z coordinate.
-    */
+     * Adds the elements of this vector to the specified values.
+     *
+     * @param xx The add x coordinate.
+     * @param yy The add y coordinate.
+     * @param zz The add z coordinate.
+     */
     inline void add(float xx, float yy, float zz);
 
     /**
@@ -198,7 +198,7 @@ public:
      *
      * @param v1 is a vector.
      * @param v2 is a vector.
-     * @param dst is a vector used to calculate the cross product of v1 and v2. 
+     * @param dst is a vector used to calculate the cross product of v1 and v2.
      */
     static void crossProduct(const Vec3 &v1, const Vec3 &v2, Vec3 *dst);
 
@@ -404,8 +404,8 @@ public:
     inline void set(const Vec3 &p1, const Vec3 &p2);
 
     /**
-    * Sets the elements of this vector to zero.
-    */
+     * Sets the elements of this vector to zero.
+     */
     inline void setZero();
 
     /**
@@ -519,11 +519,11 @@ public:
     inline const Vec3 operator*(float s) const;
 
     /**
-      * Multiply with a vector.
-      *
-      * @param rhs The value to scale by.
-      * @return The scaled vector.
-      */
+     * Multiply with a vector.
+     *
+     * @param rhs The value to scale by.
+     * @return The scaled vector.
+     */
     inline Vec3 operator*(const Vec3 &rhs) const;
 
     /**
@@ -551,7 +551,7 @@ public:
      *
      * @param rhs the vector to divide this vector with
      * @return a vector
-    */
+     */
     inline Vec3 operator/(const Vec3 &rhs) const;
 
     /**
@@ -594,12 +594,12 @@ public:
     inline bool operator==(const Vec3 &v) const;
 
     /**
-      * Assign from another vector.
-      *
-      * @param rhs the vector to divide this vector with
-      *
-      * @return a vector
-      */
+     * Assign from another vector.
+     *
+     * @param rhs the vector to divide this vector with
+     *
+     * @return a vector
+     */
     inline Vec3 &operator=(const Vec3 &rhs) noexcept = default;
 
     /**
@@ -631,6 +631,13 @@ public:
     /** equals to Vec3(0,0,-1) */
     static const Vec3 FORWARD;
 
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(x, "x");
+        ar.serialize(y, "y");
+        ar.serialize(z, "z");
+    }
+
 private:
     void transformMat4C(const Vec3 &v, const Mat4 &m);
     void transformMat4Neon(const Vec3 &v, const Mat4 &m);
@@ -645,7 +652,7 @@ private:
  */
 inline const Vec3 operator*(float x, const Vec3 &v);
 
-//typedef Vec3 Point3;
+// typedef Vec3 Point3;
 
 NS_CC_MATH_END
 /**

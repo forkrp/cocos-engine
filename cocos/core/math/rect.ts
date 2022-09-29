@@ -31,6 +31,7 @@ import { Size } from './size';
 import { IRectLike, IVec2Like } from './type-define';
 import { Vec2 } from './vec2';
 import { legacyCC } from '../global-exports';
+import { IArchive, ISerializable } from '../serialization';
 
 /**
  * @en
@@ -40,7 +41,7 @@ import { legacyCC } from '../global-exports';
  * 矩形内的所有点都大于等于矩形的最小点 (xMin, yMin) 并且小于等于矩形的最大点 (xMax, yMax)。
  * 矩形的宽度定义为 xMax - xMin；高度定义为 yMax - yMin。
  */
-export class Rect extends ValueType {
+export class Rect extends ValueType implements ISerializable {
     /**
      * @en Creates a rectangle from two coordinate values.
      * @zh 由任意两个点创建一个矩形，目标矩形即是这两个点各向 x、y 轴作线所得到的矩形。
@@ -249,6 +250,13 @@ export class Rect extends ValueType {
      * @zh 矩形的高度。
      */
     public declare height: number;
+
+    serializeInlineData (ar: IArchive): void {
+        this.x = ar.float32(this.x, 'x');
+        this.y = ar.float32(this.y, 'y');
+        this.width = ar.float32(this.width, 'width');
+        this.height = ar.float32(this.height, 'height');
+    }
 
     /**
      * @en Constructs a Rect from another one.

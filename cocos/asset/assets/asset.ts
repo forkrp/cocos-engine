@@ -28,6 +28,7 @@ import { EDITOR, PREVIEW } from 'internal:constants';
 import { _decorator, Eventify, path, debug, getError, CCObject, cclegacy } from '../../core';
 import { getUrlWithUuid } from '../asset-manager/helper';
 import { Node } from '../../scene-graph';
+import { IArchive } from '../../core/serialization';
 
 const { ccclass, serializable, property } = _decorator;
 
@@ -143,7 +144,6 @@ export class Asset extends Eventify(CCObject) {
      * @default null
      * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
-    @property
     get _nativeAsset () {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._file;
@@ -203,7 +203,7 @@ export class Asset extends Eventify(CCObject) {
      * @return {String}
      * @private
      */
-    public serialize () { }
+    //FIXME(cjh) public serialize () { }
 
     /**
      * @en
@@ -304,6 +304,15 @@ export class Asset extends Eventify(CCObject) {
     public destroy () {
         debug(getError(12101, this._uuid));
         return super.destroy();
+    }
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._native = ar.str(this._native, '_native');
+    }
+
+    serializeInlineData (ar: IArchive): void {
+        this._uuid = ar.str(this._uuid, '__uuid__');
     }
 }
 

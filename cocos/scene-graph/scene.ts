@@ -33,6 +33,7 @@ import { legacyCC } from '../core/global-exports';
 import { Component } from './component';
 import { SceneGlobals } from './scene-globals';
 import { applyTargetOverrides, expandNestedPrefabInstanceNode } from './prefab/utils';
+import { IArchive } from '../serialization';
 
 /**
  * @en
@@ -84,6 +85,12 @@ export class Scene extends Node {
 
     protected _updateScene () {
         this._scene = this;
+    }
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this.autoReleaseAssets = ar.boolean(this.autoReleaseAssets, 'autoReleaseAssets');
+        this._globals = ar.serializableObj(this._globals, '_globals');
     }
 
     constructor (name: string) {

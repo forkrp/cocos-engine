@@ -35,7 +35,7 @@
 
 namespace cc {
 
-//class RenderableComponent;
+// class RenderableComponent;
 
 namespace scene {
 class Pass;
@@ -88,6 +88,7 @@ struct IMaterialInfo {
 };
 
 class Material : public Asset {
+    CC_DECLARE_SERIALIZE()
     IMPL_EVENT_TARGET(Material)
     DECLARE_TARGET_EVENT_BEGIN(Material)
     TARGET_EVENT_ARG0(PassesUpdated)

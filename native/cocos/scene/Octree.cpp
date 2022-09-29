@@ -28,9 +28,21 @@
 #include <utility>
 #include "scene/Camera.h"
 #include "scene/Model.h"
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 namespace scene {
+
+CC_IMPL_SERIALIZE(OctreeInfo)
+
+template <class Archive>
+void OctreeInfo::serialize(Archive &ar) {
+    CC_SERIALIZE(_enabled);
+    CC_SERIALIZE(_minPos);
+    CC_SERIALIZE(_maxPos);
+    CC_SERIALIZE(_depth);
+}
 
 void OctreeInfo::setEnabled(bool val) {
     if (_enabled == val) {

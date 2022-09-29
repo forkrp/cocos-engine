@@ -109,7 +109,7 @@ public:
         return _mipmapsUuids;
     }
 
-    //cjh TODO: TextureCube also needs this method.
+    // cjh TODO: TextureCube also needs this method.
     void syncMipmapsForJS(const ccstd::vector<IntrusivePtr<ImageAsset>> &value);
 
     void setMipmaps(const ccstd::vector<IntrusivePtr<ImageAsset>> &value);
@@ -180,19 +180,6 @@ public:
      * @deprecated please use [[destroy]] instead
      */
     void releaseTexture();
-
-    // SERIALIZATION
-
-    /**
-     * @return
-     */
-    ccstd::any serialize(const ccstd::any &ctxForExporting) override;
-
-    /**
-     *
-     * @param data
-     */
-    void deserialize(const ccstd::any &serializedData, const ccstd::any &handle) override;
 
     gfx::TextureInfo getGfxTextureCreateInfo(gfx::TextureUsageBit usage, gfx::Format format, uint32_t levelCount, gfx::TextureFlagBit flags) override;
     gfx::TextureViewInfo getGfxTextureViewCreateInfo(gfx::Texture *texture, gfx::Format format, uint32_t baseLevel, uint32_t levelCount) override;

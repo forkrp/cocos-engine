@@ -51,5 +51,6 @@ export * from './algorithm';
 export { legacyCC as cclegacy } from './global-exports';
 export * from './curves/bezier';
 
+export * from './serialization';
 // TODO: should not include engine internal exports when module mechanism is implemented.
 export * from './internal-index';

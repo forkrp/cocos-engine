@@ -31,12 +31,13 @@ import { IMat3Like, IMat4Like, IQuatLike, IVec3Like } from './type-define';
 import { approx, clamp, EPSILON, lerp, random } from './utils';
 import { legacyCC } from '../global-exports';
 import type { Quat } from './quat';
+import { IArchive, ISerializable } from '../serialization';
 
 /**
  * @en Representation of 3D vectors and points.
  * @zh 三维向量。
  */
-export class Vec3 extends ValueType {
+export class Vec3 extends ValueType implements ISerializable {
     public static UNIT_X = Object.freeze(new Vec3(1, 0, 0));
     public static UNIT_Y = Object.freeze(new Vec3(0, 1, 0));
     public static UNIT_Z = Object.freeze(new Vec3(0, 0, 1));
@@ -1107,6 +1108,12 @@ export class Vec3 extends ValueType {
         this.y = (matrix.m01 * x + matrix.m05 * y + matrix.m09 * z + matrix.m13) * rhw;
         this.z = (matrix.m02 * x + matrix.m06 * y + matrix.m10 * z + matrix.m14) * rhw;
         return this;
+    }
+
+    serializeInlineData (ar: IArchive): void {
+        this.x = ar.float32(this.x, 'x');
+        this.y = ar.float32(this.y, 'y');
+        this.z = ar.float32(this.z, 'z');
     }
 }
 

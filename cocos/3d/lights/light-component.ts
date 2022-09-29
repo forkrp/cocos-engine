@@ -30,6 +30,7 @@ import { scene } from '../../render-scene';
 import { Root } from '../../root';
 import { CAMERA_DEFAULT_MASK } from '../../rendering/define';
 import { Layers } from '../../scene-graph/layers';
+import { IArchive, ISerializable } from '../../core/serialization';
 
 const _color_tmp = new Vec3();
 
@@ -47,13 +48,19 @@ export const PhotometricTerm = Enum({
  * @zh 静态灯光设置
  */
 @ccclass('cc.StaticLightSettings')
-class StaticLightSettings {
+class StaticLightSettings implements ISerializable {
     @serializable
     protected _baked = false;
     @serializable
     protected _editorOnly = false;
     @serializable
     protected _castShadow = false;
+
+    serialize (ar: IArchive): void {
+        this._baked = ar.boolean(this._baked, '_baked');
+        this._editorOnly = ar.boolean(this._editorOnly, '_editorOnly');
+        this._castShadow = ar.boolean(this._castShadow, '_castShadow');
+    }
 
     /**
      * @en Whether the light is editor only.
@@ -129,6 +136,15 @@ export class Light extends Component {
     protected _type = scene.LightType.UNKNOWN;
     protected _lightType: typeof scene.Light;
     protected _light: scene.Light | null = null;
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._color = ar.serializableObj(this._color, '_color');
+        this._useColorTemperature = ar.boolean(this._useColorTemperature, '_useColorTemperature');
+        this._colorTemperature = ar.float64(this._colorTemperature, '_colorTemperature');
+        this._staticSettings = ar.serializableObj(this._staticSettings, '_staticSettings');
+        this._visibility = ar.uint32(this._visibility, '_visibility');
+    }
 
     /**
      * @en The color of the light.

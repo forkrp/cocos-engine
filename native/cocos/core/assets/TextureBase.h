@@ -196,18 +196,6 @@ public:
      */
     virtual gfx::Sampler *getGFXSampler() const;
 
-    // SERIALIZATION
-    /**
-     * @return
-     */
-    ccstd::any serialize(const ccstd::any &ctxForExporting) override;
-
-    /**
-     *
-     * @param data
-     */
-    void deserialize(const ccstd::any &serializedData, const ccstd::any &handle) override;
-
 protected:
     static gfx::Device *getGFXDevice();
     static gfx::Format getGFXPixelFormat(PixelFormat format);

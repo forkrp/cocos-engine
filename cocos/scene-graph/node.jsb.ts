@@ -37,6 +37,7 @@ import { syncNodeValues } from "../core/utils/jsb-utils";
 import { property } from '../core/data/class-decorator';
 import { nodePolyfill } from './node-dev';
 import * as js from '../core/utils/js';
+import { IArchive } from '../serialization';
 
 const reserveContentsForAllSyncablePrefabTag = Symbol('ReserveContentsForAllSyncablePrefab');
 
@@ -1305,6 +1306,19 @@ nodeProto._instantiate = function (cloned: Node, isSyncedNode: boolean) {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return cloned;
+};
+
+nodeProto.serialize = function(ar: IArchive) {
+    this._components = ar.serializableObjArray(this._components, '_components');
+    this._prefab = ar.serializableObj(this._prefab, '_prefab');
+}
+
+nodeProto.onAfterDeserialize = function() {
+    this._children = this._getChildren();
+    this._lpos = this._getPositionForJS();
+    this._lrot = this._getRotationForJS();
+    this._lscale = this._getScaleForJS();
+    this._euler = this._getEulerForJS();
 };
 
 //

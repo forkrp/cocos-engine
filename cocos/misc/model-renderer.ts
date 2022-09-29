@@ -28,6 +28,7 @@ import {
 } from 'cc.decorator';
 import { scene } from '../render-scene';
 import { Layers } from '../scene-graph/layers';
+import { IArchive } from '../serialization';
 import { Renderer } from './renderer';
 
 /**
@@ -67,6 +68,11 @@ export class ModelRenderer extends Renderer {
     protected _visFlags = Layers.Enum.NONE;
     protected _models: scene.Model[] = [];
     protected _priority = 0;
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._visFlags = ar.uint32(this._visFlags, '_visFlags');
+    }
 
     /**
      * @zh 收集组件中的 models

@@ -1,8 +1,8 @@
 /****************************************************************************
  Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos.com
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
@@ -10,10 +10,10 @@
  not use Cocos Creator software for developing other software or tools that's
  used for developing games. You are not granted to publish, distribute,
  sublicense, and/or sell copies of Cocos Creator.
- 
+
  The software or tools in this License Agreement are licensed, not sold.
  Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,6 +40,11 @@
 
 #include "renderer/gfx-base/GFXDef.h"
 #include "renderer/gfx-base/GFXTexture.h"
+
+#include "core/assets/TextureBase.h"
+
+#include "serialization/JsonInputArchive.h"
+#include "serialization/SerializationTrait.h"
 
 namespace cc {
 
@@ -79,15 +84,131 @@ using MaterialPropertyList = ccstd::vector<MaterialProperty>;
 
 using MaterialPropertyVariant = ccstd::variant<ccstd::monostate /*0*/, MaterialProperty /*1*/, MaterialPropertyList /*2*/>;
 
+template <>
+struct SerializationTrait<MacroValue> : SerializationTraitBase<MacroValue> {
+    static void serialize(MacroValue& data, JsonInputArchive& ar) {
+        const auto* currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        if (currentNode->IsNumber()) {
+            int32_t v{0};
+            SerializationTrait<int32_t>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsBool()) {
+            bool v{false};
+            SerializationTrait<bool>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsString()) {
+            ccstd::string v;
+            SerializationTrait<ccstd::string>::serialize(v, ar);
+            data = std::move(v);
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+    }
+};
+
+template <>
+struct SerializationTrait<MaterialProperty> : SerializationTraitBase<MaterialProperty> {
+    static void serialize(MaterialProperty& data, JsonInputArchive& ar) {
+        const auto* currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        if (currentNode->IsInt() || currentNode->IsUint()) {
+            int32_t v{0};
+            SerializationTrait<int32_t>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsNumber()) {
+            float v{0.F};
+            SerializationTrait<float>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsObject()) {
+            const auto typeIter = currentNode->FindMember("__type__");
+            if (typeIter != currentNode->MemberEnd()) {
+                const auto* type = typeIter->value.GetString();
+                if (0 == strcmp(type, "cc.Color")) {
+                    cc::Color v;
+                    SerializationTrait<cc::Color>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Vec4")) {
+                    Vec4 v;
+                    SerializationTrait<Vec4>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Mat4")) {
+                    Mat4 v;
+                    SerializationTrait<Mat4>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Vec3")) {
+                    Vec3 v;
+                    SerializationTrait<Vec3>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Vec2")) {
+                    Vec2 v;
+                    SerializationTrait<Vec2>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Quat")) {
+                    Quaternion v;
+                    SerializationTrait<Quaternion>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Mat3")) {
+                    Mat3 v;
+                    SerializationTrait<Mat3>::serialize(v, ar);
+                    data = v;
+                }
+            } else {
+                assert(false); // TODO(cjh):
+            }
+
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+    }
+};
+
+template <>
+struct SerializationTrait<MaterialPropertyVariant> : SerializationTraitBase<MaterialPropertyVariant> {
+    static void serialize(MaterialPropertyVariant& data, JsonInputArchive& ar) {
+        const auto* currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        if (currentNode->IsArray()) {
+            MaterialPropertyList v;
+            SerializationTrait<MaterialPropertyList>::serialize(v, ar);
+            data = std::move(v);
+        } else if (currentNode->IsObject()) {
+            MaterialProperty v;
+            SerializationTrait<MaterialProperty>::serialize(v, ar);
+            data = std::move(v);
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+    }
+};
+
 #define MATERIAL_PROPERTY_INDEX_SINGLE 1
 #define MATERIAL_PROPERTY_INDEX_LIST   2
 
-using GFXTypeReaderCallback = void (*)(const float *, MaterialProperty &, index_t);
-using GFXTypeWriterCallback = void (*)(float *, const MaterialProperty &, index_t);
+using GFXTypeReaderCallback = void (*)(const float*, MaterialProperty&, index_t);
+using GFXTypeWriterCallback = void (*)(float*, const MaterialProperty&, index_t);
 using GFXTypeValidatorCallback = bool (*)(const MaterialProperty &);
 
-extern const ccstd::unordered_map<gfx::Type, GFXTypeReaderCallback> type2reader; //NOLINT(readability-identifier-naming)
-extern const ccstd::unordered_map<gfx::Type, GFXTypeWriterCallback> type2writer; //NOLINT(readability-identifier-naming)
+extern const ccstd::unordered_map<gfx::Type, GFXTypeReaderCallback> type2reader; // NOLINT(readability-identifier-naming)
+extern const ccstd::unordered_map<gfx::Type, GFXTypeWriterCallback> type2writer; // NOLINT(readability-identifier-naming)
 extern const ccstd::unordered_map<gfx::Type, GFXTypeValidatorCallback> type2validator; //NOLINT(readability-identifier-naming)
 
 /**
@@ -95,9 +216,9 @@ extern const ccstd::unordered_map<gfx::Type, GFXTypeValidatorCallback> type2vali
  * @zh 根据指定的 Uniform 类型来获取默认值
  * @param type The type of the uniform
  */
-const ccstd::vector<float> &getDefaultFloatArrayFromType(gfx::Type type);
-const ccstd::string &getDefaultStringFromType(gfx::Type type);
-const ccstd::string &getStringFromType(gfx::Type type);
+const ccstd::vector<float>& getDefaultFloatArrayFromType(gfx::Type type);
+const ccstd::string& getDefaultStringFromType(gfx::Type type);
+const ccstd::string& getStringFromType(gfx::Type type);
 
 /**
  * @en Combination of preprocess macros
@@ -109,9 +230,9 @@ const ccstd::string &getStringFromType(gfx::Type type);
  * @param target Target preprocess macros to be overridden
  * @param source Preprocess macros used for override
  */
-bool overrideMacros(MacroRecord &target, const MacroRecord &source);
+bool overrideMacros(MacroRecord& target, const MacroRecord& source);
 
-MaterialProperty toMaterialProperty(gfx::Type type, const ccstd::vector<float> &vec);
+MaterialProperty toMaterialProperty(gfx::Type type, const ccstd::vector<float>& vec);
 
 bool macroRecordAsBool(const MacroRecord::mapped_type &v);
 ccstd::string macroRecordAsString(const MacroRecord::mapped_type &v);

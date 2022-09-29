@@ -27,12 +27,22 @@
 #include "base/DeferredReleasePool.h"
 #include "base/Macros.h"
 #include "core/utils/Path.h"
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 
-//cjh TODO:
-ccstd::string getAssetUrlWithUuid(const ccstd::string &uuid, bool isNative, const ccstd::string &nativeExt, const ccstd::string &nativeName = "") { //NOLINT
+// cjh TODO:
+ccstd::string getAssetUrlWithUuid(const ccstd::string &uuid, bool isNative, const ccstd::string &nativeExt, const ccstd::string &nativeName = "") { // NOLINT
     return "";
+}
+
+CC_IMPL_SERIALIZE(Asset)
+
+template <class Archive>
+void Asset::serialize(Archive &ar) {
+    CCObject::serialize(ar);
+    CC_SERIALIZE(_nativeUrl);
 }
 
 ccstd::string Asset::getNativeUrl() const {
@@ -85,7 +95,7 @@ void Asset::decAssetRef(bool autoRelease /* = true*/) {
     }
 
     if (autoRelease) {
-        //cjh TODO:
+        // cjh TODO:
     }
 }
 
@@ -97,7 +107,7 @@ void Asset::initDefault(const ccstd::optional<ccstd::string> &uuid) {
 }
 
 bool Asset::destroy() {
-    //cjh TODO:    debug(getError(12101, this._uuid));
+    // cjh TODO:    debug(getError(12101, this._uuid));
     return Super::destroy();
 }
 

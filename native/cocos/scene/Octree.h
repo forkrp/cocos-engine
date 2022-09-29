@@ -30,6 +30,7 @@
 #include "base/std/container/array.h"
 #include "core/geometry/AABB.h"
 #include "math/Vec3.h"
+#include "serialization/ISerializable.h"
 
 namespace cc {
 namespace scene {
@@ -45,7 +46,8 @@ const Vec3 DEFAULT_WORLD_MAX_POS = {1024.0F, 1024.0F, 1024.0F};
 const float OCTREE_BOX_EXPAND_SIZE = 10.0F;
 constexpr int USE_MULTI_THRESHOLD = 1024; // use parallel culling if greater than this value
 
-class CC_DLL OctreeInfo final : public RefCounted {
+class CC_DLL OctreeInfo final : public RefCounted, public ISerializable {
+    CC_DECLARE_SERIALIZE()
 public:
     OctreeInfo() = default;
     ~OctreeInfo() override = default;

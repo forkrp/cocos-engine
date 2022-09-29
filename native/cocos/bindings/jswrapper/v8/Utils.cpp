@@ -63,7 +63,7 @@ void seToJsValue(v8::Isolate *isolate, const Value &v, v8::Local<v8::Value> *out
             *outJsVal = v8::Number::New(isolate, v.toDouble());
             break;
         case Value::Type::String: {
-            v8::MaybeLocal<v8::String> str = v8::String::NewFromUtf8(isolate, v.toString().data(), v8::NewStringType::kNormal, static_cast<int>(v.toString().length()));
+            v8::MaybeLocal<v8::String> str = v8::String::NewFromUtf8(isolate, v.toString().data(), v8::NewStringType::kInternalized, static_cast<int>(v.toString().length()));
             if (!str.IsEmpty()) {
                 *outJsVal = str.ToLocalChecked();
             } else {
@@ -172,7 +172,7 @@ void setReturnValueTemplate(const Value &data, const T &argv) {
         }
         argv.GetReturnValue().Set(v8::Number::New(argv.GetIsolate(), static_cast<double>(data.toInt64())));
     } else if (data.getType() == Value::Type::String) {
-        v8::MaybeLocal<v8::String> value = v8::String::NewFromUtf8(argv.GetIsolate(), data.toString().c_str(), v8::NewStringType::kNormal);
+        v8::MaybeLocal<v8::String> value = v8::String::NewFromUtf8(argv.GetIsolate(), data.toString().c_str(), v8::NewStringType::kInternalized);
         CC_ASSERT(!value.IsEmpty());
         argv.GetReturnValue().Set(value.ToLocalChecked());
     } else if (data.getType() == Value::Type::Boolean) {

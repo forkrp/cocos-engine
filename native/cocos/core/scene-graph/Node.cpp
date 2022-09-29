@@ -33,6 +33,9 @@
 #include "core/utils/IDGenerator.h"
 #include "math/Utils.h"
 
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
+
 namespace cc {
 
 // static variables
@@ -878,5 +881,27 @@ void Node::_setChildren(ccstd::vector<IntrusivePtr<Node>> &&children) {
 }
 
 //
+
+template <class Archive>
+void Node::serialize(Archive &ar) {
+    Super::serialize(ar);
+
+    CC_SERIALIZE(_parent);
+    CC_SERIALIZE(_children);
+    CC_SERIALIZE(_active);
+
+    ar.serialize(_localPosition, "_lpos");
+    ar.serialize(_localRotation, "_lrot");
+    ar.serialize(_localScale, "_lscale");
+
+    CC_SERIALIZE(_layer);
+    CC_SERIALIZE(_euler);
+
+    if (!ar.isExporting()) { // TODO(cjh): Also needs to check editor keep uuid flag
+        CC_SERIALIZE(_id);
+    }
+}
+
+CC_IMPL_SERIALIZE(Node)
 
 } // namespace cc

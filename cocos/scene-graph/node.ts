@@ -41,6 +41,7 @@ import type { Scene } from './scene';
 import { PrefabInfo } from './prefab/prefab-info';
 import { NodeEventType } from './node-event';
 import { Event } from '../input/types';
+import { IArchive } from '../serialization';
 
 const Destroying = CCObject.Flags.Destroying;
 const DontDestroy = CCObject.Flags.DontDestroy;
@@ -2540,6 +2541,27 @@ export class Node extends CCObject implements ISchedulable, CustomSerializable {
         }
 
         return result;
+    }
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+
+        this._parent = ar.serializableObj(this._parent, '_parent');
+        this._children = ar.serializableObjArray(this._children, '_children');
+        this._active = ar.boolean(this._active, '_active');
+        this._lpos = ar.serializableObj(this._lpos, '_lpos');
+        this._lrot = ar.serializableObj(this._lrot, '_lrot');
+        this._lscale = ar.serializableObj(this._lscale, '_lscale');
+        this._mobility = ar.uint8(this._mobility, '_mobility');
+        this._layer = ar.uint32(this._layer, '_layer');
+        this._euler = ar.serializableObj(this._euler, '_euler');
+
+        this._components = ar.serializableObjArray(this._components, '_components');
+        this._prefab = ar.serializableObj(this._prefab, '_prefab');
+
+        if (!ar.isExporting()) {
+            this._id = ar.str(this._id, '_id');
+        }
     }
 }
 

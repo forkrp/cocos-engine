@@ -28,6 +28,7 @@ import { Material } from '../asset/assets/material';
 import { Component } from '../scene-graph';
 import { IMaterialInstanceInfo, MaterialInstance } from '../render-scene/core/material-instance';
 import { warnID, _decorator } from '../core';
+import { IArchive } from '../serialization';
 
 const _matInsInfo: IMaterialInstanceInfo = {
     parent: null!,
@@ -138,6 +139,11 @@ export class Renderer extends Component {
     protected _materials: (Material | null)[] = [];
 
     protected _materialInstances: (MaterialInstance | null)[] = [];
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._materials = ar.serializableObjArray(this._materials, '_materials');
+    }
 
     /**
      * @en Get the shared material asset of the specified sub-model.

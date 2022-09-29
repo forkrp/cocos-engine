@@ -1,4 +1,8 @@
+import { EDITOR, JSB } from 'internal:constants';
 import type { Node } from '../../scene-graph';
+import { js } from './js';
+
+declare const jsb: any;
 
 // export interface IArrayProxy {
 //     owner: any,
@@ -168,3 +172,13 @@ ExtraEventMethods.prototype.once = function once <Callback extends (...any) => v
 ExtraEventMethods.prototype.targetOff = function targetOff (typeOrTarget: any) {
     this.removeAll(typeOrTarget);
 };
+
+if (!EDITOR && JSB) {
+    jsb.createScriptObjectByType = function(type: string) {
+        const cls = js.getClassById(type);
+        if (!cls) {
+            return null;
+        }
+        return new cls();
+    };
+}

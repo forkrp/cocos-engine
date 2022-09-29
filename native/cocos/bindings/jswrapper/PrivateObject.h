@@ -32,6 +32,10 @@
 #include "base/RefCounted.h"
 #include "base/memory/Memory.h"
 
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
+#include "serialization/SerializePrivateObject.h"
+
 namespace se {
 
 class Object;
@@ -49,6 +53,9 @@ public:
     inline T *get() const {
         return reinterpret_cast<T *>(getRaw());
     }
+
+    virtual void serialize(cc::JsonInputArchive &ar) = 0;
+    virtual void serialize(cc::BinaryInputArchive &ar) = 0;
 
     template <typename T>
     inline TypedPrivateObject<T> *typed() {
@@ -79,6 +86,14 @@ public:
     inline const char *getName() const override {
         static_assert(!std::is_base_of<PrivateObjectBase, T>::value, ""); // NOLINT // remove after using c++17
         return typeid(T).name();
+    }
+
+    void serialize(cc::JsonInputArchive &ar) override {
+        cc::serializePrivateObject(get<T>(), ar);
+    }
+
+    void serialize(cc::BinaryInputArchive &ar) override {
+        cc::serializePrivateObject(get<T>(), ar);
     }
 };
 

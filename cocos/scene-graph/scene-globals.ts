@@ -39,6 +39,7 @@ import { warnID } from '../core/platform/debug';
 import { Material } from '../asset/assets/material';
 import { cclegacy } from '../core';
 import { Scene } from './scene';
+import { IArchive, ISerializable } from '../serialization';
 
 const _up = new Vec3(0, 1, 0);
 const _v3 = new Vec3();
@@ -60,7 +61,7 @@ const normalizeHDRColor = (color : Vec4) => {
  * @zh 场景的环境光照相关配置
  */
 @ccclass('cc.AmbientInfo')
-export class AmbientInfo {
+export class AmbientInfo implements ISerializable {
     /**
      * @en The sky color in HDR mode
      * @zh HDR 模式下的天空光照色
@@ -238,6 +239,18 @@ export class AmbientInfo {
 
     protected _resource: Ambient | null = null;
 
+    serialize (ar: IArchive): void {
+        this._skyColorHDR = ar.serializableObj(this._skyColorHDR, '_skyColorHDR');
+        this._skyColorHDR = ar.serializableObj(this._skyColorHDR, '_skyColor');
+        this._skyIllumHDR = ar.float64(this._skyIllumHDR, '_skyIllumHDR');
+        this._skyIllumHDR = ar.float64(this._skyIllumHDR, '_skyIllum');
+        this._groundAlbedoHDR = ar.serializableObj(this._groundAlbedoHDR, '_groundAlbedoHDR');
+        this._groundAlbedoHDR = ar.serializableObj(this._groundAlbedoHDR, '_groundAlbedo');
+        this._skyColorLDR = ar.serializableObj(this._skyColorLDR, '_skyColorLDR');
+        this._skyIllumLDR = ar.float64(this._skyIllumLDR, '_skyIllumLDR');
+        this._groundAlbedoLDR = ar.serializableObj(this._groundAlbedoLDR, '_groundAlbedoLDR');
+    }
+
     /**
      * @en Activate the ambient lighting configuration in the render scene, no need to invoke manually.
      * @zh 在渲染场景中启用环境光照设置，不需要手动调用
@@ -255,7 +268,7 @@ legacyCC.AmbientInfo = AmbientInfo;
  * @zh 天空盒相关配置
  */
 @ccclass('cc.SkyboxInfo')
-export class SkyboxInfo {
+export class SkyboxInfo implements ISerializable {
     /**
      * @en Whether to use diffuse convolution map. Enabled -> Will use map specified. Disabled -> Will revert to hemispheric lighting
      * @zh 是否为IBL启用漫反射卷积图？不启用的话将使用默认的半球光照
@@ -548,6 +561,21 @@ export class SkyboxInfo {
 
     protected _resource: Skybox | null = null;
 
+    serialize (ar: IArchive): void {
+        this._envLightingType = ar.uint8(this._envLightingType, '_envLightingType');
+        this._envmapHDR = ar.serializableObj(this._envmapHDR, '_envmapHDR');
+        this._envmapHDR = ar.serializableObj(this._envmapHDR, '_envmap');
+        this._envmapLDR = ar.serializableObj(this._envmapLDR, '_envmapLDR');
+        this._diffuseMapHDR = ar.serializableObj(this._diffuseMapHDR, '_diffuseMapHDR');
+        this._diffuseMapLDR = ar.serializableObj(this._diffuseMapLDR, '_diffuseMapLDR');
+        this._enabled = ar.boolean(this._enabled, '_enabled');
+        this.useHDR = ar.boolean(this._useHDR, '_useHDR');
+        this._editableMaterial = ar.serializableObj(this._editableMaterial, '_editableMaterial');
+        this._reflectionHDR = ar.serializableObj(this._reflectionHDR, '_reflectionHDR');
+        this._reflectionLDR = ar.serializableObj(this._reflectionLDR, '_reflectionLDR');
+        this._rotationAngle = ar.float32(this._rotationAngle, '_rotationAngle');
+    }
+
     /**
      * @en Activate the skybox configuration in the render scene, no need to invoke manually.
      * @zh 在渲染场景中启用天空盒设置，不需要手动调用
@@ -572,7 +600,7 @@ legacyCC.SkyboxInfo = SkyboxInfo;
  * @en Global fog configuration
  */
 @ccclass('cc.FogInfo')
-export class FogInfo {
+export class FogInfo implements ISerializable {
     public static FogType = FogType;
 
     /**
@@ -780,6 +808,19 @@ export class FogInfo {
     protected _accurate = false;
     protected _resource: Fog | null = null;
 
+    serialize (ar: IArchive): void {
+        this._type = ar.uint8(this._type, '_type');
+        this._fogColor = ar.serializableObj(this._fogColor, '_fogColor');
+        this._enabled = ar.boolean(this._enabled, '_enabled');
+        this._fogDensity = ar.float32(this._fogDensity, '_fogDensity');
+        this._fogStart = ar.float32(this._fogStart, '_fogStart');
+        this._fogEnd = ar.float32(this._fogEnd, '_fogEnd');
+        this._fogAtten = ar.float32(this._fogAtten, '_fogAtten');
+        this._fogTop = ar.float32(this._fogTop, '_fogTop');
+        this._fogRange = ar.float32(this._fogRange, '_fogRange');
+        this._accurate = ar.boolean(this._accurate, '_accurate');
+    }
+
     /**
      * @en Activate the fog configuration in the render scene, no need to invoke manually.
      * @zh 在渲染场景中启用雾效设置，不需要手动调用
@@ -797,7 +838,7 @@ export class FogInfo {
  * @zh 场景级别阴影相关的配置
  */
 @ccclass('cc.ShadowsInfo')
-export class ShadowsInfo {
+export class ShadowsInfo implements ISerializable {
     /**
      * @en Whether activate planar shadow
      * @zh 是否启用平面阴影？
@@ -932,6 +973,16 @@ export class ShadowsInfo {
 
     protected _resource: Shadows | null = null;
 
+    serialize (ar: IArchive): void {
+        this._enabled = ar.boolean(this._enabled, '_enabled');
+        this._type = ar.uint8(this._type, '_type');
+        this._normal = ar.serializableObj(this._normal, '_normal');
+        this._distance = ar.float32(this._distance, '_distance');
+        this._shadowColor = ar.serializableObj(this._shadowColor, '_shadowColor');
+        this._maxReceived = ar.uint32(this._maxReceived, '_maxReceived');
+        this._size = ar.serializableObj(this._size, '_size');
+    }
+
     /**
      * @en Set plane which receives shadow with the given node's world transformation
      * @zh 根据指定节点的世界变换设置阴影接收平面的信息
@@ -966,7 +1017,7 @@ export const DEFAULT_OCTREE_DEPTH = 8;
  * @zh 基于八叉树的场景剔除配置
  */
 @ccclass('cc.OctreeInfo')
-export class OctreeInfo {
+export class OctreeInfo implements ISerializable {
     /**
      * @en Whether activate scene culling based on octree
      * @zh 是否启用八叉树加速剔除？
@@ -1043,6 +1094,13 @@ export class OctreeInfo {
     protected _depth = DEFAULT_OCTREE_DEPTH;
 
     protected _resource: Octree | null = null;
+
+    serialize (ar: IArchive): void {
+        this._enabled = ar.boolean(this._enabled, '_enabled');
+        this._minPos = ar.serializableObj(this._minPos, '_minPos');
+        this._maxPos = ar.serializableObj(this._maxPos, '_maxPos');
+        this._depth = ar.uint32(this._depth, '_depth');
+    }
 
     /**
      * @en Activate the octree configuration in the render scene, no need to invoke manually.
@@ -1378,7 +1436,7 @@ export class LightProbeInfo {
  * @zh 各类场景级别的渲染参数，将影响全场景的所有物体
  */
 @ccclass('cc.SceneGlobals')
-export class SceneGlobals {
+export class SceneGlobals implements ISerializable {
     /**
      * @en The environment lighting configuration
      * @zh 场景的环境光照相关配置
@@ -1442,6 +1500,16 @@ export class SceneGlobals {
     @editable
     @serializable
     public bakedWithStationaryMainLight = false;
+    
+    serialize (ar: IArchive): void {
+        this.ambient = ar.serializableObj(this.ambient, 'ambient');
+        this.shadows = ar.serializableObj(this.shadows, 'shadows');
+        this._skybox = ar.serializableObj(this._skybox, '_skybox');
+        this.fog = ar.serializableObj(this.fog, 'fog');
+        this.octree = ar.serializableObj(this.octree, 'octree');
+        this.lightProbeInfo = ar.serializableObj(this.lightProbeInfo, 'lightProbeInfo');
+        this.bakedWithStationaryMainLight = ar.serializableObj(this.bakedWithStationaryMainLight, 'bakedWithStationaryMainLight');
+    }
 
     /**
      * @en Activate and initialize the global configurations of the scene, no need to invoke manually.
