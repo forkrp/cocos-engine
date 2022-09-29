@@ -1,8 +1,8 @@
 /****************************************************************************
  Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos.com
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
@@ -10,10 +10,10 @@
  not use Cocos Creator software for developing other software or tools that's
  used for developing games. You are not granted to publish, distribute,
  sublicense, and/or sell copies of Cocos Creator.
- 
+
  The software or tools in this License Agreement are licensed, not sold.
  Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,6 +29,7 @@
 #include "base/RefCounted.h"
 #include "base/std/container/array.h"
 #include "math/Color.h"
+#include "serialization/ISerializable.h"
 
 namespace cc {
 namespace scene {
@@ -100,7 +101,8 @@ protected:
  */
 // @ccclass('cc.AmbientInfo')
 // @help('i18n:cc.Ambient')
-class AmbientInfo : public RefCounted {
+class AmbientInfo : public RefCounted, public ISerializable {
+    CC_DECLARE_SERIALIZE()
 public:
     AmbientInfo(/* args */) = default;
     ~AmbientInfo() override = default;
@@ -169,9 +171,9 @@ public:
 
     void activate(Ambient *resource);
 
-    //cjh JSB need to bind the property, so need to make it public
-    // @serializable
-    // @formerlySerializedAs('_skyColor'));
+    // cjh JSB need to bind the property, so need to make it public
+    //  @serializable
+    //  @formerlySerializedAs('_skyColor'));
     Vec4 _skyColorHDR{0.2F, 0.5F, 0.8F, 1.F};
     // @serializable
     // @formerlySerializedAs('_skyIllum')

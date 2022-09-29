@@ -34,7 +34,23 @@
 #include "math/Color.h"
 #include "renderer/pipeline/helper/Utils.h"
 #include "scene/Pass.h"
+
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
+
 namespace cc {
+
+CC_IMPL_SERIALIZE(Material)
+
+template <class Archive>
+void Material::serialize(Archive &ar) {
+    Super::serialize(ar);
+    CC_SERIALIZE(_effectAsset);
+    CC_SERIALIZE(_techIdx);
+    CC_SERIALIZE(_defines);
+    CC_SERIALIZE(_states);
+    CC_SERIALIZE(_props);
+}
 
 /* static */
 ccstd::hash_t Material::getHashForMaterial(Material *material) {

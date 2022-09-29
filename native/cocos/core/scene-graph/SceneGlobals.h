@@ -27,6 +27,7 @@
 
 #include "base/Ptr.h"
 #include "base/RefCounted.h"
+#include "serialization/ISerializable.h"
 
 namespace cc {
 
@@ -38,7 +39,8 @@ class FogInfo;
 class OctreeInfo;
 } // namespace scene
 
-class SceneGlobals : public RefCounted {
+class SceneGlobals : public RefCounted, public ISerializable {
+    CC_DECLARE_SERIALIZE()
 public:
     SceneGlobals();
     ~SceneGlobals() override = default;

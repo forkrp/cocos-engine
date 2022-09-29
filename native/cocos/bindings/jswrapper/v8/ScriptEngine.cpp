@@ -204,16 +204,23 @@ SE_BIND_FUNC(jsbConsoleAssert)
 class ScriptEngineV8Context {
 public:
     ScriptEngineV8Context() {
-        platform = v8::platform::NewDefaultPlatform().release();
+        platform = v8::platform::NewDefaultPlatform().release(); ///
         v8::V8::InitializePlatform(platform);
         ccstd::string flags;
         //NOTICE: spaces are required between flags
         flags.append(" --expose-gc-as=" EXPOSE_GC);
         flags.append(" --no-flush-bytecode --no-lazy"); // for bytecode support
                                                         // flags.append(" --trace-gc"); // v8 trace gc
-        #if (CC_PLATFORM == CC_PLATFORM_IOS)
-        flags.append(" --jitless");
-        #endif
+                                                        //        #if (CC_PLATFORM == CC_PLATFORM_IOS)
+                                                        //        flags.append(" --jitless");
+                                                        //        #endif
+
+        //        flags.append(" --trace-gc=true --trace-gc-verbose=true");
+        //        flags.append(" --minor-mc=true");
+        //        flags.append(" --scavenge-task=false");
+        //        flags.append(" --incremental-marking=false --incremental-marking-task=false");
+        //        flags.append(" --max-old-space-size=1000 --max-semi-space-size=512 --initial-heap-size=500 -initial-old-space-size=200");
+
         if (!flags.empty()) {
             v8::V8::SetFlagsFromString(flags.c_str(), static_cast<int>(flags.length()));
         }
@@ -510,7 +517,7 @@ bool ScriptEngine::postInit() {
     _isolate->SetPromiseRejectCallback(onPromiseRejectCallback);
 
     NativePtrToObjectMap::init();
-    Object::setup();
+
     Class::setIsolate(_isolate);
     Object::setIsolate(_isolate);
 
@@ -653,8 +660,9 @@ void ScriptEngine::cleanup() {
         _isolate->Exit();
     }
     _isolate->Dispose();
-
     _isolate = nullptr;
+    Object::setIsolate(nullptr);
+
     _globalObj = nullptr;
     _isValid = false;
 
@@ -774,11 +782,9 @@ bool ScriptEngine::start(v8::Isolate *isolate) {
 }
 
 void ScriptEngine::garbageCollect() {
-    int objSize = __objectSet ? static_cast<int>(__objectSet->size()) : -1;
-    SE_LOGD("GC begin ..., (js->native map) size: %d, all objects: %d\n", (int)NativePtrToObjectMap::size(), objSize);
+    SE_LOGD("GC begin ..., (js->native map) size: %d\n", (int)NativePtrToObjectMap::size());
     _gcFunc->call({}, nullptr);
-    objSize = __objectSet ? static_cast<int>(__objectSet->size()) : -1;
-    SE_LOGD("GC end ..., (js->native map) size: %d, all objects: %d\n", (int)NativePtrToObjectMap::size(), objSize);
+    SE_LOGD("GC end ..., (js->native map) size: %d\n", (int)NativePtrToObjectMap::size());
 }
 
 bool ScriptEngine::isGarbageCollecting() const {
@@ -1179,20 +1185,21 @@ ScriptEngine::VMStringPool::~VMStringPool() = default;
 
 v8::MaybeLocal<v8::String> ScriptEngine::VMStringPool::get(v8::Isolate *isolate, const char *name) {
     v8::Local<v8::String> ret;
-    auto iter = _vmStringPoolMap.find(name);
-    if (iter == _vmStringPoolMap.end()) {
-        v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(isolate, name, v8::NewStringType::kNormal);
-        if (!nameValue.IsEmpty()) {
-            auto *persistentName = ccnew v8::Persistent<v8::String>();
-            persistentName->Reset(isolate, nameValue.ToLocalChecked());
-            _vmStringPoolMap.emplace(name, persistentName);
-            ret = v8::Local<v8::String>::New(isolate, *persistentName);
-        }
-    } else {
-        ret = v8::Local<v8::String>::New(isolate, *iter->second);
+    //    auto iter = _vmStringPoolMap.find(name);
+    //    if (iter == _vmStringPoolMap.end()) {
+    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(isolate, name, v8::NewStringType::kInternalized);
+    if (!nameValue.IsEmpty()) {
+        //            auto *persistentName = ccnew v8::Persistent<v8::String>();
+        //            persistentName->Reset(isolate, nameValue.ToLocalChecked());
+        //            _vmStringPoolMap.emplace(name, persistentName);
+        //            ret = v8::Local<v8::String>::New(isolate, *persistentName);
     }
+    //    } else {
+    //        ret = v8::Local<v8::String>::New(isolate, *iter->second);
+    //    }
 
-    return ret;
+    //    return ret;
+    return nameValue;
 }
 
 void ScriptEngine::VMStringPool::clear() {

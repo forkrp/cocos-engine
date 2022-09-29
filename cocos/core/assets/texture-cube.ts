@@ -119,13 +119,10 @@ export enum MipmapMode {
 export class TextureCube extends SimpleTexture {
     public static FaceIndex = FaceIndex;
 
-    @serializable
     isRGBE = false;
 
-    @serializable
     _mipmapAtlas: ITextureCubeMipmapAtlas | null = null;
 
-    @serializable
     _mipmapMode = MipmapMode.NONE;
 
     /**

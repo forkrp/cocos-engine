@@ -399,6 +399,14 @@ public:
         return math::isEqualF(x, v.x, precision) && math::isEqualF(y, v.y, precision) && math::isEqualF(z, v.z, precision) && math::isEqualF(w, v.w, precision);
     }
 
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(x, "x");
+        ar.serialize(y, "y");
+        ar.serialize(z, "z");
+        ar.serialize(w, "w");
+    }
+
     /** equals to Quaternion(0,0,0, 0) */
     static const Quaternion ZERO;
 

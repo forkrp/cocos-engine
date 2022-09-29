@@ -39,7 +39,7 @@
 
 NS_CC_MATH_BEGIN
 
-//class Plane;
+// class Plane;
 
 /**
  * Defines a 4 x 4 floating point matrix representing a 3D transformation.
@@ -290,10 +290,10 @@ public:
                                 const Vec3 &cameraUpVector, const Vec3 &cameraForwardVector,
                                 Mat4 *dst);
 
-    //Fills in an existing Mat4 so that it reflects the coordinate system about a specified Plane.
-    //plane The Plane about which to create a reflection.
-    //dst A matrix to store the result in.
-    //static void createReflection(const Plane& plane, Mat4* dst);
+    // Fills in an existing Mat4 so that it reflects the coordinate system about a specified Plane.
+    // plane The Plane about which to create a reflection.
+    // dst A matrix to store the result in.
+    // static void createReflection(const Plane& plane, Mat4* dst);
 
     /**
      * Creates a scale matrix.
@@ -851,8 +851,8 @@ public:
     Mat4 getTransposed() const;
 
     /**
-    * Calculates the inverse transpose of a matrix and save the results to out matrix
-    */
+     * Calculates the inverse transpose of a matrix and save the results to out matrix
+     */
     static void inverseTranspose(const Mat4 &mat, Mat4 *dst);
     /**
      * Calculates the sum of this matrix with the given matrix.
@@ -920,7 +920,27 @@ public:
     /**
      * Determines if this matrix is approximately equal to the given matrix.
      */
-    bool approxEquals(const Mat4& v, float precision = CC_FLOAT_CMP_PRECISION) const;
+    bool approxEquals(const Mat4 &v, float precision = CC_FLOAT_CMP_PRECISION) const;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(m[0], "m00");
+        ar.serialize(m[1], "m01");
+        ar.serialize(m[2], "m02");
+        ar.serialize(m[3], "m03");
+        ar.serialize(m[4], "m04");
+        ar.serialize(m[5], "m05");
+        ar.serialize(m[6], "m06");
+        ar.serialize(m[7], "m07");
+        ar.serialize(m[8], "m08");
+        ar.serialize(m[9], "m09");
+        ar.serialize(m[10], "m10");
+        ar.serialize(m[11], "m11");
+        ar.serialize(m[12], "m12");
+        ar.serialize(m[13], "m13");
+        ar.serialize(m[14], "m14");
+        ar.serialize(m[15], "m15");
+    }
 
     /** equals to a matrix full of zeros */
     static const Mat4 ZERO;

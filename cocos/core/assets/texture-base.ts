@@ -35,6 +35,7 @@ import { legacyCC } from '../global-exports';
 import { errorID } from '../platform/debug';
 import { murmurhash2_32_gc } from '../utils/murmurhash2_gc';
 import { ccenum } from '../value-types/enum';
+import { IArchive } from '../serialization';
 
 ccenum(Format);
 
@@ -310,6 +311,19 @@ export class TextureBase extends Asset {
             this.setMipFilter(parseInt(fields[5]));
             this.setAnisotropy(parseInt(fields[6]));
         }
+    }
+
+    serialize (ar: IArchive): void {
+        //NOTE: texturebase doesn't need to invoke super serialize
+        // super.serialize(ar);
+        this._format = ar.uint32(this._format, '_format');
+        this._minFilter = ar.uint32(this._minFilter, '_minFilter');
+        this._magFilter = ar.uint32(this._magFilter, '_magFilter');
+        this._mipFilter = ar.uint32(this._mipFilter, '_mipFilter');
+        this._wrapS = ar.uint32(this._wrapS, '_wrapS');
+        this._wrapT = ar.uint32(this._wrapT, '_wrapT');
+        this._wrapR = ar.uint32(this._wrapR, '_wrapR');
+        this._anisotropy = ar.uint32(this._anisotropy, '_anisotropy');
     }
 
     protected _getGFXDevice (): Device | null {

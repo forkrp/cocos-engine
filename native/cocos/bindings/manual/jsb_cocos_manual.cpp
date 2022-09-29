@@ -733,6 +733,196 @@ static bool register_engine_Color_manual(se::Object * /*obj*/) { // NOLINT(reada
     return true;
 }
 
+static void testCreateObjectAndAssignObjectProperty(uint32_t loopCount, se::Value& rval) {
+    auto* global = se::ScriptEngine::getInstance()->getGlobalObject();
+    auto start = std::chrono::steady_clock::now();
+
+    se::Value MySerializationTestClassVal;
+    global->getProperty("MySerializationTestClass", &MySerializationTestClassVal);
+    auto* MySerializationTestClassCtor = MySerializationTestClassVal.toObject();
+
+    se::Value MyObjectClassVal;
+    global->getProperty("MyObjectClass", &MyObjectClassVal);
+    auto* MyObjectClassCtor = MyObjectClassVal.toObject();
+
+    std::vector<se::Object*> testArr;
+    testArr.reserve(loopCount);
+
+    for (uint32_t i = 0; i < loopCount; ++i) {
+        se::AutoHandleScope hs;
+        se::Value testVal;
+        testArr.emplace_back(se::Object::createObjectWithConstructor(MySerializationTestClassCtor));
+        auto& test = testArr.back();
+        test->root();
+        {
+            test->setProperty("booleanValue", se::Value(false));
+            test->setProperty("nullValue", se::Value::Null);
+            test->setProperty("undefinedValue", se::Value::Undefined);
+            test->setProperty("numberValue0", se::Value(100.123));
+            test->setProperty("numberValue1", se::Value(230.2345));
+            test->setProperty("numberValue2", se::Value(330.2345));
+            test->setProperty("numberValue3", se::Value(430.2345));
+            test->setProperty("numberValue4", se::Value(530.2345));
+
+            test->setProperty("stringValue0", se::Value("hello 0"));
+            test->setProperty("stringValue1", se::Value("hello 1"));
+            test->setProperty("stringValue2", se::Value("hello 2"));
+            test->setProperty("stringValue3", se::Value("hello 3"));
+            test->setProperty("stringValue4", se::Value("hello 4"));
+        }
+
+        {
+            se::HandleObject myInterface0{se::Object::createPlainObject()};
+            myInterface0->setProperty("booleanValue", se::Value(true));
+            myInterface0->setProperty("numberValue", se::Value(888.23));
+            myInterface0->setProperty("stringValue", se::Value("I'm string value in interface"));
+            test->setProperty("myObjectInterface0", se::Value(myInterface0));
+        }
+
+        {
+            se::HandleObject myInterface1{se::Object::createPlainObject()};
+            myInterface1->setProperty("booleanValue", se::Value(true));
+            myInterface1->setProperty("numberValue", se::Value(8834.23));
+            myInterface1->setProperty("stringValue", se::Value("I'm string value in interface1"));
+            test->setProperty("myObjectInterface1", se::Value(myInterface1));
+        }
+
+        {
+            se::HandleObject myInterface2{se::Object::createPlainObject()};
+            myInterface2->setProperty("booleanValue", se::Value(true));
+            myInterface2->setProperty("numberValue", se::Value(12390.23));
+            myInterface2->setProperty("stringValue", se::Value("I'm string value in interface2"));
+            test->setProperty("myObjectInterface2", se::Value(myInterface2));
+        }
+
+        {
+            se::HandleObject myInterface3{se::Object::createPlainObject()};
+            myInterface3->setProperty("booleanValue", se::Value(true));
+            myInterface3->setProperty("numberValue", se::Value(0.2312348));
+            myInterface3->setProperty("stringValue", se::Value("I'm string value in interface3"));
+            test->setProperty("myObjectInterface3", se::Value(myInterface3));
+        }
+
+        {
+            se::HandleObject myClass0{se::Object::createObjectWithConstructor(MyObjectClassCtor)};
+            myClass0->setProperty("booleanValue0", se::Value(true));
+            myClass0->setProperty("numberValue0", se::Value(888.23));
+            myClass0->setProperty("stringValue0", se::Value("I'm string value in myclass0-0"));
+
+            myClass0->setProperty("booleanValue1", se::Value(false));
+            myClass0->setProperty("numberValue1", se::Value(1.234));
+            myClass0->setProperty("stringValue1", se::Value("I'm string value in myclass0-1"));
+
+            myClass0->setProperty("booleanValue2", se::Value(true));
+            myClass0->setProperty("numberValue2", se::Value(2.323));
+            myClass0->setProperty("stringValue2", se::Value("I'm string value in myclass0-2"));
+
+            myClass0->setProperty("booleanValue3", se::Value(true));
+            myClass0->setProperty("numberValue3", se::Value(1.3423));
+            myClass0->setProperty("stringValue3", se::Value("I'm string value in myclass0-3"));
+
+            test->setProperty("myObjectClass0", se::Value(myClass0));
+        }
+
+        {
+            se::HandleObject myClass1{se::Object::createObjectWithConstructor(MyObjectClassCtor)};
+            myClass1->setProperty("booleanValue0", se::Value(true));
+            myClass1->setProperty("numberValue0", se::Value(888.23));
+            myClass1->setProperty("stringValue0", se::Value("I'm string value in myclass1-0"));
+
+            myClass1->setProperty("booleanValue1", se::Value(false));
+            myClass1->setProperty("numberValue1", se::Value(1.234));
+            myClass1->setProperty("stringValue1", se::Value("I'm string value in myclass1-1"));
+
+            myClass1->setProperty("booleanValue2", se::Value(true));
+            myClass1->setProperty("numberValue2", se::Value(2.323));
+            myClass1->setProperty("stringValue2", se::Value("I'm string value in myclass1-2"));
+
+            myClass1->setProperty("booleanValue3", se::Value(true));
+            myClass1->setProperty("numberValue3", se::Value(1.3423));
+            myClass1->setProperty("stringValue3", se::Value("I'm string value in myclass1-3"));
+
+            test->setProperty("myObjectClass1", se::Value(myClass1));
+        }
+
+        {
+            se::HandleObject myClass2{se::Object::createObjectWithConstructor(MyObjectClassCtor)};
+            myClass2->setProperty("booleanValue0", se::Value(true));
+            myClass2->setProperty("numberValue0", se::Value(888.23));
+            myClass2->setProperty("stringValue0", se::Value("I'm string value in myclass2-0"));
+
+            myClass2->setProperty("booleanValue1", se::Value(false));
+            myClass2->setProperty("numberValue1", se::Value(1.234));
+            myClass2->setProperty("stringValue1", se::Value("I'm string value in myclass2-1"));
+
+            myClass2->setProperty("booleanValue2", se::Value(true));
+            myClass2->setProperty("numberValue2", se::Value(2.323));
+            myClass2->setProperty("stringValue2", se::Value("I'm string value in myclass2-2"));
+
+            myClass2->setProperty("booleanValue3", se::Value(true));
+            myClass2->setProperty("numberValue3", se::Value(1.3423));
+            myClass2->setProperty("stringValue3", se::Value("I'm string value in myclass2-3"));
+
+            test->setProperty("myObjectClass2", se::Value(myClass2));
+        }
+
+        {
+            se::HandleObject myClass3{se::Object::createObjectWithConstructor(MyObjectClassCtor)};
+            myClass3->setProperty("booleanValue0", se::Value(true));
+            myClass3->setProperty("numberValue0", se::Value(888.23));
+            myClass3->setProperty("stringValue0", se::Value("I'm string value in myclass3-0"));
+
+            myClass3->setProperty("booleanValue1", se::Value(false));
+            myClass3->setProperty("numberValue1", se::Value(1.234));
+            myClass3->setProperty("stringValue1", se::Value("I'm string value in myclass3-1"));
+
+            myClass3->setProperty("booleanValue2", se::Value(true));
+            myClass3->setProperty("numberValue2", se::Value(2.323));
+            myClass3->setProperty("stringValue2", se::Value("I'm string value in myclass3-2"));
+
+            myClass3->setProperty("booleanValue3", se::Value(true));
+            myClass3->setProperty("numberValue3", se::Value(1.3423));
+            myClass3->setProperty("stringValue3", se::Value("I'm string value in myclass3-3"));
+
+            test->setProperty("myObjectClass3", se::Value(myClass3));
+        }
+
+        test->unroot();
+        test->decRef();
+    }
+
+    auto end = std::chrono::steady_clock::now();
+    auto timeCostMS = static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() / 1000000.0);
+
+    se::HandleObject jsTestArr{se::Object::createArrayObject(loopCount)};
+//    uint32_t i = 0;
+//    for (auto* e : testArr) {
+//        jsTestArr->setArrayElement(i, se::Value(e));
+//        e->unroot();
+//        e->decRef();
+//        ++i;
+//    }
+
+    se::HandleObject retObj{se::Object::createPlainObject()};
+    retObj->setProperty("timeCost", se::Value(timeCostMS));
+    retObj->setProperty("testArr", se::Value(jsTestArr));
+    rval.setObject(retObj);
+}
+
+static bool js_onCppTest(se::State &s) { // NOLINT(readability-identifier-naming)
+    const auto &args = s.args();
+    size_t argc = args.size();
+    bool ok = true;
+    if (argc == 1) {
+        uint32_t loopCount = args[0].toUint32();
+        testCreateObjectAndAssignObjectProperty(loopCount, s.rval());
+        return true;
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    return false;
+}
+SE_BIND_FUNC(js_onCppTest)
+
 bool register_all_cocos_manual(se::Object *obj) { // NOLINT(readability-identifier-naming)
     register_plist_parser(obj);
     register_sys_localStorage(obj);
@@ -741,5 +931,8 @@ bool register_all_cocos_manual(se::Object *obj) { // NOLINT(readability-identifi
     register_filetuils_ext(obj);
     register_engine_Color_manual(obj);
     register_se_setExceptionCallback(obj);
+
+    __jsbObj->defineFunction("onCppTest", _SE(js_onCppTest));
+
     return true;
 }

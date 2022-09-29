@@ -34,7 +34,7 @@
 
 namespace cc {
 
-//class RenderableComponent;
+// class RenderableComponent;
 
 namespace scene {
 class Pass;
@@ -87,6 +87,7 @@ struct IMaterialInfo {
 };
 
 class Material : public Asset {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = Asset;
     /**

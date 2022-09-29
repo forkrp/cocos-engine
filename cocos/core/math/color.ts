@@ -30,6 +30,7 @@ import { IColorLike } from './type-define';
 import { clamp, EPSILON } from './utils';
 import { legacyCC } from '../global-exports';
 import { mixin } from '../utils/js-typed';
+import { IArchive, ISerializable } from '../serialization';
 
 const toFloat = 1 / 255;
 
@@ -39,7 +40,7 @@ const toFloat = 1 / 255;
  * @zh 通过 Red、Green、Blue 颜色通道表示颜色，并通过 Alpha 通道表示不透明度。<br/>
  * 每个通道都为取值范围 [0, 255] 的整数。<br/>
  */
-export class Color extends ValueType {
+export class Color extends ValueType implements ISerializable {
     public static WHITE = Object.freeze(new Color(255, 255, 255, 255));
     public static GRAY = Object.freeze(new Color(127, 127, 127, 255));
     public static BLACK = Object.freeze(new Color(0, 0, 0, 255));
@@ -677,6 +678,13 @@ export class Color extends ValueType {
     public _set_a_unsafe (alpha) {
         this._val = ((this._val & 0x00ffffff) | (alpha << 24)) >>> 0;
         return this;
+    }
+
+    serializeInlineData (ar: IArchive): void {
+        this.r = ar.uint8(this.r, 'r');
+        this.g = ar.uint8(this.g, 'g');
+        this.b = ar.uint8(this.b, 'b');
+        this.a = ar.uint8(this.a, 'a');
     }
 }
 

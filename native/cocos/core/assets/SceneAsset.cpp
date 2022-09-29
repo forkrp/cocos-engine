@@ -25,8 +25,12 @@
 
 #include "core/assets/SceneAsset.h"
 #include "core/scene-graph/Scene.h"
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
+
+CC_IMPL_SERIALIZE(SceneAsset)
 
 SceneAsset::SceneAsset() = default;
 SceneAsset::~SceneAsset() = default;
@@ -40,6 +44,12 @@ void SceneAsset::setScene(Scene *scene) { _scene = scene; };
 void SceneAsset::initDefault(const ccstd::optional<ccstd::string> &uuid) {
     Super::initDefault(uuid);
     _scene = ccnew Scene("New Scene");
+}
+
+template <class Archive>
+void SceneAsset::serialize(Archive &ar) {
+    ar.serialize(_scene, "scene");
+    CC_LOG_DEBUG("==> SceneAsset: %p, scene: %p", this, _scene.get());
 }
 
 } // namespace cc

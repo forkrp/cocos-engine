@@ -32,6 +32,10 @@
 #include "base/RefCounted.h"
 #include "base/memory/Memory.h"
 
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
+#include "serialization/SerializePrivateObject.h"
+
 namespace se {
 
 class Object;
@@ -49,6 +53,9 @@ public:
     inline T *get() const {
         return reinterpret_cast<T *>(getRaw());
     }
+
+    virtual void serialize(cc::JsonInputArchive &ar) = 0;
+    virtual void serialize(cc::BinaryInputArchive &ar) = 0;
 
     template <typename T>
     inline TypedPrivateObject<T> *typed() {
@@ -80,6 +87,14 @@ public:
         static_assert(!std::is_base_of<PrivateObjectBase, T>::value, ""); // NOLINT // remove after using c++17
         return typeid(T).name();
     }
+
+    void serialize(cc::JsonInputArchive &ar) override {
+        cc::serializePrivateObject(get<T>(), ar);
+    }
+
+    void serialize(cc::BinaryInputArchive &ar) override {
+        cc::serializePrivateObject(get<T>(), ar);
+    }
 };
 
 template <typename T>
@@ -88,11 +103,11 @@ public:
     SharedPtrPrivateObject() = default;
     explicit SharedPtrPrivateObject(const std::shared_ptr<T> &ptr) : _data(ptr) {}
     explicit SharedPtrPrivateObject(std::shared_ptr<T> &&ptr) : _data(std::move(ptr)) {}
-    inline const std::shared_ptr<T>& getData() const {
+    inline const std::shared_ptr<T> &getData() const {
         return _data;
     }
 
-    inline std::shared_ptr<T>& getData() {
+    inline std::shared_ptr<T> &getData() {
         return _data;
     }
     constexpr bool isSharedPtr() const override { return true; }
@@ -111,8 +126,8 @@ public:
     explicit CCIntrusivePtrPrivateObject(cc::IntrusivePtr<T> &&p) : _ptr(std::move(p)) {}
     ~CCIntrusivePtrPrivateObject() override = default;
 
-    inline const cc::IntrusivePtr<T>& getData() const { return _ptr; }
-    inline cc::IntrusivePtr<T>& getData() { return _ptr; }
+    inline const cc::IntrusivePtr<T> &getData() const { return _ptr; }
+    inline cc::IntrusivePtr<T> &getData() { return _ptr; }
 
     inline void *getRaw() const override {
         return _ptr.get();

@@ -36,6 +36,7 @@ import { NodeSpace, TransformBit } from './node-enum';
 import { NodeEventType } from './node-event';
 import { CustomSerializable, editorExtrasTag, SerializationContext, SerializationOutput, serializeTag } from '../data';
 import { warnID } from '../platform/debug';
+import { IArchive } from '../serialization';
 
 const v3_a = new Vec3();
 const q_a = new Quat();
@@ -1210,6 +1211,15 @@ export class Node extends BaseNode implements CustomSerializable {
         }
 
         return result;
+    }
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._lpos = ar.serializableObj(this._lpos, '_lpos');
+        this._lrot = ar.serializableObj(this._lrot, '_lrot');
+        this._lscale = ar.serializableObj(this._lscale, '_lscale');
+        this._layer = ar.uint32(this._layer, '_layer');
+        this._euler = ar.serializableObj(this._euler, '_euler');
     }
 }
 

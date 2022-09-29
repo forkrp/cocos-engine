@@ -128,12 +128,12 @@ void TextureCube::setMipmapAtlas(const TextureCubeMipmapAtlasInfo &value) {
         const MipmapAtlasLayoutInfo &layoutInfo = layouts[level];
         uint32_t currentSize = layoutInfo.width * layoutInfo.height * pixelSize;
 
-        //Upload 6 sides by level
+        // Upload 6 sides by level
         forEachFace(atlas, [this, currentSize, lv0Layout, layoutInfo, level, pixelSize](ImageAsset *face, TextureCube::FaceIndex faceIndex) {
             auto *buffer = ccnew uint8_t[currentSize];
             memset(buffer, 0, currentSize);
             const uint8_t *data = face->getData();
-            //Splitting Atlas
+            // Splitting Atlas
             if (level == 0) {
                 memcpy(buffer, data, currentSize);
             } else {
@@ -233,64 +233,6 @@ bool TextureCube::destroy() {
     _mipmaps.clear();
     _mipmapAtlas.layout.clear();
     return Super::destroy();
-}
-
-ccstd::any TextureCube::serialize(const ccstd::any & /*ctxForExporting*/) {
-    //cjh TODO:    if (EDITOR || TEST) {
-    //        return {
-    //            base: super._serialize(ctxForExporting),
-    //            rgbe: this.isRGBE,
-    //            mipmaps: this._mipmaps.map((mipmap) => ((ctxForExporting && ctxForExporting._compressUuid) ? {
-    //                front: EditorExtends.UuidUtils.compressUuid(mipmap.front._uuid, true),
-    //                back: EditorExtends.UuidUtils.compressUuid(mipmap.back._uuid, true),
-    //                left: EditorExtends.UuidUtils.compressUuid(mipmap.left._uuid, true),
-    //                right: EditorExtends.UuidUtils.compressUuid(mipmap.right._uuid, true),
-    //                top: EditorExtends.UuidUtils.compressUuid(mipmap.top._uuid, true),
-    //                bottom: EditorExtends.UuidUtils.compressUuid(mipmap.bottom._uuid, true),
-    //            } : {
-    //                front: mipmap.front._uuid,
-    //                back: mipmap.back._uuid,
-    //                left: mipmap.left._uuid,
-    //                right: mipmap.right._uuid,
-    //                top: mipmap.top._uuid,
-    //                bottom: mipmap.bottom._uuid,
-    //            })),
-    //        };
-    //    }
-    return nullptr;
-}
-
-void TextureCube::deserialize(const ccstd::any &serializedData, const ccstd::any &handle) {
-    const auto *data = ccstd::any_cast<TextureCubeSerializeData>(&serializedData);
-    if (data == nullptr) {
-        return;
-    }
-    Super::deserialize(data->base, handle);
-    isRGBE = data->rgbe;
-    _mipmapMode = data->mipmapMode;
-
-    _mipmaps.resize(data->mipmaps.size());
-    for (size_t i = 0; i < data->mipmaps.size(); ++i) {
-        // Prevent resource load failed
-        ITextureCubeMipmap mipmap;
-        mipmap.front = ccnew ImageAsset(),
-        mipmap.back = ccnew ImageAsset(),
-        mipmap.left = ccnew ImageAsset(),
-        mipmap.right = ccnew ImageAsset(),
-        mipmap.top = ccnew ImageAsset(),
-        mipmap.bottom = ccnew ImageAsset();
-        _mipmaps[i] = mipmap;
-        //        auto* mipmap = data->mipmaps[i];
-
-        //cjh TODO: what's handle.result??        const imageAssetClassId = js.getClassId(ImageAsset);
-        //
-        //        handle.result.push(this._mipmaps[i], `front`, mipmap.front, imageAssetClassId);
-        //        handle.result.push(this._mipmaps[i], `back`, mipmap.back, imageAssetClassId);
-        //        handle.result.push(this._mipmaps[i], `left`, mipmap.left, imageAssetClassId);
-        //        handle.result.push(this._mipmaps[i], `right`, mipmap.right, imageAssetClassId);
-        //        handle.result.push(this._mipmaps[i], `top`, mipmap.top, imageAssetClassId);
-        //        handle.result.push(this._mipmaps[i], `bottom`, mipmap.bottom, imageAssetClassId);
-    }
 }
 
 gfx::TextureInfo TextureCube::getGfxTextureCreateInfo(gfx::TextureUsageBit usage, gfx::Format format, uint32_t levelCount, gfx::TextureFlagBit flags) {

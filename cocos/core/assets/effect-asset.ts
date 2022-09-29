@@ -34,6 +34,7 @@ import { programLib } from '../renderer/core/program-lib';
 import { Asset } from './asset';
 import { legacyCC } from '../global-exports';
 import { warnID } from '../platform/debug';
+import { IArchive } from '../serialization';
 
 export declare namespace EffectAsset {
     export interface IPropertyInfo {
@@ -280,6 +281,14 @@ export class EffectAsset extends Asset {
     @serializable
     @editorOnly
     public hideInEditor = false;
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this.techniques = ar.plainObj(this.techniques, 'techniques');
+        this.shaders = ar.plainObj(this.shaders, 'shaders');
+        this.combinations = ar.plainObj(this.combinations, 'combinations');
+        this.hideInEditor = ar.boolean(this.hideInEditor, 'hideInEditor');
+    }
 
     /**
      * @en The loaded callback which should be invoked by the [[CCLoader]], will automatically register the effect.

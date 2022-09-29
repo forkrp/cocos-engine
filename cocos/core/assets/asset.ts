@@ -34,6 +34,7 @@ import { legacyCC } from '../global-exports';
 import { extname } from '../utils/path';
 import { debug, getError, warn } from '../platform/debug';
 import { CCObject } from '../data/object';
+import { IArchive } from '../serialization';
 
 /**
  * @en
@@ -147,7 +148,6 @@ export class Asset extends Eventify(CCObject) {
      * @default null
      * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
-    @property
     get _nativeAsset () {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._file;
@@ -207,7 +207,7 @@ export class Asset extends Eventify(CCObject) {
      * @return {String}
      * @private
      */
-    public serialize () { }
+    //FIXME(cjh) public serialize () { }
 
     /**
      * @en
@@ -308,6 +308,15 @@ export class Asset extends Eventify(CCObject) {
     public destroy () {
         debug(getError(12101, this._uuid));
         return super.destroy();
+    }
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._native = ar.str(this._native, '_native');
+    }
+
+    serializeInlineData (ar: IArchive): void {
+        this._uuid = ar.str(this._uuid, '__uuid__');
     }
 }
 

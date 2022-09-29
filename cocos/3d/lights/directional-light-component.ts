@@ -32,7 +32,7 @@ import { Camera, PCFType, Shadows, ShadowType, CSMOptimizationMode, CSMLevel } f
 import { Root } from '../../core/root';
 import { property } from '../../core/data/class-decorator';
 import { CCBoolean, CCFloat } from '../../core/data/utils/attribute';
-import { clamp, warnID } from '../../core';
+import { clamp, IArchive, warnID } from '../../core';
 
 /**
  * @en The directional light component, only one real time directional light is permitted in one scene, it act as the main light of the scene.
@@ -86,6 +86,27 @@ export class DirectionalLight extends Light {
 
     protected _type = scene.LightType.DIRECTIONAL;
     protected _light: scene.DirectionalLight | null = null;
+
+    serialize (ar: IArchive) : void {
+        super.serialize(ar);
+        this._illuminanceHDR = ar.float64(this._illuminanceHDR, '_illuminanceHDR');
+        this._illuminanceHDR = ar.float64(this._illuminanceHDR, '_illuminance');
+        this._illuminanceLDR = ar.float64(this._illuminanceLDR, '_illuminanceLDR');
+        this._shadowEnabled = ar.boolean(this._shadowEnabled, '_shadowEnabled');
+        this._shadowPcf = ar.uint8(this._shadowPcf, '_shadowPcf');
+        this._shadowBias = ar.float64(this._shadowBias, '_shadowBias');
+        this._shadowNormalBias = ar.float64(this._shadowNormalBias, '_shadowNormalBias');
+        this._shadowSaturation = ar.float64(this._shadowSaturation, '_shadowSaturation');
+        this._shadowDistance = ar.float64(this._shadowDistance, '_shadowDistance');
+        this._shadowInvisibleOcclusionRange = ar.float64(this._shadowInvisibleOcclusionRange, '_shadowInvisibleOcclusionRange');
+        this._csmLevel = ar.uint8(this._csmLevel, '_csmLevel');
+        this._csmLayerLambda = ar.float64(this._csmLayerLambda, '_csmLayerLambda');
+        this._csmOptimizationMode = ar.uint8(this._csmOptimizationMode, '_csmOptimizationMode');
+        this._shadowFixedArea = ar.boolean(this._shadowFixedArea, '_shadowFixedArea');
+        this._shadowNear = ar.float64(this._shadowNear, '_shadowNear');
+        this._shadowFar = ar.float64(this._shadowFar, '_shadowFar');
+        this._shadowOrthoSize = ar.float64(this._shadowOrthoSize, '_shadowOrthoSize');
+    }
 
     /**
      * @en The light source intensity.

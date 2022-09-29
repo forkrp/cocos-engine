@@ -843,7 +843,12 @@ export function deserializeDynamic (data: SerializedData | CCON, details: Detail
     const deserializer = _Deserializer.pool.get(details, classFinder, reportMissingClass, customEnv, ignoreEditorOnly);
 
     legacyCC.game._isCloning = true;
+    const oldTime = performance.now();
     const res = deserializer.deserialize(data);
+    if (res instanceof legacyCC.SceneAsset) {
+        const cost = performance.now() - oldTime;
+        console.log(`===>cjh deserialize scene cost: ${cost}`);
+    }
     legacyCC.game._isCloning = false;
 
     _Deserializer.pool.put(deserializer);

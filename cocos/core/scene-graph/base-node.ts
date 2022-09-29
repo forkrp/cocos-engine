@@ -39,6 +39,7 @@ import { Node } from './node';
 import type { Scene } from './scene';
 import { PrefabInfo } from '../utils/prefab/prefab-info';
 import { NodeEventType } from './node-event';
+import { IArchive } from '../serialization';
 
 const Destroying = CCObject.Flags.Destroying;
 const DontDestroy = CCObject.Flags.DontDestroy;
@@ -1399,6 +1400,21 @@ export class BaseNode extends CCObject implements ISchedulable {
      * @throws If one or more component of same type have been existed in this node.
      */
     protected _checkMultipleComp?<T extends Component> (constructor: Constructor<T>): void;
+
+    public serialize (ar: IArchive): void {
+        super.serialize(ar);
+
+        this._parent = ar.serializableObj(this._parent, '_parent');
+        this._children = ar.serializableObjArray(this._children, '_children');
+        this._active = ar.boolean(this._active, '_active');
+
+        this._components = ar.serializableObjArray(this._components, '_components');
+        this._prefab = ar.serializableObj(this._prefab, '_prefab');
+
+        if (!ar.isExporting()) {
+            this._id = ar.str(this._id, '_id');
+        }
+    }
 }
 
 baseNodePolyfill(BaseNode);

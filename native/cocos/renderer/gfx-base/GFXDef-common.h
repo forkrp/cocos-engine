@@ -30,6 +30,7 @@
 #include "base/std/container/string.h"
 #include "base/std/container/vector.h"
 #include "math/Math.h"
+#include "serialization/IArchive.h"
 
 #ifdef Status
     // Fix linux compile errors
@@ -951,6 +952,14 @@ struct Color {
     float w{0.F};
 
     EXPOSE_COPY_FN(Color)
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(x);
+        CC_SERIALIZE(y);
+        CC_SERIALIZE(z);
+        CC_SERIALIZE(w);
+    }
 };
 using ColorList = ccstd::vector<Color>;
 
@@ -1102,8 +1111,14 @@ struct Uniform {
     ccstd::string name;
     Type type{Type::UNKNOWN};
     uint32_t count{0};
-
     EXPOSE_COPY_FN(Uniform)
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        CC_SERIALIZE(name);
+        CC_SERIALIZE(type);
+        CC_SERIALIZE(count);
+    }
 };
 
 using UniformList = ccstd::vector<Uniform>;

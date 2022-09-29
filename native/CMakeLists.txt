@@ -460,6 +460,24 @@ cocos_source_files(
     cocos/engine/Engine.h
 )
 
+############ serialization
+cocos_source_files(
+    cocos/serialization/AssetDependInfo.cpp
+    cocos/serialization/AssetDependInfo.h
+    cocos/serialization/BinaryInputArchive.cpp
+    cocos/serialization/BinaryInputArchive.h
+    cocos/serialization/HasMemberFunction.h
+    cocos/serialization/IArchive.h
+    cocos/serialization/ISerializable.h
+    cocos/serialization/ISerializableBase.h
+    cocos/serialization/JsonInputArchive.cpp
+    cocos/serialization/JsonInputArchive.h
+    cocos/serialization/SerializationData.cpp
+    cocos/serialization/SerializationData.h
+    cocos/serialization/SerializationTrait.h
+    cocos/serialization/SerializePrivateObject.h
+)
+
 ############ main
 if(NOT USE_SERVER_MODE AND (WINDOWS OR LINUX))
 cocos_source_files(

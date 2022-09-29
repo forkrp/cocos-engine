@@ -42,6 +42,7 @@ import { TransformBit } from '../scene-graph/node-enum';
 import { legacyCC } from '../global-exports';
 import { RenderWindow } from '../renderer/core/render-window';
 import { ClearFlagBit } from '../gfx';
+import { IArchive } from '../serialization';
 
 const _temp_vec3_1 = new Vec3();
 
@@ -160,6 +161,30 @@ export class Camera extends Component {
     protected _cameraType: CameraType = CameraType.DEFAULT;
     @serializable
     protected _trackingType: TrackingType = TrackingType.NO_TRACKING;
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._projection = ar.int8(this._projection, '_projection');
+        this._priority = ar.uint32(this._priority, '_priority');
+        this._fov = ar.float32(this._fov, '_fov');
+        this._fovAxis = ar.int8(this._fovAxis, '_fovAxis');
+        this._orthoHeight = ar.float32(this._orthoHeight, '_orthoHeight');
+        this._near = ar.float32(this._near, '_near');
+        this._far = ar.float32(this._far, '_far');
+        this._color = ar.serializableObj(this._color, '_color');
+        this._depth = ar.float32(this._depth, '_depth');
+        this._stencil = ar.uint32(this._stencil, '_stencil');
+        this._clearFlags = ar.uint32(this._clearFlags, '_clearFlags');
+        this._rect = ar.serializableObj(this._rect, '_rect');
+        this._aperture = ar.uint32(this._aperture, '_aperture');
+        this._shutter = ar.uint8(this._shutter, '_shutter');
+        this._iso = ar.uint8(this._iso, '_iso');
+        this._screenScale = ar.float32(this._screenScale, '_screenScale');
+        this._visibility = ar.uint32(this._visibility, '_visibility');
+        this._targetTexture = ar.serializableObj(this._targetTexture, '_targetTexture');
+        this._cameraType = ar.int32(this._cameraType, '_cameraType');
+        this._trackingType = ar.uint32(this._trackingType, '_trackingType');
+    }
 
     /**
      * @en The render camera representation.
@@ -522,7 +547,7 @@ export class Camera extends Component {
     }
 
     public onLoad () {
-         this._createCamera();
+        this._createCamera();
     }
 
     public onEnable () {
