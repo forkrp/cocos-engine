@@ -204,16 +204,23 @@ SE_BIND_FUNC(jsbConsoleAssert)
 class ScriptEngineV8Context {
 public:
     ScriptEngineV8Context() {
-        platform = v8::platform::NewDefaultPlatform().release();
+        platform = v8::platform::NewDefaultPlatform().release(); ///
         v8::V8::InitializePlatform(platform);
         ccstd::string flags;
         //NOTICE: spaces are required between flags
         flags.append(" --expose-gc-as=" EXPOSE_GC);
         flags.append(" --no-flush-bytecode --no-lazy"); // for bytecode support
                                                         // flags.append(" --trace-gc"); // v8 trace gc
-        #if (CC_PLATFORM == CC_PLATFORM_IOS)
-        flags.append(" --jitless");
-        #endif
+                                                        //        #if (CC_PLATFORM == CC_PLATFORM_IOS)
+                                                        //        flags.append(" --jitless");
+                                                        //        #endif
+
+        //        flags.append(" --trace-gc=true --trace-gc-verbose=true");
+        //        flags.append(" --minor-mc=true");
+        //        flags.append(" --scavenge-task=false");
+        //        flags.append(" --incremental-marking=false --incremental-marking-task=false");
+        //        flags.append(" --max-old-space-size=1000 --max-semi-space-size=512 --initial-heap-size=500 -initial-old-space-size=200");
+
         if (!flags.empty()) {
             v8::V8::SetFlagsFromString(flags.c_str(), static_cast<int>(flags.length()));
         }
@@ -655,7 +662,7 @@ void ScriptEngine::cleanup() {
     _isolate->Dispose();
     _isolate = nullptr;
     Object::setIsolate(nullptr);
-    
+
     _globalObj = nullptr;
     _isValid = false;
 
