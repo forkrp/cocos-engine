@@ -1178,20 +1178,21 @@ ScriptEngine::VMStringPool::~VMStringPool() = default;
 
 v8::MaybeLocal<v8::String> ScriptEngine::VMStringPool::get(v8::Isolate *isolate, const char *name) {
     v8::Local<v8::String> ret;
-    auto iter = _vmStringPoolMap.find(name);
-    if (iter == _vmStringPoolMap.end()) {
-        v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(isolate, name, v8::NewStringType::kNormal);
-        if (!nameValue.IsEmpty()) {
-            auto *persistentName = ccnew v8::Persistent<v8::String>();
-            persistentName->Reset(isolate, nameValue.ToLocalChecked());
-            _vmStringPoolMap.emplace(name, persistentName);
-            ret = v8::Local<v8::String>::New(isolate, *persistentName);
-        }
-    } else {
-        ret = v8::Local<v8::String>::New(isolate, *iter->second);
+    //    auto iter = _vmStringPoolMap.find(name);
+    //    if (iter == _vmStringPoolMap.end()) {
+    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(isolate, name, v8::NewStringType::kInternalized);
+    if (!nameValue.IsEmpty()) {
+        //            auto *persistentName = ccnew v8::Persistent<v8::String>();
+        //            persistentName->Reset(isolate, nameValue.ToLocalChecked());
+        //            _vmStringPoolMap.emplace(name, persistentName);
+        //            ret = v8::Local<v8::String>::New(isolate, *persistentName);
     }
+    //    } else {
+    //        ret = v8::Local<v8::String>::New(isolate, *iter->second);
+    //    }
 
-    return ret;
+    //    return ret;
+    return nameValue;
 }
 
 void ScriptEngine::VMStringPool::clear() {

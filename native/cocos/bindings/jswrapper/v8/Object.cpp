@@ -396,7 +396,7 @@ bool Object::getProperty(const char *name, Value *data, bool cachePropertyName) 
     if (cachePropertyName) {
         nameValue = ScriptEngine::getInstance()->_getStringPool().get(__isolate, name);
     } else {
-        nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kNormal);
+        nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kInternalized);
     }
 
     if (nameValue.IsEmpty()) {
@@ -432,7 +432,7 @@ bool Object::deleteProperty(const char *name) {
         return false;
     }
 
-    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kNormal);
+    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kInternalized);
     if (nameValue.IsEmpty()) {
         return false;
     }
@@ -468,7 +468,7 @@ bool Object::setProperty(const char *name, const Value &data) {
 }
 
 bool Object::defineProperty(const char *name, v8::AccessorNameGetterCallback getter, v8::AccessorNameSetterCallback setter) {
-    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kNormal);
+    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kInternalized);
     if (nameValue.IsEmpty()) {
         return false;
     }
@@ -480,7 +480,7 @@ bool Object::defineProperty(const char *name, v8::AccessorNameGetterCallback get
 }
 
 bool Object::defineOwnProperty(const char *name, const se::Value &value, bool writable, bool enumerable, bool configurable) {
-    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kNormal);
+    v8::MaybeLocal<v8::String> nameValue = v8::String::NewFromUtf8(__isolate, name, v8::NewStringType::kInternalized);
     if (nameValue.IsEmpty()) {
         return false;
     }
@@ -693,7 +693,7 @@ bool Object::call(const ValueArray &args, Object *thisObject, Value *rval /* = n
 }
 
 bool Object::defineFunction(const char *funcName, void (*func)(const v8::FunctionCallbackInfo<v8::Value> &args)) {
-    v8::MaybeLocal<v8::String> maybeFuncName = v8::String::NewFromUtf8(__isolate, funcName, v8::NewStringType::kNormal);
+    v8::MaybeLocal<v8::String> maybeFuncName = v8::String::NewFromUtf8(__isolate, funcName, v8::NewStringType::kInternalized);
     if (maybeFuncName.IsEmpty()) {
         return false;
     }
