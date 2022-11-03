@@ -30,6 +30,7 @@ import { errorID, warnID } from '../platform/debug';
 import { legacyCC } from '../global-exports';
 import { EditorExtendableObject, editorExtrasTag } from './editor-extras-tag';
 import { copyAllProperties } from '../utils/js';
+import { IArchive, ISerializable } from '../serialization';
 
 // definitions for CCObject.Flags
 
@@ -168,7 +169,7 @@ function compileDestruct (obj, ctor) {
  * 大部分对象的基类。
  * @private
  */
-class CCObject implements EditorExtendableObject {
+class CCObject implements EditorExtendableObject, ISerializable {
     public static _deferredDestroy () {
         const deleteCount = objectsToDestroy.length;
         for (let i = 0; i < deleteCount; ++i) {
@@ -388,6 +389,12 @@ class CCObject implements EditorExtendableObject {
         }
 
         this._objFlags |= Destroyed;
+    }
+
+    public serialize (ar: IArchive): void {
+        this._name = ar.str(this._name, '_name');
+        this._objFlags = ar.uint32(this._objFlags, '_objFlags');
+        this[editorExtrasTag] = ar.plainObj(this[editorExtrasTag], editorExtrasTag);
     }
 }
 

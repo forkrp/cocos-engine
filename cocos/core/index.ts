@@ -61,4 +61,6 @@ export * from './builtin';
 export * from './curves';
 export * from './settings';
 
+export * from './serialization';
+
 export * from './pipeline/custom/builtin-pipelines';

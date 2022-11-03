@@ -30,12 +30,13 @@ import { Mat4 } from './mat4';
 import { IMat4Like, IQuatLike, IVec4Like } from './type-define';
 import { clamp, EPSILON, random } from './utils';
 import { legacyCC } from '../global-exports';
+import { IArchive, ISerializable } from '../serialization';
 
 /**
  * @en Representation of four-dimensional vectors.
  * @zh 四维向量。
  */
-export class Vec4 extends ValueType {
+export class Vec4 extends ValueType implements ISerializable {
     public static ZERO = Object.freeze(new Vec4(0, 0, 0, 0));
     public static ONE = Object.freeze(new Vec4(1, 1, 1, 1));
     public static NEG_ONE = Object.freeze(new Vec4(-1, -1, -1, -1));
@@ -886,6 +887,13 @@ export class Vec4 extends ValueType {
         this.z = matrix.m02 * x + matrix.m06 * y + matrix.m10 * z + matrix.m14 * w;
         this.w = matrix.m03 * x + matrix.m07 * y + matrix.m11 * z + matrix.m15 * w;
         return this;
+    }
+
+    serializeInlineData (ar: IArchive): void {
+        this.x = ar.float32(this.x, 'x');
+        this.y = ar.float32(this.y, 'y');
+        this.z = ar.float32(this.z, 'z');
+        this.w = ar.float32(this.w, 'w');
     }
 }
 

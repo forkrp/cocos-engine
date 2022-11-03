@@ -34,6 +34,7 @@ import { legacyCC } from '../global-exports';
 import { extname } from '../utils/path';
 import { debug, getError, warn } from '../platform/debug';
 import { CCObject } from '../data/object';
+import { IArchive } from '../serialization';
 
 /**
  * @en
@@ -207,7 +208,7 @@ export class Asset extends Eventify(CCObject) {
      * @return {String}
      * @private
      */
-    public serialize () { }
+    //FIXME(cjh) public serialize () { }
 
     /**
      * @en
@@ -308,6 +309,15 @@ export class Asset extends Eventify(CCObject) {
     public destroy () {
         debug(getError(12101, this._uuid));
         return super.destroy();
+    }
+
+    serialize (ar: IArchive): void {
+        this._native = ar.str(this._native, '_native');
+        this._file = ar.anyObj(this._file, '_nativeAsset');
+    }
+
+    serializeInlineData (ar: IArchive): void {
+        this._uuid = ar.str(this._uuid, '__uuid__');
     }
 }
 

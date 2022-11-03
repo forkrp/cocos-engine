@@ -30,12 +30,13 @@ import { IQuatLike, IVec3Like } from './type-define';
 import { EPSILON, toDegree } from './utils';
 import { Vec3 } from './vec3';
 import { legacyCC } from '../global-exports';
+import { IArchive, ISerializable } from '../serialization';
 
 /**
  * @en quaternion
  * @zh 四元数
  */
-export class Quat extends ValueType {
+export class Quat extends ValueType implements ISerializable {
     public static IDENTITY = Object.freeze(new Quat());
 
     /**
@@ -811,6 +812,13 @@ export class Quat extends ValueType {
      */
     public lengthSqr () {
         return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
+    }
+
+    serializeInlineData (ar: IArchive): void {
+        this.x = ar.float32(this.x, 'x');
+        this.y = ar.float32(this.y, 'y');
+        this.z = ar.float32(this.z, 'z');
+        this.w = ar.float32(this.w, 'w');
     }
 }
 

@@ -28,6 +28,7 @@ import { ccclass, editable, serializable } from 'cc.decorator';
 import { Scene } from '../scene-graph/scene';
 import { Asset } from './asset';
 import { legacyCC } from '../global-exports';
+import { IArchive } from '../serialization';
 
 /**
  * @en Class for scene loading.
@@ -51,6 +52,11 @@ export class SceneAsset extends Asset {
 
     public validate () {
         return !!this.scene;
+    }
+
+    serialize (ar: IArchive) {
+        super.serialize(ar);
+        this.scene = ar.serializableObj(this.scene, 'scene');
     }
 }
 

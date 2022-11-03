@@ -36,6 +36,7 @@ import { legacyCC } from '../global-exports';
 import { Root } from '../root';
 import { warnID } from '../platform/debug';
 import { Material } from '../assets/material';
+import { IArchive, ISerializable } from '../serialization';
 
 const _up = new Vec3(0, 1, 0);
 const _v3 = new Vec3();
@@ -57,7 +58,7 @@ const normalizeHDRColor = (color : Vec4) => {
  * @zh 场景的环境光照相关配置
  */
 @ccclass('cc.AmbientInfo')
-export class AmbientInfo {
+export class AmbientInfo implements ISerializable {
     /**
      * @en The sky color in HDR mode
      * @zh HDR 模式下的天空光照色
@@ -234,6 +235,15 @@ export class AmbientInfo {
     protected _groundAlbedoLDR = new Vec4(0.2, 0.2, 0.2, 1.0);
 
     protected _resource: Ambient | null = null;
+
+    serialize (ar: IArchive): void {
+        this._skyColorHDR = ar.serializableObj(this._skyColorHDR, '_skyColor');
+        this._skyIllumHDR = ar.float64(this._skyIllumHDR, '_skyIllum');
+        this._groundAlbedoHDR = ar.serializableObj(this._groundAlbedoHDR, '_groundAlbedo');
+        this._skyColorLDR = ar.serializableObj(this._skyColorLDR, '_groundAlbedo');
+        this._skyIllumLDR = ar.float64(this._skyIllumLDR, '_skyIllumLDR');
+        this._groundAlbedoLDR = ar.serializableObj(this._groundAlbedoLDR, '_groundAlbedoLDR');
+    }
 
     /**
      * @en Activate the ambient lighting configuration in the render scene, no need to invoke manually.
@@ -1055,7 +1065,7 @@ export class OctreeInfo {
  * @zh 各类场景级别的渲染参数，将影响全场景的所有物体
  */
 @ccclass('cc.SceneGlobals')
-export class SceneGlobals {
+export class SceneGlobals implements ISerializable {
     /**
      * @en The environment lighting configuration
      * @zh 场景的环境光照相关配置
@@ -1103,6 +1113,10 @@ export class SceneGlobals {
     @editable
     @serializable
     public octree = new OctreeInfo();
+
+    serialize (ar: IArchive): void {
+        this.ambient = ar.serializableObj(this.ambient, 'ambient');
+    }
 
     /**
      * @en Activate and initialize the global configurations of the scene, no need to invoke manually.
