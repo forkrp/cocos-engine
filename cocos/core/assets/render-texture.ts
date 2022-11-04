@@ -33,6 +33,7 @@ import { Root } from '../root';
 import { TextureBase } from './texture-base';
 import { BufferTextureCopy } from '../gfx/base/define';
 import { errorID } from '../platform/debug';
+import { IArchive } from '../serialization';
 
 export interface IRenderTextureCreateInfo {
     name?: string;
@@ -139,6 +140,13 @@ export class RenderTexture extends TextureBase {
         this._height = data.h;
         this._name = data.n;
         super._deserialize(data.base, handle);
+    }
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this._width = ar.uint32(this._width, 'w');
+        this._height = ar.uint32(this._height, 'h');
+        this._name = ar.str(this._name, 'n');
     }
 
     // To be compatible with material property interface

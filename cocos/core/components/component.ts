@@ -649,6 +649,7 @@ class Component extends CCObject {
     protected onRestore? (): void;
 
     serialize (ar: IArchive): void {
+        super.serialize(ar);
         this.node = ar.serializableObj(this.node, 'node');
         this._enabled = ar.boolean(this._enabled, '_enabled');
         this.__prefab = ar.serializableObj(this.__prefab, '__prefab');

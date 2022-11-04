@@ -32,6 +32,7 @@ import { clamp, EPSILON, random } from './utils';
 
 import { Vec3 } from './vec3';
 import { legacyCC } from '../global-exports';
+import { IArchive } from '../serialization';
 
 /**
  * @en Representation of 2D vectors and points.
@@ -440,6 +441,11 @@ export class Vec2 extends ValueType {
      * @zh y 分量。
      */
     public declare y: number;
+
+    serializeInlineData (ar: IArchive): void {
+        this.x = ar.float32(this.x, 'x');
+        this.y = ar.float32(this.y, 'y');
+    }
 
     constructor (other: Vec2);
 

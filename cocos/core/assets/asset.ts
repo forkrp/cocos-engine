@@ -148,7 +148,6 @@ export class Asset extends Eventify(CCObject) {
      * @default null
      * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
      */
-    @property
     get _nativeAsset () {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return this._file;
@@ -312,8 +311,8 @@ export class Asset extends Eventify(CCObject) {
     }
 
     serialize (ar: IArchive): void {
+        super.serialize(ar);
         this._native = ar.str(this._native, '_native');
-        this._file = ar.anyObj(this._file, '_nativeAsset');
     }
 
     serializeInlineData (ar: IArchive): void {

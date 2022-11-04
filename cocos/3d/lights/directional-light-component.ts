@@ -89,6 +89,7 @@ export class DirectionalLight extends Light {
 
     serialize (ar: IArchive) : void {
         super.serialize(ar);
+        this._illuminanceHDR = ar.float64(this._illuminanceHDR, '_illuminanceHDR');
         this._illuminanceHDR = ar.float64(this._illuminanceHDR, '_illuminance');
         this._illuminanceLDR = ar.float64(this._illuminanceLDR, '_illuminanceLDR');
         this._shadowEnabled = ar.boolean(this._shadowEnabled, '_shadowEnabled');
