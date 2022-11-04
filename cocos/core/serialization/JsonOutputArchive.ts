@@ -33,12 +33,10 @@ export class JsonOutputArchive implements IArchive {
         return this._isRoot;
     }
 
-    public start (data: ISerializable): void {
-        this.str(getClassId(data), '__type__');
-        if (data.serialize) {
-            data.serialize(this);
-        } else if (data.serializeInlineData) {
-            data.serializeInlineData(this);
+    public start (obj: ISerializable): void {
+        this.str(getClassId(obj), '__type__');
+        if (obj.serialize) {
+            obj.serialize(this);
         }
     }
 
@@ -138,7 +136,10 @@ export class JsonOutputArchive implements IArchive {
             const objId: IObjectId = { __id__: -1 };
             const inlineData = checkISerializableObjectNeedInline(data, this._isRoot);
             if (!inlineData) {
+                parentNode[name] = objId;
                 this._serializedObjIdMap.set(data, objId);
+            } else {
+                parentNode[name] = this._currentNode;
             }
 
             if (this._objectDepth > 0 && !inlineData) {
@@ -321,13 +322,9 @@ export class JsonOutputArchive implements IArchive {
                 objId.__id__ = this._serializedList.length;
                 serializedNode.__index__ = objId.__id__; // For debug only, need to be deleted.
                 this._serializedList.push(serializedNode);
-                parentNode[name] = objId;
             }
-        } else {
-            if (data.serializeInlineData) {
-                data.serializeInlineData(this);
-            }
-            parentNode[name] = serializedNode;
+        } else if (data.serializeInlineData) {
+            data.serializeInlineData(this);
         }
 
         this._currentNode = oldCurrentNode;

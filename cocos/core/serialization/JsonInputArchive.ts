@@ -2,6 +2,7 @@ import { assert } from './utils';
 import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
 import { IObjectFactory } from './ObjectFactory';
+import { getClassById } from '../utils/js-typed';
 
 type NodeValuePrimitive = boolean | number | string | Record<string, unknown>;
 type NodeValueType = NodeValuePrimitive | NodeValuePrimitive[];
@@ -17,6 +18,12 @@ export class JsonInputArchive implements IArchive {
         this._deserializedList = Array.isArray(root) ? root : [root];
         this._currentNode = this._deserializedList[0];
         this._objectFactory = objectFactory;
+    }
+
+    public start (obj: ISerializable) {
+        if (obj.serialize) {
+            obj.serialize(this);
+        }
     }
 
     public isRoot () : boolean {
@@ -150,41 +157,56 @@ export class JsonInputArchive implements IArchive {
             this._currentNode = jsonData;
         }
 
-        const ret = data;
+        let ret = data;
         if (!ret) {
-            if (this._objectFactory) {
-                this._objectFactory.createObject((this._currentNode as any).__type__) as ISerializable;
-            } else {
+            const classId = (this._currentNode as any).__type__ as string;
+            if (!classId) {
+                console.error(`classId is null`);
+                this._currentNode = parentNode;
+                return null;
+            }
 
+            if (this._objectFactory) {
+                ret = this._objectFactory.createObject(classId) as ISerializable;
+            } else {
+                //TODO(cjh):
+                const Ctor = getClassById(classId);
+                if (Ctor) {
+                    ret = new Ctor() as ISerializable;
+                } else {
+                    console.error(`${classId} has no constructor`);
+                }
             }
         }
 
         assert(ret);
 
-        if (hasId && index > 0) {
-            this._deserializedObjIdMap.set(index, ret);
-        }
+        if (ret) {
+            if (hasId && index > 0) {
+                this._deserializedObjIdMap.set(index, ret);
+            }
 
-        let serializeMethod;
-        const serializeExist = !!ret.serialize;
-        const serializeInlineData = !!ret.serializeInlineData;
+            let serializeMethod;
+            const serializeExist = !!ret.serialize;
+            const serializeInlineData = !!ret.serializeInlineData;
 
-        if (serializeExist && serializeInlineData) {
-            if (this._isRoot) {
+            if (serializeExist && serializeInlineData) {
+                if (this._isRoot) {
+                    serializeMethod = ret.serialize;
+                } else {
+                    serializeMethod = ret.serializeInlineData;
+                }
+            } else if (serializeExist) {
                 serializeMethod = ret.serialize;
-            } else {
+            } else if (serializeInlineData) {
                 serializeMethod = ret.serializeInlineData;
             }
-        } else if (serializeExist) {
-            serializeMethod = ret.serialize;
-        } else if (serializeInlineData) {
-            serializeMethod = ret.serializeInlineData;
-        }
 
-        serializeMethod.call(ret, this);
+            serializeMethod.call(ret, this);
 
-        if (ret.onAfterDeserialize) {
-            ret.onAfterDeserialize();
+            if (ret.onAfterDeserialize) {
+                ret.onAfterDeserialize();
+            }
         }
 
         this._currentNode = parentNode;

@@ -1,3 +1,4 @@
+import { getClassId } from '../utils/js-typed';
 import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
 import { IObjectFactory } from './ObjectFactory';
@@ -127,6 +128,13 @@ export class BinaryInputArchive implements IArchive {
     constructor (buffer: ArrayBuffer, objectFactory: IObjectFactory) {
         this._currentNode = new DeserializeNode('root', buffer);
         this._objectFactory = objectFactory;
+    }
+
+    public start (obj: ISerializable): void {
+        this.str(getClassId(obj), '__type__');
+        if (obj.serialize) {
+            obj.serialize(this);
+        }
     }
 
     public anyObj (data: any, name: string): any {

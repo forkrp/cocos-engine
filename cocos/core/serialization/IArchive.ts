@@ -2,6 +2,8 @@ import { ISerializable } from './ISerializable';
 
 export interface IArchive {
 
+    start(obj: ISerializable);
+
     //TODO: Rename all methods, remove serialize prefix for better JS package size.
     anyObj(data: any, name: string): any;
 

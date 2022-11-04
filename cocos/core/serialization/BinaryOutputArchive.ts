@@ -148,12 +148,10 @@ export class BinaryOutputArchive implements IArchive {
         return this._isRoot;
     }
 
-    public start (data: ISerializable): void {
-        this.str(getClassId(data), '__type__');
-        if (data.serialize) {
-            data.serialize(this);
-        } else if (data.serializeInlineData) {
-            data.serializeInlineData(this);
+    public start (obj: ISerializable): void {
+        this.str(getClassId(obj), '__type__');
+        if (obj.serialize) {
+            obj.serialize(this);
         }
     }
 
