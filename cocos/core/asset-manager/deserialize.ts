@@ -63,7 +63,7 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
 
     let asset: Asset;
     try {
-        if (Array.isArray(json) && json[0].__type__ === 'cc.SceneAsset') {
+        if ((Array.isArray(json) && json[0].__type__ === 'cc.SceneAsset') || json.__type__ === 'cc.EffectAsset' || json.__type__ === 'cc.Material') {
             const ar = new JsonInputArchive();
             asset = ar.start(json, tdInfo, {
                 classFinder,

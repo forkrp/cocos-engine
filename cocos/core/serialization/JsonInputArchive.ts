@@ -171,6 +171,7 @@ export class JsonInputArchive implements IArchive {
 
         const obj = this.createObjectByJsonValue(this._currentNode);
         if (obj) {
+            this._currentOwner = obj;
             if (obj.serialize) {
                 obj.serialize(this);
             } else if (obj.serializeInlineData) {
@@ -528,6 +529,10 @@ export class JsonInputArchive implements IArchive {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
+        if (this._currentNode == null) {
+            this._currentNode = parentNode;
+            return data;
+        }
 
         let arr: any[];
         const dataArrayLength = (this._currentNode as any[]).length;
