@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { SceneAsset, Scene, JsonOutputArchive, Node, JsonInputArchive, Camera, RenderTexture } from '../../../cocos/core';
-import { DirectionalLight } from '../../../cocos/3d/lights';
+import { MeshRenderer, DirectionalLight } from '../../../cocos/3d';
 
 describe(`new-serialization`, () => {
     describe(`json-archive`, () => {
@@ -11,8 +11,9 @@ describe(`new-serialization`, () => {
 
         test('demo-scene', () => {
             const light = new DirectionalLight(); //FIXME: for register direction light component to classId map.
+            const meshRenderer = new MeshRenderer();
 
-            const serializedJsonStr = fs.readFileSync('tests/core/new-serialization/demo.scene', 'utf-8');
+            const serializedJsonStr = fs.readFileSync('tests/core/new-serialization/demo2.scene', 'utf-8');
             const serializedJsonObj = JSON.parse(serializedJsonStr);
             const inputAr = new JsonInputArchive(serializedJsonObj);
             const sceneAsset = new SceneAsset();

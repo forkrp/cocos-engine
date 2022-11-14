@@ -4,7 +4,7 @@ export interface IArchive {
 
     // TODO(cjh): Add reset interface
 
-    start(obj: ISerializable);
+    // start(obj: ISerializable);
 
     //TODO: Rename all methods, remove serialize prefix for better JS package size.
     anyObj(data: any, name: string): any;
