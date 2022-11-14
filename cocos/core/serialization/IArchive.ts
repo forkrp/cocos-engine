@@ -2,6 +2,8 @@ import { ISerializable } from './ISerializable';
 
 export interface IArchive {
 
+    // TODO(cjh): Add reset interface
+
     start(obj: ISerializable);
 
     //TODO: Rename all methods, remove serialize prefix for better JS package size.
@@ -37,12 +39,13 @@ export interface IArchive {
     float64Array(data: number[], name: string): number[];
     strArray(data: string[], name: string): string[];
     plainObjArray(data: any[], name: string): any[];
-    serializableObjArray(data: ISerializable[] | null | undefined, name: string): any;
+    serializableObjArray(data: (ISerializable | null)[] | null | undefined, name: string): any;
 
     typedArray(data: any, name: string): any;
     //
 
     isReading(): boolean;
     isWritting(): boolean;
+    isExporting(): boolean;
     isRoot(): boolean;
 }

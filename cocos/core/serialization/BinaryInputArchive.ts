@@ -326,7 +326,7 @@ export class BinaryInputArchive implements IArchive {
         throw new Error('Method not implemented.');
     }
 
-    serializableObjArray (data: ISerializable[] | null, name: string): ISerializable[] | null {
+    serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
         let length = 0;
         const currentNode = this._currentNode;
         const tag = currentNode.popInt8();
@@ -342,7 +342,7 @@ export class BinaryInputArchive implements IArchive {
             assert(false);
         }
 
-        let arr: ISerializable[];
+        let arr: (ISerializable | null)[];
         if (Array.isArray(data)) {
             data.length = length;
             arr = data;
@@ -387,5 +387,9 @@ export class BinaryInputArchive implements IArchive {
     }
     isRoot (): boolean {
         return this._isRoot;
+    }
+
+    isExporting (): boolean {
+        return false;
     }
 }

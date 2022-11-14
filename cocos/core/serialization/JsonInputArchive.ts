@@ -360,12 +360,15 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public serializableObjArray (data: ISerializable[] | null, name: string) : ISerializable[] | null {
+    public serializableObjArray (data: (ISerializable | null)[] | null, name: string) : (ISerializable | null)[] | null {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
 
-        let arr: ISerializable[];
+        let arr: (ISerializable | null)[];
+        if (!this._currentNode) {
+            console.log(`xxx`);
+        }
         const dataArrayLength = (this._currentNode as any[]).length;
         if (Array.isArray(data)) {
             data.length = dataArrayLength;
@@ -418,6 +421,10 @@ export class JsonInputArchive implements IArchive {
         return true;
     }
     isWritting (): boolean {
+        return false;
+    }
+
+    isExporting (): boolean {
         return false;
     }
 }

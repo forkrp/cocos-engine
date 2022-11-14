@@ -220,12 +220,12 @@ export class PrefabInfo implements ISerializable {
     // the most top node of this prefab in the scene
     @serializable
     @type(Node)
-    public root?: Node;
+    public root: Node | null = null;
 
     // 所属的 prefab 资源对象 (cc.Prefab)
     // In Editor, only asset._uuid is usable because asset will be changed.
     @serializable
-    public asset?: Prefab;
+    public asset: Prefab | null = null;
 
     // 用来标识别该节点在 prefab 资源中的位置，因此这个 ID 只需要保证在 Assets 里不重复就行
     @serializable
@@ -235,18 +235,19 @@ export class PrefabInfo implements ISerializable {
     // Instance of a prefabAsset
     @serializable
     @type(PrefabInstance)
-    public instance?: PrefabInstance;
+    public instance: PrefabInstance | null = null;
 
     @serializable
     @type([TargetOverrideInfo])
-    public targetOverrides?: TargetOverrideInfo[];
+    public targetOverrides: TargetOverrideInfo[] = [];
 
     // record outMost prefabInstance nodes in descendants
     // collected when saving sceneAsset or prefabAsset
     @serializable
-    public nestedPrefabInstanceRoots?: Node[];
+    public nestedPrefabInstanceRoots: Node[] = [];
 
     public serialize (ar: IArchive): void {
+        this.root = ar.serializableObj(this.root, 'root');
         this.asset = ar.serializableObj(this.asset, 'asset');
         this.fileId = ar.str(this.fileId, 'fileId');
         this.instance = ar.serializableObj(this.instance, 'instance');

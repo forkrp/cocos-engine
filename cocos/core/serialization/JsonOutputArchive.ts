@@ -23,8 +23,10 @@ export class JsonOutputArchive implements IArchive {
     private _objectStack : IObjectStackElement[] = [];
     private _objectDepth = 0;
     private _isRoot = true;
+    private _isExporting = false;
 
-    constructor () {
+    constructor (isExporting = false) {
+        this._isExporting = isExporting;
         this._currentNode = {};
         this._serializedList.push(this._currentNode);
     }
@@ -258,7 +260,7 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
-    public serializableObjArray (data: ISerializable[] | null, name: string) : ISerializable[] | null {
+    public serializableObjArray (data: (ISerializable | null)[] | null, name: string) : (ISerializable | null)[] | null {
         if (data == null) {
             this.serializeNull(name);
             return data;
@@ -376,7 +378,12 @@ export class JsonOutputArchive implements IArchive {
     isReading (): boolean {
         return false;
     }
+
     isWritting (): boolean {
         return true;
+    }
+
+    isExporting (): boolean {
+        return this._isExporting;
     }
 }

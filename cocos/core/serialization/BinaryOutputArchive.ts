@@ -138,8 +138,10 @@ export class BinaryOutputArchive implements IArchive {
     private _objectStack: IObjectStackElement[] = [];
     private _objectDepth = 0;
     private _isRoot = true;
+    private _isExporting = false;
 
-    constructor () {
+    constructor (isExporting = false) {
+        this._isExporting = isExporting;
         this._currentNode = new SerializeNode('root', null);
         this._serializedList.push(this._currentNode);
     }
@@ -358,7 +360,7 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    public serializableObjArray (data: ISerializable[] | null, name: string): ISerializable[] | null {
+    public serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
         if (data == null) {
             this._currentNode.pushInt8(SerializeTag.TAG_NULL);
             this.serializeNull(name);
@@ -524,5 +526,9 @@ export class BinaryOutputArchive implements IArchive {
     }
     isWritting (): boolean {
         return true;
+    }
+
+    isExporting (): boolean {
+        return this._isExporting;
     }
 }

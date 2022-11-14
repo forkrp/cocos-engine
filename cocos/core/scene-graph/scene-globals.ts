@@ -560,6 +560,7 @@ export class SkyboxInfo implements ISerializable {
 
     serialize (ar: IArchive): void {
         this._envLightingType = ar.uint8(this._envLightingType, '_envLightingType');
+        this._envmapHDR = ar.serializableObj(this._envmapHDR, '_envmapHDR');
         this._envmapHDR = ar.serializableObj(this._envmapHDR, '_envmap');
         this._envmapLDR = ar.serializableObj(this._envmapLDR, '_envmapLDR');
         this._diffuseMapHDR = ar.serializableObj(this._diffuseMapHDR, '_diffuseMapHDR');

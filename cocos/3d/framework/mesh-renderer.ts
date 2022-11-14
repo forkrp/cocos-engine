@@ -24,7 +24,7 @@
 */
 
 import { ccclass, help, executeInEditMode, executionOrder, menu, tooltip, visible, type,
-    formerlySerializedAs, serializable, editable, disallowAnimation } from 'cc.decorator';
+    formerlySerializedAs, serializable, editable, disallowAnimation, range } from 'cc.decorator';
 import { JSB } from 'internal:constants';
 import { Texture2D } from '../../core/assets';
 import { Material } from '../../core/assets/material';
@@ -40,8 +40,9 @@ import { ModelRenderer } from '../../core/components/model-renderer';
 import { MorphRenderingInstance } from '../assets/morph-rendering';
 import { legacyCC } from '../../core/global-exports';
 import { assertIsTrue } from '../../core/data/utils/asserts';
-import { CCFloat } from '../../core/data/utils/attribute';
+import { CCFloat, CCInteger } from '../../core/data/utils/attribute';
 import { property } from '../../core/data/class-decorator';
+import { IArchive, ISerializable } from '../../core';
 
 /**
  * @en Shadow projection mode.
@@ -82,7 +83,7 @@ const ModelShadowReceivingMode = Enum({
  * @zh 模型光照图设置
  */
 @ccclass('cc.ModelLightmapSettings')
-class ModelLightmapSettings {
+class ModelLightmapSettings implements ISerializable {
     @serializable
     public texture: Texture2D|null = null;
     @serializable
@@ -93,8 +94,19 @@ class ModelLightmapSettings {
     protected _castShadow = false;
     @formerlySerializedAs('_recieveShadow')
     protected _receiveShadow = false;
+
     @serializable
     protected _lightmapSize = 64;
+
+    serialize (ar: IArchive): void {
+        this.texture = ar.serializableObj(this.texture, 'texture');
+        this.uvParam = ar.serializableObj(this.uvParam, 'uvParam');
+        this._bakeable = ar.boolean(this._bakeable, '_bakeable');
+        this._castShadow = ar.boolean(this._castShadow, '_castShadow');
+        this._receiveShadow = ar.boolean(this._receiveShadow, '_receiveShadow');
+        this._receiveShadow = ar.boolean(this._receiveShadow, '_recieveShadow');
+        this._lightmapSize = ar.uint16(this._lightmapSize, '_lightmapSize');
+    }
 
     /**
      * @en Whether the model is static and bake-able with light map.
@@ -200,6 +212,17 @@ export class MeshRenderer extends ModelRenderer {
 
     // @serializable
     private _subMeshShapesWeights: number[][] = [];
+
+    serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this.lightmapSettings = ar.serializableObj(this.lightmapSettings, 'lightmapSettings');
+        this._mesh = ar.serializableObj(this._mesh, '_mesh');
+        this._shadowCastingMode = ar.uint8(this._shadowCastingMode, '_shadowCastingMode');
+        this._shadowReceivingMode = ar.uint8(this._shadowReceivingMode, '_shadowReceivingMode');
+        this._shadowBias = ar.float32(this._shadowBias, '_shadowBias');
+        this._shadowNormalBias = ar.float32(this._shadowNormalBias, '_shadowNormalBias');
+        this._enableMorph = ar.boolean(this._enableMorph, '_enableMorph');
+    }
 
     /**
      * @en Local shadow bias for real time lighting.

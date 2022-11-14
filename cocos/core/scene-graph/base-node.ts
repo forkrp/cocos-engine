@@ -1410,6 +1410,10 @@ export class BaseNode extends CCObject implements ISchedulable {
 
         this._components = ar.serializableObjArray(this._components, '_components');
         this._prefab = ar.serializableObj(this._prefab, '_prefab');
+
+        if (!ar.isExporting()) {
+            this._id = ar.str(this._id, '_id');
+        }
     }
 }
 
