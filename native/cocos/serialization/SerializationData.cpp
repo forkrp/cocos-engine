@@ -31,7 +31,6 @@ namespace cc {
 static constexpr uint32_t DEFAULT_ARRAY_BUFFER_SIZE = 1024;
 
 SerializationData::SerializationData() {
-
 }
 
 SerializationData::~SerializationData() {
@@ -64,9 +63,9 @@ void SerializationData::expandBufferIfNeeded(uint32_t byteOffset, uint32_t dataB
     }
 
     if (newDataSize >= _bufferCapacity) {
-        uint8_t *oldBuffer = _buffer;
+        uint8_t* oldBuffer = _buffer;
         uint32_t newBufferSize = std::max(newDataSize + DEFAULT_ARRAY_BUFFER_SIZE, _bufferCapacity * 2);
-        uint8_t *newBuffer = reinterpret_cast<uint8_t*>(malloc(newBufferSize));
+        uint8_t* newBuffer = reinterpret_cast<uint8_t*>(malloc(newBufferSize));
         memcpy(newBuffer, oldBuffer, _bufferCapacity);
         CC_LOG_DEBUG("==> expandBuffer from %u to %u", _bufferCapacity, newBufferSize);
         _bufferCapacity = newBufferSize;
@@ -74,12 +73,10 @@ void SerializationData::expandBufferIfNeeded(uint32_t byteOffset, uint32_t dataB
 }
 
 void SerializationData::set(uint32_t byteOffset, const std::string_view& value) {
-
 }
 
 std::string_view SerializationData::get(uint32_t byteOffset) {
     return "";
 }
 
-}
-
+} // namespace cc

@@ -91,45 +91,42 @@ public:
         serialize(data, name);
     }
 
-    template<class T>
+    template <class T>
     void serializePrimitiveData(T&);
 
-    template<class T>
+    template <class T>
     void serializeString(T& data);
 
-    template<class T>
+    template <class T>
     void serializeStlLikeMap(T&) {}
 
-    template<class T>
+    template <class T>
     void serialize(T& data, const char* name);
 
-    template<class T>
+    template <class T>
     void onStartSerialize(T& data);
 
-    template<class T>
+    template <class T>
     void onFinishSerialize(T& data);
 };
 
-template<class T>
+template <class T>
 void BinaryInputArchive::serializePrimitiveData(T&) {
-
 }
 
-template<class T>
+template <class T>
 void BinaryInputArchive::serializeString(T&) {
-
 }
 
-template<class T>
+template <class T>
 void BinaryInputArchive::serialize(T& data, const char* name) {
-
     SerializationTrait<T>::serialize(data, *this);
 }
 
-template<class T>
+template <class T>
 void BinaryInputArchive::onStartSerialize(T& data) {}
 
-template<class T>
+template <class T>
 void BinaryInputArchive::onFinishSerialize(T& data) {}
 
-}
+} // namespace cc

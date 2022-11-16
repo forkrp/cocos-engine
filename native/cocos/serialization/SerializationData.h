@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include <stdint.h>
 #include <assert.h>
+#include <stdint.h>
 
 #include <type_traits>
 
@@ -42,12 +42,12 @@ public:
     void init();
     void initWithBuffer(uint8_t* buffer, uint32_t bufferByteLength);
 
-    inline uint8_t *getBuffer() const { return _buffer; }
+    inline uint8_t* getBuffer() const { return _buffer; }
     inline uint32_t getByteLength() const { return _dataLength; }
 
     void expandBufferIfNeeded(uint32_t byteOffset, uint32_t dataByteLength);
 
-    template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value> >
+    template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value> >
     inline void set(uint32_t byteOffset, T value) {
         if (byteOffset < 0) {
             return;
@@ -59,7 +59,7 @@ public:
 
     void set(uint32_t byteOffset, const std::string_view& value);
 
-    template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value> >
+    template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value> >
     inline T get(uint32_t byteOffset) const {
         if (byteOffset >= 0 && byteOffset + sizeof(T) <= _dataLength) {
             return *reinterpret_cast<T*>(&_buffer[byteOffset]);
@@ -71,11 +71,10 @@ public:
     std::string_view get(uint32_t byteOffset);
 
 private:
-
-    uint8_t *_buffer{nullptr};
+    uint8_t* _buffer{nullptr};
     uint32_t _bufferCapacity{0};
     uint32_t _dataLength{0};
     bool _needFreeBuffer{false};
 };
 
-}
+} // namespace cc

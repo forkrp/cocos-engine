@@ -27,121 +27,120 @@
 
 #include <stdint.h>
 
+#include "base/Ptr.h"
 #include "base/std/container/list.h"
 #include "base/std/container/string.h"
 #include "base/std/container/unordered_map.h"
 #include "base/std/container/vector.h"
-#include "base/Ptr.h"
 
 namespace cc {
 
-template<class T>
+template <class T>
 class IsIntrusivePtr {
 public:
     using type = T;
     static constexpr bool value = false;
 };
 
-template<class T>
+template <class T>
 class IsIntrusivePtr<IntrusivePtr<T>> {
 public:
     using type = T;
     static constexpr bool value = true;
 };
 
-template<class T>
+template <class T>
 class SerializationTraitBase {
 public:
     using data_type = T;
 };
 
-template<class T>
+template <class T>
 class SerializationTraitPrimitive : public SerializationTraitBase<T> {
 public:
     using data_type = T;
 
-    template<class Archive> inline
-    static void serialize(data_type& data, Archive& ar) {
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
         ar.serializePrimitiveData(data);
     }
 };
 
-template<class T>
+template <class T>
 class SerializationTrait : public SerializationTraitBase<T> {
 public:
     using data_type = T;
 
-    template<class Archive> inline
-    static void serialize(data_type &data, Archive &ar) {
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
         ar.onStartSerialize(data);
         data->serialize(ar);
         ar.onFinishSerialize(data);
     }
 };
 
-template<>
+template <>
 class SerializationTrait<bool> : public SerializationTraitBase<bool> {
 public:
     using data_type = bool;
 
-    template<class Archive> inline
-    static void serialize(data_type& data, Archive& ar) {
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
         ar.serializePrimitiveData(reinterpret_cast<uint8_t&>(data));
     }
 };
 
-template<>
+template <>
 class SerializationTrait<int8_t> : public SerializationTraitPrimitive<int8_t> {};
 
-template<>
+template <>
 class SerializationTrait<int16_t> : public SerializationTraitPrimitive<int16_t> {};
 
-template<>
+template <>
 class SerializationTrait<int32_t> : public SerializationTraitPrimitive<int32_t> {};
 
-template<>
+template <>
 class SerializationTrait<int64_t> : public SerializationTraitPrimitive<int64_t> {};
 
-template<>
+template <>
 class SerializationTrait<uint8_t> : public SerializationTraitPrimitive<uint8_t> {};
 
-template<>
+template <>
 class SerializationTrait<uint16_t> : public SerializationTraitPrimitive<uint16_t> {};
 
-template<>
+template <>
 class SerializationTrait<uint32_t> : public SerializationTraitPrimitive<uint32_t> {};
 
-template<>
+template <>
 class SerializationTrait<uint64_t> : public SerializationTraitPrimitive<uint64_t> {};
 
-template<>
+template <>
 class SerializationTrait<float> : public SerializationTraitPrimitive<float> {};
 
-template<>
+template <>
 class SerializationTrait<double> : public SerializationTraitPrimitive<double> {};
 
-template<class StringT>
+template <class StringT>
 class SerializationTraitStringBase : public SerializationTraitBase<StringT> {
 public:
     using data_type = StringT;
 
-    template<class Archive> inline
-    static void serialize(data_type& data, Archive& ar) {
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
         ar.serializeString(data);
     }
 };
 
-template<>
+template <>
 class SerializationTrait<ccstd::string> : public SerializationTraitStringBase<ccstd::string> {};
 
-
-template<class T, class Allocator>
+template <class T, class Allocator>
 class SerializationTrait<ccstd::vector<T, Allocator>> : public SerializationTraitBase<ccstd::vector<T, Allocator>> {
 public:
     using data_type = ccstd::vector<T, Allocator>;
 
-    template<class Archive> inline
-    static void serialize(data_type& data, Archive& ar) {
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
         ar.serializeStlLikeArray(data);
     }
 
@@ -150,13 +149,13 @@ public:
     }
 };
 
-template<class K, class V, class Allocator>
+template <class K, class V, class Allocator>
 class SerializationTrait<ccstd::unordered_map<K, V, Allocator>> : public SerializationTraitBase<ccstd::unordered_map<K, V, Allocator>> {
 public:
     using data_type = ccstd::unordered_map<K, V, Allocator>;
 
-    template<class Archive> inline
-    static void serialize(data_type& data, Archive& ar) {
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
         ar.serializeStlLikeMap(data);
     }
 
@@ -165,4 +164,4 @@ public:
     }
 };
 
-}
+} // namespace cc

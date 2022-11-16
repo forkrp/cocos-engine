@@ -27,18 +27,17 @@
 
 #include <functional>
 
-#define CC_DECLARE_SERIALIZABLE() \
+#define CC_DECLARE_SERIALIZABLE()                         \
     void virtualSerialize(JsonInputArchive& ar) override; \
     void virtualSerialize(BinaryInputArchive& ar) override;
 
-#define CC_IMPL_SERIALIZABLE(__type__) \
-    void __type__::virtualSerialize(JsonInputArchive& ar) { \
-        __type__::serialize(ar); \
-    } \
-    void __type__::virtualSerialize(BinaryInputArchive& ar)  { \
-        __type__::serialize(ar); \
+#define CC_IMPL_SERIALIZABLE(__type__)                        \
+    void __type__::virtualSerialize(JsonInputArchive& ar) {   \
+        __type__::serialize(ar);                              \
+    }                                                         \
+    void __type__::virtualSerialize(BinaryInputArchive& ar) { \
+        __type__::serialize(ar);                              \
     }
-
 
 namespace cc {
 
@@ -59,4 +58,4 @@ public:
 
 using ObjectFactory = std::function<ISerializable*(const char*)>;
 
-}
+} // namespace cc

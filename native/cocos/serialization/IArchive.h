@@ -35,14 +35,14 @@ public:
     bool isWritting() const { return false; }
     bool isExporting() const { return false; }
 
-    template<class T>
+    template <class T>
     void serializePrimitiveData(T&) {}
 
-    template<class T>
+    template <class T>
     void serializeStlLikeArray(T&) {}
 
-    template<class T>
+    template <class T>
     void serializeStlLikeMap(T&) {}
 };
 
-}
+} // namespace cc

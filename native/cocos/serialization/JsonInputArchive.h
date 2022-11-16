@@ -28,8 +28,8 @@
 #include "IArchive.h"
 #include "ISerializable.h"
 #include "SerializationTrait.h"
-#include "json/document.h"
 #include "base/Ptr.h"
+#include "json/document.h"
 
 namespace cc {
 
@@ -44,25 +44,25 @@ public:
 
     ISerializable* start(const std::string& rootJsonStr, const ObjectFactory& factory);
 
-    template<class T>
+    template <class T>
     void serializePrimitiveData(T& data);
 
-    template<class T>
+    template <class T>
     void serializeString(T& data);
 
-    template<class T>
+    template <class T>
     void serializeStlLikeArray(T& data);
 
-    template<class T>
+    template <class T>
     void serializeStlLikeMap(T& data);
 
-    template<class T>
+    template <class T>
     void serialize(T& data, const char* name);
 
-    template<class T>
+    template <class T>
     void onStartSerialize(T& data);
 
-    template<class T>
+    template <class T>
     void onFinishSerialize(T& data);
 
     inline void boolean(bool& data, const char* name) {
@@ -114,7 +114,6 @@ public:
     }
 
 private:
-
     const rapidjson::Value* getValue(const rapidjson::Value* parentNode, const char* key);
 
     rapidjson::Document _serializedData;
@@ -122,7 +121,7 @@ private:
     ObjectFactory _objectFactory{nullptr};
 };
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(bool& data) {
     if (_currentNode->IsBool()) {
         data = _currentNode->GetBool();
@@ -135,7 +134,7 @@ inline void JsonInputArchive::serializePrimitiveData(bool& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(int8_t& data) {
     if (_currentNode->IsInt()) {
         data = static_cast<int8_t>(_currentNode->GetInt());
@@ -148,7 +147,7 @@ inline void JsonInputArchive::serializePrimitiveData(int8_t& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(int16_t& data) {
     if (_currentNode->IsInt()) {
         data = static_cast<int16_t>(_currentNode->GetInt());
@@ -161,7 +160,7 @@ inline void JsonInputArchive::serializePrimitiveData(int16_t& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(int32_t& data) {
     if (_currentNode->IsInt()) {
         data = static_cast<int32_t>(_currentNode->GetInt());
@@ -174,7 +173,7 @@ inline void JsonInputArchive::serializePrimitiveData(int32_t& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(int64_t& data) {
     if (_currentNode->IsInt()) {
         data = static_cast<int64_t>(_currentNode->GetInt64());
@@ -185,7 +184,7 @@ inline void JsonInputArchive::serializePrimitiveData(int64_t& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(uint8_t& data) {
     if (_currentNode->IsUint()) {
         data = static_cast<uint8_t>(_currentNode->GetInt());
@@ -198,7 +197,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint8_t& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(uint16_t& data) {
     if (_currentNode->IsUint()) {
         data = static_cast<uint16_t>(_currentNode->GetInt());
@@ -211,7 +210,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint16_t& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(uint32_t& data) {
     if (_currentNode->IsUint()) {
         data = static_cast<uint32_t>(_currentNode->GetInt());
@@ -224,7 +223,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint32_t& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(uint64_t& data) {
     if (_currentNode->IsUint64()) {
         data = static_cast<uint64_t>(_currentNode->GetInt64());
@@ -235,8 +234,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint64_t& data) {
     }
 }
 
-
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(float& data) {
     if (_currentNode->IsNumber()) {
         data = _currentNode->GetFloat();
@@ -247,7 +245,7 @@ inline void JsonInputArchive::serializePrimitiveData(float& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializePrimitiveData(double& data) {
     if (_currentNode->IsNumber()) {
         data = _currentNode->GetDouble();
@@ -258,7 +256,7 @@ inline void JsonInputArchive::serializePrimitiveData(double& data) {
     }
 }
 
-template<>
+template <>
 inline void JsonInputArchive::serializeString(ccstd::string& data) {
     if (_currentNode->IsString()) {
         data = _currentNode->GetString();
@@ -267,7 +265,7 @@ inline void JsonInputArchive::serializeString(ccstd::string& data) {
     }
 }
 
-template<class T>
+template <class T>
 inline void JsonInputArchive::serializeStlLikeArray(T& data) {
     if (!_currentNode->IsArray()) {
         return;
@@ -291,7 +289,7 @@ inline void JsonInputArchive::serializeStlLikeArray(T& data) {
     _currentNode = parentNode;
 }
 
-template<class T>
+template <class T>
 void JsonInputArchive::serializeStlLikeMap(T& data) {
     using key_type = typename T::key_type;
     using mapped_type = typename T::mapped_type;
@@ -326,7 +324,7 @@ void JsonInputArchive::serializeStlLikeMap(T& data) {
     _currentNode = parentNode;
 }
 
-template<class T>
+template <class T>
 inline void JsonInputArchive::serialize(T& data, const char* name) {
     auto* parentNode = _currentNode;
 
@@ -339,7 +337,7 @@ inline void JsonInputArchive::serialize(T& data, const char* name) {
     _currentNode = parentNode;
 }
 
-template<class T>
+template <class T>
 inline void JsonInputArchive::onStartSerialize(T& data) {
     if (!_currentNode->IsObject()) {
         return;
@@ -366,9 +364,8 @@ inline void JsonInputArchive::onStartSerialize(T& data) {
     }
 }
 
-template<class T>
+template <class T>
 inline void JsonInputArchive::onFinishSerialize(T& data) {
-
 }
 
-}
+} // namespace cc

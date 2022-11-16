@@ -25,15 +25,12 @@
 
 #include "JsonInputArchive.h"
 
-
 namespace cc {
 
 JsonInputArchive::JsonInputArchive() {
-
 }
 
 JsonInputArchive::~JsonInputArchive() {
-
 }
 
 ISerializable* JsonInputArchive::start(const std::string& rootJsonStr, const ObjectFactory& factory) {
@@ -86,4 +83,4 @@ const rapidjson::Value* JsonInputArchive::getValue(const rapidjson::Value* paren
     return ret;
 }
 
-}
+} // namespace cc
