@@ -115,6 +115,7 @@ public:
 
 private:
     const rapidjson::Value* getValue(const rapidjson::Value* parentNode, const char* key);
+    static const char* findTypeInJsonObject(const rapidjson::Value& jsonObj);
 
     rapidjson::Document _serializedData;
     const rapidjson::Value* _currentNode;
@@ -339,20 +340,37 @@ inline void JsonInputArchive::serialize(T& data, const char* name) {
 
 template <class T>
 inline void JsonInputArchive::onStartSerialize(T& data) {
+    if (nullptr != data) {
+        return;
+    }
+
     if (!_currentNode->IsObject()) {
         return;
     }
 
-    rapidjson::Value::ConstMemberIterator iter = _currentNode->FindMember("__type__");
-    if (iter == _currentNode->MemberEnd()) {
-        return;
+    bool couldDeserialize = false;
+    const char* type = findTypeInJsonObject(*_currentNode);
+
+    if (nullptr == type) {
+        const auto& iter = _currentNode->FindMember("__id__");
+        couldDeserialize = iter != _currentNode->MemberEnd();
+        if (couldDeserialize && !iter->value.IsInt()) {
+            return;
+        }
+
+        int index = iter->value.GetInt();
+        if (index < 0 || index >= _serializedData.Size()) {
+            return;
+        }
+
+        _currentNode = &_serializedData[index];
+        type = findTypeInJsonObject(*_currentNode);
+
+        if (nullptr == type) {
+            return;
+        }
     }
 
-    if (!iter->value.IsString()) {
-        return;
-    }
-
-    const auto* type = iter->value.GetString();
     ISerializable* obj = _objectFactory(type);
 
     static_assert(std::is_pointer_v<T> || IsIntrusivePtr<T>::value, "Wrong pointer type");

@@ -53,11 +53,7 @@ ISerializable* JsonInputArchive::start(const std::string& rootJsonStr, const Obj
 
     _currentNode = &_serializedData[0];
 
-    if (!_currentNode->HasMember("__type__")) {
-        return nullptr;
-    }
-
-    const auto* type = (*_currentNode)["__type__"].GetString();
+    const char * type = findTypeInJsonObject(*_currentNode);
     ISerializable* obj = _objectFactory(type);
     if (!obj) {
         return nullptr;
@@ -81,6 +77,20 @@ const rapidjson::Value* JsonInputArchive::getValue(const rapidjson::Value* paren
     }
 
     return ret;
+}
+
+/* static */
+const char* JsonInputArchive::findTypeInJsonObject(const rapidjson::Value& jsonObj) {
+    rapidjson::Value::ConstMemberIterator iter = jsonObj.FindMember("__type__");
+    bool found = iter != jsonObj.MemberEnd();
+    if (!found) {
+        return nullptr;
+    }
+
+    if (!iter->value.IsString()) {
+        return nullptr;
+    }
+    return iter->value.GetString();
 }
 
 } // namespace cc
