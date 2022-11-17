@@ -444,8 +444,8 @@ public:
         return math::isEqualF(x, v.x, precision) && math::isEqualF(y, v.y, precision) && math::isEqualF(z, v.z, precision) && math::isEqualF(w, v.w, precision);
     }
 
-    template<class Archive>
-    void serialize(Archive& ar) {
+    template <class Archive>
+    void serialize(Archive &ar) {
         ar.serialize(x, "x");
         ar.serialize(y, "y");
         ar.serialize(z, "z");
