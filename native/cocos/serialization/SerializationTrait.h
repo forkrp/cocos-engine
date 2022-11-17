@@ -36,17 +36,13 @@
 namespace cc {
 
 template <class T>
-class IsIntrusivePtr {
-public:
+struct IsIntrusivePtr : std::false_type {
     using type = T;
-    static constexpr bool value = false;
 };
 
 template <class T>
-class IsIntrusivePtr<IntrusivePtr<T>> {
-public:
+struct IsIntrusivePtr<IntrusivePtr<T>> : std::true_type {
     using type = T;
-    static constexpr bool value = true;
 };
 
 template <class T>
@@ -74,7 +70,13 @@ public:
     template <class Archive>
     inline static void serialize(data_type& data, Archive& ar) {
         ar.onStartSerialize(data);
-        data->serialize(ar);
+        if constexpr (std::is_pointer_v<data_type> || IsIntrusivePtr<data_type>::value) {
+            if (data != nullptr) {
+                data->serialize(ar);
+            }
+        } else {
+            data.serialize(ar);
+        }
         ar.onFinishSerialize(data);
     }
 };

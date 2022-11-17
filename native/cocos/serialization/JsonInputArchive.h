@@ -65,61 +65,75 @@ public:
     template <class T>
     void onFinishSerialize(T& data);
 
-    inline void boolean(bool& data, const char* name) {
+    inline bool boolean(bool& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int8(int8_t& data, const char* name) {
+    inline int8_t int8(int8_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int16(int16_t& data, const char* name) {
+    inline int16_t int16(int16_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int32(int32_t& data, const char* name) {
+    inline int32_t int32(int32_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int64(uint64_t& data, const char* name) {
+    inline int64_t int64(int64_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint8(uint8_t& data, const char* name) {
+    inline uint8_t uint8(uint8_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint16(uint16_t& data, const char* name) {
+    inline uint16_t uint16(uint16_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint32(uint32_t& data, const char* name) {
+    inline uint32_t uint32(uint32_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint64(uint64_t& data, const char* name) {
+    inline uint64_t uint64(uint64_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void float32(float& data, const char* name) {
+    inline float float32(float& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void float64(double& data, const char* name) {
+    inline double float64(double& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void str(ccstd::string& data, const char* name) {
+    inline ccstd::string& str(ccstd::string& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
 private:
     const rapidjson::Value* getValue(const rapidjson::Value* parentNode, const char* key);
     static const char* findTypeInJsonObject(const rapidjson::Value& jsonObj);
+    ISerializable* createOrGetISerializableObject();
 
     rapidjson::Document _serializedData;
     const rapidjson::Value* _currentNode;
     ObjectFactory _objectFactory{nullptr};
+    ccstd::unordered_map<int32_t, ISerializable*> _deserializedObjIdMap;
 };
 
 template <>
@@ -340,45 +354,17 @@ inline void JsonInputArchive::serialize(T& data, const char* name) {
 
 template <class T>
 inline void JsonInputArchive::onStartSerialize(T& data) {
-    if (nullptr != data) {
-        return;
-    }
-
-    if (!_currentNode->IsObject()) {
-        return;
-    }
-
-    bool couldDeserialize = false;
-    const char* type = findTypeInJsonObject(*_currentNode);
-
-    if (nullptr == type) {
-        const auto& iter = _currentNode->FindMember("__id__");
-        couldDeserialize = iter != _currentNode->MemberEnd();
-        if (couldDeserialize && !iter->value.IsInt()) {
+    if constexpr (std::is_pointer_v<T> || IsIntrusivePtr<T>::value) {
+        if (nullptr != data) {
             return;
         }
 
-        int index = iter->value.GetInt();
-        if (index < 0 || index >= _serializedData.Size()) {
-            return;
+        ISerializable* obj = createOrGetISerializableObject();
+        if constexpr (std::is_pointer_v<T>) {
+            data = static_cast<T>(obj);
+        } else if constexpr (IsIntrusivePtr<T>::value) {
+            data = static_cast<std::add_pointer_t<typename IsIntrusivePtr<T>::type>>(obj);
         }
-
-        _currentNode = &_serializedData[index];
-        type = findTypeInJsonObject(*_currentNode);
-
-        if (nullptr == type) {
-            return;
-        }
-    }
-
-    ISerializable* obj = _objectFactory(type);
-
-    static_assert(std::is_pointer_v<T> || IsIntrusivePtr<T>::value, "Wrong pointer type");
-
-    if constexpr (std::is_pointer_v<T>) {
-        data = static_cast<T>(obj);
-    } else if constexpr (IsIntrusivePtr<T>::value) {
-        data = static_cast<std::add_pointer_t<typename IsIntrusivePtr<T>::type>>(obj);
     }
 }
 

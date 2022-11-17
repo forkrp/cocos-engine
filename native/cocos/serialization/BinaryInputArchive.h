@@ -43,52 +43,64 @@ public:
     bool isWritting() const { return false; }
     bool isExporting() const { return false; }
 
-    inline void boolean(bool& data, const char* name) {
+    inline bool boolean(bool& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int8(int8_t& data, const char* name) {
+    inline int8_t int8(int8_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int16(int16_t& data, const char* name) {
+    inline int16_t int16(int16_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int32(int32_t& data, const char* name) {
+    inline int32_t int32(int32_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void int64(uint64_t& data, const char* name) {
+    inline int64_t int64(int64_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint8(uint8_t& data, const char* name) {
+    inline uint8_t uint8(uint8_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint16(uint16_t& data, const char* name) {
+    inline uint16_t uint16(uint16_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint32(uint32_t& data, const char* name) {
+    inline uint32_t uint32(uint32_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void uint64(uint64_t& data, const char* name) {
+    inline uint64_t uint64(uint64_t& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void float32(float& data, const char* name) {
+    inline float float32(float& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void float64(double& data, const char* name) {
+    inline double float64(double& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
-    inline void str(ccstd::string& data, const char* name) {
+    inline ccstd::string& str(ccstd::string& data, const char* name) {
         serialize(data, name);
+        return data;
     }
 
     template <class T>

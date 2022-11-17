@@ -53,7 +53,7 @@ ISerializable* JsonInputArchive::start(const std::string& rootJsonStr, const Obj
 
     _currentNode = &_serializedData[0];
 
-    const char * type = findTypeInJsonObject(*_currentNode);
+    const char* type = findTypeInJsonObject(*_currentNode);
     ISerializable* obj = _objectFactory(type);
     if (!obj) {
         return nullptr;
@@ -91,6 +91,49 @@ const char* JsonInputArchive::findTypeInJsonObject(const rapidjson::Value& jsonO
         return nullptr;
     }
     return iter->value.GetString();
+}
+
+ISerializable* JsonInputArchive::createOrGetISerializableObject() {
+    if (!_currentNode->IsObject()) {
+        return;
+    }
+
+    int32_t index = -1;
+    bool couldDeserialize = false;
+    const char* type = findTypeInJsonObject(*_currentNode);
+
+    if (nullptr == type) {
+        const auto& iter = _currentNode->FindMember("__id__");
+        couldDeserialize = iter != _currentNode->MemberEnd();
+        if (couldDeserialize && !iter->value.IsInt()) {
+            return nullptr;
+        }
+
+        index = iter->value.GetInt();
+        if (index < 0 || index >= _serializedData.Size()) {
+            return nullptr;
+        }
+
+        auto cachedMapIter = _deserializedObjIdMap.find(index);
+        if (cachedMapIter != _deserializedObjIdMap.end()) {
+            return cachedMapIter->second;
+        }
+
+        _currentNode = &_serializedData[index];
+        type = findTypeInJsonObject(*_currentNode);
+
+        if (nullptr == type) {
+            return nullptr;
+        }
+    }
+
+    ISerializable* obj = _objectFactory(type);
+
+    if (index >= 0) {
+        assert(_deserializedObjIdMap.find(index) == _deserializedObjIdMap.end());
+        _deserializedObjIdMap[index] = obj;
+    }
+    return obj;
 }
 
 } // namespace cc
