@@ -69,15 +69,15 @@ public:
 
     template <class Archive>
     inline static void serialize(data_type& data, Archive& ar) {
-        ar.onStartSerialize(data);
+        ar.onStartSerializeObject(data);
         if constexpr (std::is_pointer_v<data_type> || IsIntrusivePtr<data_type>::value) {
             if (data != nullptr) {
-                data->serialize(ar);
+                ar.onSerializingObject(*data);
             }
         } else {
-            data.serialize(ar);
+            ar.onSerializingObject(data);
         }
-        ar.onFinishSerialize(data);
+        ar.onFinishSerializeObject(data);
     }
 };
 

@@ -30,6 +30,7 @@
 #include "SerializationTrait.h"
 #include "base/Ptr.h"
 #include "json/document.h"
+#include "HasMemberFunction.h"
 
 namespace cc {
 
@@ -60,10 +61,13 @@ public:
     void serialize(T& data, const char* name);
 
     template <class T>
-    void onStartSerialize(T& data);
+    void onSerializingObject(T& data);
 
     template <class T>
-    void onFinishSerialize(T& data);
+    void onStartSerializeObject(T& data);
+
+    template <class T>
+    void onFinishSerializeObject(T& data);
 
     inline bool boolean(bool& data, const char* name) {
         serialize(data, name);
@@ -134,6 +138,7 @@ private:
     const rapidjson::Value* _currentNode;
     ObjectFactory _objectFactory{nullptr};
     ccstd::unordered_map<int32_t, ISerializable*> _deserializedObjIdMap;
+    bool _isRoot{true};
 };
 
 template <>
@@ -353,7 +358,28 @@ inline void JsonInputArchive::serialize(T& data, const char* name) {
 }
 
 template <class T>
-inline void JsonInputArchive::onStartSerialize(T& data) {
+void JsonInputArchive::onSerializingObject(T& data) {
+    static_assert(has_serialize<T, void( decltype(*this) &)>::value || has_serializeInlineData<T, void( decltype(*this) &)>::value, "class should have serialize or serializeInlineData method");
+
+    if constexpr (has_serialize<T, void( decltype(*this) &)>::value && has_serializeInlineData<T, void( decltype(*this) &)>::value) {
+        if (_isRoot) {
+            _isRoot = false;
+            data.serialize(*this);
+        } else {
+            _isRoot = false;
+            data.serializeInlineData(*this);
+        }
+    } else if constexpr (has_serialize<T, void( decltype(*this) &)>::value) {
+        _isRoot = false;
+        data.serialize(*this);
+    } else if constexpr (has_serializeInlineData<T, void( decltype(*this) &)>::value) {
+        _isRoot = false;
+        data.serializeInlineData(*this);
+    }
+}
+
+template <class T>
+inline void JsonInputArchive::onStartSerializeObject(T& data) {
     if constexpr (std::is_pointer_v<T> || IsIntrusivePtr<T>::value) {
         if (nullptr != data) {
             return;
@@ -369,7 +395,7 @@ inline void JsonInputArchive::onStartSerialize(T& data) {
 }
 
 template <class T>
-inline void JsonInputArchive::onFinishSerialize(T& data) {
+inline void JsonInputArchive::onFinishSerializeObject(T& data) {
 }
 
 } // namespace cc

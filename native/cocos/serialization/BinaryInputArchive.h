@@ -27,6 +27,7 @@
 
 #include "IArchive.h"
 #include "SerializationTrait.h"
+#include "HasMemberFunction.h"
 
 namespace cc {
 
@@ -116,10 +117,16 @@ public:
     void serialize(T& data, const char* name);
 
     template <class T>
-    void onStartSerialize(T& data);
+    void onSerializingObject(T& data);
 
     template <class T>
-    void onFinishSerialize(T& data);
+    void onStartSerializeObject(T& data);
+
+    template <class T>
+    void onFinishSerializeObject(T& data);
+
+private:
+    bool _isRoot{true};
 };
 
 template <class T>
@@ -136,9 +143,30 @@ void BinaryInputArchive::serialize(T& data, const char* name) {
 }
 
 template <class T>
-void BinaryInputArchive::onStartSerialize(T& data) {}
+void BinaryInputArchive::onSerializingObject(T& data) {
+    static_assert(has_serialize<T, void( decltype(*this) &)>::value || has_serializeInlineData<T, void( decltype(*this) &)>::value, "class should have serialize or serializeInlineData method");
+
+    if constexpr (has_serialize<T, void( decltype(*this) &)>::value && has_serializeInlineData<T, void( decltype(*this) &)>::value) {
+        if (_isRoot) {
+            _isRoot = false;
+            data.serialize(*this);
+        } else {
+            _isRoot = false;
+            data.serializeInlineData(*this);
+        }
+    } else if constexpr (has_serialize<T, void( decltype(*this) &)>::value) {
+        _isRoot = false;
+        data.serialize(*this);
+    } else if constexpr (has_serializeInlineData<T, void( decltype(*this) &)>::value) {
+        _isRoot = false;
+        data.serializeInlineData(*this);
+    }
+}
 
 template <class T>
-void BinaryInputArchive::onFinishSerialize(T& data) {}
+void BinaryInputArchive::onStartSerializeObject(T& data) {}
+
+template <class T>
+void BinaryInputArchive::onFinishSerializeObject(T& data) {}
 
 } // namespace cc
