@@ -445,7 +445,7 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive &ar) {
+    void serializeInlineData(Archive &ar) {
         ar.serialize(x, "x");
         ar.serialize(y, "y");
         ar.serialize(z, "z");

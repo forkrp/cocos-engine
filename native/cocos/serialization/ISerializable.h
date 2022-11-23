@@ -28,16 +28,25 @@
 #include <functional>
 
 #define CC_DECLARE_SERIALIZABLE()                         \
+public: \
+    template<class Archive> void serialize(Archive& ar); \
     void virtualSerialize(JsonInputArchive& ar) override; \
-    void virtualSerialize(BinaryInputArchive& ar) override;
+    void virtualSerialize(BinaryInputArchive& ar) override; \
+    void virtualOnBeforeSerialize() override; \
+    void virtualOnAfterDeserialize() override; \
+private: \
+    inline void serializeInternal(JsonInputArchive& ar) { serialize(ar); } \
+    inline void serializeInternal(BinaryInputArchive& ar) { serialize(ar); }
 
-#define CC_IMPL_SERIALIZABLE(__type__)                        \
-    void __type__::virtualSerialize(JsonInputArchive& ar) {   \
-        __type__::serialize(ar);                              \
-    }                                                         \
-    void __type__::virtualSerialize(BinaryInputArchive& ar) { \
-        __type__::serialize(ar);                              \
-    }
+#define CC_IMPL_SERIALIZABLE(__klass__)                        \
+    void __klass__::virtualSerialize(JsonInputArchive& ar) { __klass__::serialize(ar); } \
+    void __klass__::virtualSerialize(BinaryInputArchive& ar) { __klass__::serialize(ar); } \
+    void __klass__::virtualOnBeforeSerialize() { __klass__::onBeforeSerialize(); } \
+    void __klass__::virtualOnAfterDeserialize() { __klass__::onAfterDeserialize(); }
+
+namespace se {
+class Object;
+}
 
 namespace cc {
 
@@ -50,12 +59,26 @@ public:
     virtual void virtualSerialize(JsonInputArchive& ar) {}
     virtual void virtualSerialize(BinaryInputArchive& ar) {}
 
-    virtual void onBeforeSerialize() {}
-    virtual void onAfterDeserialize() {}
+    virtual void virtualOnBeforeSerialize() {}
+    virtual void virtualOnAfterDeserialize() {}
 
-    virtual RefCounted* getRefCounted() { return nullptr; }
+    void onBeforeSerialize() {}
+    void onAfterDeserialize() {}
 };
 
-using ObjectFactory = std::function<ISerializable*(const char*)>;
+//enum class TypeImplementationLocation {
+//    NONE,
+//    CPP,
+//    Script
+//};
+
+class ObjectFactory {
+public:
+    virtual ~ObjectFactory() = default;
+
+//    virtual TypeImplementationLocation queryTypeImplementLocation(const char* type) = 0;
+//    virtual ISerializable* createISerializableObject(const char* type) = 0;
+    virtual se::Object* createScriptObject(const char* type) = 0;
+};
 
 } // namespace cc

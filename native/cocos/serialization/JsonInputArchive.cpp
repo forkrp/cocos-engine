@@ -24,6 +24,8 @@
  ****************************************************************************/
 
 #include "JsonInputArchive.h"
+#include "bindings/manual/jsb_conversions.h"
+#include "bindings/jswrapper/SeApi.h"
 
 namespace cc {
 
@@ -33,7 +35,8 @@ JsonInputArchive::JsonInputArchive() {
 JsonInputArchive::~JsonInputArchive() {
 }
 
-ISerializable* JsonInputArchive::start(const std::string& rootJsonStr, const ObjectFactory& factory) {
+se::Object* JsonInputArchive::start(const std::string& rootJsonStr, ObjectFactory* factory) {
+    assert(factory != nullptr);
     _objectFactory = factory;
 
     rapidjson::Document d;
@@ -54,13 +57,23 @@ ISerializable* JsonInputArchive::start(const std::string& rootJsonStr, const Obj
     _currentNode = &_serializedData[0];
 
     const char* type = findTypeInJsonObject(*_currentNode);
-    ISerializable* obj = _objectFactory(type);
-    if (!obj) {
-        return nullptr;
-    }
 
-    obj->virtualSerialize(*this);
-    return obj;
+    se::Object* ret = _objectFactory->createScriptObject(type);
+    assert(ret);
+
+    ret->root();
+
+    _previousOwner = nullptr;
+    _currentOwner = ret;
+
+    // Serialize CPP object
+    ret->getPrivateObject()->serialize(*this);
+
+    // Serialize JS object
+    serializeScriptObject(ret);
+
+    ret->unroot();
+    return ret;
 }
 
 const rapidjson::Value* JsonInputArchive::getValue(const rapidjson::Value* parentNode, const char* key) {
@@ -93,7 +106,7 @@ const char* JsonInputArchive::findTypeInJsonObject(const rapidjson::Value& jsonO
     return iter->value.GetString();
 }
 
-ISerializable* JsonInputArchive::createOrGetISerializableObject() {
+se::Object* JsonInputArchive::getOrCreateScriptObject() {
     if (!_currentNode->IsObject()) {
         return;
     }
@@ -127,13 +140,121 @@ ISerializable* JsonInputArchive::createOrGetISerializableObject() {
         }
     }
 
-    ISerializable* obj = _objectFactory(type);
+    se::Object* obj = _objectFactory->createScriptObject(type);
 
     if (index >= 0) {
         assert(_deserializedObjIdMap.find(index) == _deserializedObjIdMap.end());
         _deserializedObjIdMap[index] = obj;
     }
     return obj;
+}
+
+void *JsonInputArchive::seObjectGetPrivateData(se::Object* obj) {
+    obj->getPrivateData();
+}
+
+void JsonInputArchive::seObjectRoot(se::Object* obj) {
+    obj->root();
+}
+
+void JsonInputArchive::seObjectUnroot(se::Object* obj) {
+    obj->unroot();
+}
+
+se::Value& JsonInputArchive::anyValue(se::Value& value, const char* name) {
+    return serializeInternal(value, name);
+}
+
+se::Value& JsonInputArchive::plainObj(se::Value& value, const char* name) {
+    return value;
+}
+
+se::Value& JsonInputArchive::serializableObj(se::Value& value, const char* name) {
+    return value;
+}
+
+se::Value& JsonInputArchive::serializableObjArray(se::Value& value, const char* name) {
+    return value;
+}
+
+se::Value& JsonInputArchive::serializeArray(se::Value& value, const char* name) {
+    return value;
+}
+
+se::Value& JsonInputArchive::serializeInternal(se::Value& value, const char* name) {
+    auto iter = _currentNode->FindMember(name);
+    if (iter == _currentNode->MemberEnd()) {
+        value.setUndefined();
+        return value;
+    }
+    const auto& data = iter->value;
+
+    switch (iter->value.GetType()) {
+        case rapidjson::kNullType:
+            value.setNull();
+            break;
+        case rapidjson::kFalseType:
+            value.setBoolean(false);
+            break;
+        case rapidjson::kTrueType:
+            value.setBoolean(true);
+            break;
+        case rapidjson::kObjectType:
+            if (data.HasMember("__id__")) {
+                value = serializableObj(value, name);
+            } else {
+                value = anyValue(value, name);
+            }
+            break;
+        case rapidjson::kArrayType:
+            serializeArray(value, name);
+            break;
+        case rapidjson::kStringType:
+            value.setString(iter->value.GetString());
+            break;
+        case rapidjson::kNumberType:
+            value.setDouble(iter->value.GetDouble());
+            break;
+        default:
+            break;
+    }
+
+    return value;
+}
+
+void JsonInputArchive::serializeScriptObject(se::Object* obj) {
+    se::Value serializeVal;
+    obj->getProperty("serialize", &serializeVal);
+
+    se::Value serializeInlineDataVal;
+    obj->getProperty("serializeInlineData", &serializeInlineDataVal);
+
+    bool hasSerializeMethod = serializeVal.isObject() && serializeVal.toObject()->isFunction();
+    bool hasSerializeInlineDataMethod = serializeInlineDataVal.isObject() && serializeInlineDataVal.toObject()->isFunction();
+    if (!hasSerializeMethod && !hasSerializeInlineDataMethod) {
+        return;
+    }
+
+    static se::ValueArray args;
+    args.resize(1);
+    bool ok = nativevalue_to_se(this, args[0]);
+    assert(ok);
+
+    if (hasSerializeMethod && hasSerializeInlineDataMethod) {
+        if (_isRoot) {
+            _isRoot = false;
+            serializeVal.toObject()->call(args, obj);
+        } else {
+            serializeInlineDataVal.toObject()->call(args, obj);
+        }
+    } else {
+        _isRoot = false;
+        if (hasSerializeMethod) {
+            serializeVal.toObject()->call(args, obj);
+        } else if (hasSerializeInlineDataMethod) {
+            serializeInlineDataVal.toObject()->call(args, obj);
+        }
+    }
 }
 
 } // namespace cc

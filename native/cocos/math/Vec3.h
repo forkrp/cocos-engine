@@ -631,6 +631,13 @@ public:
     /** equals to Vec3(0,0,-1) */
     static const Vec3 FORWARD;
 
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(x, "x");
+        ar.serialize(y, "y");
+        ar.serialize(z, "z");
+    }
+
 private:
     void transformMat4C(const Vec3 &v, const Mat4 &m);
     void transformMat4Neon(const Vec3 &v, const Mat4 &m);

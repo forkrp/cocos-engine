@@ -23,29 +23,8 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#pragma once
-
-
-
-#define CC_SERIALIZE(name) ar.serialize(name, #name)
-
+#include "AssetDependInfo.h"
 
 namespace cc {
 
-class IArchive {
-public:
-    bool isReading() const { return false; }
-    bool isWritting() const { return false; }
-    bool isExporting() const { return false; }
-
-    template <class T>
-    void serializePrimitiveData(T&) {}
-
-    template <class T>
-    void serializeStlLikeArray(T&) {}
-
-    template <class T>
-    void serializeStlLikeMap(T&) {}
-};
-
-} // namespace cc
+}

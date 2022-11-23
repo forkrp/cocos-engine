@@ -25,27 +25,20 @@
 
 #pragma once
 
+#include "base/std/container/string.h"
+#include "base/std/variant.h"
 
-
-#define CC_SERIALIZE(name) ar.serialize(name, #name)
-
+namespace se {
+class Object;
+}
 
 namespace cc {
 
-class IArchive {
-public:
-    bool isReading() const { return false; }
-    bool isWritting() const { return false; }
-    bool isExporting() const { return false; }
-
-    template <class T>
-    void serializePrimitiveData(T&) {}
-
-    template <class T>
-    void serializeStlLikeArray(T&) {}
-
-    template <class T>
-    void serializeStlLikeMap(T&) {}
+struct AssetDependInfo final {
+    se::Object* owner{nullptr};
+    ccstd::variant<ccstd::string, uint32_t> propNameOrIndex;
+    ccstd::string uuid;
+    ccstd::string expectedType;
 };
 
-} // namespace cc
+}

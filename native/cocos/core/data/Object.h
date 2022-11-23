@@ -31,6 +31,9 @@
 #include "base/RefCounted.h"
 #include "base/TypeDef.h"
 
+#include "serialization/ISerializable.h"
+#include "serialization/IArchive.h"
+
 namespace cc {
 
 /**
@@ -40,7 +43,8 @@ namespace cc {
  * 大部分对象的基类。
  * @private
  */
-class CCObject : public RefCounted /*cjh implements EditorExtendableObject*/ {
+class CCObject : public RefCounted, public ISerializable /*cjh implements EditorExtendableObject*/ {
+    CC_DECLARE_SERIALIZABLE()
 public:
     // definitions for CCObject.Flags
     enum class Flags : FlagBits {

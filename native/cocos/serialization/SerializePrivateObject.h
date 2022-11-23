@@ -25,27 +25,20 @@
 
 #pragma once
 
-
-
-#define CC_SERIALIZE(name) ar.serialize(name, #name)
-
+#include "ISerializable.h"
+#include "JsonInputArchive.h"
+#include "BinaryInputArchive.h"
 
 namespace cc {
 
-class IArchive {
-public:
-    bool isReading() const { return false; }
-    bool isWritting() const { return false; }
-    bool isExporting() const { return false; }
+template<class T, class Archive>
+inline void serializePrivateObject(T* data, Archive& ar) {
+    if constexpr (std::is_base_of<ISerializable, T>::value) {
+        ISerializable* obj = static_cast<ISerializable*>(data);
+        obj->virtualSerialize(ar);
+    } else {
+        ar.onSerializingObject(data);
+    }
+}
 
-    template <class T>
-    void serializePrimitiveData(T&) {}
-
-    template <class T>
-    void serializeStlLikeArray(T&) {}
-
-    template <class T>
-    void serializeStlLikeMap(T&) {}
-};
-
-} // namespace cc
+}
