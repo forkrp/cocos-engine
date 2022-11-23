@@ -25,10 +25,7 @@
 
 #pragma once
 
-
-
 #define CC_SERIALIZE(name) ar.serialize(name, #name)
-
 
 namespace cc {
 

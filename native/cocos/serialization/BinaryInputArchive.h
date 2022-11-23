@@ -144,7 +144,7 @@ void BinaryInputArchive::serialize(T& data, const char* name) {
 
 template <class T>
 void BinaryInputArchive::onSerializingObject(T& data) {
-//    static_assert(has_serialize<T, void(decltype(*this)&)>::value || has_serializeInlineData<T, void(decltype(*this)&)>::value, "class should have serialize or serializeInlineData method");
+    //    static_assert(has_serialize<T, void(decltype(*this)&)>::value || has_serializeInlineData<T, void(decltype(*this)&)>::value, "class should have serialize or serializeInlineData method");
 
     if constexpr (has_serialize<T, void(decltype(*this)&)>::value && has_serializeInlineData<T, void(decltype(*this)&)>::value) {
         if (_isRoot) {

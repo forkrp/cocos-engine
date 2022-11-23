@@ -25,13 +25,13 @@
 
 #pragma once
 
+#include "BinaryInputArchive.h"
 #include "ISerializable.h"
 #include "JsonInputArchive.h"
-#include "BinaryInputArchive.h"
 
 namespace cc {
 
-template<class T, class Archive>
+template <class T, class Archive>
 inline void serializePrivateObject(T* data, Archive& ar) {
     if constexpr (std::is_base_of<ISerializable, T>::value) {
         ISerializable* obj = static_cast<ISerializable*>(data);
@@ -41,4 +41,4 @@ inline void serializePrivateObject(T* data, Archive& ar) {
     }
 }
 
-}
+} // namespace cc

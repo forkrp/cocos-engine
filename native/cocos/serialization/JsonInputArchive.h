@@ -25,13 +25,13 @@
 
 #pragma once
 
+#include "AssetDependInfo.h"
 #include "HasMemberFunction.h"
 #include "IArchive.h"
 #include "ISerializable.h"
 #include "SerializationTrait.h"
 #include "base/Ptr.h"
 #include "json/document.h"
-#include "AssetDependInfo.h"
 
 #include "base/std/container/vector.h"
 
@@ -146,7 +146,7 @@ private:
     static const char* findTypeInJsonObject(const rapidjson::Value& jsonObj);
     se::Object* getOrCreateScriptObject();
 
-    void *seObjectGetPrivateData(se::Object* obj);
+    void* seObjectGetPrivateData(se::Object* obj);
     void seObjectRoot(se::Object* obj);
     void seObjectUnroot(se::Object* obj);
 
@@ -162,8 +162,8 @@ private:
 
     ccstd::vector<AssetDependInfo> _depends;
 
-    se::Object *_previousOwner{nullptr};
-    se::Object *_currentOwner{nullptr};
+    se::Object* _previousOwner{nullptr};
+    se::Object* _currentOwner{nullptr};
     bool _isRoot{true};
 };
 
@@ -385,7 +385,7 @@ inline void JsonInputArchive::serialize(T& data, const char* name) {
 
 template <class T>
 void JsonInputArchive::onSerializingObject(T& data) {
-//    static_assert(has_serialize<T, void(decltype(*this)&)>::value || has_serializeInlineData<T, void(decltype(*this)&)>::value, "class should have serialize or serializeInlineData method");
+    //    static_assert(has_serialize<T, void(decltype(*this)&)>::value || has_serializeInlineData<T, void(decltype(*this)&)>::value, "class should have serialize or serializeInlineData method");
     bool isRoot = _isRoot;
     _isRoot = false;
     if constexpr (has_serialize<T, void(decltype(*this)&)>::value && has_serializeInlineData<T, void(decltype(*this)&)>::value) {
@@ -410,7 +410,7 @@ inline void JsonInputArchive::onStartSerializeObject(T& data) {
 
         se::Object* obj = getOrCreateScriptObject();
         assert(obj != nullptr && seObjectGetPrivateData(obj) != nullptr);
-        seObjectRoot(obj); //FIXME(cjh): How to unroot it?
+        seObjectRoot(obj); // FIXME(cjh): How to unroot it?
 
         _previousOwner = _currentOwner;
         _currentOwner = obj;

@@ -33,4 +33,4 @@ public:
     ~ISerializableBase() = default;
 };
 
-}
+} // namespace cc

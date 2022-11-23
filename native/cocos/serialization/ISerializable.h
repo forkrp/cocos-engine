@@ -27,21 +27,23 @@
 
 #include <functional>
 
-#define CC_DECLARE_SERIALIZABLE()                         \
-public: \
-    template<class Archive> void serialize(Archive& ar); \
-    void virtualSerialize(JsonInputArchive& ar) override; \
-    void virtualSerialize(BinaryInputArchive& ar) override; \
-    void virtualOnBeforeSerialize() override; \
-    void virtualOnAfterDeserialize() override; \
-private: \
+#define CC_DECLARE_SERIALIZABLE()                                          \
+public:                                                                    \
+    template <class Archive>                                               \
+    void serialize(Archive& ar);                                           \
+    void virtualSerialize(JsonInputArchive& ar) override;                  \
+    void virtualSerialize(BinaryInputArchive& ar) override;                \
+    void virtualOnBeforeSerialize() override;                              \
+    void virtualOnAfterDeserialize() override;                             \
+                                                                           \
+private:                                                                   \
     inline void serializeInternal(JsonInputArchive& ar) { serialize(ar); } \
     inline void serializeInternal(BinaryInputArchive& ar) { serialize(ar); }
 
-#define CC_IMPL_SERIALIZABLE(__klass__)                        \
-    void __klass__::virtualSerialize(JsonInputArchive& ar) { __klass__::serialize(ar); } \
+#define CC_IMPL_SERIALIZABLE(__klass__)                                                    \
+    void __klass__::virtualSerialize(JsonInputArchive& ar) { __klass__::serialize(ar); }   \
     void __klass__::virtualSerialize(BinaryInputArchive& ar) { __klass__::serialize(ar); } \
-    void __klass__::virtualOnBeforeSerialize() { __klass__::onBeforeSerialize(); } \
+    void __klass__::virtualOnBeforeSerialize() { __klass__::onBeforeSerialize(); }         \
     void __klass__::virtualOnAfterDeserialize() { __klass__::onAfterDeserialize(); }
 
 namespace se {
@@ -66,18 +68,18 @@ public:
     void onAfterDeserialize() {}
 };
 
-//enum class TypeImplementationLocation {
-//    NONE,
-//    CPP,
-//    Script
-//};
+// enum class TypeImplementationLocation {
+//     NONE,
+//     CPP,
+//     Script
+// };
 
 class ObjectFactory {
 public:
     virtual ~ObjectFactory() = default;
 
-//    virtual TypeImplementationLocation queryTypeImplementLocation(const char* type) = 0;
-//    virtual ISerializable* createISerializableObject(const char* type) = 0;
+    //    virtual TypeImplementationLocation queryTypeImplementLocation(const char* type) = 0;
+    //    virtual ISerializable* createISerializableObject(const char* type) = 0;
     virtual se::Object* createScriptObject(const char* type) = 0;
 };
 

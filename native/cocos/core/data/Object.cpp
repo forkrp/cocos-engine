@@ -26,19 +26,19 @@
 #include "core/data/Object.h"
 #include "base/std/container/vector.h"
 #include "core/platform/Debug.h"
-#include "serialization/JsonInputArchive.h"
 #include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 
 namespace {
-ccstd::vector<CCObject *> objectsToDestroy;
+ccstd::vector<CCObject*> objectsToDestroy;
 }
 
-template<class Archive>
+template <class Archive>
 void CCObject::serialize(Archive& ar) {
     CC_SERIALIZE(_name);
-//    CC_SERIALIZE(_objFlags);
+    //    CC_SERIALIZE(_objFlags);
 }
 
 void CCObject::virtualSerialize(JsonInputArchive& ar) {
@@ -49,14 +49,14 @@ void CCObject::virtualSerialize(BinaryInputArchive& ar) {
     CCObject::serialize(ar);
 }
 
-//CC_IMPL_SERIALIZABLE(CCObject)
+// CC_IMPL_SERIALIZABLE(CCObject)
 
 /* static */
 void CCObject::deferredDestroy() {
     if (objectsToDestroy.empty()) return;
     auto deleteCount = static_cast<int32_t>(objectsToDestroy.size());
     for (size_t i = 0; i < deleteCount; ++i) {
-        CCObject *obj = objectsToDestroy[i];
+        CCObject* obj = objectsToDestroy[i];
         if (!(obj->_objFlags & Flags::DESTROYED)) {
             obj->destroyImmediate();
             obj->release();
@@ -78,8 +78,8 @@ CCObject::CCObject(ccstd::string name /* = ""*/)
 CCObject::~CCObject() = default;
 
 bool CCObject::destroy() {
-    //NOTE: _objFlags will be set to TO_DESTROY when destroy method in TS is triggered.
-    // CCObject::destroy method will be invoked at the end. Refer to cocos/core/data/object.ts
+    // NOTE: _objFlags will be set to TO_DESTROY when destroy method in TS is triggered.
+    //  CCObject::destroy method will be invoked at the end. Refer to cocos/core/data/object.ts
     /*
      public destroy (): boolean {
          if (this._objFlags & Destroyed) {
@@ -99,8 +99,8 @@ bool CCObject::destroy() {
      */
 
     if (static_cast<bool>(_objFlags & Flags::TO_DESTROY)) {
-        //NOTE: Should not return false because _objFlags is already set to TO_DESTROY in TS.
-        // And Scene::destroy depends on the return value. Refer to:
+        // NOTE: Should not return false because _objFlags is already set to TO_DESTROY in TS.
+        //  And Scene::destroy depends on the return value. Refer to:
         /*
          bool Scene::destroy() {
              bool success = Super::destroy();
@@ -124,7 +124,7 @@ bool CCObject::destroy() {
     addRef();
     objectsToDestroy.emplace_back(this);
 
-    //NOTE: EDITOR's deferredDestroyTimer trigger from ts
+    // NOTE: EDITOR's deferredDestroyTimer trigger from ts
     return true;
 }
 
@@ -141,7 +141,7 @@ void CCObject::destroyImmediate() {
     _objFlags |= Flags::DESTROYED;
 }
 
-bool isObjectValid(CCObject *value, bool strictMode /* = false*/) {
+bool isObjectValid(CCObject* value, bool strictMode /* = false*/) {
     if (value == nullptr) {
         return false;
     }

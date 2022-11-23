@@ -41,4 +41,4 @@ struct AssetDependInfo final {
     ccstd::string expectedType;
 };
 
-}
+} // namespace cc

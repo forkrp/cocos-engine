@@ -24,8 +24,8 @@
  ****************************************************************************/
 
 #include "JsonInputArchive.h"
-#include "bindings/manual/jsb_conversions.h"
 #include "bindings/jswrapper/SeApi.h"
+#include "bindings/manual/jsb_conversions.h"
 
 namespace cc {
 
@@ -149,7 +149,7 @@ se::Object* JsonInputArchive::getOrCreateScriptObject() {
     return obj;
 }
 
-void *JsonInputArchive::seObjectGetPrivateData(se::Object* obj) {
+void* JsonInputArchive::seObjectGetPrivateData(se::Object* obj) {
     obj->getPrivateData();
 }
 
