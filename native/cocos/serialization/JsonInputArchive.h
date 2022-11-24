@@ -158,12 +158,6 @@ private:
 
     void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject);
 
-    void* seObjectGetPrivateData(se::Object* obj);
-    void seObjectRoot(se::Object* obj);
-    void seObjectUnroot(se::Object* obj);
-
-    se::Value& serializeInternal(se::Value& value, const char* name);
-
     void doSerializeObj(se::Value& value);
     void doSerializeArray(se::Value& value);
     void doSerializeAny(se::Value& value);
@@ -257,7 +251,7 @@ inline void JsonInputArchive::serializePrimitiveData(int64_t& data) {
 template <>
 inline void JsonInputArchive::serializePrimitiveData(uint8_t& data) {
     if (_currentNode->IsUint()) {
-        data = static_cast<uint8_t>(_currentNode->GetInt());
+        data = static_cast<uint8_t>(_currentNode->GetUint());
     } else if (_currentNode->IsNumber()) {
         data = static_cast<uint8_t>(_currentNode->GetDouble());
     } else if (_currentNode->IsString()) {
@@ -270,7 +264,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint8_t& data) {
 template <>
 inline void JsonInputArchive::serializePrimitiveData(uint16_t& data) {
     if (_currentNode->IsUint()) {
-        data = static_cast<uint16_t>(_currentNode->GetInt());
+        data = static_cast<uint16_t>(_currentNode->GetUint());
     } else if (_currentNode->IsNumber()) {
         data = static_cast<uint16_t>(_currentNode->GetDouble());
     } else if (_currentNode->IsString()) {
@@ -283,7 +277,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint16_t& data) {
 template <>
 inline void JsonInputArchive::serializePrimitiveData(uint32_t& data) {
     if (_currentNode->IsUint()) {
-        data = static_cast<uint32_t>(_currentNode->GetInt());
+        data = static_cast<uint32_t>(_currentNode->GetUint());
     } else if (_currentNode->IsNumber()) {
         data = static_cast<uint32_t>(_currentNode->GetDouble());
     } else if (_currentNode->IsString()) {
@@ -296,7 +290,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint32_t& data) {
 template <>
 inline void JsonInputArchive::serializePrimitiveData(uint64_t& data) {
     if (_currentNode->IsUint64()) {
-        data = static_cast<uint64_t>(_currentNode->GetInt64());
+        data = static_cast<uint64_t>(_currentNode->GetUint64());
     } else if (_currentNode->IsString()) {
         data = static_cast<uint64_t>(atol(_currentNode->GetString()));
     } else {

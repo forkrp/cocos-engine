@@ -1006,6 +1006,6 @@ void Node::serialize(Archive &ar) {
     }
 }
 
-CC_IMPL_SERIALIZABLE(Node)
+CC_IMPL_SERIALIZE(Node)
 
 } // namespace cc

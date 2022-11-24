@@ -168,20 +168,45 @@ void* JsonInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScr
     return obj;
 }
 
-void* JsonInputArchive::seObjectGetPrivateData(se::Object* obj) {
-    obj->getPrivateData();
-}
-
-void JsonInputArchive::seObjectRoot(se::Object* obj) {
-    obj->root();
-}
-
-void JsonInputArchive::seObjectUnroot(se::Object* obj) {
-    obj->unroot();
-}
-
 se::Value& JsonInputArchive::anyValue(se::Value& value, const char* name) {
-    return serializeInternal(value, name);
+    auto iter = _currentNode->FindMember(name);
+    if (iter == _currentNode->MemberEnd()) {
+        value.setUndefined();
+        return value;
+    }
+    const auto& data = iter->value;
+
+    switch (data.GetType()) {
+        case rapidjson::kNullType:
+            value.setNull();
+            break;
+        case rapidjson::kFalseType:
+            value.setBoolean(false);
+            break;
+        case rapidjson::kTrueType:
+            value.setBoolean(true);
+            break;
+        case rapidjson::kObjectType:
+            if (data.HasMember("__id__")) {
+                value = serializableObj(value, name);
+            } else {
+                value = plainObj(value, name);
+            }
+            break;
+        case rapidjson::kArrayType:
+            arrayObj(value, name);
+            break;
+        case rapidjson::kStringType:
+            value.setString(iter->value.GetString());
+            break;
+        case rapidjson::kNumberType:
+            value.setDouble(iter->value.GetDouble());
+            break;
+        default:
+            break;
+    }
+
+    return value;
 }
 
 se::Value& JsonInputArchive::plainObj(se::Value& value, const char* name) {
@@ -368,47 +393,6 @@ void JsonInputArchive::doSerializeAny(se::Value& value) {
         default:
             break;
     }
-}
-
-se::Value& JsonInputArchive::serializeInternal(se::Value& value, const char* name) {
-    auto iter = _currentNode->FindMember(name);
-    if (iter == _currentNode->MemberEnd()) {
-        value.setUndefined();
-        return value;
-    }
-    const auto& data = iter->value;
-
-    switch (data.GetType()) {
-        case rapidjson::kNullType:
-            value.setNull();
-            break;
-        case rapidjson::kFalseType:
-            value.setBoolean(false);
-            break;
-        case rapidjson::kTrueType:
-            value.setBoolean(true);
-            break;
-        case rapidjson::kObjectType:
-            if (data.HasMember("__id__")) {
-                value = serializableObj(value, name);
-            } else {
-                value = plainObj(value, name);
-            }
-            break;
-        case rapidjson::kArrayType:
-            arrayObj(value, name);
-            break;
-        case rapidjson::kStringType:
-            value.setString(iter->value.GetString());
-            break;
-        case rapidjson::kNumberType:
-            value.setDouble(iter->value.GetDouble());
-            break;
-        default:
-            break;
-    }
-
-    return value;
 }
 
 void JsonInputArchive::serializeScriptObject(se::Object* obj) {

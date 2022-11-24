@@ -48,7 +48,7 @@ namespace cc {
  * @private
  */
 class CCObject : public RefCounted, public ISerializable /*cjh implements EditorExtendableObject*/ {
-    CC_DECLARE_SERIALIZABLE()
+    CC_DECLARE_SERIALIZE()
 public:
     // definitions for CCObject.Flags
     enum class Flags : FlagBits {

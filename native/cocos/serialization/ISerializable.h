@@ -27,7 +27,7 @@
 
 #include <functional>
 
-#define CC_DECLARE_SERIALIZABLE()                                              \
+#define CC_DECLARE_SERIALIZE()                                              \
 public:                                                                        \
     template <class Archive>                                                   \
     void serialize(Archive& ar);                                               \
@@ -40,11 +40,12 @@ private:                                                                       \
     inline void serializeInternal(cc::JsonInputArchive& ar) { serialize(ar); } \
     inline void serializeInternal(cc::BinaryInputArchive& ar) { serialize(ar); }
 
-#define CC_IMPL_SERIALIZABLE(__klass__)                                                    \
+#define CC_IMPL_SERIALIZE(__klass__)                                                    \
     void __klass__::virtualSerialize(JsonInputArchive& ar) { __klass__::serialize(ar); }   \
     void __klass__::virtualSerialize(BinaryInputArchive& ar) { __klass__::serialize(ar); } \
     void __klass__::virtualOnBeforeSerialize() { __klass__::onBeforeSerialize(); }         \
     void __klass__::virtualOnAfterDeserialize() { __klass__::onAfterDeserialize(); }
+
 
 namespace se {
 class Object;

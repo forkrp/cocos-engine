@@ -58,7 +58,7 @@ using EventType = NodeEventType;
 using TransformDirtyBit = TransformBit;
 
 class Node : public BaseNode {
-    CC_DECLARE_SERIALIZABLE()
+    CC_DECLARE_SERIALIZE()
 public:
     class UserData : public RefCounted {
     public:
