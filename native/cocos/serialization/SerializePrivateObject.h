@@ -25,9 +25,7 @@
 
 #pragma once
 
-#include "BinaryInputArchive.h"
 #include "ISerializable.h"
-#include "JsonInputArchive.h"
 
 namespace cc {
 
@@ -37,7 +35,7 @@ inline void serializePrivateObject(T* data, Archive& ar) {
         ISerializable* obj = static_cast<ISerializable*>(data);
         obj->virtualSerialize(ar);
     } else {
-        ar.onSerializingObject(data);
+        ar.onSerializingObjectPtr(data);
     }
 }
 

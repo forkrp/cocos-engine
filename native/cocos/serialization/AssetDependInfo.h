@@ -28,6 +28,8 @@
 #include "base/std/container/string.h"
 #include "base/std/variant.h"
 
+#include <functional>
+
 namespace se {
 class Object;
 }
@@ -35,7 +37,7 @@ class Object;
 namespace cc {
 
 struct AssetDependInfo final {
-    se::Object* owner{nullptr};
+    std::function<void()> dereferenceCb{nullptr};
     ccstd::variant<ccstd::string, uint32_t> propNameOrIndex;
     ccstd::string uuid;
     ccstd::string expectedType;

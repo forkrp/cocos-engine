@@ -26,6 +26,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <memory>
 
 #include "base/Ptr.h"
 #include "base/std/container/list.h"
@@ -44,6 +45,45 @@ template <class T>
 struct IsIntrusivePtr<IntrusivePtr<T>> : std::true_type {
     using type = T;
 };
+
+template<class T>
+struct IsPtr : std::false_type {};
+
+template<class T>
+struct IsPtr<T*> : std::true_type {
+    using type = T;
+};
+
+template<class T>
+struct IsPtr<T* const> : std::true_type {
+    using type = T;
+};
+
+template<class T>
+struct IsPtr<T* volatile> : std::true_type {
+    using type = T;
+};
+
+template<class T>
+struct IsPtr<T* const volatile> : std::true_type {
+    using type = T;
+};
+
+template<class T>
+struct IsPtr<IntrusivePtr<T>> : std::true_type {
+    using type = T;
+};
+
+template<class T>
+struct IsPtr<std::shared_ptr<T>> : std::true_type {
+    using type = T;
+};
+
+template <typename T, typename = se::Object*>
+struct has_script_object : std::false_type{};
+
+template <typename T>
+struct has_script_object<T, decltype(T::_scriptObject)> : std::true_type {};
 
 template <class T>
 class SerializationTraitBase {
@@ -70,27 +110,19 @@ public:
     template <class Archive>
     inline static void serialize(data_type& data, Archive& ar) {
         ar.onStartSerializeObject(data);
-        if constexpr (std::is_pointer_v<data_type> || IsIntrusivePtr<data_type>::value) {
+        if constexpr (IsPtr<data_type>::value) {
             if (data != nullptr) {
-                ar.onSerializingObject(*data);
+                ar.onSerializingObjectPtr(data);
             }
         } else {
-            ar.onSerializingObject(data);
+            ar.onSerializingObjectRef(data);
         }
         ar.onFinishSerializeObject(data);
     }
 };
 
 template <>
-class SerializationTrait<bool> : public SerializationTraitBase<bool> {
-public:
-    using data_type = bool;
-
-    template <class Archive>
-    inline static void serialize(data_type& data, Archive& ar) {
-        ar.serializePrimitiveData(reinterpret_cast<uint8_t&>(data));
-    }
-};
+class SerializationTrait<bool> : public SerializationTraitPrimitive<bool> {};
 
 template <>
 class SerializationTrait<int8_t> : public SerializationTraitPrimitive<int8_t> {};

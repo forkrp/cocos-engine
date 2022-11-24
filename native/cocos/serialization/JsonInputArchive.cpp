@@ -30,6 +30,7 @@
 namespace cc {
 
 JsonInputArchive::JsonInputArchive() {
+    _deserializedObjects.reserve(10);
 }
 
 JsonInputArchive::~JsonInputArchive() {
@@ -106,7 +107,7 @@ const char* JsonInputArchive::findTypeInJsonObject(const rapidjson::Value& jsonO
     return iter->value.GetString();
 }
 
-se::Object* JsonInputArchive::getOrCreateScriptObject() {
+void* JsonInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject) {
     if (!_currentNode->IsObject()) {
         return;
     }
@@ -129,7 +130,10 @@ se::Object* JsonInputArchive::getOrCreateScriptObject() {
 
         auto cachedMapIter = _deserializedObjIdMap.find(index);
         if (cachedMapIter != _deserializedObjIdMap.end()) {
-            return cachedMapIter->second;
+            const auto& info = cachedMapIter->second;
+            assert(info.index == index);
+            outScriptObject = info.scriptObj;
+            return info.nativeObj;
         }
 
         _currentNode = &_serializedData[index];
@@ -140,11 +144,26 @@ se::Object* JsonInputArchive::getOrCreateScriptObject() {
         }
     }
 
-    se::Object* obj = _objectFactory->createScriptObject(type);
+    void* obj = nullptr;
+    if (_objectFactory->needCreateScriptObject(type)) {
+        se::Object* seObj = _objectFactory->createScriptObject(type);
+        if (seObj != nullptr) {
+            seObj->root(); // FIXME(cjh): When to unroot it?
+            obj = seObj->getPrivateData();
+        }
+        outScriptObject = seObj;
+    } else {
+        obj = _objectFactory->createNativeObject(type);
+        outScriptObject = nullptr;
+    }
 
     if (index >= 0) {
         assert(_deserializedObjIdMap.find(index) == _deserializedObjIdMap.end());
-        _deserializedObjIdMap[index] = obj;
+        DeserializedInfo info;
+        info.index = index;
+        info.nativeObj = obj;
+        info.scriptObj = outScriptObject;
+        _deserializedObjIdMap[index] = info;
     }
     return obj;
 }
@@ -166,19 +185,190 @@ se::Value& JsonInputArchive::anyValue(se::Value& value, const char* name) {
 }
 
 se::Value& JsonInputArchive::plainObj(se::Value& value, const char* name) {
+    auto* parentNode = _currentNode;
+    _currentNode = getValue(parentNode, name);
+
+    if (_currentNode != nullptr) {
+        if (_currentNode->IsObject()) {
+
+            se::Object* seObj = nullptr;
+            bool needRelease = false;
+            if (value.isObject()) {
+                seObj = value.toObject();
+            } else {
+                seObj = se::Object::createPlainObject();
+                seObj->root();
+                needRelease = true;
+            }
+
+            const auto& curJSONObj = _currentNode->GetObject();
+            for (const auto& e : curJSONObj) {
+                assert(e.name.IsString());
+                const auto* subParentNode = _currentNode;
+
+                se::Value seValue;
+                seValue = anyValue(seValue, e.name.GetString());
+                seObj->setProperty(e.name.GetString(), seValue);
+
+                _currentNode = subParentNode;
+            }
+
+            value.setObject(seObj);
+
+            if (needRelease) {
+                seObj->unroot();
+                seObj->decRef();
+            }
+        } else {
+            assert(false);
+        }
+    }
+
+    _currentNode = parentNode;
     return value;
+}
+
+void JsonInputArchive::doSerializeObj(se::Value& value) {
+    if (_currentNode != nullptr) {
+        se::Object* scriptObject{nullptr};
+        void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject);
+        if (scriptObject != nullptr) {
+            if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), obj) == _deserializedObjects.cend()) {
+                scriptObject->getPrivateObject()->serialize(*this);
+            } else {
+                CC_LOG_DEBUG("serializableObj return from cache, scriptObject: %p", scriptObject);
+            }
+
+            value.setObject(scriptObject);
+        }
+    }
 }
 
 se::Value& JsonInputArchive::serializableObj(se::Value& value, const char* name) {
+    auto* parentNode = _currentNode;
+    _currentNode = getValue(parentNode, name);
+
+    doSerializeObj(value);
+
+    _currentNode = parentNode;
     return value;
+}
+
+void JsonInputArchive::doSerializeArray(se::Value& value) {
+    if (_currentNode != nullptr) {
+        if (_currentNode->IsArray()) {
+            se::Object* seObj = nullptr;
+            bool needRelease = false;
+            if (value.isObject() && value.toObject()->isArray()) {
+                seObj = value.toObject();
+            } else {
+                seObj = se::Object::createArrayObject(_currentNode->GetArray().Size());
+                seObj->root();
+                needRelease = true;
+            }
+
+            uint32_t i = 0;
+            for (const auto& e : _currentNode->GetArray()) {
+                const auto* parentNode = _currentNode;
+                _currentNode = &e;
+                se::Value seValue;
+                doSerializeAny(seValue);
+                seObj->setArrayElement(i, seValue);
+                _currentNode = parentNode;
+                ++i;
+            }
+
+            value.setObject(seObj);
+
+            if (needRelease) {
+                seObj->unroot();
+                seObj->decRef();
+            }
+        } else {
+            assert(false);
+        }
+    }
 }
 
 se::Value& JsonInputArchive::serializableObjArray(se::Value& value, const char* name) {
+    auto* parentNode = _currentNode;
+    _currentNode = getValue(parentNode, name);
+
+    if (_currentNode != nullptr) {
+        if (_currentNode->IsArray()) {
+            se::Object* seObj = nullptr;
+            bool needRelease = false;
+            if (value.isObject() && value.toObject()->isArray()) {
+                seObj = value.toObject();
+            } else {
+                seObj = se::Object::createArrayObject(_currentNode->GetArray().Size());
+                seObj->root();
+                needRelease = true;
+            }
+
+            uint32_t i = 0;
+            for (const auto& e : _currentNode->GetArray()) {
+                const auto* parentNode = _currentNode;
+                _currentNode = &e;
+                se::Value seValue;
+                doSerializeObj(seValue);
+                seObj->setArrayElement(i, seValue);
+                _currentNode = parentNode;
+                ++i;
+            }
+
+            value.setObject(seObj);
+            if (needRelease) {
+                seObj->unroot();
+                seObj->decRef();
+            }
+        } else {
+            assert(false);
+        }
+    }
+
+    _currentNode = parentNode;
     return value;
 }
 
-se::Value& JsonInputArchive::serializeArray(se::Value& value, const char* name) {
+se::Value& JsonInputArchive::arrayObj(se::Value& value, const char* name) {
+    auto* parentNode = _currentNode;
+    _currentNode = getValue(parentNode, name);
+
+    doSerializeArray(value);
+
+    _currentNode = parentNode;
     return value;
+}
+
+void JsonInputArchive::doSerializeAny(se::Value& value) {
+    const auto& data = *_currentNode;
+
+    switch (data.GetType()) {
+        case rapidjson::kNullType:
+            value.setNull();
+            break;
+        case rapidjson::kFalseType:
+            value.setBoolean(false);
+            break;
+        case rapidjson::kTrueType:
+            value.setBoolean(true);
+            break;
+        case rapidjson::kObjectType:
+            doSerializeObj(value);
+            break;
+        case rapidjson::kArrayType:
+            doSerializeArray(value);
+            break;
+        case rapidjson::kStringType:
+            value.setString(data.GetString());
+            break;
+        case rapidjson::kNumberType:
+            value.setDouble(data.GetDouble());
+            break;
+        default:
+            break;
+    }
 }
 
 se::Value& JsonInputArchive::serializeInternal(se::Value& value, const char* name) {
@@ -189,7 +379,7 @@ se::Value& JsonInputArchive::serializeInternal(se::Value& value, const char* nam
     }
     const auto& data = iter->value;
 
-    switch (iter->value.GetType()) {
+    switch (data.GetType()) {
         case rapidjson::kNullType:
             value.setNull();
             break;
@@ -203,11 +393,11 @@ se::Value& JsonInputArchive::serializeInternal(se::Value& value, const char* nam
             if (data.HasMember("__id__")) {
                 value = serializableObj(value, name);
             } else {
-                value = anyValue(value, name);
+                value = plainObj(value, name);
             }
             break;
         case rapidjson::kArrayType:
-            serializeArray(value, name);
+            arrayObj(value, name);
             break;
         case rapidjson::kStringType:
             value.setString(iter->value.GetString());
@@ -223,6 +413,10 @@ se::Value& JsonInputArchive::serializeInternal(se::Value& value, const char* nam
 }
 
 void JsonInputArchive::serializeScriptObject(se::Object* obj) {
+    if (obj == nullptr) {
+        return;
+    }
+
     se::Value serializeVal;
     obj->getProperty("serialize", &serializeVal);
 
@@ -254,6 +448,13 @@ void JsonInputArchive::serializeScriptObject(se::Object* obj) {
         } else if (hasSerializeInlineDataMethod) {
             serializeInlineDataVal.toObject()->call(args, obj);
         }
+    }
+}
+
+void JsonInputArchive::serializeScriptObjectByNativePtr(void *nativeObj) {
+    auto iter = se::NativePtrToObjectMap::find(nativeObj);
+    if (iter != se::NativePtrToObjectMap::end()) {
+        serializeScriptObject(iter->second);
     }
 }
 

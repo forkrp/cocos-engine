@@ -582,6 +582,11 @@ inline bool nativevalue_to_se(const ccstd::monostate & /*from*/, se::Value &to, 
     return true;
 }
 
+inline bool nativevalue_to_se(const se::Value & from, se::Value &to, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
+    to = from;
+    return true;
+}
+
 inline bool nativevalue_to_se(const ccstd::any &from, se::Value &to, se::Object *ctx) { //NOLINT
     CC_ASSERT(false);
     SE_LOGE("should not convert ccstd::any");

@@ -32,11 +32,8 @@
 #include "base/RefCounted.h"
 #include "base/memory/Memory.h"
 #include "serialization/SerializePrivateObject.h"
-
-namespace cc {
-class JsonInputArchive;
-class BinaryInputArchive;
-} // namespace cc
+#include "serialization/JsonInputArchive.h"
+#include "serialization/BinaryInputArchive.h"
 
 namespace se {
 

@@ -31,6 +31,7 @@
 #include "ISerializable.h"
 #include "SerializationTrait.h"
 #include "base/Ptr.h"
+#include "core/data/Object.h"
 #include "json/document.h"
 
 #include "base/std/container/vector.h"
@@ -68,7 +69,13 @@ public:
     void serialize(T& data, const char* name);
 
     template <class T>
-    void onSerializingObject(T& data);
+    void onSerializingObjectPtr(T& data);
+
+    template <class T>
+    void onSerializingObjectIntrusivePtr(T& data);
+
+    template <class T>
+    void onSerializingObjectRef(T& data);
 
     template <class T>
     void onStartSerializeObject(T& data);
@@ -138,27 +145,44 @@ public:
 
     se::Value& anyValue(se::Value& value, const char* name);
     se::Value& plainObj(se::Value& value, const char* name);
+    se::Value& arrayObj(se::Value& value, const char* name);
     se::Value& serializableObj(se::Value& value, const char* name);
     se::Value& serializableObjArray(se::Value& value, const char* name);
 
 private:
     const rapidjson::Value* getValue(const rapidjson::Value* parentNode, const char* key);
     static const char* findTypeInJsonObject(const rapidjson::Value& jsonObj);
-    se::Object* getOrCreateScriptObject();
+
+    template<class T>
+    T getOrCreateNativeObject(se::Object*& outScriptObject);
+
+    void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject);
 
     void* seObjectGetPrivateData(se::Object* obj);
     void seObjectRoot(se::Object* obj);
     void seObjectUnroot(se::Object* obj);
 
     se::Value& serializeInternal(se::Value& value, const char* name);
-    se::Value& serializeArray(se::Value& value, const char* name);
+
+    void doSerializeObj(se::Value& value);
+    void doSerializeArray(se::Value& value);
+    void doSerializeAny(se::Value& value);
 
     void serializeScriptObject(se::Object* obj);
+    void serializeScriptObjectByNativePtr(void* nativeObj);
 
     rapidjson::Document _serializedData;
     const rapidjson::Value* _currentNode;
     ObjectFactory* _objectFactory{nullptr};
-    ccstd::unordered_map<int32_t, se::Object*> _deserializedObjIdMap;
+
+    struct DeserializedInfo final {
+        int32_t index{0};
+        void* nativeObj{nullptr};
+        se::Object* scriptObj{nullptr};
+    };
+
+    ccstd::unordered_map<int32_t, DeserializedInfo> _deserializedObjIdMap;
+    ccstd::vector<void*> _deserializedObjects;
 
     ccstd::vector<AssetDependInfo> _depends;
 
@@ -384,44 +408,76 @@ inline void JsonInputArchive::serialize(T& data, const char* name) {
 }
 
 template <class T>
-void JsonInputArchive::onSerializingObject(T& data) {
-    //    static_assert(has_serialize<T, void(decltype(*this)&)>::value || has_serializeInlineData<T, void(decltype(*this)&)>::value, "class should have serialize or serializeInlineData method");
+void JsonInputArchive::onSerializingObjectPtr(T& data) {
+    // Return directly since the object has already been deserialized.
+    if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), data) != _deserializedObjects.cend()) {
+        return;
+    }
+
+    using data_type = std::remove_const_t<typename IsPtr<T>::type>;
     bool isRoot = _isRoot;
     _isRoot = false;
-    if constexpr (has_serialize<T, void(decltype(*this)&)>::value && has_serializeInlineData<T, void(decltype(*this)&)>::value) {
+    if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value && has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
+        if (isRoot) {
+            data->serialize(*this);
+        } else {
+            data->serializeInlineData(*this);
+        }
+    } else if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value) {
+        data->serialize(*this);
+    } else if constexpr (has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
+        data->serializeInlineData(*this);
+    }
+
+    if constexpr (has_script_object<data_type>::value) {
+        se::Object* scriptObject = data->getScriptObject();
+        serializeScriptObject(scriptObject);
+    } else {
+        serializeScriptObjectByNativePtr(data);
+    }
+
+    _deserializedObjects.emplace_back(data);
+}
+
+template <class T>
+void JsonInputArchive::onSerializingObjectRef(T& data) {
+    using data_type = std::decay_t<T>;
+    bool isRoot = _isRoot;
+    _isRoot = false;
+    if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value && has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
         if (isRoot) {
             data.serialize(*this);
         } else {
             data.serializeInlineData(*this);
         }
-    } else if constexpr (has_serialize<T, void(decltype(*this)&)>::value) {
+    } else if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value) {
         data.serialize(*this);
-    } else if constexpr (has_serializeInlineData<T, void(decltype(*this)&)>::value) {
+    } else if constexpr (has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
         data.serializeInlineData(*this);
+    }
+
+    if constexpr (has_script_object<data_type>::value) {
+        se::Object* scriptObject = data.getScriptObject();
+        serializeScriptObject(scriptObject);
+    } else {
+        serializeScriptObjectByNativePtr(&data);
     }
 }
 
 template <class T>
 inline void JsonInputArchive::onStartSerializeObject(T& data) {
-    if constexpr (std::is_pointer_v<T> || IsIntrusivePtr<T>::value) {
-        if (nullptr != data) {
-            return;
+    se::Object* scriptObject{nullptr};
+    if constexpr (IsPtr<T>::value) {
+        using value_type = typename IsPtr<T>::type;
+        assert(data == nullptr);//, "Raw ptr should be nullptr in new serialization system");
+        value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject);
+        data = obj;
+        if constexpr (has_script_object<value_type>::value) {
+            data->setScriptObject(scriptObject);
         }
-
-        se::Object* obj = getOrCreateScriptObject();
-        assert(obj != nullptr && seObjectGetPrivateData(obj) != nullptr);
-        seObjectRoot(obj); // FIXME(cjh): How to unroot it?
-
-        _previousOwner = _currentOwner;
-        _currentOwner = obj;
-
-        // Serialize script properties first.
-        serializeScriptObject(obj);
-
-        if constexpr (std::is_pointer_v<T>) {
-            data = reinterpret_cast<T>(seObjectGetPrivateData(obj));
-        } else if constexpr (IsIntrusivePtr<T>::value) {
-            data = reinterpret_cast<std::add_pointer_t<typename IsIntrusivePtr<T>::type>>(seObjectGetPrivateData(obj));
+    } else {
+        if constexpr (has_script_object<T>::value) {
+            data->setScriptObject(scriptObject);
         }
     }
 }
@@ -432,6 +488,12 @@ inline void JsonInputArchive::onFinishSerializeObject(T& data) {
         _currentOwner = _previousOwner;
         _previousOwner = nullptr;
     }
+}
+
+template<class T>
+inline T JsonInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject) {
+//    static_assert(std::is_base_of<CCObject, T>::value, "Native object should be inherited from CCObject");
+    return reinterpret_cast<T>(getOrCreateNativeObjectReturnVoidPtr(outScriptObject));
 }
 
 } // namespace cc

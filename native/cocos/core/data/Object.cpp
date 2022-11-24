@@ -35,21 +35,13 @@ namespace {
 ccstd::vector<CCObject*> objectsToDestroy;
 }
 
+CC_IMPL_SERIALIZABLE(CCObject)
+
 template <class Archive>
 void CCObject::serialize(Archive& ar) {
     CC_SERIALIZE(_name);
     //    CC_SERIALIZE(_objFlags);
 }
-
-void CCObject::virtualSerialize(JsonInputArchive& ar) {
-    CCObject::serialize(ar);
-}
-
-void CCObject::virtualSerialize(BinaryInputArchive& ar) {
-    CCObject::serialize(ar);
-}
-
-// CC_IMPL_SERIALIZABLE(CCObject)
 
 /* static */
 void CCObject::deferredDestroy() {

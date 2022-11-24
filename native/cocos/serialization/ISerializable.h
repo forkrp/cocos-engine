@@ -31,14 +31,14 @@
 public:                                                                    \
     template <class Archive>                                               \
     void serialize(Archive& ar);                                           \
-    void virtualSerialize(JsonInputArchive& ar) override;                  \
-    void virtualSerialize(BinaryInputArchive& ar) override;                \
+    void virtualSerialize(cc::JsonInputArchive& ar) override;                  \
+    void virtualSerialize(cc::BinaryInputArchive& ar) override;                \
     void virtualOnBeforeSerialize() override;                              \
     void virtualOnAfterDeserialize() override;                             \
                                                                            \
 private:                                                                   \
-    inline void serializeInternal(JsonInputArchive& ar) { serialize(ar); } \
-    inline void serializeInternal(BinaryInputArchive& ar) { serialize(ar); }
+    inline void serializeInternal(cc::JsonInputArchive& ar) { serialize(ar); } \
+    inline void serializeInternal(cc::BinaryInputArchive& ar) { serialize(ar); }
 
 #define CC_IMPL_SERIALIZABLE(__klass__)                                                    \
     void __klass__::virtualSerialize(JsonInputArchive& ar) { __klass__::serialize(ar); }   \
@@ -58,6 +58,7 @@ class RefCounted;
 
 class ISerializable {
 public:
+    virtual ~ISerializable() = default;
     virtual void virtualSerialize(JsonInputArchive& ar) {}
     virtual void virtualSerialize(BinaryInputArchive& ar) {}
 
@@ -68,18 +69,12 @@ public:
     void onAfterDeserialize() {}
 };
 
-// enum class TypeImplementationLocation {
-//     NONE,
-//     CPP,
-//     Script
-// };
-
 class ObjectFactory {
 public:
     virtual ~ObjectFactory() = default;
 
-    //    virtual TypeImplementationLocation queryTypeImplementLocation(const char* type) = 0;
-    //    virtual ISerializable* createISerializableObject(const char* type) = 0;
+    virtual bool needCreateScriptObject(const char* type) = 0;
+    virtual void* createNativeObject(const char* type) = 0;
     virtual se::Object* createScriptObject(const char* type) = 0;
 };
 
