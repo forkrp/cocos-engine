@@ -110,15 +110,16 @@ public:
     template <class Archive>
     inline static void serialize(data_type& data, Archive& ar) {
         if constexpr (std::is_class_v<std::remove_cv_t<std::remove_pointer_t<data_type>>>) {
-            ar.onStartSerializeObject(data);
-            if constexpr (IsPtr<data_type>::value) {
-                if (data != nullptr) {
-                    ar.onSerializingObjectPtr(data);
+            if (ar.onStartSerializeObject(data)) {
+                if constexpr (IsPtr<data_type>::value) {
+                    if (data != nullptr) {
+                        ar.onSerializingObjectPtr(data);
+                    }
+                } else {
+                    ar.onSerializingObjectRef(data);
                 }
-            } else {
-                ar.onSerializingObjectRef(data);
+                ar.onFinishSerializeObject(data);
             }
-            ar.onFinishSerializeObject(data);
         } else if constexpr (std::is_enum_v<data_type>) {
             using underlying_type = std::underlying_type_t<data_type>;
             underlying_type v;

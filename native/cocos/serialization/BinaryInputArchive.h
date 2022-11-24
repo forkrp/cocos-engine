@@ -130,7 +130,7 @@ public:
     void onSerializingObjectRef(T& data) {}
 
     template <class T>
-    void onStartSerializeObject(T& data);
+    bool onStartSerializeObject(T& data);
 
     template <class T>
     void onFinishSerializeObject(T& data);
@@ -153,7 +153,7 @@ void BinaryInputArchive::serialize(T& data, const char* name) {
 }
 
 template <class T>
-void BinaryInputArchive::onStartSerializeObject(T& data) {}
+bool BinaryInputArchive::onStartSerializeObject(T& data) { return false; }
 
 template <class T>
 void BinaryInputArchive::onFinishSerializeObject(T& data) {}

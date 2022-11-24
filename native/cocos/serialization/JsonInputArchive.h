@@ -53,6 +53,8 @@ public:
 
     se::Object* start(const std::string& rootJsonStr, ObjectFactory* factory);
 
+    inline std::vector<AssetDependInfo> getDepends() const { return _depends; }
+
     template <class T>
     void serializePrimitiveData(T& data);
 
@@ -78,7 +80,7 @@ public:
     void onSerializingObjectRef(T& data);
 
     template <class T>
-    void onStartSerializeObject(T& data);
+    bool onStartSerializeObject(T& data);
 
     template <class T>
     void onFinishSerializeObject(T& data);
@@ -164,6 +166,9 @@ private:
 
     void serializeScriptObject(se::Object* obj);
     void serializeScriptObjectByNativePtr(void* nativeObj);
+
+    AssetDependInfo* checkAssetDependInfo();
+    static void* seObjGetPrivateData(se::Object* obj);
 
     rapidjson::Document _serializedData;
     const rapidjson::Value* _currentNode;
@@ -459,11 +464,21 @@ void JsonInputArchive::onSerializingObjectRef(T& data) {
 }
 
 template <class T>
-inline void JsonInputArchive::onStartSerializeObject(T& data) {
+inline bool JsonInputArchive::onStartSerializeObject(T& data) {
     se::Object* scriptObject{nullptr};
     if constexpr (IsPtr<T>::value) {
         using value_type = typename IsPtr<T>::type;
         assert(data == nullptr); //, "Raw ptr should be nullptr in new serialization system");
+
+        auto* dependInfo = checkAssetDependInfo();
+        if (dependInfo != nullptr) {
+            dependInfo->dereferenceCb = [&data](se::Object* seDataObj, const ccstd::string& uuid){
+                data = reinterpret_cast<value_type*>(seObjGetPrivateData(seDataObj));
+                data->setUuid(uuid);
+            };
+            return false;
+        }
+
         value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject);
         data = obj;
         if constexpr (has_script_object<value_type>::value) {
@@ -474,6 +489,8 @@ inline void JsonInputArchive::onStartSerializeObject(T& data) {
             data->setScriptObject(scriptObject);
         }
     }
+
+    return true;
 }
 
 template <class T>
@@ -492,20 +509,3 @@ inline T JsonInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject)
 
 } // namespace cc
 
-/*
- auto iter = _currentNode->FindMember("__uuid__");
- if (iter != _currentNode->MemberEnd()) {
-     assert(iter->value.IsString());
-     AssetDependInfo dependInfo;
-     dependInfo.owner = _currentOwner;
-     dependInfo.propNameOrIndex = name;
-     dependInfo.uuid = iter->value.GetString();
-     iter = _currentNode->FindMember("__expectedType__");
-     if (iter != _currentNode->MemberEnd()) {
-         assert(iter->value.IsString());
-         dependInfo.expectedType = iter->value.GetString();
-     }
-
-     _depends.emplace_back(std::move(dependInfo));
- } else {
- */

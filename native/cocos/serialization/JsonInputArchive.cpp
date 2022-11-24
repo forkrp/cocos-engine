@@ -441,4 +441,28 @@ void JsonInputArchive::serializeScriptObjectByNativePtr(void* nativeObj) {
     }
 }
 
+AssetDependInfo* JsonInputArchive::checkAssetDependInfo() {
+    auto iter = _currentNode->FindMember("__uuid__");
+    if (iter != _currentNode->MemberEnd()) {
+        assert(iter->value.IsString());
+        AssetDependInfo dependInfo;
+        dependInfo.uuid = iter->value.GetString();
+        iter = _currentNode->FindMember("__expectedType__");
+        if (iter != _currentNode->MemberEnd()) {
+            assert(iter->value.IsString());
+            dependInfo.expectedType = iter->value.GetString();
+        }
+
+        _depends.emplace_back(std::move(dependInfo));
+        return &_depends.back();
+    }
+
+    return nullptr;
+}
+
+/* static */
+void* JsonInputArchive::seObjGetPrivateData(se::Object* obj) {
+    return obj->getPrivateData();
+}
+
 } // namespace cc

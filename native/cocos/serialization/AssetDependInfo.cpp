@@ -27,4 +27,10 @@
 
 namespace cc {
 
+void AssetDependInfo::dereference(se::Object* obj, const ccstd::string& uuid) {
+    if (dereferenceCb) {
+        dereferenceCb(obj, uuid);
+    }
+}
+
 }

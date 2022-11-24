@@ -36,11 +36,14 @@ class Object;
 
 namespace cc {
 
+using AssetDereferenceCallback = std::function<void(se::Object*, const ccstd::string& /*uuid*/)>;
+
 struct AssetDependInfo final {
-    std::function<void()> dereferenceCb{nullptr};
-    ccstd::variant<ccstd::string, uint32_t> propNameOrIndex;
+    AssetDereferenceCallback dereferenceCb{nullptr};
     ccstd::string uuid;
     ccstd::string expectedType;
+
+    void dereference(se::Object* obj, const ccstd::string& uuid);
 };
 
 } // namespace cc
