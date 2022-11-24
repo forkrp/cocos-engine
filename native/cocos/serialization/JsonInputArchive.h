@@ -472,7 +472,7 @@ inline bool JsonInputArchive::onStartSerializeObject(T& data) {
 
         auto* dependInfo = checkAssetDependInfo();
         if (dependInfo != nullptr) {
-            dependInfo->dereferenceCb = [&data](se::Object* seDataObj, const ccstd::string& uuid){
+            dependInfo->dereferenceCb = [&data](se::Object* seDataObj, const ccstd::string& uuid) {
                 data = reinterpret_cast<value_type*>(seObjGetPrivateData(seDataObj));
                 data->setUuid(uuid);
             };
@@ -508,4 +508,3 @@ inline T JsonInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject)
 }
 
 } // namespace cc
-

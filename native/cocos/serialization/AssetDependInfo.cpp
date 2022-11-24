@@ -33,4 +33,4 @@ void AssetDependInfo::dereference(se::Object* obj, const ccstd::string& uuid) {
     }
 }
 
-}
+} // namespace cc
