@@ -190,7 +190,6 @@ se::Value& JsonInputArchive::plainObj(se::Value& value, const char* name) {
 
     if (_currentNode != nullptr) {
         if (_currentNode->IsObject()) {
-
             se::Object* seObj = nullptr;
             bool needRelease = false;
             if (value.isObject()) {
@@ -451,7 +450,7 @@ void JsonInputArchive::serializeScriptObject(se::Object* obj) {
     }
 }
 
-void JsonInputArchive::serializeScriptObjectByNativePtr(void *nativeObj) {
+void JsonInputArchive::serializeScriptObjectByNativePtr(void* nativeObj) {
     auto iter = se::NativePtrToObjectMap::find(nativeObj);
     if (iter != se::NativePtrToObjectMap::end()) {
         serializeScriptObject(iter->second);

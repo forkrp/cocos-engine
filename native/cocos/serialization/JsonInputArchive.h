@@ -153,7 +153,7 @@ private:
     const rapidjson::Value* getValue(const rapidjson::Value* parentNode, const char* key);
     static const char* findTypeInJsonObject(const rapidjson::Value& jsonObj);
 
-    template<class T>
+    template <class T>
     T getOrCreateNativeObject(se::Object*& outScriptObject);
 
     void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject);
@@ -469,7 +469,7 @@ inline void JsonInputArchive::onStartSerializeObject(T& data) {
     se::Object* scriptObject{nullptr};
     if constexpr (IsPtr<T>::value) {
         using value_type = typename IsPtr<T>::type;
-        assert(data == nullptr);//, "Raw ptr should be nullptr in new serialization system");
+        assert(data == nullptr); //, "Raw ptr should be nullptr in new serialization system");
         value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject);
         data = obj;
         if constexpr (has_script_object<value_type>::value) {
@@ -490,9 +490,9 @@ inline void JsonInputArchive::onFinishSerializeObject(T& data) {
     }
 }
 
-template<class T>
+template <class T>
 inline T JsonInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject) {
-//    static_assert(std::is_base_of<CCObject, T>::value, "Native object should be inherited from CCObject");
+    //    static_assert(std::is_base_of<CCObject, T>::value, "Native object should be inherited from CCObject");
     return reinterpret_cast<T>(getOrCreateNativeObjectReturnVoidPtr(outScriptObject));
 }
 

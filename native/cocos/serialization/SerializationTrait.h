@@ -46,41 +46,41 @@ struct IsIntrusivePtr<IntrusivePtr<T>> : std::true_type {
     using type = T;
 };
 
-template<class T>
+template <class T>
 struct IsPtr : std::false_type {};
 
-template<class T>
+template <class T>
 struct IsPtr<T*> : std::true_type {
     using type = T;
 };
 
-template<class T>
+template <class T>
 struct IsPtr<T* const> : std::true_type {
     using type = T;
 };
 
-template<class T>
+template <class T>
 struct IsPtr<T* volatile> : std::true_type {
     using type = T;
 };
 
-template<class T>
+template <class T>
 struct IsPtr<T* const volatile> : std::true_type {
     using type = T;
 };
 
-template<class T>
+template <class T>
 struct IsPtr<IntrusivePtr<T>> : std::true_type {
     using type = T;
 };
 
-template<class T>
+template <class T>
 struct IsPtr<std::shared_ptr<T>> : std::true_type {
     using type = T;
 };
 
 template <typename T, typename = se::Object*>
-struct has_script_object : std::false_type{};
+struct has_script_object : std::false_type {};
 
 template <typename T>
 struct has_script_object<T, decltype(T::_scriptObject)> : std::true_type {};

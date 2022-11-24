@@ -27,16 +27,16 @@
 
 #include <functional>
 
-#define CC_DECLARE_SERIALIZABLE()                                          \
-public:                                                                    \
-    template <class Archive>                                               \
-    void serialize(Archive& ar);                                           \
+#define CC_DECLARE_SERIALIZABLE()                                              \
+public:                                                                        \
+    template <class Archive>                                                   \
+    void serialize(Archive& ar);                                               \
     void virtualSerialize(cc::JsonInputArchive& ar) override;                  \
     void virtualSerialize(cc::BinaryInputArchive& ar) override;                \
-    void virtualOnBeforeSerialize() override;                              \
-    void virtualOnAfterDeserialize() override;                             \
-                                                                           \
-private:                                                                   \
+    void virtualOnBeforeSerialize() override;                                  \
+    void virtualOnAfterDeserialize() override;                                 \
+                                                                               \
+private:                                                                       \
     inline void serializeInternal(cc::JsonInputArchive& ar) { serialize(ar); } \
     inline void serializeInternal(cc::BinaryInputArchive& ar) { serialize(ar); }
 

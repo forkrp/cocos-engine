@@ -43,7 +43,7 @@
 namespace se {
 
 namespace {
-v8::Isolate *__isolate = nullptr; //NOLINT
+v8::Isolate *__isolate = nullptr; // NOLINT
     #if CC_DEBUG_JS_OBJECT_ID && CC_DEBUG
 uint32_t nativeObjectId = 0;
     #endif
@@ -100,7 +100,7 @@ public:
     }
 };
 
-Object::Object() { //NOLINT
+Object::Object() { // NOLINT
     #if JSB_TRACK_OBJECT_CREATION
     _objectCreationStackFrame = se::ScriptEngine::getInstance()->getCurrentStackTrace();
     #endif
@@ -247,7 +247,7 @@ Object *Object::createTypedArray(TypedArrayType type, const void *data, size_t b
     }
 
     v8::Local<v8::ArrayBuffer> jsobj = v8::ArrayBuffer::New(__isolate, byteLength);
-    //If data has content,then will copy data into buffer,or will only clear buffer.
+    // If data has content,then will copy data into buffer,or will only clear buffer.
     if (data) {
         memcpy(jsobj->GetBackingStore()->Data(), data, byteLength);
     } else {
@@ -582,7 +582,7 @@ bool Object::getArrayBufferData(uint8_t **ptr, size_t *length) const {
 void Object::setPrivateObject(PrivateObjectBase *data) {
     CC_ASSERT(_privateObject == nullptr);
     #if CC_DEBUG
-    //CC_ASSERT(NativePtrToObjectMap::find(data->getRaw()) == NativePtrToObjectMap::end());
+    // CC_ASSERT(NativePtrToObjectMap::find(data->getRaw()) == NativePtrToObjectMap::end());
     if (data != nullptr) {
         auto it = NativePtrToObjectMap::find(data->getRaw());
         if (it != NativePtrToObjectMap::end()) {

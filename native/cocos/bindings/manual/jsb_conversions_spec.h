@@ -161,7 +161,7 @@ bool sevalue_to_native(const se::Value &from, cc::MacroValue *to, se::Object *ct
 bool sevalue_to_native(const se::Value &from, cc::IPreCompileInfoValueType *to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
 
 // ccstd::any
-bool sevalue_to_native(const se::Value &from, ccstd::any *to, se::Object *ctx); //NOLINT(readability-identifier-naming)
+bool sevalue_to_native(const se::Value &from, ccstd::any *to, se::Object *ctx); // NOLINT(readability-identifier-naming)
 ////////////////// ArrayBuffer
 bool sevalue_to_native(const se::Value &from, cc::ArrayBuffer *to, se::Object * /*ctx*/);  // NOLINT(readability-identifier-naming)
 bool sevalue_to_native(const se::Value &from, cc::ArrayBuffer **to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
@@ -259,10 +259,10 @@ inline bool sevalue_to_native(const se::Value &from, double *to, se::Object * /*
     return true;
 }
 
-//inline bool sevalue_to_native(const se::Value & /*from*/, void * /*to*/, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
-//    CC_ASSERT(false);                                                                               // void not supported
-//    return false;
-//}
+// inline bool sevalue_to_native(const se::Value & /*from*/, void * /*to*/, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
+//     CC_ASSERT(false);                                                                               // void not supported
+//     return false;
+// }
 
 bool sevalue_to_native(const se::Value &from, cc::Data *to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
 
@@ -331,11 +331,11 @@ bool sevalue_to_native(const se::Value &from, cc::TypedArray *to, se::Object * /
 
 bool sevalue_to_native(const se::Value &from, cc::IBArray *to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
 
-//bool sevalue_to_native(const se::Value &from, cc::gfx::Context **to, se::Object*) {// NOLINT(readability-identifier-naming)
-//    CC_ASSERT(from.isObject());
-//    *to = (cc::gfx::Context*)from.toObject()->getPrivateData();
-//    return true;
-//}
+// bool sevalue_to_native(const se::Value &from, cc::gfx::Context **to, se::Object*) {// NOLINT(readability-identifier-naming)
+//     CC_ASSERT(from.isObject());
+//     *to = (cc::gfx::Context*)from.toObject()->getPrivateData();
+//     return true;
+// }
 
 inline bool sevalue_to_native(const se::Value &from, void **to, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
     CC_ASSERT(to != nullptr);
@@ -423,7 +423,7 @@ bool Size_to_seval(const cc::Size &v, se::Value *ret); // NOLINT(readability-ide
 CC_DEPRECATED(3.6, "use native_to_se instead")
 bool Rect_to_seval(const cc::Rect &v, se::Value *ret); // NOLINT(readability-identifier-naming)
 
-//bool nativevalue_to_se(const cc::TypedArray &typedArray, se::Value &to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming) // NOLINT
+// bool nativevalue_to_se(const cc::TypedArray &typedArray, se::Value &to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming) // NOLINT
 
 /**
  * WARN: call nativevalue_to_se instead and it converts cc::Data to ArrayBuffer
@@ -582,12 +582,12 @@ inline bool nativevalue_to_se(const ccstd::monostate & /*from*/, se::Value &to, 
     return true;
 }
 
-inline bool nativevalue_to_se(const se::Value & from, se::Value &to, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
+inline bool nativevalue_to_se(const se::Value &from, se::Value &to, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
     to = from;
     return true;
 }
 
-inline bool nativevalue_to_se(const ccstd::any &from, se::Value &to, se::Object *ctx) { //NOLINT
+inline bool nativevalue_to_se(const ccstd::any &from, se::Value &to, se::Object *ctx) { // NOLINT
     CC_ASSERT(false);
     SE_LOGE("should not convert ccstd::any");
     return true;
@@ -629,7 +629,7 @@ inline bool nativevalue_to_se(se::Object *from, se::Value &to, se::Object * /*ct
 
 #if CC_USE_MIDDLEWARE
 bool seval_to_Map_string_key(const se::Value &v, cc::RefMap<ccstd::string, cc::middleware::Texture2D *> *ret); // NOLINT(readability-identifier-naming)
-#endif                                                                                                         //CC_USE_MIDDLEWARE
+#endif                                                                                                         // CC_USE_MIDDLEWARE
 
 #if CC_USE_PHYSICS_PHYSX
 
@@ -646,4 +646,4 @@ bool sevalue_to_native(const se::Value &from, cc::physics::RaycastOptions *to, s
 bool nativevalue_to_se(const cc::geometry::AABB &from, se::Value &to, se::Object *ctx);
 bool nativevalue_to_se(const cc::geometry::Sphere &from, se::Value &to, se::Object *ctx);
 
-#endif //USE_PHYSICS_PHYSX
+#endif // USE_PHYSICS_PHYSX

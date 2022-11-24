@@ -31,9 +31,9 @@
 #include "base/Ptr.h"
 #include "base/RefCounted.h"
 #include "base/memory/Memory.h"
-#include "serialization/SerializePrivateObject.h"
-#include "serialization/JsonInputArchive.h"
 #include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
+#include "serialization/SerializePrivateObject.h"
 
 namespace se {
 
