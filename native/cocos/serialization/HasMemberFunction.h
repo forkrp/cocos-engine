@@ -27,31 +27,30 @@
 
 #include <type_traits>
 
-#define DEFINE_HAS_MEMBER_FUNC(memFunc) \
-template <typename, typename T> \
-struct has_##memFunc { \
-    static_assert( \
-        std::integral_constant<T, false>::value, \
-        "Second template parameter needs to be of function type."); \
-}; \
-\
-template <typename C, typename Ret, typename... Args>\
-struct has_##memFunc<C, Ret(Args...)> { \
-private: \
-    template <typename T> \
-    static constexpr auto check(T*) \
-        -> typename std::is_same< \
-            decltype(std::declval<T>().memFunc(std::declval<Args>()...)), \
-            Ret \
-            >::type; \
-\
-    template <typename> \
-    static constexpr std::false_type check(...); \
-    typedef decltype(check<C>(0)) type; \
-public: \
-    static constexpr bool value = type::value; \
-};
-
+#define DEFINE_HAS_MEMBER_FUNC(memFunc)                                       \
+    template <typename, typename T>                                           \
+    struct has_##memFunc {                                                    \
+        static_assert(                                                        \
+            std::integral_constant<T, false>::value,                          \
+            "Second template parameter needs to be of function type.");       \
+    };                                                                        \
+                                                                              \
+    template <typename C, typename Ret, typename... Args>                     \
+    struct has_##memFunc<C, Ret(Args...)> {                                   \
+    private:                                                                  \
+        template <typename T>                                                 \
+        static constexpr auto check(T*)                                       \
+            -> typename std::is_same<                                         \
+                decltype(std::declval<T>().memFunc(std::declval<Args>()...)), \
+                Ret>::type;                                                   \
+                                                                              \
+        template <typename>                                                   \
+        static constexpr std::false_type check(...);                          \
+        typedef decltype(check<C>(0)) type;                                   \
+                                                                              \
+    public:                                                                   \
+        static constexpr bool value = type::value;                            \
+    };
 
 DEFINE_HAS_MEMBER_FUNC(serialize)
 DEFINE_HAS_MEMBER_FUNC(serializeInlineData)
