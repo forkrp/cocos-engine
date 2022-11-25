@@ -428,7 +428,7 @@ void JsonInputArchive::onSerializingObjectPtr(T& data) {
         data->serializeInlineData(*this);
     }
 
-    if constexpr (has_script_object<data_type>::value) {
+    if constexpr (has_setScriptObject<data_type, void(se::Object*)>::value) {
         se::Object* scriptObject = data->getScriptObject();
         serializeScriptObject(scriptObject);
     } else {
@@ -455,7 +455,7 @@ void JsonInputArchive::onSerializingObjectRef(T& data) {
         data.serializeInlineData(*this);
     }
 
-    if constexpr (has_script_object<data_type>::value) {
+    if constexpr (has_getScriptObject<data_type, se::Object*()>::value) {
         se::Object* scriptObject = data.getScriptObject();
         serializeScriptObject(scriptObject);
     } else {
@@ -470,22 +470,29 @@ inline bool JsonInputArchive::onStartSerializeObject(T& data) {
         using value_type = typename IsPtr<T>::type;
         assert(data == nullptr); //, "Raw ptr should be nullptr in new serialization system");
 
-        auto* dependInfo = checkAssetDependInfo();
-        if (dependInfo != nullptr) {
-            dependInfo->dereferenceCb = [&data](se::Object* seDataObj, const ccstd::string& uuid) {
-                data = reinterpret_cast<value_type*>(seObjGetPrivateData(seDataObj));
-                data->setUuid(uuid);
-            };
-            return false;
+        if constexpr (has_setUuid<value_type, void(const ccstd::string&)>::value) {
+            auto* dependInfo = checkAssetDependInfo();
+            if (dependInfo != nullptr) {
+                dependInfo->dereferenceCb = [&data](se::Object* seDataObj, const ccstd::string& uuid) {
+                    data = reinterpret_cast<value_type*>(seObjGetPrivateData(seDataObj));
+                    data->setUuid(uuid);
+
+                    if constexpr (has_setScriptObject<value_type, void(se::Object*)>::value) {
+                        data->setScriptObject(seDataObj);
+                    }
+                };
+                return false;
+            }
         }
 
         value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject);
         data = obj;
-        if constexpr (has_script_object<value_type>::value) {
+        if constexpr (has_setScriptObject<value_type, void(se::Object*)>::value) {
             data->setScriptObject(scriptObject);
         }
     } else {
-        if constexpr (has_script_object<T>::value) {
+        using value_type = typename std::decay_t<T>;
+        if constexpr (has_setScriptObject<value_type, void(se::Object*)>::value) {
             data->setScriptObject(scriptObject);
         }
     }

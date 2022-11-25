@@ -79,12 +79,6 @@ struct IsPtr<std::shared_ptr<T>> : std::true_type {
     using type = T;
 };
 
-template <typename T, typename = se::Object*>
-struct has_script_object : std::false_type {};
-
-template <typename T>
-struct has_script_object<T, decltype(T::_scriptObject)> : std::true_type {};
-
 template <class T>
 class SerializationTraitBase {
 public:
