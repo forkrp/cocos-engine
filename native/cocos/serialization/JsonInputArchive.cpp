@@ -36,14 +36,14 @@ JsonInputArchive::JsonInputArchive() {
 JsonInputArchive::~JsonInputArchive() {
 }
 
-se::Object* JsonInputArchive::start(const std::string& rootJsonStr, ObjectFactory* factory) {
+se::Value JsonInputArchive::start(const std::string& rootJsonStr, ObjectFactory* factory) {
     assert(factory != nullptr);
     _objectFactory = factory;
 
     rapidjson::Document d;
     d.Parse(rootJsonStr.c_str());
     if (d.HasParseError()) {
-        return nullptr;
+        return se::Value::Null;
     }
 
     if (d.IsArray()) {
@@ -56,25 +56,21 @@ se::Object* JsonInputArchive::start(const std::string& rootJsonStr, ObjectFactor
     }
 
     _currentNode = &_serializedData[0];
+    _currentKey = nullptr;
 
     const char* type = findTypeInJsonObject(*_currentNode);
 
     se::Object* ret = _objectFactory->createScriptObject(type);
     assert(ret);
 
-    ret->root();
-
-    _previousOwner = nullptr;
+    ret->root(); // FIXME(cjh): How to unroot ?
     _currentOwner = ret;
 
-    // Serialize CPP object
+    se::Value retVal;
+    retVal.setObject(ret, true);
+
     ret->getPrivateObject()->serialize(*this);
-
-    // Serialize JS object
-    serializeScriptObject(ret);
-
-    ret->unroot();
-    return ret;
+    return retVal;
 }
 
 const rapidjson::Value* JsonInputArchive::getValue(const rapidjson::Value* parentNode, const char* key) {
@@ -109,7 +105,7 @@ const char* JsonInputArchive::findTypeInJsonObject(const rapidjson::Value& jsonO
 
 void* JsonInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject) {
     if (!_currentNode->IsObject()) {
-        return;
+        return nullptr;
     }
 
     int32_t index = -1;
@@ -211,7 +207,11 @@ se::Value& JsonInputArchive::anyValue(se::Value& value, const char* name) {
 
 se::Value& JsonInputArchive::plainObj(se::Value& value, const char* name) {
     auto* parentNode = _currentNode;
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
     _currentNode = getValue(parentNode, name);
+    _currentKey = name;
 
     if (_currentNode != nullptr) {
         if (_currentNode->IsObject()) {
@@ -219,22 +219,28 @@ se::Value& JsonInputArchive::plainObj(se::Value& value, const char* name) {
             bool needRelease = false;
             if (value.isObject()) {
                 seObj = value.toObject();
+                seObj->root();
+                seObj->incRef();
             } else {
                 seObj = se::Object::createPlainObject();
                 seObj->root();
                 needRelease = true;
             }
 
+            _currentOwner = seObj;
+
             const auto& curJSONObj = _currentNode->GetObject();
             for (const auto& e : curJSONObj) {
+                se::Object* oldOwner = _currentOwner;
                 assert(e.name.IsString());
-                const auto* subParentNode = _currentNode;
+                _currentNode = &e.value;
+                _currentKey = e.name.GetString();
 
                 se::Value seValue;
                 seValue = anyValue(seValue, e.name.GetString());
                 seObj->setProperty(e.name.GetString(), seValue);
 
-                _currentNode = subParentNode;
+                _currentOwner = oldOwner;
             }
 
             value.setObject(seObj);
@@ -249,20 +255,31 @@ se::Value& JsonInputArchive::plainObj(se::Value& value, const char* name) {
     }
 
     _currentNode = parentNode;
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
     return value;
 }
 
 void JsonInputArchive::doSerializeObj(se::Value& value) {
     if (_currentNode != nullptr) {
+        auto* dependInfo = checkAssetDependInfo();
+        if (dependInfo != nullptr) {
+            return;
+        }
+
         se::Object* scriptObject{nullptr};
         void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject);
         if (scriptObject != nullptr) {
-            if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), obj) == _deserializedObjects.cend()) {
-                scriptObject->getPrivateObject()->serialize(*this);
+            _currentOwner = scriptObject;
+            if (obj != nullptr) {
+                if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), obj) == _deserializedObjects.cend()) {
+                    scriptObject->getPrivateObject()->serialize(*this);
+                } else {
+                    CC_LOG_DEBUG("serializableObj return from cache, scriptObject: %p", scriptObject);
+                }
             } else {
-                CC_LOG_DEBUG("serializableObj return from cache, scriptObject: %p", scriptObject);
+                serializeScriptObject(scriptObject);
             }
-
             value.setObject(scriptObject);
         }
     }
@@ -270,11 +287,17 @@ void JsonInputArchive::doSerializeObj(se::Value& value) {
 
 se::Value& JsonInputArchive::serializableObj(se::Value& value, const char* name) {
     auto* parentNode = _currentNode;
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
     _currentNode = getValue(parentNode, name);
+    _currentKey = name;
 
     doSerializeObj(value);
 
     _currentNode = parentNode;
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
     return value;
 }
 
@@ -285,20 +308,30 @@ void JsonInputArchive::doSerializeArray(se::Value& value) {
             bool needRelease = false;
             if (value.isObject() && value.toObject()->isArray()) {
                 seObj = value.toObject();
+                seObj->root();
+                seObj->incRef();
             } else {
                 seObj = se::Object::createArrayObject(_currentNode->GetArray().Size());
-                seObj->root();
+                seObj->root(); //FIXME(cjh): How to unroot?
                 needRelease = true;
             }
 
+            _currentOwner = seObj;
+            char keyTmp[12] = {0};
+
             uint32_t i = 0;
             for (const auto& e : _currentNode->GetArray()) {
-                const auto* parentNode = _currentNode;
+                se::Object* oldOwner = _currentOwner;
+
                 _currentNode = &e;
+                snprintf(keyTmp, sizeof(keyTmp), "%u", i);
+                _currentKey = keyTmp;
+
                 se::Value seValue;
                 doSerializeAny(seValue);
                 seObj->setArrayElement(i, seValue);
-                _currentNode = parentNode;
+
+                _currentOwner = oldOwner;
                 ++i;
             }
 
@@ -316,7 +349,11 @@ void JsonInputArchive::doSerializeArray(se::Value& value) {
 
 se::Value& JsonInputArchive::serializableObjArray(se::Value& value, const char* name) {
     auto* parentNode = _currentNode;
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
     _currentNode = getValue(parentNode, name);
+    _currentKey = name;
 
     if (_currentNode != nullptr) {
         if (_currentNode->IsArray()) {
@@ -324,20 +361,30 @@ se::Value& JsonInputArchive::serializableObjArray(se::Value& value, const char* 
             bool needRelease = false;
             if (value.isObject() && value.toObject()->isArray()) {
                 seObj = value.toObject();
+                seObj->root();
+                seObj->incRef();
             } else {
                 seObj = se::Object::createArrayObject(_currentNode->GetArray().Size());
                 seObj->root();
                 needRelease = true;
             }
 
+            char keyTmp[12] = {0};
+            _currentOwner = seObj;
+
             uint32_t i = 0;
             for (const auto& e : _currentNode->GetArray()) {
-                const auto* parentNode = _currentNode;
+                se::Object* oldOwner = _currentOwner;
+
                 _currentNode = &e;
+                snprintf(keyTmp, sizeof(keyTmp), "%u", i);
+                _currentKey = keyTmp;
+
                 se::Value seValue;
                 doSerializeObj(seValue);
                 seObj->setArrayElement(i, seValue);
-                _currentNode = parentNode;
+
+                _currentOwner = oldOwner;
                 ++i;
             }
 
@@ -352,16 +399,24 @@ se::Value& JsonInputArchive::serializableObjArray(se::Value& value, const char* 
     }
 
     _currentNode = parentNode;
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
     return value;
 }
 
 se::Value& JsonInputArchive::arrayObj(se::Value& value, const char* name) {
     auto* parentNode = _currentNode;
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
     _currentNode = getValue(parentNode, name);
+    _currentKey = name;
 
     doSerializeArray(value);
 
     _currentNode = parentNode;
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
     return value;
 }
 
@@ -441,17 +496,55 @@ void JsonInputArchive::serializeScriptObjectByNativePtr(void* nativeObj) {
     }
 }
 
+void JsonInputArchive::onAfterDeserializeScriptObject(se::Object* obj) {
+    if (obj == nullptr) {
+        return;
+    }
+
+    se::Value onAfterDeserializeVal;
+    obj->getProperty("onAfterDeserialize", &onAfterDeserializeVal);
+
+    bool hasOnAfterDeserializeMethod = onAfterDeserializeVal.isObject() && onAfterDeserializeVal.toObject()->isFunction();
+    if (!hasOnAfterDeserializeMethod) {
+        return;
+    }
+
+    static se::ValueArray args;
+    args.resize(1);
+    bool ok = nativevalue_to_se(this, args[0]);
+    assert(ok);
+
+    if (hasOnAfterDeserializeMethod) {
+        onAfterDeserializeVal.toObject()->call(args, obj);
+    }
+}
+
+void JsonInputArchive::onAfterDeserializeScriptObjectByNativePtr(void* nativeObj) {
+    auto iter = se::NativePtrToObjectMap::find(nativeObj);
+    if (iter != se::NativePtrToObjectMap::end()) {
+        onAfterDeserializeScriptObject(iter->second);
+    }
+}
+
 AssetDependInfo* JsonInputArchive::checkAssetDependInfo() {
+    if (!_currentNode->IsObject()) {
+        return nullptr;
+    }
+    
     auto iter = _currentNode->FindMember("__uuid__");
     if (iter != _currentNode->MemberEnd()) {
         assert(iter->value.IsString());
         AssetDependInfo dependInfo;
         dependInfo.uuid = iter->value.GetString();
+        dependInfo.owner = _currentOwner;
+        dependInfo.propName = _currentKey;
         iter = _currentNode->FindMember("__expectedType__");
         if (iter != _currentNode->MemberEnd()) {
             assert(iter->value.IsString());
             dependInfo.expectedType = iter->value.GetString();
         }
+
+        CC_LOG_DEBUG("Found __uuid__, owner: %p, current key: %s", _currentOwner, _currentKey);
 
         _depends.emplace_back(std::move(dependInfo));
         return &_depends.back();

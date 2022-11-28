@@ -113,6 +113,14 @@ public:
     void set(const Color &p1, const Color &p2);
 
     Vec4 toVec4() const;
+
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(r, "r");
+        ar.serialize(g, "g");
+        ar.serialize(b, "b");
+        ar.serialize(a, "a");
+    }
 };
 
 } // namespace cc

@@ -57,3 +57,6 @@ DEFINE_HAS_MEMBER_FUNC(serializeInlineData)
 DEFINE_HAS_MEMBER_FUNC(setUuid)
 DEFINE_HAS_MEMBER_FUNC(setScriptObject)
 DEFINE_HAS_MEMBER_FUNC(getScriptObject)
+
+DEFINE_HAS_MEMBER_FUNC(onBeforeSerialize)
+DEFINE_HAS_MEMBER_FUNC(onAfterDeserialize)

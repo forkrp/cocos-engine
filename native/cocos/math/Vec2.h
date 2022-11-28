@@ -606,6 +606,12 @@ public:
         return Vec2(cosf(a), sinf(a));
     }
 
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(x, "x");
+        ar.serialize(y, "y");
+    }
+
     /** A general line-line intersection test
      @param a   the startpoint for the first line L1 = (a - b)
      @param b   the endpoint for the first line L1 = (a - b)

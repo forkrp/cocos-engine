@@ -116,7 +116,7 @@ public:
             }
         } else if constexpr (std::is_enum_v<data_type>) {
             using underlying_type = std::underlying_type_t<data_type>;
-            underlying_type v;
+            underlying_type v{};
             SerializationTrait<underlying_type>::serialize(v, ar);
             data = static_cast<data_type>(v);
         } else {

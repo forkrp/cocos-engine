@@ -40,6 +40,8 @@ using AssetDereferenceCallback = std::function<void(se::Object*, const ccstd::st
 
 struct AssetDependInfo final {
     AssetDereferenceCallback dereferenceCb{nullptr};
+    se::Object *owner{nullptr};
+    ccstd::string propName;
     ccstd::string uuid;
     ccstd::string expectedType;
 
