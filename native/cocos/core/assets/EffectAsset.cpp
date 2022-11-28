@@ -29,6 +29,8 @@
 #include "core/platform/Debug.h"
 #include "engine/BaseEngine.h"
 #include "renderer/core/ProgramLib.h"
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 
@@ -162,6 +164,16 @@ EffectAsset *EffectAsset::get(const ccstd::string &name) {
     }
 
     return nullptr;
+}
+
+template <class Archive>
+void EffectAsset::serialize(Archive &ar) {
+    Super::serialize(ar);
+
+    ar.serialize(_techniques, "techniques");
+    ar.serialize(_shaders, "shaders");
+    ar.serialize(_combinations, "combinations");
+    CC_SERIALIZE(hideInEditor); //FIXME(cjh): not bound?
 }
 
 void EffectAsset::onLoaded() {

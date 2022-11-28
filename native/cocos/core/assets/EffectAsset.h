@@ -524,6 +524,7 @@ using IPreCompileInfoValueType = ccstd::variant<ccstd::vector<bool>, ccstd::vect
 using IPreCompileInfo = ccstd::unordered_map<ccstd::string, IPreCompileInfoValueType>;
 
 class EffectAsset final : public Asset {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = Asset;
 
