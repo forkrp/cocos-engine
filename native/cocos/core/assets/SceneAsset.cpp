@@ -25,8 +25,8 @@
 
 #include "core/assets/SceneAsset.h"
 #include "core/scene-graph/Scene.h"
-#include "serialization/JsonInputArchive.h"
 #include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 

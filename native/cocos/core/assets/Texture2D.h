@@ -109,7 +109,7 @@ public:
         return _mipmapsUuids;
     }
 
-    //cjh TODO: TextureCube also needs this method.
+    // cjh TODO: TextureCube also needs this method.
     void syncMipmapsForJS(const ccstd::vector<IntrusivePtr<ImageAsset>> &value);
 
     void setMipmaps(const ccstd::vector<IntrusivePtr<ImageAsset>> &value);

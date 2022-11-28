@@ -32,8 +32,8 @@
 #include "scene/Octree.h"
 #include "scene/Shadow.h"
 #include "scene/Skybox.h"
-#include "serialization/JsonInputArchive.h"
 #include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 

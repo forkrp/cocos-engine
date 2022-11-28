@@ -1,8 +1,8 @@
 /****************************************************************************
  Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos.com
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
@@ -10,10 +10,10 @@
  not use Cocos Creator software for developing other software or tools that's
  used for developing games. You are not granted to publish, distribute,
  sublicense, and/or sell copies of Cocos Creator.
- 
+
  The software or tools in this License Agreement are licensed, not sold.
  Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,8 +29,8 @@
 #include "core/Root.h"
 //#include "core/scene-graph/NodeActivator.h"
 #include "cocos/bindings/event/EventDispatcher.h"
-#include "serialization/JsonInputArchive.h"
 #include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 
@@ -53,13 +53,13 @@ void Scene::setSceneGlobals(SceneGlobals *globals) { _globals = globals; }
 void Scene::load() {
     EventDispatcher::dispatchSceneLoadEvent();
     if (!_inited) {
-        //cjh        if (TEST) {
-        //            CC_ASSERT(!_activeInHierarchy, 'Should deactivate ActionManager by default');
-        //        }
-        // expandNestedPrefabInstanceNode(this); // TODO(xwx): expandNestedPrefabInstanceNode not implement yet
-        // applyTargetOverrides(this); // TODO(xwx): applyTargetOverrides not implement yet
-        //cjh _onBatchCreated is implemented in TS now, so comment the following line
-        //        onBatchCreated(false); //cjh EDITOR && _prefabSyncedInLiveReload);
+        // cjh        if (TEST) {
+        //             CC_ASSERT(!_activeInHierarchy, 'Should deactivate ActionManager by default');
+        //         }
+        //  expandNestedPrefabInstanceNode(this); // TODO(xwx): expandNestedPrefabInstanceNode not implement yet
+        //  applyTargetOverrides(this); // TODO(xwx): applyTargetOverrides not implement yet
+        // cjh _onBatchCreated is implemented in TS now, so comment the following line
+        //         onBatchCreated(false); //cjh EDITOR && _prefabSyncedInLiveReload);
         _inited = true;
     }
     _scene = this;
@@ -71,10 +71,10 @@ void Scene::activate(bool active /* = true */) { // NOLINT(misc-unused-parameter
 #if CC_EDITOR
     this->notifyEditorAttached(active);
 #endif
-    //cjh
-    //    Director::getInstance()->getNodeActivator()->activateNode(this, active);
-    //     The test environment does not currently support the renderer
-    //        if (!TEST) {
+    // cjh
+    //     Director::getInstance()->getNodeActivator()->activateNode(this, active);
+    //      The test environment does not currently support the renderer
+    //         if (!TEST) {
     _globals->activate();
     if (_renderScene) {
         _renderScene->activate();

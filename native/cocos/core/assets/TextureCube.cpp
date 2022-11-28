@@ -128,12 +128,12 @@ void TextureCube::setMipmapAtlas(const TextureCubeMipmapAtlasInfo &value) {
         const MipmapAtlasLayoutInfo &layoutInfo = layouts[level];
         uint32_t currentSize = layoutInfo.width * layoutInfo.height * pixelSize;
 
-        //Upload 6 sides by level
+        // Upload 6 sides by level
         forEachFace(atlas, [this, currentSize, lv0Layout, layoutInfo, level, pixelSize](ImageAsset *face, TextureCube::FaceIndex faceIndex) {
             auto *buffer = ccnew uint8_t[currentSize];
             memset(buffer, 0, currentSize);
             const uint8_t *data = face->getData();
-            //Splitting Atlas
+            // Splitting Atlas
             if (level == 0) {
                 memcpy(buffer, data, currentSize);
             } else {

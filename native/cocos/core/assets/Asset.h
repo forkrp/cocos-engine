@@ -132,7 +132,7 @@ public:
     ccstd::string _nativeUrl;
 
     template <class Archive>
-    void serializeInlineData(Archive& ar) {
+    void serializeInlineData(Archive &ar) {
         ar.serialize(_uuid, "__uuid__");
         ccstd::string expectedType; // TODO(cjh):
         ar.serialize(expectedType, "__expectedType__");
