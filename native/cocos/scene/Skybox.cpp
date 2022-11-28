@@ -39,8 +39,28 @@
 #include "scene/Ambient.h"
 #include "scene/Model.h"
 
+#include "serialization/JsonInputArchive.h"
+#include "serialization/BinaryInputArchive.h"
+
 namespace cc {
 namespace scene {
+
+CC_IMPL_SERIALIZE(SkyboxInfo)
+
+template <class Archive>
+void SkyboxInfo::serialize(Archive& ar) {
+    CC_SERIALIZE(_envLightingType);
+    CC_SERIALIZE(_envmapHDR);
+    CC_SERIALIZE(_envmapLDR);
+    CC_SERIALIZE(_diffuseMapHDR);
+    CC_SERIALIZE(_diffuseMapLDR);
+    CC_SERIALIZE(_enabled);
+    CC_SERIALIZE(_useHDR);
+    CC_SERIALIZE(_editableMaterial);
+    CC_SERIALIZE(_reflectionHDR);
+    CC_SERIALIZE(_reflectionLDR);
+    CC_SERIALIZE(_rotationAngle);
+}
 
 SkyboxInfo::SkyboxInfo(/* args */) = default;
 SkyboxInfo::~SkyboxInfo() = default;

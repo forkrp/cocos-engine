@@ -33,6 +33,7 @@
 #include "math/Vec3.h"
 #include "renderer/gfx-base/GFXShader.h"
 #include "scene/Define.h"
+#include "serialization/ISerializable.h"
 
 namespace cc {
 
@@ -203,7 +204,8 @@ enum class CSMOptimizationMode {
 
 class Shadows;
 
-class ShadowsInfo : public RefCounted {
+class ShadowsInfo : public RefCounted, public ISerializable {
+    CC_DECLARE_SERIALIZE()
 public:
     ShadowsInfo() = default;
     ~ShadowsInfo() override = default;

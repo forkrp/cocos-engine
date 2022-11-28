@@ -28,8 +28,27 @@
 #include "renderer/pipeline/custom/RenderInterfaceTypes.h"
 #include "renderer/pipeline/helper/Utils.h"
 
+#include "serialization/JsonInputArchive.h"
+#include "serialization/BinaryInputArchive.h"
+
 namespace cc {
 namespace scene {
+
+CC_IMPL_SERIALIZE(FogInfo)
+
+template <class Archive>
+void FogInfo::serialize(Archive &ar) {
+    CC_SERIALIZE(_type);
+    CC_SERIALIZE(_fogColor);
+    ar.serialize(_isEnabled, "_enabled");
+    CC_SERIALIZE(_fogDensity);
+    CC_SERIALIZE(_fogStart);
+    CC_SERIALIZE(_fogEnd);
+    CC_SERIALIZE(_fogAtten);
+    CC_SERIALIZE(_fogTop);
+    CC_SERIALIZE(_fogRange);
+    CC_SERIALIZE(_accurate);
+}
 
 void FogInfo::setEnabled(bool val) const {
     if (_isEnabled == val) {

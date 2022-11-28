@@ -29,6 +29,7 @@
 #include "base/RefCounted.h"
 #include "base/std/container/array.h"
 #include "math/Color.h"
+#include "serialization/ISerializable.h"
 
 namespace cc {
 namespace scene {
@@ -198,7 +199,8 @@ private:
     CC_DISALLOW_COPY_MOVE_ASSIGN(Fog);
 };
 
-class FogInfo : public RefCounted {
+class FogInfo : public RefCounted, public ISerializable {
+    CC_DECLARE_SERIALIZE()
 public:
     FogInfo() = default;
     ~FogInfo() override = default;

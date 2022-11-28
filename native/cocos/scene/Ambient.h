@@ -29,6 +29,7 @@
 #include "base/RefCounted.h"
 #include "base/std/container/array.h"
 #include "math/Color.h"
+#include "serialization/ISerializable.h"
 
 namespace cc {
 namespace scene {
@@ -100,7 +101,8 @@ protected:
  */
 // @ccclass('cc.AmbientInfo')
 // @help('i18n:cc.Ambient')
-class AmbientInfo : public RefCounted {
+class AmbientInfo : public RefCounted, public ISerializable {
+    CC_DECLARE_SERIALIZE()
 public:
     AmbientInfo(/* args */) = default;
     ~AmbientInfo() override = default;

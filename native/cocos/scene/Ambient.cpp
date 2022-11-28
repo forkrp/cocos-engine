@@ -28,6 +28,8 @@
 #include "renderer/pipeline/PipelineSceneData.h"
 #include "renderer/pipeline/RenderPipeline.h"
 #include "renderer/pipeline/custom/RenderInterfaceTypes.h"
+#include "serialization/JsonInputArchive.h"
+#include "serialization/BinaryInputArchive.h"
 
 namespace {
 cc::Color col;
@@ -45,6 +47,23 @@ void normalizeHDRColor(cc::Vec4 &color) {
 } // namespace
 namespace cc {
 namespace scene {
+
+CC_IMPL_SERIALIZE(AmbientInfo)
+
+template <class Archive>
+void AmbientInfo::serialize(Archive &ar) {
+    CC_SERIALIZE(_skyColorHDR);
+    ar.serialize(_skyColorHDR, "_skyColor");
+    CC_SERIALIZE(_skyIllumHDR);
+    ar.serialize(_skyIllumHDR, "_skyIllum");
+
+    CC_SERIALIZE(_groundAlbedoHDR);
+    ar.serialize(_groundAlbedoHDR, "_groundAlbedo");
+
+    CC_SERIALIZE(_skyColorLDR);
+    CC_SERIALIZE(_skyIllumLDR);
+    CC_SERIALIZE(_groundAlbedoLDR);
+}
 
 void AmbientInfo::setSkyLightingColor(const Color &val) {
     Vec4 v4(static_cast<float>(val.r) / 255.F, static_cast<float>(val.g) / 255.F, static_cast<float>(val.b) / 255.F, static_cast<float>(val.a) / 255.F);

@@ -29,10 +29,26 @@
 #include "core/scene-graph/Node.h"
 #include "scene/Pass.h"
 
+#include "serialization/JsonInputArchive.h"
+#include "serialization/BinaryInputArchive.h"
+
 namespace cc {
 namespace scene {
 
 // ShadowInfo
+
+CC_IMPL_SERIALIZE(ShadowsInfo)
+
+template <class Archive>
+void ShadowsInfo::serialize(Archive &ar) {
+    CC_SERIALIZE(_enabled);
+    CC_SERIALIZE(_type);
+    CC_SERIALIZE(_normal);
+    CC_SERIALIZE(_distance);
+    CC_SERIALIZE(_shadowColor);
+    CC_SERIALIZE(_maxReceived);
+    CC_SERIALIZE(_size);
+}
 
 void ShadowsInfo::setEnabled(bool val) {
     if (_enabled == val) {
