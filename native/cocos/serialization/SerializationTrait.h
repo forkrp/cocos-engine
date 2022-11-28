@@ -80,14 +80,12 @@ struct IsPtr<std::shared_ptr<T>> : std::true_type {
 };
 
 template <class T>
-class SerializationTraitBase {
-public:
+struct SerializationTraitBase {
     using data_type = T;
 };
 
 template <class T>
-class SerializationTraitPrimitive : public SerializationTraitBase<T> {
-public:
+struct SerializationTraitPrimitive : SerializationTraitBase<T> {
     using data_type = T;
 
     template <class Archive>
@@ -97,8 +95,7 @@ public:
 };
 
 template <class T>
-class SerializationTrait : public SerializationTraitBase<T> {
-public:
+struct SerializationTrait : SerializationTraitBase<T> {
     using data_type = T;
 
     template <class Archive>
@@ -126,41 +123,40 @@ public:
 };
 
 template <>
-class SerializationTrait<bool> : public SerializationTraitPrimitive<bool> {};
+struct SerializationTrait<bool> : SerializationTraitPrimitive<bool> {};
 
 template <>
-class SerializationTrait<int8_t> : public SerializationTraitPrimitive<int8_t> {};
+struct SerializationTrait<int8_t> : SerializationTraitPrimitive<int8_t> {};
 
 template <>
-class SerializationTrait<int16_t> : public SerializationTraitPrimitive<int16_t> {};
+struct SerializationTrait<int16_t> : SerializationTraitPrimitive<int16_t> {};
 
 template <>
-class SerializationTrait<int32_t> : public SerializationTraitPrimitive<int32_t> {};
+struct SerializationTrait<int32_t> : SerializationTraitPrimitive<int32_t> {};
 
 template <>
-class SerializationTrait<int64_t> : public SerializationTraitPrimitive<int64_t> {};
+struct SerializationTrait<int64_t> : SerializationTraitPrimitive<int64_t> {};
 
 template <>
-class SerializationTrait<uint8_t> : public SerializationTraitPrimitive<uint8_t> {};
+struct SerializationTrait<uint8_t> : SerializationTraitPrimitive<uint8_t> {};
 
 template <>
-class SerializationTrait<uint16_t> : public SerializationTraitPrimitive<uint16_t> {};
+struct SerializationTrait<uint16_t> : SerializationTraitPrimitive<uint16_t> {};
 
 template <>
-class SerializationTrait<uint32_t> : public SerializationTraitPrimitive<uint32_t> {};
+struct SerializationTrait<uint32_t> : SerializationTraitPrimitive<uint32_t> {};
 
 template <>
-class SerializationTrait<uint64_t> : public SerializationTraitPrimitive<uint64_t> {};
+struct SerializationTrait<uint64_t> : SerializationTraitPrimitive<uint64_t> {};
 
 template <>
-class SerializationTrait<float> : public SerializationTraitPrimitive<float> {};
+struct SerializationTrait<float> : SerializationTraitPrimitive<float> {};
 
 template <>
-class SerializationTrait<double> : public SerializationTraitPrimitive<double> {};
+struct SerializationTrait<double> : SerializationTraitPrimitive<double> {};
 
 template <class StringT>
-class SerializationTraitStringBase : public SerializationTraitBase<StringT> {
-public:
+struct SerializationTraitStringBase : SerializationTraitBase<StringT> {
     using data_type = StringT;
 
     template <class Archive>
@@ -170,11 +166,10 @@ public:
 };
 
 template <>
-class SerializationTrait<ccstd::string> : public SerializationTraitStringBase<ccstd::string> {};
+struct SerializationTrait<ccstd::string> : SerializationTraitStringBase<ccstd::string> {};
 
 template <class T, class Allocator>
-class SerializationTrait<ccstd::vector<T, Allocator>> : public SerializationTraitBase<ccstd::vector<T, Allocator>> {
-public:
+struct SerializationTrait<ccstd::vector<T, Allocator>> : SerializationTraitBase<ccstd::vector<T, Allocator>> {
     using data_type = ccstd::vector<T, Allocator>;
 
     template <class Archive>
@@ -188,8 +183,7 @@ public:
 };
 
 template <class K, class V, class Allocator>
-class SerializationTrait<ccstd::unordered_map<K, V, Allocator>> : public SerializationTraitBase<ccstd::unordered_map<K, V, Allocator>> {
-public:
+struct SerializationTrait<ccstd::unordered_map<K, V, Allocator>> : SerializationTraitBase<ccstd::unordered_map<K, V, Allocator>> {
     using data_type = ccstd::unordered_map<K, V, Allocator>;
 
     template <class Archive>
@@ -201,5 +195,6 @@ public:
         data.reserve(capacity);
     }
 };
+
 
 } // namespace cc
