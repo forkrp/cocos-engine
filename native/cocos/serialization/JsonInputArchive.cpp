@@ -312,7 +312,7 @@ void JsonInputArchive::doSerializeArray(se::Value& value) {
                 seObj->incRef();
             } else {
                 seObj = se::Object::createArrayObject(_currentNode->GetArray().Size());
-                seObj->root(); //FIXME(cjh): How to unroot?
+                seObj->root(); // FIXME(cjh): How to unroot?
                 needRelease = true;
             }
 
@@ -530,7 +530,7 @@ AssetDependInfo* JsonInputArchive::checkAssetDependInfo() {
     if (!_currentNode->IsObject()) {
         return nullptr;
     }
-    
+
     auto iter = _currentNode->FindMember("__uuid__");
     if (iter != _currentNode->MemberEnd()) {
         assert(iter->value.IsString());

@@ -39,6 +39,7 @@ namespace cc {
 class Node;
 
 class Asset : public CCObject, public EventTarget {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = CCObject;
 
@@ -109,19 +110,6 @@ public:
 
     bool destroy() override;
 
-    // SERIALIZATION
-
-    /**
-     * @return
-     */
-    virtual ccstd::any serialize(const ccstd::any & /*ctxForExporting*/) { return ccstd::any{}; };
-
-    /**
-     *
-     * @param data
-     */
-    virtual void deserialize(const ccstd::any &serializedData, const ccstd::any &handle) {}
-
     ccstd::string toString() const override { return _nativeUrl; }
 
 protected:
@@ -142,6 +130,13 @@ protected:
 public:
     ccstd::string _native;
     ccstd::string _nativeUrl;
+
+    template <class Archive>
+    void serializeInlineData(Archive& ar) {
+        ar.serialize(_uuid, "__uuid__");
+        ccstd::string expectedType; // TODO(cjh):
+        ar.serialize(expectedType, "__expectedType__");
+    }
 
 protected:
     ccstd::string _uuid;

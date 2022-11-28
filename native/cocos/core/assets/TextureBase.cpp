@@ -126,37 +126,6 @@ gfx::Sampler *TextureBase::getGFXSampler() const {
     return _gfxSampler;
 }
 
-ccstd::any TextureBase::serialize(const ccstd::any & /*ctxForExporting*/) {
-    //cjh TODO:    if (EDITOR || TEST) {
-    //        return `${this._minFilter},${this._magFilter},${
-    //            this._wrapS},${this._wrapT},${
-    //            this._mipFilter},${this._anisotropy}`;
-    //    }
-    return ccstd::string("");
-}
-
-void TextureBase::deserialize(const ccstd::any &serializedData, const ccstd::any & /*handle*/) {
-    const auto *pData = ccstd::any_cast<const ccstd::string>(&serializedData);
-    if (pData == nullptr) {
-        return;
-    }
-    const ccstd::string &data = *pData;
-    auto fields = StringUtil::split(data, ",");
-    fields.insert(fields.begin(), "");
-
-    if (fields.size() >= 5) {
-        // decode filters
-        setFilters(static_cast<Filter>(atoi(fields[1].c_str())), static_cast<Filter>(atoi(fields[2].c_str())));
-        // decode wraps
-        setWrapMode(static_cast<WrapMode>(atoi(fields[3].c_str())), static_cast<WrapMode>(atoi(fields[4].c_str())));
-    }
-
-    if (fields.size() >= 7) {
-        setMipFilter(static_cast<Filter>(atoi(fields[5].c_str())));
-        setAnisotropy(atoi(fields[6].c_str()));
-    }
-}
-
 gfx::Device *TextureBase::getGFXDevice() {
     return gfx::Device::getInstance();
 }

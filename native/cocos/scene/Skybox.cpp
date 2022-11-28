@@ -39,8 +39,8 @@
 #include "scene/Ambient.h"
 #include "scene/Model.h"
 
-#include "serialization/JsonInputArchive.h"
 #include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 namespace scene {
@@ -48,7 +48,7 @@ namespace scene {
 CC_IMPL_SERIALIZE(SkyboxInfo)
 
 template <class Archive>
-void SkyboxInfo::serialize(Archive& ar) {
+void SkyboxInfo::serialize(Archive &ar) {
     CC_SERIALIZE(_envLightingType);
     CC_SERIALIZE(_envmapHDR);
     CC_SERIALIZE(_envmapLDR);
@@ -317,7 +317,7 @@ void Skybox::activate() {
 
     if (!_model) {
         _model = Root::getInstance()->createModel<scene::Model>();
-        //The skybox material has added properties of 'environmentMap' that need local ubo
+        // The skybox material has added properties of 'environmentMap' that need local ubo
         //_model->initLocalDescriptors(CC_INVALID_INDEX);
         //_model->initWorldBoundDescriptors(CC_INVALID_INDEX);
     }

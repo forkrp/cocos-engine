@@ -144,8 +144,8 @@ public:
      * obj.name = "New Obj";
      * ```
      */
-    inline const ccstd::string &getName() const { return _name; }
-    inline void setName(const ccstd::string &value) { _name = value; }
+    inline const ccstd::string& getName() const { return _name; }
+    inline void setName(const ccstd::string& value) { _name = value; }
 
     /**
      * @en After inheriting CCObject objects, control whether you need to hide, lock, serialize, and other functions.
@@ -297,6 +297,6 @@ inline bool CCObject::isReplicated() const {
  * log(isValid(node));    // false, destroyed in the end of last frame
  * ```
  */
-bool isObjectValid(CCObject *value, bool strictMode = false);
+bool isObjectValid(CCObject* value, bool strictMode = false);
 
 } // namespace cc

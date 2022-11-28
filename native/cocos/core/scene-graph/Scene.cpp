@@ -29,8 +29,12 @@
 #include "core/Root.h"
 //#include "core/scene-graph/NodeActivator.h"
 #include "cocos/bindings/event/EventDispatcher.h"
+#include "serialization/JsonInputArchive.h"
+#include "serialization/BinaryInputArchive.h"
 
 namespace cc {
+
+CC_IMPL_SERIALIZE(Scene)
 
 Scene::Scene(const ccstd::string &name)
 : Node(name) {
@@ -110,6 +114,22 @@ bool Scene::destroy() {
     _active = false;
     setActiveInHierarchy(false);
     return success;
+}
+
+template <class Archive>
+void Scene::serialize(Archive &ar) {
+    CCObject::serialize(ar);
+
+    CC_SERIALIZE(_parent);
+    CC_SERIALIZE(_children);
+    CC_SERIALIZE(_active);
+
+    ar.serialize(_autoReleaseAssets, "autoReleaseAssets");
+    CC_SERIALIZE(_globals);
+
+    if (!ar.isExporting()) { // TODO(cjh): Also needs to check editor keep uuid flag
+        CC_SERIALIZE(_id);
+    }
 }
 
 } // namespace cc

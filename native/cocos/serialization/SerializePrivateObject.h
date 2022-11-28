@@ -31,13 +31,13 @@ namespace cc {
 
 template <class T, class Archive>
 inline void serializePrivateObject(T* data, Archive& ar) {
-//    if constexpr (std::is_base_of<ISerializable, T>::value) {
-//        ISerializable* obj = static_cast<ISerializable*>(data);
-//        obj->virtualSerialize(ar);
-//    } else {
-        ar.onSerializingObjectPtr(data);
-        ar.onFinishSerializeObject(data);
-//    }
+    //    if constexpr (std::is_base_of<ISerializable, T>::value) {
+    //        ISerializable* obj = static_cast<ISerializable*>(data);
+    //        obj->virtualSerialize(ar);
+    //    } else {
+    ar.onSerializingObjectPtr(data);
+    ar.onFinishSerializeObject(data);
+    //    }
 }
 
 } // namespace cc

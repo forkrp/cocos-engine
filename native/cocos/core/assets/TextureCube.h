@@ -237,9 +237,6 @@ public:
      */
     bool destroy() override;
 
-    ccstd::any serialize(const ccstd::any &ctxForExporting) override;
-    void deserialize(const ccstd::any &serializedData, const ccstd::any &handle) override;
-
     gfx::TextureInfo getGfxTextureCreateInfo(gfx::TextureUsageBit usage, gfx::Format format, uint32_t levelCount, gfx::TextureFlagBit flags) override;
     gfx::TextureViewInfo getGfxTextureViewCreateInfo(gfx::Texture *texture, gfx::Format format, uint32_t baseLevel, uint32_t levelCount) override;
 

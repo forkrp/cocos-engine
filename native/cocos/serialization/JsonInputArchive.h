@@ -318,7 +318,7 @@ inline void JsonInputArchive::serializePrimitiveData(uint64_t& data) {
         data = static_cast<uint64_t>(_currentNode->GetUint64());
     } else if (_currentNode->IsNumber()) {
         data = static_cast<uint64_t>(_currentNode->GetDouble());
-    }  else if (_currentNode->IsBool()) {
+    } else if (_currentNode->IsBool()) {
         data = _currentNode->GetBool() ? 1 : 0;
     } else if (_currentNode->IsString()) {
         data = static_cast<uint64_t>(atol(_currentNode->GetString()));
@@ -416,7 +416,7 @@ void JsonInputArchive::serializeStlLikeMap(T& data) {
 
     for (const auto& e : obj) {
         _currentNode = &e.name;
-        _currentKey = nullptr; //FIXME(cjh): Should be nullptr for key itself?
+        _currentKey = nullptr; // FIXME(cjh): Should be nullptr for key itself?
         if (_currentNode == nullptr) {
             continue;
         }
@@ -530,7 +530,7 @@ inline bool JsonInputArchive::onStartSerializeObject(T& data) {
     se::Object* scriptObject{nullptr};
     if constexpr (IsPtr<T>::value) {
         using value_type = typename IsPtr<T>::type;
-//        assert(data == nullptr); //, "Raw ptr should be nullptr in new serialization system");
+        //        assert(data == nullptr); //, "Raw ptr should be nullptr in new serialization system");
 
         AssetDependInfo* dependInfo{nullptr};
         if constexpr (has_setUuid<value_type, void(const ccstd::string&)>::value) {

@@ -988,17 +988,15 @@ template <class Archive>
 void Node::serialize(Archive &ar) {
     Super::serialize(ar);
 
-    //    CC_SERIALIZE(_parent);
-    //    CC_SERIALIZE(_children);
+    CC_SERIALIZE(_parent);
+    CC_SERIALIZE(_children);
     CC_SERIALIZE(_active);
-    //    CC_SERIALIZE(_components);
-    //    CC_SERIALIZE(_prefab);
 
     ar.serialize(_localPosition, "_lpos");
     ar.serialize(_localRotation, "_lrot");
     ar.serialize(_localScale, "_lscale");
 
-    //    CC_SERIALIZE(_layer);
+    CC_SERIALIZE(_layer);
     CC_SERIALIZE(_euler);
 
     if (!ar.isExporting()) { // TODO(cjh): Also needs to check editor keep uuid flag

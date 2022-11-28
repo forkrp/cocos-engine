@@ -34,6 +34,7 @@ class RenderScene;
 }
 
 class Scene final : public Node {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = Node;
     explicit Scene(const ccstd::string &name);

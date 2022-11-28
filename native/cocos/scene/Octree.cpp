@@ -28,8 +28,8 @@
 #include <utility>
 #include "scene/Camera.h"
 #include "scene/Model.h"
-#include "serialization/JsonInputArchive.h"
 #include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
 
 namespace cc {
 namespace scene {

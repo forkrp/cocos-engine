@@ -33,6 +33,7 @@ namespace cc {
 class Scene;
 
 class SceneAsset final : public Asset {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = Asset;
     SceneAsset();

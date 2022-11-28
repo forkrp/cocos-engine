@@ -32,8 +32,21 @@
 #include "scene/Octree.h"
 #include "scene/Shadow.h"
 #include "scene/Skybox.h"
+#include "serialization/JsonInputArchive.h"
+#include "serialization/BinaryInputArchive.h"
 
 namespace cc {
+
+CC_IMPL_SERIALIZE(SceneGlobals)
+
+template <class Archive>
+void SceneGlobals::serialize(Archive &ar) {
+    ar.serialize(_ambientInfo, "ambient");
+    ar.serialize(_shadowInfo, "shadows");
+    ar.serialize(_skyboxInfo, "_skybox");
+    ar.serialize(_fogInfo, "fog");
+    ar.serialize(_octreeInfo, "octree");
+}
 
 SceneGlobals::SceneGlobals() {
     _ambientInfo = ccnew scene::AmbientInfo();
