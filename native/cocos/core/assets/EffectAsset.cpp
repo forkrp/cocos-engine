@@ -166,6 +166,8 @@ EffectAsset *EffectAsset::get(const ccstd::string &name) {
     return nullptr;
 }
 
+CC_IMPL_SERIALIZE(EffectAsset)
+
 template <class Archive>
 void EffectAsset::serialize(Archive &ar) {
     Super::serialize(ar);

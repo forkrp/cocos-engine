@@ -33,6 +33,7 @@
 #include "base/std/container/string.h"
 #include "base/std/container/unordered_map.h"
 #include "base/std/container/vector.h"
+#include "base/std/optional.h"
 
 namespace cc {
 
@@ -196,5 +197,24 @@ struct SerializationTrait<ccstd::unordered_map<K, V, Allocator>> : Serialization
     }
 };
 
+template <typename T>
+struct SerializationTrait<ccstd::optional<T>> : SerializationTraitBase<ccstd::optional<T>> {
+    using data_type = ccstd::optional<T>;
+
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
+        ar.serializeOptional(data);
+    }
+};
+
+template <typename ...Args>
+struct SerializationTrait<std::tuple<Args...>> : SerializationTraitBase<std::tuple<Args...>> {
+    using data_type = std::tuple<Args...>;
+
+    template <class Archive>
+    inline static void serialize(data_type& data, Archive& ar) {
+        ar.serializeStdTuple(data);
+    }
+};
 
 } // namespace cc

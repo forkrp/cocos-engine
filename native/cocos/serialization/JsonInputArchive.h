@@ -35,6 +35,9 @@
 #include "json/document.h"
 
 #include "base/std/container/vector.h"
+#include "base/std/variant.h"
+
+#include <tuple>
 
 namespace se {
 class Value;
@@ -66,6 +69,12 @@ public:
 
     template <class T>
     void serializeStlLikeMap(T& data);
+
+    template <class T>
+    void serializeOptional(ccstd::optional<T>& data);
+
+    template <class ...Args>
+    void serializeStdTuple(std::tuple<Args...>& data);
 
     template <class T>
     void serialize(T& data, const char* name);
@@ -150,6 +159,9 @@ public:
     se::Value& arrayObj(se::Value& value, const char* name);
     se::Value& serializableObj(se::Value& value, const char* name);
     se::Value& serializableObjArray(se::Value& value, const char* name);
+
+    inline const rapidjson::Value* getCurrentNode() const { return _currentNode; }
+    inline void setCurrentNode(const rapidjson::Value* node) { _currentNode = node; }
 
 private:
     const rapidjson::Value* getValue(const rapidjson::Value* parentNode, const char* key);
@@ -360,6 +372,8 @@ inline void JsonInputArchive::serializeString(ccstd::string& data) {
 
 template <class T>
 inline void JsonInputArchive::serializeStlLikeArray(T& data) {
+    using data_type = typename T::value_type;
+
     if (!_currentNode->IsArray()) {
         return;
     }
@@ -384,7 +398,13 @@ inline void JsonInputArchive::serializeStlLikeArray(T& data) {
         _currentKey = keyTmp;
 
         if (_currentNode != nullptr) {
-            SerializationTrait<typename T::value_type>::serialize(data[i], *this);
+            if constexpr (std::is_same_v<bool, data_type>) {
+                data_type v{};
+                SerializationTrait<data_type>::serialize(v, *this);
+                data[i] = v;
+            } else {
+                SerializationTrait<data_type>::serialize(data[i], *this);
+            }
         }
     }
 
@@ -441,6 +461,61 @@ void JsonInputArchive::serializeStlLikeMap(T& data) {
 
         data[key] = value;
     }
+
+    _currentNode = parentNode;
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
+}
+
+template <class T>
+inline void JsonInputArchive::serializeOptional(ccstd::optional<T>& data) {
+    if (!_currentNode || _currentNode->IsNull()) {
+        return;
+    }
+
+    T serializedData{};
+    SerializationTrait<T>::serialize(serializedData, *this);
+    data = std::move(serializedData);
+}
+
+template <typename Tuple, typename Func, size_t ... N>
+void func_call_tuple(Tuple& t, Func&& func, std::index_sequence<N...>) {
+    static_cast<void>(std::initializer_list<int>{(func(std::get<N>(t)), 0)...});
+}
+
+template <typename ... Args, typename Func>
+void travel_tuple(std::tuple<Args...>& t, Func&& func) {
+    func_call_tuple(t, std::forward<Func>(func), std::make_index_sequence<sizeof...(Args)>{});
+}
+
+template <class ...Args>
+inline void JsonInputArchive::serializeStdTuple(std::tuple<Args...>& data) {
+    static constexpr size_t ARG_N = sizeof...(Args);
+
+    if (!_currentNode->IsArray()) {
+        return;
+    }
+
+    auto* parentNode = _currentNode;
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
+    _currentOwner = nullptr; // Stl container should not be a script owner.
+    _currentKey = nullptr;
+
+    const auto& arr = _currentNode->GetArray();
+    uint32_t len = arr.Size();
+    assert(len == ARG_N);
+
+    uint32_t i = 0;
+    travel_tuple(data, [&](auto&& item){
+        _currentNode = &arr[i];
+
+        using data_type = std::decay_t<decltype(item)>;
+        SerializationTrait<data_type>::serialize(item, *this);
+
+        ++i;
+    });
 
     _currentNode = parentNode;
     _currentKey = oldKey;
@@ -515,6 +590,8 @@ inline void JsonInputArchive::onSerializingObjectRef(T& data) {
         data.serialize(*this);
     } else if constexpr (has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
         data.serializeInlineData(*this);
+    } else {
+        static_assert(std::is_void_v<T>, "CPP type doesn't have a serialize or serializeInlineData method");
     }
 
     if constexpr (has_getScriptObject<data_type, se::Object*()>::value) {

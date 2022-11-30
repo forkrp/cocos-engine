@@ -41,6 +41,11 @@
 #include "renderer/gfx-base/GFXDef.h"
 #include "renderer/gfx-base/GFXTexture.h"
 
+#include "core/assets/TextureBase.h"
+
+#include "serialization/SerializationTrait.h"
+#include "serialization/JsonInputArchive.h"
+
 namespace cc {
 
 class TextureBase;
@@ -78,6 +83,125 @@ using MaterialProperty = ccstd::variant<ccstd::monostate /*0*/, float /*1*/, int
 using MaterialPropertyList = ccstd::vector<MaterialProperty>;
 
 using MaterialPropertyVariant = ccstd::variant<ccstd::monostate /*0*/, MaterialProperty /*1*/, MaterialPropertyList /*2*/>;
+
+template <>
+struct SerializationTrait<MacroValue> : SerializationTraitBase<MacroValue> {
+    static void serialize(MacroValue& data, JsonInputArchive& ar) {
+        const auto* currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+        
+        if (currentNode->IsNumber()) {
+            int32_t v{0};
+            SerializationTrait<int32_t>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsBool()) {
+            bool v{false};
+            SerializationTrait<bool>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsString()) {
+            ccstd::string v;
+            SerializationTrait<ccstd::string>::serialize(v, ar);
+            data = std::move(v);
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+
+    }
+};
+
+template <>
+struct SerializationTrait<MaterialProperty> : SerializationTraitBase<MaterialProperty> {
+    static void serialize(MaterialProperty& data, JsonInputArchive& ar) {
+        const auto* currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        if (currentNode->IsInt() || currentNode->IsUint()) {
+            int32_t v{0};
+            SerializationTrait<int32_t>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsNumber()) {
+            float v{0.F};
+            SerializationTrait<float>::serialize(v, ar);
+            data = v;
+        } else if (currentNode->IsObject()) {
+            const auto typeIter = currentNode->FindMember("__type__");
+            if (typeIter != currentNode->MemberEnd()) {
+                const auto* type = typeIter->value.GetString();
+                if (0 == strcmp(type, "cc.Color")) {
+                    cc::Color v;
+                    SerializationTrait<cc::Color>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Vec4")) {
+                    Vec4 v;
+                    SerializationTrait<Vec4>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Mat4")) {
+                    Mat4 v;
+                    SerializationTrait<Mat4>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Vec3")) {
+                    Vec3 v;
+                    SerializationTrait<Vec3>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Vec2")) {
+                    Vec2 v;
+                    SerializationTrait<Vec2>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Quat")) {
+                    Quaternion v;
+                    SerializationTrait<Quaternion>::serialize(v, ar);
+                    data = v;
+                } else if (0 == strcmp(type, "cc.Mat3")) {
+                    Mat3 v;
+                    SerializationTrait<Mat3>::serialize(v, ar);
+                    data = v;
+                }
+            } else {
+                assert(false); //TODO(cjh):
+            }
+
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+
+    }
+};
+
+template <>
+struct SerializationTrait<MaterialPropertyVariant> : SerializationTraitBase<MaterialPropertyVariant> {
+    static void serialize(MaterialPropertyVariant& data, JsonInputArchive& ar) {
+        const auto* currentNode = ar.getCurrentNode();
+        if (currentNode == nullptr) {
+            return;
+        }
+
+        if (currentNode->IsArray()) {
+            MaterialPropertyList v;
+            SerializationTrait<MaterialPropertyList>::serialize(v, ar);
+            data = std::move(v);
+        } else if (currentNode->IsObject()) {
+            MaterialProperty v;
+            SerializationTrait<MaterialProperty>::serialize(v, ar);
+            data = std::move(v);
+        } else {
+            assert(false);
+        }
+    }
+
+    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+
+    }
+};
 
 #define MATERIAL_PROPERTY_INDEX_SINGLE 1
 #define MATERIAL_PROPERTY_INDEX_LIST   2

@@ -922,6 +922,14 @@ public:
      */
     bool approxEquals(const Mat4& v, float precision = CC_FLOAT_CMP_PRECISION) const;
 
+    template <class Archive>
+    void serializeInlineData(Archive &ar) {
+        ar.serialize(m[0], "m00"); ar.serialize(m[1], "m01"); ar.serialize(m[2], "m02"); ar.serialize(m[3], "m03");
+        ar.serialize(m[4], "m04"); ar.serialize(m[5], "m05"); ar.serialize(m[6], "m06"); ar.serialize(m[7], "m07");
+        ar.serialize(m[8], "m08"); ar.serialize(m[9], "m09"); ar.serialize(m[10], "m10"); ar.serialize(m[11], "m11");
+        ar.serialize(m[12], "m12"); ar.serialize(m[13], "m13"); ar.serialize(m[14], "m14"); ar.serialize(m[15], "m15");
+    }
+
     /** equals to a matrix full of zeros */
     static const Mat4 ZERO;
     /** equals to the identity matrix */

@@ -87,6 +87,7 @@ struct IMaterialInfo {
 };
 
 class Material : public Asset {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = Asset;
     /**
