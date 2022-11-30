@@ -137,7 +137,7 @@ export class BinaryInputArchive implements IArchive {
         }
     }
 
-    public anyObj (data: any, name: string): any {
+    public anyValue (data: any, name: string): any {
         return this._serializeInternal(data, name);
     }
 

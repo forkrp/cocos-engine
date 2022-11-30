@@ -90,7 +90,7 @@ export class PropertyOverrideInfo implements ISerializable {
     serialize (ar: IArchive): void {
         this.targetInfo = ar.serializableObj(this.targetInfo, 'targetInfo');
         this.propertyPath = ar.strArray(this.propertyPath, 'propertyPath');
-        this.value = ar.anyObj(this.value, 'value');
+        this.value = ar.anyValue(this.value, 'value');
     }
 }
 

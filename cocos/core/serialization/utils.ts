@@ -7,8 +7,8 @@ export function assert (cond) {
 }
 
 export enum SerializeTag {
-    TAG_NUMBER = 100,
-    TAG_NULL,
+    TAG_NULL = 0,
+    TAG_NUMBER,
     TAG_BOOLEAN,
     TAG_STRING,
     TAG_SERIALIZABLE_OBJECT,

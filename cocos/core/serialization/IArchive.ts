@@ -7,7 +7,7 @@ export interface IArchive {
     // start(obj: ISerializable);
 
     //TODO: Rename all methods, remove serialize prefix for better JS package size.
-    anyObj(data: any, name: string): any;
+    anyValue(data: any, name: string): any;
 
     // TODO: Should not use serialize directly, use the the following explict type for better performance and binary support.
     //
@@ -16,12 +16,12 @@ export interface IArchive {
     int8(data: number, name: string): number;
     int16(data: number, name: string): number;
     int32(data: number, name: string): number;
-    // serializeInt64(data: number, name: string) : number;
+    // int64(data: number, name: string) : number;
 
     uint8(data: number, name: string): number;
     uint16(data: number, name: string): number;
     uint32(data: number, name: string): number;
-    // serializeUint64(data: number, name: string) : number;
+    // uint64(data: number, name: string) : number;
 
     float32(data: number, name: string): number;
     float64(data: number, name: string): number;

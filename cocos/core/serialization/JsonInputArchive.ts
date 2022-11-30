@@ -212,7 +212,7 @@ export class JsonInputArchive implements IArchive {
         return this._isRoot;
     }
 
-    public anyObj (data: any, name: string) : any {
+    public anyValue (data: any, name: string) : any {
         return this._serializeInternal(data, name);
     }
 
@@ -258,7 +258,7 @@ export class JsonInputArchive implements IArchive {
         return this._currentNode[name] as number;
     }
 
-    public serializeInt64 (data: number, name: string) : number {
+    public int64 (data: number, name: string) : number {
         return this._currentNode[name] as number;
     }
 
@@ -274,7 +274,7 @@ export class JsonInputArchive implements IArchive {
         return this._currentNode[name] as number;
     }
 
-    public serializeUint64 (data: number, name: string) : number {
+    public uint64 (data: number, name: string) : number {
         return this._currentNode[name] as number;
     }
 
@@ -366,7 +366,7 @@ export class JsonInputArchive implements IArchive {
         if (ret) {
             const oldOwner = this._currentOwner;
             this._currentOwner = ret;
-            if (hasId && index > 0) {
+            if (hasId && index >= 0) {
                 this._deserializedObjIdMap.set(index, ret);
             }
 

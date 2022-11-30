@@ -75,7 +75,7 @@ export class SerializeData {
         this._dataLength = Math.max(byteOffset + 2, this._dataLength);
     }
 
-    setUint16(byteOffset: number, value: number) {
+    setUint16 (byteOffset: number, value: number) {
         if (byteOffset < 0) {
             return;
         }
@@ -241,7 +241,7 @@ export class SerializeData {
     //     throw new RangeError(`Offset ${byteOffset} is outside the bounds of the DataView (${this._dataLength})`);
     // }
 
-    getString(byteOffset: number) {
+    getString (byteOffset: number) {
         if (byteOffset >= 0 && byteOffset + 4 <= this._dataLength) {
             const strBytes = this.getUint32(byteOffset);
             const strLength = strBytes / 2;
