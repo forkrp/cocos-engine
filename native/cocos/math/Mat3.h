@@ -1,18 +1,18 @@
 /****************************************************************************
  Copyright (c) 2018-2021 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos.com
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -222,13 +222,19 @@ public:
     /**
      * Determines if this matrix is approximately equal to the given matrix.
      */
-    bool approxEquals(const Mat3& v, float precision = CC_FLOAT_CMP_PRECISION) const;
+    bool approxEquals(const Mat3 &v, float precision = CC_FLOAT_CMP_PRECISION) const;
 
     template <class Archive>
     void serializeInlineData(Archive &ar) {
-        ar.serialize(m[0], "m00"); ar.serialize(m[1], "m01"); ar.serialize(m[2], "m02");
-        ar.serialize(m[3], "m03"); ar.serialize(m[4], "m04"); ar.serialize(m[5], "m05");
-        ar.serialize(m[6], "m06"); ar.serialize(m[7], "m07"); ar.serialize(m[8], "m08");
+        ar.serialize(m[0], "m00");
+        ar.serialize(m[1], "m01");
+        ar.serialize(m[2], "m02");
+        ar.serialize(m[3], "m03");
+        ar.serialize(m[4], "m04");
+        ar.serialize(m[5], "m05");
+        ar.serialize(m[6], "m06");
+        ar.serialize(m[7], "m07");
+        ar.serialize(m[8], "m08");
     }
 
     /** equals to a matrix full of zeros */

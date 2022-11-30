@@ -207,7 +207,7 @@ struct SerializationTrait<ccstd::optional<T>> : SerializationTraitBase<ccstd::op
     }
 };
 
-template <typename ...Args>
+template <typename... Args>
 struct SerializationTrait<std::tuple<Args...>> : SerializationTraitBase<std::tuple<Args...>> {
     using data_type = std::tuple<Args...>;
 

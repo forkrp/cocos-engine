@@ -73,7 +73,7 @@ public:
     template <class T>
     void serializeOptional(ccstd::optional<T>& data);
 
-    template <class ...Args>
+    template <class... Args>
     void serializeStdTuple(std::tuple<Args...>& data);
 
     template <class T>
@@ -478,17 +478,17 @@ inline void JsonInputArchive::serializeOptional(ccstd::optional<T>& data) {
     data = std::move(serializedData);
 }
 
-template <typename Tuple, typename Func, size_t ... N>
+template <typename Tuple, typename Func, size_t... N>
 void func_call_tuple(Tuple& t, Func&& func, std::index_sequence<N...>) {
     static_cast<void>(std::initializer_list<int>{(func(std::get<N>(t)), 0)...});
 }
 
-template <typename ... Args, typename Func>
+template <typename... Args, typename Func>
 void travel_tuple(std::tuple<Args...>& t, Func&& func) {
     func_call_tuple(t, std::forward<Func>(func), std::make_index_sequence<sizeof...(Args)>{});
 }
 
-template <class ...Args>
+template <class... Args>
 inline void JsonInputArchive::serializeStdTuple(std::tuple<Args...>& data) {
     static constexpr size_t ARG_N = sizeof...(Args);
 
@@ -508,7 +508,7 @@ inline void JsonInputArchive::serializeStdTuple(std::tuple<Args...>& data) {
     assert(len == ARG_N);
 
     uint32_t i = 0;
-    travel_tuple(data, [&](auto&& item){
+    travel_tuple(data, [&](auto&& item) {
         _currentNode = &arr[i];
 
         using data_type = std::decay_t<decltype(item)>;

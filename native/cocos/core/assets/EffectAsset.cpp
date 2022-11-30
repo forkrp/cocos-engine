@@ -175,7 +175,7 @@ void EffectAsset::serialize(Archive &ar) {
     ar.serialize(_techniques, "techniques");
     ar.serialize(_shaders, "shaders");
     ar.serialize(_combinations, "combinations");
-    CC_SERIALIZE(hideInEditor); //FIXME(cjh): not bound?
+    CC_SERIALIZE(hideInEditor); // FIXME(cjh): not bound?
 }
 
 void EffectAsset::onLoaded() {
@@ -203,7 +203,7 @@ void EffectAsset::initDefault(const ccstd::optional<ccstd::string> &uuid) {
     _name = "builtin-unlit";
     _shaders = effect->_shaders;
     _combinations = effect->_combinations;
-    _techniques = effect->_techniques; //NOTE: it will copy effect->_techniques to _techniques and _techniques will kept by SE_HOLD_RETURN_VALUE
+    _techniques = effect->_techniques; // NOTE: it will copy effect->_techniques to _techniques and _techniques will kept by SE_HOLD_RETURN_VALUE
 }
 
 bool EffectAsset::validate() const {
@@ -265,7 +265,7 @@ const defines = [
                  // ... all the combinations (2x4x3 in this case)
                  ];
  */
-ccstd::vector<MacroRecord> EffectAsset::doCombine(const ccstd::vector<MacroRecord> &cur, const IPreCompileInfo &info, IPreCompileInfo::iterator iter) { //NOLINT(misc-no-recursion)
+ccstd::vector<MacroRecord> EffectAsset::doCombine(const ccstd::vector<MacroRecord> &cur, const IPreCompileInfo &info, IPreCompileInfo::iterator iter) { // NOLINT(misc-no-recursion)
     if (iter == info.end()) {
         return cur;
     }

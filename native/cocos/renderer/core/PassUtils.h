@@ -1,8 +1,8 @@
 /****************************************************************************
  Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
- 
+
  http://www.cocos.com
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
  worldwide, royalty-free, non-assignable, revocable and non-exclusive license
@@ -10,10 +10,10 @@
  not use Cocos Creator software for developing other software or tools that's
  used for developing games. You are not granted to publish, distribute,
  sublicense, and/or sell copies of Cocos Creator.
- 
+
  The software or tools in this License Agreement are licensed, not sold.
  Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,8 +43,8 @@
 
 #include "core/assets/TextureBase.h"
 
-#include "serialization/SerializationTrait.h"
 #include "serialization/JsonInputArchive.h"
+#include "serialization/SerializationTrait.h"
 
 namespace cc {
 
@@ -91,7 +91,7 @@ struct SerializationTrait<MacroValue> : SerializationTraitBase<MacroValue> {
         if (currentNode == nullptr) {
             return;
         }
-        
+
         if (currentNode->IsNumber()) {
             int32_t v{0};
             SerializationTrait<int32_t>::serialize(v, ar);
@@ -110,7 +110,6 @@ struct SerializationTrait<MacroValue> : SerializationTraitBase<MacroValue> {
     }
 
     static void serialize(MacroValue& data, BinaryInputArchive& ar) {
-
     }
 };
 
@@ -164,7 +163,7 @@ struct SerializationTrait<MaterialProperty> : SerializationTraitBase<MaterialPro
                     data = v;
                 }
             } else {
-                assert(false); //TODO(cjh):
+                assert(false); // TODO(cjh):
             }
 
         } else {
@@ -173,7 +172,6 @@ struct SerializationTrait<MaterialProperty> : SerializationTraitBase<MaterialPro
     }
 
     static void serialize(MacroValue& data, BinaryInputArchive& ar) {
-
     }
 };
 
@@ -199,27 +197,26 @@ struct SerializationTrait<MaterialPropertyVariant> : SerializationTraitBase<Mate
     }
 
     static void serialize(MacroValue& data, BinaryInputArchive& ar) {
-
     }
 };
 
 #define MATERIAL_PROPERTY_INDEX_SINGLE 1
 #define MATERIAL_PROPERTY_INDEX_LIST   2
 
-using GFXTypeReaderCallback = void (*)(const float *, MaterialProperty &, index_t);
-using GFXTypeWriterCallback = void (*)(float *, const MaterialProperty &, index_t);
+using GFXTypeReaderCallback = void (*)(const float*, MaterialProperty&, index_t);
+using GFXTypeWriterCallback = void (*)(float*, const MaterialProperty&, index_t);
 
-extern const ccstd::unordered_map<gfx::Type, GFXTypeReaderCallback> type2reader; //NOLINT(readability-identifier-naming)
-extern const ccstd::unordered_map<gfx::Type, GFXTypeWriterCallback> type2writer; //NOLINT(readability-identifier-naming)
+extern const ccstd::unordered_map<gfx::Type, GFXTypeReaderCallback> type2reader; // NOLINT(readability-identifier-naming)
+extern const ccstd::unordered_map<gfx::Type, GFXTypeWriterCallback> type2writer; // NOLINT(readability-identifier-naming)
 
 /**
  * @en Gets the default values for the given type of uniform
  * @zh 根据指定的 Uniform 类型来获取默认值
  * @param type The type of the uniform
  */
-const ccstd::vector<float> &getDefaultFloatArrayFromType(gfx::Type type);
-const ccstd::string &getDefaultStringFromType(gfx::Type type);
-const ccstd::string &getStringFromType(gfx::Type type);
+const ccstd::vector<float>& getDefaultFloatArrayFromType(gfx::Type type);
+const ccstd::string& getDefaultStringFromType(gfx::Type type);
+const ccstd::string& getStringFromType(gfx::Type type);
 
 /**
  * @en Combination of preprocess macros
@@ -231,8 +228,8 @@ const ccstd::string &getStringFromType(gfx::Type type);
  * @param target Target preprocess macros to be overridden
  * @param source Preprocess macros used for override
  */
-bool overrideMacros(MacroRecord &target, const MacroRecord &source);
+bool overrideMacros(MacroRecord& target, const MacroRecord& source);
 
-MaterialProperty toMaterialProperty(gfx::Type type, const ccstd::vector<float> &vec);
+MaterialProperty toMaterialProperty(gfx::Type type, const ccstd::vector<float>& vec);
 
 } // namespace cc

@@ -47,7 +47,7 @@ using IPropertyValueInternal = ccstd::variant<ccstd::vector<float>, ccstd::strin
 using IPropertyValue = ccstd::optional<IPropertyValueInternal>;
 
 struct IPropertyInfo {
-    int32_t type{0};                                    // auto-extracted from shader
+    int32_t type{0};                                 // auto-extracted from shader
     ccstd::optional<IPropertyHandleInfo> handleInfo; // auto-generated from 'target'
     ccstd::optional<ccstd::hash_t> samplerHash;      // auto-generated from 'sampler'
     IPropertyValue value;                            // default value
@@ -435,7 +435,7 @@ using PassOverrides = IPassStates;
 
 using PassPropertyInfoMap = ccstd::unordered_map<ccstd::string, IPropertyInfo>;
 
-struct IPassInfoFull final { //cjh } : public IPassInfo {
+struct IPassInfoFull final { // cjh } : public IPassInfo {
     // IPassStates
     ccstd::optional<int32_t> priority;
     ccstd::optional<gfx::PrimitiveMode> primitive;
@@ -652,7 +652,7 @@ struct IAttributeInfo {
 struct IDefineInfo {
     ccstd::string name;
     ccstd::string type;
-    ccstd::optional<ccstd::vector<int32_t>> range; //cjh number is float?  ?: number[];
+    ccstd::optional<ccstd::vector<int32_t>> range; // cjh number is float?  ?: number[];
     ccstd::optional<ccstd::vector<ccstd::string>> options;
     ccstd::optional<ccstd::string> defaultVal;
 
@@ -860,7 +860,7 @@ public:
     ccstd::vector<IPreCompileInfo> _combinations;
     //
 protected:
-    static RegisteredEffectAssetMap effects; //cjh TODO: how to clear when game exits.
+    static RegisteredEffectAssetMap effects; // cjh TODO: how to clear when game exits.
     static bool layoutValid;
 
     CC_DISALLOW_COPY_MOVE_ASSIGN(EffectAsset);
@@ -874,8 +874,8 @@ protected:
 
 template <>
 struct SerializationTrait<IPropertyValueInternal> : SerializationTraitBase<IPropertyValueInternal> {
-    static void serialize(IPropertyValueInternal& data, JsonInputArchive& ar) {
-        const auto* currentNode = ar.getCurrentNode();
+    static void serialize(IPropertyValueInternal &data, JsonInputArchive &ar) {
+        const auto *currentNode = ar.getCurrentNode();
         if (currentNode == nullptr) {
             return;
         }
@@ -893,23 +893,22 @@ struct SerializationTrait<IPropertyValueInternal> : SerializationTraitBase<IProp
         }
     }
 
-    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
-
+    static void serialize(MacroValue &data, BinaryInputArchive &ar) {
     }
 };
 
 template <>
 struct SerializationTrait<IPreCompileInfoValueType> : SerializationTraitBase<IPreCompileInfoValueType> {
-    static void serialize(IPreCompileInfoValueType& data, JsonInputArchive& ar) {
-        const auto* currentNode = ar.getCurrentNode();
+    static void serialize(IPreCompileInfoValueType &data, JsonInputArchive &ar) {
+        const auto *currentNode = ar.getCurrentNode();
         if (currentNode == nullptr) {
             return;
         }
 
         if (currentNode->IsArray()) {
-            const auto& jsonArr = currentNode->GetArray();
+            const auto &jsonArr = currentNode->GetArray();
             if (jsonArr.Size() > 0) {
-                const auto& first = jsonArr[0];
+                const auto &first = jsonArr[0];
                 if (first.IsBool()) {
                     ccstd::vector<bool> arr;
                     SerializationTrait<ccstd::vector<bool>>::serialize(arr, ar);
@@ -931,10 +930,8 @@ struct SerializationTrait<IPreCompileInfoValueType> : SerializationTraitBase<IPr
         }
     }
 
-    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
-
+    static void serialize(MacroValue &data, BinaryInputArchive &ar) {
     }
 };
-
 
 } // namespace cc
