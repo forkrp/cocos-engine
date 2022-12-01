@@ -25,6 +25,9 @@
 
 #pragma once
 
+#include <tuple>
+#include "base/std/optional.h"
+
 #define CC_SERIALIZE(name) ar.serialize(name, #name)
 
 namespace cc {
@@ -43,6 +46,12 @@ public:
 
     template <class T>
     void serializeStlLikeMap(T&) {}
+
+    template <class T>
+    void serializeOptional(ccstd::optional<T>& data) {}
+
+    template <class... Args>
+    void serializeStdTuple(std::tuple<Args...>& data) {}
 };
 
 } // namespace cc

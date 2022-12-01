@@ -54,7 +54,6 @@ namespace cc {
 
 class JsonInputArchive;
 class BinaryInputArchive;
-class RefCounted;
 
 class ISerializable {
 public:

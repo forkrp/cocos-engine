@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { SceneAsset, Scene, JsonOutputArchive, Node, JsonInputArchive, Camera, RenderTexture } from '../../../cocos/core';
+import { SceneAsset, Scene, JsonOutputArchive, Node, JsonInputArchive, Camera, RenderTexture, Details } from '../../../cocos/core';
 import { MeshRenderer, DirectionalLight } from '../../../cocos/3d';
 
 describe(`new-serialization`, () => {
@@ -15,9 +15,10 @@ describe(`new-serialization`, () => {
 
             const serializedJsonStr = fs.readFileSync('tests/core/new-serialization/demo2.scene', 'utf-8');
             const serializedJsonObj = JSON.parse(serializedJsonStr);
-            const inputAr = new JsonInputArchive(serializedJsonObj);
-            const sceneAsset = new SceneAsset();
-            inputAr.start(sceneAsset);
+            const inputAr = new JsonInputArchive();
+
+            let details = new Details();
+            const sceneAsset: SceneAsset = inputAr.start(serializedJsonObj, details) as SceneAsset;
 
             const outputAr = new JsonOutputArchive();
             outputAr.start(sceneAsset);
