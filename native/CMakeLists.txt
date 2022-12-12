@@ -502,6 +502,7 @@ cocos_source_files(
     cocos/gi/light-probe/tetgen.cpp
     cocos/gi/light-probe/tetgen.h
     cocos/gi/light-probe/predicates.cpp
+)
 
 ############ serialization
 cocos_source_files(
