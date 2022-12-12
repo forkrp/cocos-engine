@@ -1,6 +1,9 @@
 import fs from 'fs';
-import { SceneAsset, Scene, JsonOutputArchive, Node, JsonInputArchive, Camera, RenderTexture, Details } from '../../../cocos/core';
+
 import { MeshRenderer, DirectionalLight } from '../../../cocos/3d';
+import { SceneAsset } from '../../../cocos/asset/assets/scene-asset';
+import { JsonInputArchive, JsonOutputArchive } from '../../../cocos/core';
+import { Details } from '../../../cocos/serialization';
 
 describe(`new-serialization`, () => {
     describe(`json-archive`, () => {

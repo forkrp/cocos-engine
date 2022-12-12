@@ -185,7 +185,7 @@ export class SerializeData {
         throw new RangeError(`Offset ${byteOffset} is outside the bounds of the DataView (${this._dataLength})`);
     }
 
-    getUint16 (byteOffset: number) : number {
+    getUint16 (byteOffset: number): number {
         if (byteOffset >= 0 && byteOffset + 2 <= this._dataLength) {
             return this._dataView.getUint16(byteOffset, true);
         }
@@ -253,7 +253,7 @@ export class SerializeData {
 
                 if (byteOffset % 2 === 0) {
                     arr = new Uint16Array(this._arrayBuffer, byteOffset, strLength);
-                    // @ts-expect-error
+                    // @ts-expect-error Use String.fromCharCode.apply is faster
                     const ret = String.fromCharCode.apply(null, arr);
                     return ret;
                 } else {

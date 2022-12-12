@@ -2,9 +2,8 @@ import { legacyCC } from '../global-exports';
 import { assert } from './utils';
 import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
-import { getClassById } from '../utils/js-typed';
 import { js } from '../utils/js';
-import { reportMissingClass as defaultReportMissingClass } from '../data/report-missing-class';
+import { reportMissingClass as defaultReportMissingClass } from '../../serialization/report-missing-class';
 
 type NodeValuePrimitive = boolean | number | string | Record<string, unknown>;
 type NodeValueType = NodeValuePrimitive | NodeValuePrimitive[];
@@ -138,8 +137,8 @@ export type InputArchiveClassFinder = {
     onDereferenced?: (deserializedList: Array<Record<PropertyKey, unknown> | undefined>, id: number, object: Record<string, unknown> | unknown[], propName: string) => void;
 };
 export class JsonInputArchive implements IArchive {
-    private _currentNode : NodeValueType = {};
-    private _serializedData : Record<string, any>[] = [];
+    private _currentNode: NodeValueType = {};
+    private _serializedData: Record<string, any>[] = [];
     private _isRoot  = true;
     private _deserializedObjIdMap = new Map<number, ISerializable>();
     private _borrowDetails = false;
@@ -152,7 +151,7 @@ export class JsonInputArchive implements IArchive {
 
     }
 
-    public start (root: any | any[], details: Details | any, options?: IOptions | any) : unknown {
+    public start (root: any | any[], details: Details | any, options?: IOptions | any): unknown {
         this._serializedData = Array.isArray(root) ? root : [root];
         this._currentNode = this._serializedData[0];
         this._borrowDetails = !details;
@@ -208,15 +207,15 @@ export class JsonInputArchive implements IArchive {
         return createObject(klass) as ISerializable;
     }
 
-    public isRoot () : boolean {
+    public isRoot (): boolean {
         return this._isRoot;
     }
 
-    public anyValue (data: any, name: string) : any {
+    public anyValue (data: any, name: string): any {
         return this._serializeInternal(data, name);
     }
 
-    private _serializeInternal (obj: any, name: string) : any {
+    private _serializeInternal (obj: any, name: string): any {
         let data: any = this._currentNode[name];
         if (data === undefined) {
             return data;
@@ -242,55 +241,55 @@ export class JsonInputArchive implements IArchive {
         return data;
     }
 
-    public boolean (data: boolean, name: string) : boolean {
+    public boolean (data: boolean, name: string): boolean {
         return this._currentNode[name] as boolean;
     }
 
-    public int8 (data: number, name: string) : number {
+    public int8 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public int16 (data: number, name: string) : number {
+    public int16 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public int32 (data: number, name: string) : number {
+    public int32 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public int64 (data: number, name: string) : number {
+    public int64 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public uint8 (data: number, name: string) : number {
+    public uint8 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public uint16 (data: number, name: string) : number {
+    public uint16 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public uint32 (data: number, name: string) : number {
+    public uint32 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public uint64 (data: number, name: string) : number {
+    public uint64 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public float32 (data: number, name: string) : number {
+    public float32 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public float64 (data: number, name: string) : number {
+    public float64 (data: number, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    public str (data: string, name: string) : string {
+    public str (data: string, name: string): string {
         return this._currentNode[name] as string;
     }
 
-    public plainObj (data: any, name: string) : any {
+    public plainObj (data: any, name: string): any {
         this._isRoot = false;
 
         const parentNode = this._currentNode;
@@ -317,7 +316,7 @@ export class JsonInputArchive implements IArchive {
         return data;
     }
 
-    public serializableObj (data: ISerializable | null, name: string) : ISerializable | null {
+    public serializableObj (data: ISerializable | null, name: string): ISerializable | null {
         this._isRoot = false;
 
         const jsonData: any = this._currentNode[name];
@@ -399,7 +398,7 @@ export class JsonInputArchive implements IArchive {
         return ret;
     }
 
-    public booleanArray (data: boolean[], name: string) : boolean[] {
+    public booleanArray (data: boolean[], name: string): boolean[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -420,7 +419,7 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public int32Array (data: number[], name: string) : number[] {
+    public int32Array (data: number[], name: string): number[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -441,7 +440,7 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public serializeArrayInt64 (data: number[], name: string) : number[] {
+    public serializeArrayInt64 (data: number[], name: string): number[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -455,14 +454,14 @@ export class JsonInputArchive implements IArchive {
             arr = new Array(dataArrayLength);
         }
         for (let i = 0, len = arr.length; i < len; ++i) {
-            arr[i] = this.serializeInt64(arr[i], `${i}`);
+            arr[i] = this.int64(arr[i], `${i}`);
         }
 
         this._currentNode = parentNode;
         return arr;
     }
 
-    public float32Array (data: number[], name: string) : number[] {
+    public float32Array (data: number[], name: string): number[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -483,7 +482,7 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public float64Array (data: number[], name: string) : number[] {
+    public float64Array (data: number[], name: string): number[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -504,7 +503,7 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public strArray (data: string[], name: string) : string[] {
+    public strArray (data: string[], name: string): string[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -525,7 +524,7 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public plainObjArray (data: any[], name: string) : any[] {
+    public plainObjArray (data: any[], name: string): any[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -550,7 +549,7 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public serializableObjArray (data: (ISerializable | null)[] | null, name: string) : (ISerializable | null)[] | null {
+    public serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
@@ -576,19 +575,19 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public typedArray (data: any, name: string) : any {
+    public typedArray (data: any, name: string): any {
         throw new Error(`not implemented yet`);
     }
 
-    private serializeNull (name: string) : null {
+    private serializeNull (name: string): null {
         return null;
     }
 
-    private serializeNumber (data: boolean, name: string) : number {
+    private serializeNumber (data: boolean, name: string): number {
         return this._currentNode[name] as number;
     }
 
-    private serializeArray (data: any[], name: string) : any[] {
+    private serializeArray (data: any[], name: string): any[] {
         const parentNode = this._currentNode;
 
         this._currentNode = parentNode[name];
