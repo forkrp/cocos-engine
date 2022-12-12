@@ -83,7 +83,7 @@
 // Note: 
 //   %import "your_header_file.h" will not generate code for that header file
 //
-
+%import "serialization/ISerializable.h"
 %import "base/Macros.h"
 %import "base/RefCounted.h"
 %import "extensions/ExtensionExport.h"

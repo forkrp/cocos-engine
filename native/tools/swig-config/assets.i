@@ -51,6 +51,7 @@
 //
 %ignore cc::RefCounted;
 %ignore cc::Asset::createNode; //FIXME: swig needs to support std::function
+
 %ignore cc::IMemoryImageSource::data;
 %ignore cc::IMemoryImageSource::compressed;
 %ignore cc::SimpleTexture::uploadDataWithArrayBuffer;
@@ -62,6 +63,8 @@
 %ignore cc::EffectAsset::_techniques;
 %ignore cc::EffectAsset::_shaders;
 %ignore cc::EffectAsset::_combinations;
+
+%rename("$ignore", regextarget=1, fullname=1) ".*::virtual(?:OnBeforeS|OnAfterDes|S)*erialize$";
 
 // ----- Rename Section ------
 // Brief: Classes, methods or attributes needs to be renamed
@@ -183,6 +186,7 @@
 // Note: 
 //   %import "your_header_file.h" will not generate code for that header file
 //
+%import "serialization/ISerializable.h"
 %import "base/Macros.h"
 %import "base/RefCounted.h"
 %import "base/TypeDef.h"

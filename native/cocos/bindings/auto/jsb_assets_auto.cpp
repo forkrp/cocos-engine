@@ -2868,73 +2868,6 @@ static bool js_cc_Asset_validate(se::State& s)
 }
 SE_BIND_FUNC(js_cc_Asset_validate) 
 
-static bool js_cc_Asset_serialize(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::Asset *arg1 = (cc::Asset *) NULL ;
-    ccstd::any *arg2 = 0 ;
-    ccstd::any temp2 ;
-    ccstd::any result;
-    
-    if(argc != 1) {
-        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
-        return false;
-    }
-    arg1 = SE_THIS_OBJECT<cc::Asset>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments");
-    arg2 = &temp2;
-    
-    result = (arg1)->serialize((ccstd::any const &)*arg2);
-    
-    ok &= nativevalue_to_se(result, s.rval(), s.thisObject() /*ctx*/);
-    SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval());
-    
-    
-    
-    return true;
-}
-SE_BIND_FUNC(js_cc_Asset_serialize) 
-
-static bool js_cc_Asset_deserialize(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::Asset *arg1 = (cc::Asset *) NULL ;
-    ccstd::any *arg2 = 0 ;
-    ccstd::any *arg3 = 0 ;
-    ccstd::any temp2 ;
-    ccstd::any temp3 ;
-    
-    if(argc != 2) {
-        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
-        return false;
-    }
-    arg1 = SE_THIS_OBJECT<cc::Asset>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments");
-    arg2 = &temp2;
-    
-    
-    ok &= sevalue_to_native(args[1], &temp3, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments");
-    arg3 = &temp3;
-    
-    (arg1)->deserialize((ccstd::any const &)*arg2,(ccstd::any const &)*arg3);
-    
-    
-    return true;
-}
-SE_BIND_FUNC(js_cc_Asset_deserialize) 
-
 static bool js_cc_Asset__native_set(se::State& s)
 {
     CC_UNUSED bool ok = true;
@@ -3127,8 +3060,6 @@ bool js_register_cc_Asset(se::Object* obj) {
     cls->defineFunction("onLoaded", _SE(js_cc_Asset_onLoaded)); 
     cls->defineFunction("initDefault", _SE(js_cc_Asset_initDefault)); 
     cls->defineFunction("validate", _SE(js_cc_Asset_validate)); 
-    cls->defineFunction("serialize", _SE(js_cc_Asset_serialize)); 
-    cls->defineFunction("deserialize", _SE(js_cc_Asset_deserialize)); 
     
     
     

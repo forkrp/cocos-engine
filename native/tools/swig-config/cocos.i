@@ -47,6 +47,10 @@
 //  2. namespace is needed
 //
 %ignore cc::RefCounted;
+%ignore cc::ISerializable;
+
+%rename("$ignore", regextarget=1, fullname=1) "^cc::CCObject::[g|s]etScriptObject$";
+%rename("$ignore", regextarget=1, fullname=1) ".*::virtual(?:OnBeforeS|OnAfterDes|S)*erialize$";
 
 %rename("$ignore", regextarget=1, fullname=1) "cc::Vec2::.*[^2]$";
 %rename("$ignore", regextarget=1, fullname=1) "cc::Vec3::.*[^3]$";
@@ -177,6 +181,7 @@ namespace cc {
 // Note: 
 //   %import "your_header_file.h" will not generate code for that header file
 //
+%import "serialization/ISerializable.h"
 %import "base/Macros.h"
 %import "base/RefCounted.h"
 %import "base/memory/Memory.h"

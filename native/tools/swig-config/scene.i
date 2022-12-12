@@ -69,6 +69,7 @@ using namespace cc;
 //  2. namespace is needed
 //
 %ignore cc::RefCounted;
+%ignore cc::ISerializable;
 
 %ignore cc::scene::Pass::getBlocks;
 %ignore cc::scene::Pass::initPassFromTarget;
@@ -161,6 +162,8 @@ using namespace cc;
 %ignore cc::JointInfo;
 %ignore cc::BakedJointInfo;
 %ignore cc::ITemplateInfo;
+
+%rename("$ignore", regextarget=1, fullname=1) ".*::virtual(?:OnBeforeS|OnAfterDes|S)*erialize$";
 
 // ----- Rename Section ------
 // Brief: Classes, methods or attributes needs to be renamed
@@ -544,6 +547,7 @@ using namespace cc;
 // Note:
 //   %import "your_header_file.h" will not generate code for that header file
 //
+%import "serialization/ISerializable.h"
 %import "base/Macros.h"
 %import "base/RefCounted.h"
 %import "base/TypeDef.h"
