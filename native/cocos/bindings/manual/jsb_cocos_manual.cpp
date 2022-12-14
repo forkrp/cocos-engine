@@ -751,6 +751,150 @@ static bool register_platform(se::Object * /*obj*/) { // NOLINT(readability-iden
     return result;
 }
 
+namespace {
+
+//using NativeObjectCreateFunc = void* (*)();
+//using ScriptObjectCreateFunc = se::Object* (*)();
+//
+//std::unordered_map<const char*, NativeObjectCreateFunc> nativeObjectCreateMap = {
+//
+//};
+//
+//std::unordered_map<const char*, ScriptObjectCreateFunc> scriptObjectCreateMap = {
+//    { "MyClassA", []() { return new MyClassA(); } },
+//    { "MyClassB", []() { return new MyClassB(); } },
+//    { "MyAsset", []() { return new MyAsset(); } },
+//};
+
+ccstd::vector<ccstd::string> scriptObjectTypeList = {
+    "cc.SceneAsset",
+    "cc.Scene",
+    "cc.SceneGlobals",
+    "cc.AmbientInfo",
+    "cc.ShadowsInfo",
+    "cc.SkyboxInfo",
+    "cc.FogInfo",
+    "cc.OctreeInfo",
+    "cc.Node",
+};
+
+class MyObjectFactory : public cc::ObjectFactory {
+public:
+
+    virtual bool needCreateScriptObject(const char* type) override {
+//        if (0 == strcmp(type, "MyClassA")) {
+//            return true;
+//        }
+//
+//        if (0 == strcmp(type, "MyClassB")) {
+//            return true;
+//        }
+//
+//        if (0 == strcmp(type, "MyAsset")) {
+//            return true;
+//        }
+
+        return true;
+//        auto iter = std::find(scriptObjectTypeList.begin(), scriptObjectTypeList.end(), type);
+//        bool ret =  iter != scriptObjectTypeList.end();
+//        if (!ret) {
+//            if (memcmp(type, "cc.", 3) == 0) {
+//                CC_LOG_INFO("==> %s not found, create it from JS", type);
+//                ret = true;
+//            } else {
+//                CC_LOG_INFO("==> %s not found", type);
+//            }
+//        }
+//
+//        return ret;
+    }
+
+    virtual void* createNativeObject(const char* type) override {
+//        if (0 == strcmp(type, "MyClassA")) {
+//            return new MyClassA();
+//        }
+//
+//        if (0 == strcmp(type, "MyClassB")) {
+//            return new MyClassB();
+//        }
+//
+//        if (0 == strcmp(type, "MyAsset")) {
+//            return new MyAsset();
+//        }
+//
+        CC_LOG_INFO("==> createNativeObject, %s not found", type);
+        return nullptr;
+    }
+
+    se::Object* createScriptObject(const char* type) override {
+        se::Object* scriptObj{};
+        auto iter = std::find(scriptObjectTypeList.begin(), scriptObjectTypeList.end(), type);
+        if (iter != scriptObjectTypeList.end()) {
+            se::Value ctor;
+            if (memcmp(type, "cc.", 3) == 0) {
+                type += 3;
+            }
+
+            if (!__jsbObj->getProperty(type, &ctor)) {
+                return nullptr;
+            }
+            assert(ctor.isObject() && ctor.toObject()->isFunction());
+
+            scriptObj = se::Object::createObjectWithConstructor(ctor.toObject());
+        } else {
+            se::Value createObjFunc;
+            if (!__jsbObj->getProperty("createScriptObjectByType", &createObjFunc)) {
+                return nullptr;
+            }
+
+            assert(createObjFunc.isObject() && createObjFunc.toObject()->isFunction());
+            se::ValueArray args;
+            args.emplace_back(se::Value(type));
+            se::Value scriptVal;
+            createObjFunc.toObject()->call(args, nullptr, &scriptVal);
+            if (scriptVal.isObject()) {
+                scriptObj = scriptVal.toObject();
+                scriptObj->incRef();
+            }
+        }
+
+        return scriptObj;
+    }
+};
+
+MyObjectFactory myObjectFactory;
+
+}
+
+static bool JSB_JsonInputArchive_start(se::State& s) {
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+
+    if(argc < 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+
+    std::string jsonStr;
+    const auto &arg0 = args[0];
+    if (arg0.isString()) {
+        sevalue_to_native(args[0], &jsonStr);
+    } else if (arg0.isObject()) {
+        jsonStr = arg0.toObject()->stringifyToJSON();
+    } else {
+        SE_REPORT_ERROR("Error processing arguments");
+        return false;
+    }
+
+    s.rval() = arg1->start(jsonStr, &myObjectFactory);
+    return true;
+}
+SE_BIND_FUNC(JSB_JsonInputArchive_start)
+
 template <typename T>
 static bool bindAsExternalBuffer(se::State &s) {  // NOLINT
     auto *self = SE_THIS_OBJECT<T>(s);
@@ -802,6 +946,8 @@ bool register_all_cocos_manual(se::Object *obj) { // NOLINT(readability-identifi
     __jsb_cc_Mat3_proto->defineFunction("underlyingData", _SE(js_cc_Mat3_underlyingData));
     __jsb_cc_Mat4_proto->defineFunction("underlyingData", _SE(js_cc_Mat4_underlyingData));
     __jsb_cc_Quaternion_proto->defineFunction("underlyingData", _SE(js_cc_Quaternion_underlyingData));
+
+    __jsb_cc_JsonInputArchive_proto->defineFunction("start", _SE(JSB_JsonInputArchive_start));
 
     register_plist_parser(obj);
     register_sys_localStorage(obj);
