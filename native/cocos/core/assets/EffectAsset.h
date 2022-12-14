@@ -436,6 +436,7 @@ struct IPassStates {
         CC_SERIALIZE(blendState);
         CC_SERIALIZE(dynamicStates);
         CC_SERIALIZE(phase);
+        CC_SERIALIZE(pass);
     }
 };
 using PassOverrides = IPassStates;
