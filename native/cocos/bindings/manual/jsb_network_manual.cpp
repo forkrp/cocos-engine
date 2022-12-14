@@ -45,7 +45,7 @@ static bool js_network_Downloader_createDownloadFileTask(se::State &s) { // NOLI
         ok &= sevalue_to_native(args[1], &arg1);
         SE_PRECONDITION2(ok, false,
                          "js_network_Downloader_createDownloadFileTask : Error processing arguments");
-        std::shared_ptr<const cc::network::DownloadTask> result = cobj->createDownloadTask(
+        std::shared_ptr<cc::network::DownloadTask> result = cobj->createDownloadTask(
             arg0, arg1);
         ok &= nativevalue_to_se(result, s.rval());
         //ROOT downloader object
@@ -64,7 +64,7 @@ static bool js_network_Downloader_createDownloadFileTask(se::State &s) { // NOLI
         ok &= sevalue_to_native(args[2], &arg2);
         SE_PRECONDITION2(ok, false,
                          "js_network_Downloader_createDownloadFileTask : Error processing arguments");
-        std::shared_ptr<const cc::network::DownloadTask> result = cobj->createDownloadTask(
+        std::shared_ptr<cc::network::DownloadTask> result = cobj->createDownloadTask(
             arg0, arg1, arg2);
         ok &= nativevalue_to_se(result, s.rval());
         //ROOT downloader object
@@ -94,7 +94,7 @@ static bool js_network_Downloader_createDownloadTask(se::State &s) { // NOLINT(r
         ok &= sevalue_to_native(args[1], &arg1);
         SE_PRECONDITION2(ok, false,
                          "js_network_Downloader_createDownloadTask : Error processing arguments");
-        std::shared_ptr<const cc::network::DownloadTask> result = cobj->createDownloadTask(
+        std::shared_ptr<cc::network::DownloadTask> result = cobj->createDownloadTask(
             arg0, arg1);
         ok &= nativevalue_to_se(result, s.rval());
         //ROOT downloader object
@@ -113,7 +113,7 @@ static bool js_network_Downloader_createDownloadTask(se::State &s) { // NOLINT(r
         ok &= sevalue_to_native(args[2], &arg2);
         SE_PRECONDITION2(ok, false,
                          "js_network_Downloader_createDownloadTask : Error processing arguments");
-        std::shared_ptr<const cc::network::DownloadTask> result = cobj->createDownloadTask(
+        std::shared_ptr<cc::network::DownloadTask> result = cobj->createDownloadTask(
             arg0, arg1, arg2);
         ok &= nativevalue_to_se(result, s.rval());
         //ROOT downloader object
