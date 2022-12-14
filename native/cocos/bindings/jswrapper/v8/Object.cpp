@@ -199,7 +199,8 @@ Object *Object::createObjectWithConstructor(se::Object *constructor) {
     }
 
     v8::Local<v8::Object> jsobj = v8::Local<v8::Object>::Cast(jsVal.ToLocalChecked());
-    return Object::_createJSObject(nullptr, jsobj);
+    Object *ret = internal::getPrivate(__isolate, jsobj);
+    return ret != nullptr ? ret : Object::_createJSObject(nullptr, jsobj);
 }
 
 /* static */
