@@ -709,8 +709,8 @@ static bool js_cc_network_Downloader_abort(se::State& s)
     const auto& args = s.args();
     size_t argc = args.size();
     cc::network::Downloader *arg1 = (cc::network::Downloader *) NULL ;
-    std::shared_ptr< cc::network::DownloadTask const > *arg2 = 0 ;
-    std::shared_ptr< cc::network::DownloadTask const > temp2 ;
+    std::shared_ptr< cc::network::DownloadTask > *arg2 = 0 ;
+    std::shared_ptr< cc::network::DownloadTask > temp2 ;
     
     if(argc != 1) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
@@ -723,7 +723,7 @@ static bool js_cc_network_Downloader_abort(se::State& s)
     SE_PRECONDITION2(ok, false, "Error processing arguments");
     arg2 = &temp2;
     
-    (arg1)->abort((std::shared_ptr< cc::network::DownloadTask const > const &)*arg2);
+    (arg1)->abort((std::shared_ptr< cc::network::DownloadTask > const &)*arg2);
     
     
     return true;

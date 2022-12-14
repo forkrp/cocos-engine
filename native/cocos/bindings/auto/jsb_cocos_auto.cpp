@@ -6670,6 +6670,1064 @@ bool js_register_cc_DebugRenderer(se::Object* obj) {
 
 #endif // CC_USE_DEBUG_RENDERER
 
+se::Class* __jsb_cc_AssetDependInfo_class = nullptr;
+se::Object* __jsb_cc_AssetDependInfo_proto = nullptr;
+SE_DECLARE_FINALIZE_FUNC(js_delete_cc_AssetDependInfo) 
+
+static bool js_cc_AssetDependInfo_owner_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->owner, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_AssetDependInfo_owner_set) 
+
+static bool js_cc_AssetDependInfo_owner_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->owner, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(arg1->owner, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_AssetDependInfo_owner_get) 
+
+static bool js_cc_AssetDependInfo_propName_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->propName, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_AssetDependInfo_propName_set) 
+
+static bool js_cc_AssetDependInfo_propName_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->propName, s.rval(), s.thisObject() /*ctx*/);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(arg1->propName, s.thisObject(), s.rval());
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_AssetDependInfo_propName_get) 
+
+static bool js_cc_AssetDependInfo_uuid_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->uuid, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_AssetDependInfo_uuid_set) 
+
+static bool js_cc_AssetDependInfo_uuid_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->uuid, s.rval(), s.thisObject() /*ctx*/);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(arg1->uuid, s.thisObject(), s.rval());
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_AssetDependInfo_uuid_get) 
+
+static bool js_cc_AssetDependInfo_expectedType_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->expectedType, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_AssetDependInfo_expectedType_set) 
+
+static bool js_cc_AssetDependInfo_expectedType_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->expectedType, s.rval(), s.thisObject() /*ctx*/);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(arg1->expectedType, s.thisObject(), s.rval());
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_AssetDependInfo_expectedType_get) 
+
+static bool js_cc_AssetDependInfo_dereference(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::AssetDependInfo *arg1 = (cc::AssetDependInfo *) NULL ;
+    se::Object *arg2 = (se::Object *) NULL ;
+    ccstd::string *arg3 = 0 ;
+    ccstd::string temp3 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::AssetDependInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    ok &= sevalue_to_native(args[1], &temp3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = &temp3;
+    
+    (arg1)->dereference(arg2,(ccstd::string const &)*arg3);
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_AssetDependInfo_dereference) 
+
+static bool js_new_cc_AssetDependInfo(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    
+    cc::AssetDependInfo *result;
+    result = (cc::AssetDependInfo *)new cc::AssetDependInfo();
+    
+    
+    auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
+    s.thisObject()->setPrivateObject(ptr);
+    return true;
+}
+SE_BIND_CTOR(js_new_cc_AssetDependInfo, __jsb_cc_AssetDependInfo_class, js_delete_cc_AssetDependInfo)
+
+static bool js_delete_cc_AssetDependInfo(se::State& s)
+{
+    return true;
+}
+SE_BIND_FINALIZE_FUNC(js_delete_cc_AssetDependInfo) 
+
+template<>
+bool sevalue_to_native(const se::Value &from, cc::AssetDependInfo * to, se::Object *ctx)
+{
+    assert(from.isObject());
+    se::Object *json = from.toObject();
+    auto* data = reinterpret_cast<cc::AssetDependInfo*>(json->getPrivateData());
+    if (data) {
+        *to = *data;
+        return true;
+    }
+    se::Value field;
+    bool ok = true;
+    
+    json->getProperty("owner", &field, true);
+    if (!field.isNullOrUndefined()) {
+        ok &= sevalue_to_native(field, &(to->owner), ctx);
+    }
+    
+    
+    json->getProperty("propName", &field, true);
+    if (!field.isNullOrUndefined()) {
+        ok &= sevalue_to_native(field, &(to->propName), ctx);
+    }
+    
+    
+    json->getProperty("uuid", &field, true);
+    if (!field.isNullOrUndefined()) {
+        ok &= sevalue_to_native(field, &(to->uuid), ctx);
+    }
+    
+    
+    json->getProperty("expectedType", &field, true);
+    if (!field.isNullOrUndefined()) {
+        ok &= sevalue_to_native(field, &(to->expectedType), ctx);
+    }
+    
+    
+    return ok;
+}
+
+
+bool js_register_cc_AssetDependInfo(se::Object* obj) {
+    auto* cls = se::Class::create("AssetDependInfo", obj, nullptr, _SE(js_new_cc_AssetDependInfo)); 
+    
+    cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
+    cls->defineProperty("owner", _SE(js_cc_AssetDependInfo_owner_get), _SE(js_cc_AssetDependInfo_owner_set)); 
+    cls->defineProperty("propName", _SE(js_cc_AssetDependInfo_propName_get), _SE(js_cc_AssetDependInfo_propName_set)); 
+    cls->defineProperty("uuid", _SE(js_cc_AssetDependInfo_uuid_get), _SE(js_cc_AssetDependInfo_uuid_set)); 
+    cls->defineProperty("expectedType", _SE(js_cc_AssetDependInfo_expectedType_get), _SE(js_cc_AssetDependInfo_expectedType_set)); 
+    
+    cls->defineFunction("dereference", _SE(js_cc_AssetDependInfo_dereference)); 
+    
+    
+    
+    
+    cls->defineFinalizeFunction(_SE(js_delete_cc_AssetDependInfo));
+    
+    
+    cls->install();
+    JSBClassType::registerClass<cc::AssetDependInfo>(cls);
+    
+    __jsb_cc_AssetDependInfo_proto = cls->getProto();
+    __jsb_cc_AssetDependInfo_class = cls;
+    se::ScriptEngine::getInstance()->clearException();
+    return true;
+}
+
+
+se::Class* __jsb_cc_JsonInputArchive_class = nullptr;
+se::Object* __jsb_cc_JsonInputArchive_proto = nullptr;
+SE_DECLARE_FINALIZE_FUNC(js_delete_cc_JsonInputArchive) 
+
+static bool js_new_cc_JsonInputArchive(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    
+    cc::JsonInputArchive *result;
+    result = (cc::JsonInputArchive *)new cc::JsonInputArchive();
+    
+    
+    auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
+    s.thisObject()->setPrivateObject(ptr);
+    return true;
+}
+SE_BIND_CTOR(js_new_cc_JsonInputArchive, __jsb_cc_JsonInputArchive_class, js_delete_cc_JsonInputArchive)
+
+static bool js_delete_cc_JsonInputArchive(se::State& s)
+{
+    return true;
+}
+SE_BIND_FINALIZE_FUNC(js_delete_cc_JsonInputArchive) 
+
+static bool js_cc_JsonInputArchive_isReading(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    bool result;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (bool)((cc::JsonInputArchive const *)arg1)->isReading();
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_isReading) 
+
+static bool js_cc_JsonInputArchive_isWritting(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    bool result;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (bool)((cc::JsonInputArchive const *)arg1)->isWritting();
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_isWritting) 
+
+static bool js_cc_JsonInputArchive_isExporting(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    bool result;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (bool)((cc::JsonInputArchive const *)arg1)->isExporting();
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_isExporting) 
+
+static bool js_cc_JsonInputArchive_getDepends(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    std::vector< cc::AssetDependInfo > *result = 0 ;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (std::vector< cc::AssetDependInfo > *) &((cc::JsonInputArchive const *)arg1)->getDepends();
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_getDepends) 
+
+static bool js_cc_JsonInputArchive_boolean(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    bool *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    bool temp2 ;
+    ccstd::string temp3 ;
+    bool result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (bool)(arg1)->boolean(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_boolean) 
+
+static bool js_cc_JsonInputArchive_int8(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    int8_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int8_t temp2 ;
+    ccstd::string temp3 ;
+    int8_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int8(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_int8) 
+
+static bool js_cc_JsonInputArchive_int16(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    int16_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int16_t temp2 ;
+    ccstd::string temp3 ;
+    int16_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int16(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_int16) 
+
+static bool js_cc_JsonInputArchive_int32(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    int32_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int32_t temp2 ;
+    ccstd::string temp3 ;
+    int32_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int32(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_int32) 
+
+static bool js_cc_JsonInputArchive_int64(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    int64_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int64_t temp2 ;
+    ccstd::string temp3 ;
+    int64_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int64(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_int64) 
+
+static bool js_cc_JsonInputArchive_uint8(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    uint8_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint8_t temp2 ;
+    ccstd::string temp3 ;
+    uint8_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint8(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_uint8) 
+
+static bool js_cc_JsonInputArchive_uint16(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    uint16_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint16_t temp2 ;
+    ccstd::string temp3 ;
+    uint16_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint16(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_uint16) 
+
+static bool js_cc_JsonInputArchive_uint32(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    uint32_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint32_t temp2 ;
+    ccstd::string temp3 ;
+    uint32_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint32(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_uint32) 
+
+static bool js_cc_JsonInputArchive_uint64(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    uint64_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint64_t temp2 ;
+    ccstd::string temp3 ;
+    uint64_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint64(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_uint64) 
+
+static bool js_cc_JsonInputArchive_float32(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    float *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    float temp2 ;
+    ccstd::string temp3 ;
+    float result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (float)(arg1)->float32(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_float32) 
+
+static bool js_cc_JsonInputArchive_float64(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    double *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    double temp2 ;
+    ccstd::string temp3 ;
+    double result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (double)(arg1)->float64(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_float64) 
+
+static bool js_cc_JsonInputArchive_str(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    ccstd::string *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    ccstd::string temp2 ;
+    ccstd::string temp3 ;
+    ccstd::string *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (ccstd::string *) &(arg1)->str(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_str) 
+
+static bool js_cc_JsonInputArchive_anyValue(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->anyValue(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_anyValue) 
+
+static bool js_cc_JsonInputArchive_plainObj(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->plainObj(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_plainObj) 
+
+static bool js_cc_JsonInputArchive_arrayObj(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->arrayObj(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_arrayObj) 
+
+static bool js_cc_JsonInputArchive_serializableObj(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->serializableObj(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_serializableObj) 
+
+static bool js_cc_JsonInputArchive_serializableObjArray(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::JsonInputArchive *arg1 = (cc::JsonInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::JsonInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->serializableObjArray(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_JsonInputArchive_serializableObjArray) 
+
+bool js_register_cc_JsonInputArchive(se::Object* obj) {
+    auto* cls = se::Class::create("JsonInputArchive", obj, nullptr, _SE(js_new_cc_JsonInputArchive)); 
+    
+    cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
+    
+    cls->defineFunction("isReading", _SE(js_cc_JsonInputArchive_isReading)); 
+    cls->defineFunction("isWritting", _SE(js_cc_JsonInputArchive_isWritting)); 
+    cls->defineFunction("isExporting", _SE(js_cc_JsonInputArchive_isExporting)); 
+    cls->defineFunction("getDepends", _SE(js_cc_JsonInputArchive_getDepends)); 
+    cls->defineFunction("boolean", _SE(js_cc_JsonInputArchive_boolean)); 
+    cls->defineFunction("int8", _SE(js_cc_JsonInputArchive_int8)); 
+    cls->defineFunction("int16", _SE(js_cc_JsonInputArchive_int16)); 
+    cls->defineFunction("int32", _SE(js_cc_JsonInputArchive_int32)); 
+    cls->defineFunction("int64", _SE(js_cc_JsonInputArchive_int64)); 
+    cls->defineFunction("uint8", _SE(js_cc_JsonInputArchive_uint8)); 
+    cls->defineFunction("uint16", _SE(js_cc_JsonInputArchive_uint16)); 
+    cls->defineFunction("uint32", _SE(js_cc_JsonInputArchive_uint32)); 
+    cls->defineFunction("uint64", _SE(js_cc_JsonInputArchive_uint64)); 
+    cls->defineFunction("float32", _SE(js_cc_JsonInputArchive_float32)); 
+    cls->defineFunction("float64", _SE(js_cc_JsonInputArchive_float64)); 
+    cls->defineFunction("str", _SE(js_cc_JsonInputArchive_str)); 
+    cls->defineFunction("anyValue", _SE(js_cc_JsonInputArchive_anyValue)); 
+    cls->defineFunction("plainObj", _SE(js_cc_JsonInputArchive_plainObj)); 
+    cls->defineFunction("arrayObj", _SE(js_cc_JsonInputArchive_arrayObj)); 
+    cls->defineFunction("serializableObj", _SE(js_cc_JsonInputArchive_serializableObj)); 
+    cls->defineFunction("serializableObjArray", _SE(js_cc_JsonInputArchive_serializableObjArray)); 
+    
+    
+    
+    
+    cls->defineFinalizeFunction(_SE(js_delete_cc_JsonInputArchive));
+    
+    
+    cls->install();
+    JSBClassType::registerClass<cc::JsonInputArchive>(cls);
+    
+    __jsb_cc_JsonInputArchive_proto = cls->getProto();
+    __jsb_cc_JsonInputArchive_class = cls;
+    se::ScriptEngine::getInstance()->clearException();
+    return true;
+}
+
+
 
 
 bool register_all_engine(se::Object* obj) {
@@ -6708,6 +7766,8 @@ bool register_all_engine(se::Object* obj) {
 #if CC_USE_DEBUG_RENDERER
     js_register_cc_DebugRenderer(ns); 
 #endif // CC_USE_DEBUG_RENDERER
+    js_register_cc_AssetDependInfo(ns); 
+    js_register_cc_JsonInputArchive(ns); 
     
     /* Register global variables & global functions */
     

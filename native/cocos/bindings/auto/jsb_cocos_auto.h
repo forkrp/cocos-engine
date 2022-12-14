@@ -174,4 +174,18 @@ extern se::Object *__jsb_cc_DebugRenderer_proto; // NOLINT
 extern se::Class * __jsb_cc_DebugRenderer_class; // NOLINT
 
 #endif // CC_USE_DEBUG_RENDERER
+
+JSB_REGISTER_OBJECT_TYPE(cc::AssetDependInfo);
+extern se::Object *__jsb_cc_AssetDependInfo_proto; // NOLINT
+extern se::Class * __jsb_cc_AssetDependInfo_class; // NOLINT
+
+
+template<>
+bool sevalue_to_native(const se::Value &from, cc::AssetDependInfo * to, se::Object *ctx);
+
+
+JSB_REGISTER_OBJECT_TYPE(cc::JsonInputArchive);
+extern se::Object *__jsb_cc_JsonInputArchive_proto; // NOLINT
+extern se::Class * __jsb_cc_JsonInputArchive_class; // NOLINT
+
 // clang-format on
