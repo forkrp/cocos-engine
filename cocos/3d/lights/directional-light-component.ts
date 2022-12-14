@@ -91,7 +91,7 @@ export class DirectionalLight extends Light {
     protected _type = scene.LightType.DIRECTIONAL;
     protected _light: scene.DirectionalLight | null = null;
 
-    serialize (ar: IArchive) : void {
+    serialize (ar: IArchive): void {
         super.serialize(ar);
         this._illuminanceHDR = ar.float64(this._illuminanceHDR, '_illuminanceHDR');
         this._illuminanceHDR = ar.float64(this._illuminanceHDR, '_illuminance');
@@ -106,6 +106,9 @@ export class DirectionalLight extends Light {
         this._csmLevel = ar.uint8(this._csmLevel, '_csmLevel');
         this._csmLayerLambda = ar.float64(this._csmLayerLambda, '_csmLayerLambda');
         this._csmOptimizationMode = ar.uint8(this._csmOptimizationMode, '_csmOptimizationMode');
+        this._csmAdvancedOptions = ar.boolean(this._csmAdvancedOptions, '_csmAdvancedOptions');
+        this._csmLayersTransition = ar.boolean(this._csmLayersTransition, '_csmLayersTransition');
+        this._csmTransitionRange = ar.float32(this._csmTransitionRange, '_csmTransitionRange');
         this._shadowFixedArea = ar.boolean(this._shadowFixedArea, '_shadowFixedArea');
         this._shadowNear = ar.float64(this._shadowNear, '_shadowNear');
         this._shadowFar = ar.float64(this._shadowFar, '_shadowFar');

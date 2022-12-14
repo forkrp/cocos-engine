@@ -174,7 +174,7 @@ ExtraEventMethods.prototype.targetOff = function targetOff (typeOrTarget: any) {
 };
 
 if (!EDITOR && JSB) {
-    jsb.createScriptObjectByType = function(type: string) {
+    jsb.createScriptObjectByType = function (type: string) {
         const cls = js.getClassById(type);
         if (!cls) {
             return null;

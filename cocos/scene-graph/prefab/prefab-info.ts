@@ -5,7 +5,7 @@ import { Prefab } from './prefab';
 import { CCObject } from '../../core/data';
 import { Component } from '../component';
 import { Node } from '../node';
-import { IArchive, ISerializable } from '../../serialization';
+import { IArchive, ISerializable } from '../../core/serialization';
 
 function compareStringArray (array1: string[] | undefined, array2: string[] | undefined) {
     if (!array1 || !array2) {
@@ -221,12 +221,12 @@ export class PrefabInfo implements ISerializable {
     // the most top node of this prefab in the scene
     @serializable
     @type(Node)
-    public root: Node | null = null;
+    public root: Node | null | undefined = null;
 
     // reference to the prefab asset file.
     // In Editor, only asset._uuid is usable because asset will be changed.
     @serializable
-    public asset: Prefab | null = null;
+    public asset: Prefab | null | undefined = null;
 
     // prefabInfo's id,unique in the asset.
     @serializable
@@ -236,7 +236,7 @@ export class PrefabInfo implements ISerializable {
     // Instance of a prefabAsset
     @serializable
     @type(PrefabInstance)
-    public instance: PrefabInstance | null = null;
+    public instance: PrefabInstance | null | undefined = null;
 
     @serializable
     @type([TargetOverrideInfo])

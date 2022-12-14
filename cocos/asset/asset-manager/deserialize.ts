@@ -23,17 +23,17 @@
  THE SOFTWARE.
  */
 
-import { EDITOR } from 'internal:constants';
+import { EDITOR, JSB } from 'internal:constants';
 import { Asset } from '../assets/asset';
 import { MissingScript } from '../../misc/missing-script';
 import { deserialize, Details } from '../../serialization/deserialize';
 import { error, js } from '../../core';
-import { JsonInputArchive } from '../serialization';
+// import { JsonInputArchive } from '../../core/serialization';
 import { dependMap, nativeDependMap } from './depend-maps';
 import { decodeUuid } from './helper';
 
 const missingClass = EDITOR && EditorExtends.MissingReporter.classInstance;
-
+declare const jsb: any;
 export interface IDependProp {
     uuid: string;
     owner: any;
@@ -62,12 +62,20 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
 
     let asset: Asset;
     try {
-        if ((Array.isArray(json) && json[0].__type__ === 'cc.SceneAsset') || json.__type__ === 'cc.EffectAsset' || json.__type__ === 'cc.Material') {
-            const ar = new JsonInputArchive();
+        if (window.jsb && ((Array.isArray(json) && json[0].__type__ === 'cc.SceneAsset')
+         || json.__type__ === 'cc.EffectAsset' || json.__type__ === 'cc.Material')) {
+            tdInfo.init(); //FIXME(cjh): init here?
+            const ar = new jsb.JsonInputArchive();
             asset = ar.start(json, tdInfo, {
                 classFinder,
                 customEnv: options,
             }) as Asset;
+
+            const depends = ar.getDepends();
+            for (const depend of depends) {
+                console.log(`==> Depends, owner:${depend.owner}, propName: ${depend.propName}`);
+                tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
+            }
         } else {
             asset = deserialize(json, tdInfo, {
                 classFinder,
