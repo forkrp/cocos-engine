@@ -55,6 +55,7 @@ public:
 
     inline const std::vector<AssetDependInfo>& getDepends() const { return _depends; }
 
+#ifndef SWIGCOCOS
     template <class T>
     void serializePrimitiveData(T& data);
 
@@ -90,6 +91,7 @@ public:
 
     template <class T>
     void onFinishSerializeObject(T& data);
+#endif // SWIGCOCOS
 
     inline bool boolean(bool& data, const char* name) {
         serialize(data, name);
@@ -174,10 +176,10 @@ private:
     void doSerializeAny(se::Value& value);
 
     void serializeScriptObject(se::Object* obj);
-    void serializeScriptObjectByNativePtr(void* nativeObj);
+    void serializeScriptObjectByNativePtr(const void* nativeObj);
 
     void onAfterDeserializeScriptObject(se::Object* obj);
-    void onAfterDeserializeScriptObjectByNativePtr(void* nativeObj);
+    void onAfterDeserializeScriptObjectByNativePtr(const void* nativeObj);
 
     AssetDependInfo* checkAssetDependInfo();
     static void* seObjGetPrivateData(se::Object* obj);
@@ -193,7 +195,7 @@ private:
     };
 
     ccstd::unordered_map<int32_t, DeserializedInfo> _deserializedObjIdMap;
-    ccstd::vector<void*> _deserializedObjects;
+    ccstd::vector<const void*> _deserializedObjects;
 
     ccstd::vector<AssetDependInfo> _depends;
 
@@ -202,6 +204,8 @@ private:
 
     bool _isRoot{true};
 };
+
+#ifndef SWIGCOCOS
 
 template <>
 inline void JsonInputArchive::serializePrimitiveData(bool& data) {
@@ -543,7 +547,7 @@ inline void JsonInputArchive::onSerializingObjectPtr(T& data) {
     // Return directly since the object has already been deserialized.
     auto iter = std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), data);
     if (iter != _deserializedObjects.cend()) {
-        data = reinterpret_cast<data_type*>(*iter);
+        data = reinterpret_cast<data_type*>(const_cast<void*>(*iter));
         return;
     }
     _deserializedObjects.emplace_back(data);
@@ -665,5 +669,7 @@ inline T JsonInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject)
     //    static_assert(std::is_base_of<CCObject, T>::value, "Native object should be inherited from CCObject");
     return reinterpret_cast<T>(getOrCreateNativeObjectReturnVoidPtr(outScriptObject));
 }
+
+#endif // SWIGCOCOS
 
 } // namespace cc

@@ -489,8 +489,8 @@ void JsonInputArchive::serializeScriptObject(se::Object* obj) {
     }
 }
 
-void JsonInputArchive::serializeScriptObjectByNativePtr(void* nativeObj) {
-    auto iter = se::NativePtrToObjectMap::find(nativeObj);
+void JsonInputArchive::serializeScriptObjectByNativePtr(const void* nativeObj) {
+    auto iter = se::NativePtrToObjectMap::find(const_cast<void*>(nativeObj));
     if (iter != se::NativePtrToObjectMap::end()) {
         serializeScriptObject(iter->second);
     }
@@ -519,8 +519,8 @@ void JsonInputArchive::onAfterDeserializeScriptObject(se::Object* obj) {
     }
 }
 
-void JsonInputArchive::onAfterDeserializeScriptObjectByNativePtr(void* nativeObj) {
-    auto iter = se::NativePtrToObjectMap::find(nativeObj);
+void JsonInputArchive::onAfterDeserializeScriptObjectByNativePtr(const void* nativeObj) {
+    auto iter = se::NativePtrToObjectMap::find(const_cast<void*>(nativeObj));
     if (iter != se::NativePtrToObjectMap::end()) {
         onAfterDeserializeScriptObject(iter->second);
     }
