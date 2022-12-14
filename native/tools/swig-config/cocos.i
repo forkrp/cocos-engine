@@ -48,9 +48,14 @@
 //
 %ignore cc::RefCounted;
 %ignore cc::ISerializable;
+%ignore cc::IArchive;
 
 %rename("$ignore", regextarget=1, fullname=1) "^cc::CCObject::[g|s]etScriptObject$";
 %rename("$ignore", regextarget=1, fullname=1) ".*::virtual(?:OnBeforeS|OnAfterDes|S)*erialize$";
+%ignore cc::JsonInputArchive::start;
+%ignore cc::JsonInputArchive::setCurrentNode;
+%ignore cc::JsonInputArchive::getCurrentNode;
+%ignore cc::AssetDependInfo::dereferenceCb;
 
 %rename("$ignore", regextarget=1, fullname=1) "cc::Vec2::.*[^2]$";
 %rename("$ignore", regextarget=1, fullname=1) "cc::Vec3::.*[^3]$";
@@ -219,4 +224,7 @@ namespace cc {
 %include "platform/SAXParser.h"
 
 %include "profiler/DebugRenderer.h"
+
+%include "serialization/AssetDependInfo.h"
+%include "serialization/JsonInputArchive.h"
 

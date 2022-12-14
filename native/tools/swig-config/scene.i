@@ -115,7 +115,7 @@ using namespace cc;
 %ignore cc::Node::rotate;
 %ignore cc::Node::setUserData;
 %ignore cc::Node::getUserData;
-%ignore cc::Node::getChildren;
+
 %ignore cc::Node::rotateForJS;
 %ignore cc::Node::setScale;
 %ignore cc::Node::setRotation;
@@ -125,10 +125,7 @@ using namespace cc;
 %ignore cc::Node::setActiveInHierarchy;
 %ignore cc::Node::setActiveInHierarchyPtr;
 %ignore cc::Node::getUIProps;
-%ignore cc::Node::getPosition;
-%ignore cc::Node::getRotation;
-%ignore cc::Node::getScale;
-%ignore cc::Node::getEulerAngles;
+
 %ignore cc::Node::getForward;
 %ignore cc::Node::getUp;
 %ignore cc::Node::getRight;
@@ -186,6 +183,12 @@ using namespace cc;
 %rename(_updateSiblingIndex) cc::Node::updateSiblingIndex;
 %rename(_onPreDestroyBase) cc::Node::onPreDestroyBase;
 %rename(_onPreDestroy) cc::Node::onPreDestroy;
+
+%rename(_getChildren) cc::Node::getChildren;
+%rename(_getPositionForJS) cc::Node::getPosition;
+%rename(_getRotationForJS) cc::Node::getRotation;
+%rename(_getScaleForJS) cc::Node::getScale;
+%rename(_getEulerForJS) cc::Node::getEulerAngles;
 
 %rename(_enabled) cc::scene::FogInfo::_isEnabled;
 %rename(cpp_keyword_register) cc::ProgramLib::registerEffect;
