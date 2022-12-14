@@ -188,6 +188,12 @@ public:
     CC_DEPRECATED(3.7) static Object *getObjectWithPtr(void *ptr);
 
     /**
+     * @brief Stringify a JS object to a JSON string, like JSON.stringify(obj) in JS
+     * @return A JSON string.
+     */
+    std::string stringifyToJSON();
+
+    /**
      *  @brief Gets a property from an object.
      *  @param[in] name A utf-8 string containing the property's name.
      *  @param[out] value The property's value if object has the property, otherwise the undefined value.

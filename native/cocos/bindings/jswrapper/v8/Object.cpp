@@ -397,6 +397,18 @@ Object *Object::createJSONObject(const ccstd::string &jsonStr) {
     return Object::_createJSObject(nullptr, jsobj);
 }
 
+std::string Object::stringifyToJSON() {
+    v8::Local<v8::Object> localObj = _obj.handle(__isolate);
+    v8::MaybeLocal<v8::String> r = v8::JSON::Stringify(__isolate->GetCurrentContext(), localObj);
+    if (r.IsEmpty()) {
+        return "";
+    }
+    Value jsonStrVal;
+    internal::jsToSeValue(__isolate, r.ToLocalChecked(), &jsonStrVal);
+    CC_ASSERT_TRUE(jsonStrVal.isString());
+    return jsonStrVal.toString();
+}
+
 bool Object::init(Class *cls, v8::Local<v8::Object> obj) {
     _cls = cls;
 
