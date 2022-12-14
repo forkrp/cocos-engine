@@ -110,13 +110,13 @@ public:
                                                     uint32_t totalBytesReceived,
                                                     uint32_t totalBytesExpected)> &callback) { onTaskProgress = callback; };
 
-    std::shared_ptr<const DownloadTask> createDataTask(const ccstd::string &srcUrl, const ccstd::string &identifier = "");
+    std::shared_ptr<DownloadTask> createDataTask(const ccstd::string &srcUrl, const ccstd::string &identifier = "");
 
-    std::shared_ptr<const DownloadTask> createDownloadTask(const ccstd::string &srcUrl, const ccstd::string &storagePath, const ccstd::string &identifier = "");
+    std::shared_ptr<DownloadTask> createDownloadTask(const ccstd::string &srcUrl, const ccstd::string &storagePath, const ccstd::string &identifier = "");
 
-    std::shared_ptr<const DownloadTask> createDownloadTask(const ccstd::string &srcUrl, const ccstd::string &storagePath, const ccstd::unordered_map<ccstd::string, ccstd::string> &header, const ccstd::string &identifier = "");
+    std::shared_ptr<DownloadTask> createDownloadTask(const ccstd::string &srcUrl, const ccstd::string &storagePath, const ccstd::unordered_map<ccstd::string, ccstd::string> &header, const ccstd::string &identifier = "");
 
-    void abort(const std::shared_ptr<const DownloadTask> &task);
+    void abort(const std::shared_ptr<DownloadTask> &task);
 
 private:
     std::unique_ptr<IDownloaderImpl> _impl;

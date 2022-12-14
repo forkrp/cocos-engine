@@ -86,7 +86,7 @@ struct DownloadTaskAndroid : public IDownloadTask {
     }
 
     int id;
-    std::shared_ptr<const DownloadTask> task; // reference to DownloadTask, when task finish, release
+    std::shared_ptr<DownloadTask> task; // reference to DownloadTask, when task finish, release
 };
 
 DownloaderJava::DownloaderJava(const DownloaderHints &hints)
@@ -138,7 +138,7 @@ DownloaderJava::~DownloaderJava() {
     DLLOG("Destruct DownloaderJava: %p", this);
 }
 
-IDownloadTask *DownloaderJava::createCoTask(std::shared_ptr<const DownloadTask> &task) {
+IDownloadTask *DownloaderJava::createCoTask(std::shared_ptr<DownloadTask> &task) {
     auto *coTask = ccnew DownloadTaskAndroid;
     coTask->task = task;
 

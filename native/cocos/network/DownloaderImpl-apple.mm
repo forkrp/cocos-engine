@@ -37,14 +37,14 @@
 
 // this wrapper used to wrap C++ class DownloadTask into NSMutableDictionary
 @interface DownloadTaskWrapper : NSObject {
-    std::shared_ptr<const cc::network::DownloadTask> _task;
+    std::shared_ptr<cc::network::DownloadTask> _task;
     NSMutableArray *_dataArray;
 }
 // temp vars for dataTask: didReceivedData callback
 @property (nonatomic) uint32_t bytesReceived;
 @property (nonatomic) uint32_t totalBytesReceived;
 
-- (id)init:(std::shared_ptr<const cc::network::DownloadTask> &)t;
+- (id)init:(std::shared_ptr<cc::network::DownloadTask> &)t;
 - (const cc::network::DownloadTask *)get;
 - (void)addData:(NSData *)data;
 - (uint32_t)transferDataToBuffer:(void *)buffer lengthOfBuffer:(uint32_t)len;
@@ -61,8 +61,8 @@
 
 - (id)init:(const cc::network::DownloaderApple *)o hints:(const cc::network::DownloaderHints &)hints;
 - (const cc::network::DownloaderHints &)getHints;
-- (NSURLSessionDataTask *)createDataTask:(std::shared_ptr<const cc::network::DownloadTask> &)task;
-- (NSURLSessionDownloadTask *)createDownloadTask:(std::shared_ptr<const cc::network::DownloadTask> &)task;
+- (NSURLSessionDataTask *)createDataTask:(std::shared_ptr<cc::network::DownloadTask> &)task;
+- (NSURLSessionDownloadTask *)createDownloadTask:(std::shared_ptr<cc::network::DownloadTask> &)task;
 - (void)saveResumeData:(NSData *)resumeData forTaskStoragePath:(const ccstd::string &) path;
 - (void)abort:(NSURLSessionTask *)task;
 - (void)doDestroy;
@@ -100,7 +100,7 @@ DownloaderApple::~DownloaderApple() {
     [impl doDestroy];
     DLLOG("Destruct DownloaderApple %p", this);
 }
-IDownloadTask *DownloaderApple::createCoTask(std::shared_ptr<const DownloadTask> &task) {
+IDownloadTask *DownloaderApple::createCoTask(std::shared_ptr<DownloadTask> &task) {
     DownloadTaskApple *coTask = ccnew DownloadTaskApple();
     DeclareDownloaderImplVar;
     if (task->storagePath.length()) {
@@ -138,7 +138,7 @@ void DownloaderApple::abort(const std::unique_ptr<IDownloadTask> &task) {
 //  OC Classes Implementation
 @implementation DownloadTaskWrapper
 
-- (id)init:(std::shared_ptr<const cc::network::DownloadTask> &)t {
+- (id)init:(std::shared_ptr<cc::network::DownloadTask> &)t {
     DLLOG("Construct DonloadTaskWrapper %p", self);
     _dataArray = [NSMutableArray arrayWithCapacity:8];
     [_dataArray retain];
@@ -249,7 +249,7 @@ void DownloaderApple::abort(const std::unique_ptr<IDownloadTask> &task) {
     return _hints;
 }
 
-- (NSURLSessionDataTask *)createDataTask:(std::shared_ptr<const cc::network::DownloadTask> &)task {
+- (NSURLSessionDataTask *)createDataTask:(std::shared_ptr<cc::network::DownloadTask> &)task {
     const char *urlStr = task->requestURL.c_str();
     DLLOG("DownloaderAppleImpl createDataTask: %s", urlStr);
     NSURL *url = [NSURL URLWithString:[NSString stringWithUTF8String:urlStr]];
@@ -273,7 +273,7 @@ void DownloaderApple::abort(const std::unique_ptr<IDownloadTask> &task) {
     return ocTask;
 };
 
-- (NSURLSessionDownloadTask *)createDownloadTask:(std::shared_ptr<const cc::network::DownloadTask> &)task {
+- (NSURLSessionDownloadTask *)createDownloadTask:(std::shared_ptr<cc::network::DownloadTask> &)task {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     NSString *requesetURL = [NSString stringWithFormat:@"%s", task->requestURL.c_str()];
     [dict setObject:@"YES" forKey:requesetURL];

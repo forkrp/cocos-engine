@@ -108,9 +108,9 @@ Downloader::~Downloader() {
     DLLOG("Destruct Downloader %p", this);
 }
 
-std::shared_ptr<const DownloadTask> Downloader::createDataTask(const ccstd::string &srcUrl, const ccstd::string &identifier /* = ""*/) {
+std::shared_ptr<DownloadTask> Downloader::createDataTask(const ccstd::string &srcUrl, const ccstd::string &identifier /* = ""*/) {
     auto *iTask = ccnew DownloadTask();
-    std::shared_ptr<const DownloadTask> task(iTask);
+    std::shared_ptr<DownloadTask> task(iTask);
     do {
         iTask->requestURL = srcUrl;
         iTask->identifier = identifier;
@@ -127,12 +127,12 @@ std::shared_ptr<const DownloadTask> Downloader::createDataTask(const ccstd::stri
     return task;
 }
 
-std::shared_ptr<const DownloadTask> Downloader::createDownloadTask(const ccstd::string &srcUrl,
+std::shared_ptr<DownloadTask> Downloader::createDownloadTask(const ccstd::string &srcUrl,
                                                                    const ccstd::string &storagePath,
                                                                    const ccstd::unordered_map<ccstd::string, ccstd::string> &header,
                                                                    const ccstd::string &identifier /* = ""*/) {
     auto *iTask = ccnew DownloadTask();
-    std::shared_ptr<const DownloadTask> task(iTask);
+    std::shared_ptr<DownloadTask> task(iTask);
     do {
         iTask->requestURL = srcUrl;
         iTask->storagePath = storagePath;
@@ -150,14 +150,14 @@ std::shared_ptr<const DownloadTask> Downloader::createDownloadTask(const ccstd::
 
     return task;
 }
-std::shared_ptr<const DownloadTask> Downloader::createDownloadTask(const ccstd::string &srcUrl,
+std::shared_ptr<DownloadTask> Downloader::createDownloadTask(const ccstd::string &srcUrl,
                                                                    const ccstd::string &storagePath,
                                                                    const ccstd::string &identifier /* = ""*/) {
     const ccstd::unordered_map<ccstd::string, ccstd::string> emptyHeader;
     return createDownloadTask(srcUrl, storagePath, emptyHeader, identifier);
 }
 
-void Downloader::abort(const std::shared_ptr<const DownloadTask> &task) {
+void Downloader::abort(const std::shared_ptr<DownloadTask> &task) {
     _impl->abort(task->_coTask);
 }
 //ccstd::string Downloader::getFileNameFromUrl(const ccstd::string& srcUrl)

@@ -222,7 +222,7 @@ private:
 int DownloadTaskCURL::_sSerialId;
 ccstd::set<ccstd::string> DownloadTaskCURL::_sStoragePathSet;
 
-typedef std::pair<std::shared_ptr<const DownloadTask>, DownloadTaskCURL *> TaskWrapper;
+typedef std::pair<std::shared_ptr<DownloadTask>, DownloadTaskCURL *> TaskWrapper;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Implementation DownloaderCURL::Impl
@@ -241,7 +241,7 @@ public:
         DLLOG("Destruct DownloaderCURL::Impl %p %d", this, _thread.joinable());
     }
 
-    void addTask(std::shared_ptr<const DownloadTask> task, DownloadTaskCURL *coTask) {
+    void addTask(std::shared_ptr<DownloadTask> task, DownloadTaskCURL *coTask) {
         if (DownloadTask::ERROR_NO_ERROR == coTask->_errCode) {
             std::lock_guard<std::mutex> lock(_requestMutex);
             _requestQueue.push_back(make_pair(task, coTask));
@@ -668,7 +668,7 @@ DownloaderCURL::~DownloaderCURL() {
     DLLOG("Destruct DownloaderCURL %p", this);
 }
 
-IDownloadTask *DownloaderCURL::createCoTask(std::shared_ptr<const DownloadTask> &task) {
+IDownloadTask *DownloaderCURL::createCoTask(std::shared_ptr<DownloadTask> &task) {
     DownloadTaskCURL *coTask = ccnew DownloadTaskCURL;
     coTask->init(task->storagePath, _impl->hints.tempFileNameSuffix);
 

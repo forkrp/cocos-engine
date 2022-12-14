@@ -42,7 +42,7 @@ public:
     explicit DownloaderCURL(const DownloaderHints &hints);
     ~DownloaderCURL() override;
 
-    IDownloadTask *createCoTask(std::shared_ptr<const DownloadTask> &task) override;
+    IDownloadTask *createCoTask(std::shared_ptr<DownloadTask> &task) override;
 
     void abort(const std::unique_ptr<IDownloadTask> &task) override;
 
