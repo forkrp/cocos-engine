@@ -187,12 +187,10 @@ struct SerializationTrait<MaterialPropertyVariant> : SerializationTraitBase<Mate
             MaterialPropertyList v;
             SerializationTrait<MaterialPropertyList>::serialize(v, ar);
             data = std::move(v);
-        } else if (currentNode->IsObject()) {
+        } else {
             MaterialProperty v;
             SerializationTrait<MaterialProperty>::serialize(v, ar);
             data = std::move(v);
-        } else {
-            assert(false);
         }
     }
 
