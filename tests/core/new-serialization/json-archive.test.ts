@@ -2,7 +2,7 @@ import fs from 'fs';
 
 import { MeshRenderer, DirectionalLight } from '../../../cocos/3d';
 import { SceneAsset } from '../../../cocos/asset/assets/scene-asset';
-import { JsonInputArchive, JsonOutputArchive } from '../../../cocos/core';
+import { BinaryInputArchive, BinaryOutputArchive, JsonInputArchive, JsonOutputArchive } from '../../../cocos/core';
 import { Details } from '../../../cocos/serialization';
 
 describe(`new-serialization`, () => {
@@ -28,6 +28,20 @@ describe(`new-serialization`, () => {
             const serializedJsonObj2 = outputAr.dump();
 
             console.log(JSON.stringify(serializedJsonObj2, null, 2));
+
+            const binOurAr = new BinaryOutputArchive();
+            binOurAr.start(sceneAsset);
+            const binBuffer: ArrayBuffer = binOurAr.dump();
+
+            const binInAr = new BinaryInputArchive();
+            const sceneFromBin: SceneAsset = binInAr.start(binBuffer, details) as SceneAsset;
+
+            console.log('---------------------------------------')
+            const outputAr2 = new JsonOutputArchive();
+            outputAr2.start(sceneFromBin);
+            const serializedJsonObj3 = outputAr.dump();
+
+            console.log(JSON.stringify(serializedJsonObj3, null, 2));
 
             console.log('ok');
         });

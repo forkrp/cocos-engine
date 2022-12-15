@@ -42,7 +42,7 @@ type StringIndexBnotNumber = Bnot<StringIndex, number>;
  * @zh 包含反序列化时的一些信息。
  * @class Details
  */
-export class Details {
+class Details {
     /**
      * @en
      * the object list whose field needs to load asset by uuid
@@ -125,11 +125,11 @@ Details.pool.get = function get () {
     return this._get() || new Details();
 };
 
-export type InputArchiveDetails = Details;
+type InputArchiveDetails = Details;
 
-export type InputArchiveClassConstructor = new () => unknown;
+type InputArchiveClassConstructor = new () => unknown;
 
-export type InputArchiveClassFinder = {
+type InputArchiveClassFinder = {
     // eslint-disable-next-line max-len
     (id: string, serialized: unknown, owner?: unknown[] | Record<PropertyKey, unknown>, propName?: string): InputArchiveClassConstructor | undefined;
 

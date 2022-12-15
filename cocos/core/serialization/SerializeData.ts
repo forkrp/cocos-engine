@@ -1,9 +1,11 @@
 import { assert } from './utils';
+import { stringToUTF8Array, UTF8ArrayToString, lengthBytesUTF8 } from './string-utils';
 
 const DEFAULT_ARRAY_BUFFER_SIZE = 1024;
 
 export class SerializeData {
     private _arrayBuffer: ArrayBuffer;
+    private _bufferView: Uint8Array;
     private _dataLength = 0;
     private _dataView: DataView;
 
@@ -14,7 +16,7 @@ export class SerializeData {
             this._arrayBuffer = arrayBuffer;
             this._dataLength = this._arrayBuffer.byteLength;
         }
-
+        this._bufferView = new Uint8Array(this._arrayBuffer);
         this._dataView = new DataView(this._arrayBuffer);
     }
 
@@ -144,19 +146,32 @@ export class SerializeData {
     //     this._dataLength = Math.max(byteOffset + 8, this._dataLength);
     // }
 
-    setString (byteOffset: number, value: string) {
+    // setString (byteOffset: number, value: string) {
+    //     if (byteOffset < 0) {
+    //         return;
+    //     }
+
+    //     const strBytes = value.length * 2;
+    //     this.expandBufferIfNeeded(byteOffset, 4 + strBytes); //TODO: Save UTF16 temporarily, needs to change to save utf-8
+
+    //     this.setUint32(byteOffset, strBytes);
+    //     byteOffset += 4;
+    //     for (let i = 0, len = value.length; i < len; ++i) {
+    //         this.setUint16(byteOffset + i * 2, value.charCodeAt(i));
+    //     }
+    // }
+
+    setString (byteOffset: number, value: string): number {
         if (byteOffset < 0) {
-            return;
+            return 0;
         }
 
-        const strBytes = value.length * 2;
-        this.expandBufferIfNeeded(byteOffset, 4 + strBytes); //TODO: Save UTF16 temporarily, needs to change to save utf-8
-
-        this.setUint32(byteOffset, strBytes);
-        byteOffset += 4;
-        for (let i = 0, len = value.length; i < len; ++i) {
-            this.setUint16(byteOffset + i * 2, value.charCodeAt(i));
-        }
+        const maxBytesToWrite = value.length * 4 + 1;
+        this.expandBufferIfNeeded(byteOffset, 4 + maxBytesToWrite);
+        const bytesWritten = stringToUTF8Array(value, this._bufferView, byteOffset + 4, maxBytesToWrite);
+        this.setUint32(byteOffset, bytesWritten);
+        this._dataLength = Math.max(byteOffset + bytesWritten + 4 + 1, this._dataLength);
+        return bytesWritten + 4 + 1; // 1 is null-terminated
     }
 
     // get
@@ -241,37 +256,46 @@ export class SerializeData {
     //     throw new RangeError(`Offset ${byteOffset} is outside the bounds of the DataView (${this._dataLength})`);
     // }
 
-    getString (byteOffset: number) {
-        if (byteOffset >= 0 && byteOffset + 4 <= this._dataLength) {
-            const strBytes = this.getUint32(byteOffset);
-            const strLength = strBytes / 2;
+    // getString (byteOffset: number) {
+    //     if (byteOffset >= 0 && byteOffset + 4 <= this._dataLength) {
+    //         const strBytes = this.getUint32(byteOffset);
+    //         const strLength = strBytes / 2;
 
-            byteOffset += 4;
-            const dstOffset = byteOffset + strBytes;
-            if (dstOffset <= this._dataLength) {
-                let arr: number[] | Uint16Array;
+    //         byteOffset += 4;
+    //         const dstOffset = byteOffset + strBytes;
+    //         if (dstOffset <= this._dataLength) {
+    //             let arr: number[] | Uint16Array;
 
-                if (byteOffset % 2 === 0) {
-                    arr = new Uint16Array(this._arrayBuffer, byteOffset, strLength);
-                    // @ts-expect-error Use String.fromCharCode.apply is faster
-                    const ret = String.fromCharCode.apply(null, arr);
-                    return ret;
-                } else {
-                    arr = new Array(strLength);
-                    for (let i = 0; i < strLength; ++i) {
-                        arr[i] = this.getUint16(byteOffset + i * 2);
-                    }
-                    const ret = String.fromCharCode.apply(null, arr);
-                    return ret;
+    //             if (byteOffset % 2 === 0) {
+    //                 arr = new Uint16Array(this._arrayBuffer, byteOffset, strLength);
+    //                 // @ts-expect-error Use String.fromCharCode.apply is faster
+    //                 const ret = String.fromCharCode.apply(null, arr);
+    //                 return ret;
+    //             } else {
+    //                 arr = new Array(strLength);
+    //                 for (let i = 0; i < strLength; ++i) {
+    //                     arr[i] = this.getUint16(byteOffset + i * 2);
+    //                 }
+    //                 const ret = String.fromCharCode.apply(null, arr);
+    //                 return ret;
 
-                    // let ret = '';
-                    // for (let i = 0; i < strLength; ++i) {
-                    //     ret += String.fromCharCode(this.getUint16(byteOffset + i * 2));
-                    // }
-                    // return ret;
-                }
-            }
-            throw new RangeError(`Offset ${dstOffset}  is outside the bounds of the DataView (${this._dataLength})`);
+    //                 // let ret = '';
+    //                 // for (let i = 0; i < strLength; ++i) {
+    //                 //     ret += String.fromCharCode(this.getUint16(byteOffset + i * 2));
+    //                 // }
+    //                 // return ret;
+    //             }
+    //         }
+    //         throw new RangeError(`Offset ${dstOffset}  is outside the bounds of the DataView (${this._dataLength})`);
+    //     }
+
+    //     throw new RangeError(`Offset ${byteOffset}  is outside the bounds of the DataView (${this._dataLength})`);
+    // }
+
+    getString (byteOffset: number, strBytes: number): string {
+        if (byteOffset >= 0 && byteOffset <= this._dataLength) {
+            const str = UTF8ArrayToString(this._bufferView, byteOffset, strBytes);
+            return str;
         }
 
         throw new RangeError(`Offset ${byteOffset}  is outside the bounds of the DataView (${this._dataLength})`);

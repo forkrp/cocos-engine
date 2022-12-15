@@ -1,9 +1,141 @@
+import { legacyCC } from '../global-exports';
+import { js } from '../utils/js';
 import { getClassId } from '../utils/js-typed';
 import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
 import { IObjectFactory } from './ObjectFactory';
 import { SerializeData } from './SerializeData';
 import { SerializeTag, assert } from './utils';
+import { reportMissingClass as defaultReportMissingClass } from '../../serialization/report-missing-class';
+
+type Ctor<T> = new() => T;
+// eslint-disable-next-line @typescript-eslint/ban-types
+type AnyCtor = Ctor<Object>;
+
+interface ICustomHandler {
+    result: Details,
+    customEnv: any,
+}
+
+type ReportMissingClass = (id: string) => void;
+interface IOptions extends Partial<ICustomHandler> {
+    classFinder?: InputArchiveClassFinder;
+    reportMissingClass: ReportMissingClass;
+    _version?: number;
+}
+
+type StringIndex = number;
+type InstanceIndex = number;
+
+// Includes Bitwise NOT value.
+// Both T and U have non-negative integer ranges.
+// When the value >= 0 represents T
+// When the value is < 0, it represents ~U. Use ~x to extract the value of U.
+type Bnot<T extends number, U extends number> = T|U;
+
+// When the value >= 0 represents the string index
+// When the value is < 0, it just represents non-negative integer. Use ~x to extract the value.
+type StringIndexBnotNumber = Bnot<StringIndex, number>;
+
+/**
+ * @en Contains information collected during deserialization
+ * @zh 包含反序列化时的一些信息。
+ * @class Details
+ */
+class Details {
+    /**
+     * @en
+     * the object list whose field needs to load asset by uuid
+     * @zh
+     * 对象列表，其中每个对象有属性需要通过 uuid 进行资源加载
+     */
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    uuidObjList: (object|InstanceIndex)[] | null = null;
+    /**
+     * @en
+     * the corresponding field name which referenced to the asset
+     * @zh
+     * 引用着资源的字段名称
+     */
+    uuidPropList: (StringIndexBnotNumber|string)[] | null = null;
+    /**
+     * @en
+     * list of the depends assets' uuid
+     * @zh
+     * 依赖资源的 uuid 列表
+     */
+    uuidList: (StringIndex|string)[] | null = null;
+
+    /**
+     * @en
+     * list of the depends assets' type
+     * @zh
+     * 依赖的资源类型列表
+     */
+    uuidTypeList: string[] = [];
+
+    static pool = new js.Pool((obj: Details) => {
+        obj.reset();
+    }, 5);
+
+    /**
+     * @method init
+     * @param {Object} data
+     */
+    init () {
+        // could be used by deserialize-dynamic
+        const used = this.uuidList;
+        if (!used) {
+            this.uuidList = [];
+            this.uuidObjList = [];
+            this.uuidPropList = [];
+            this.uuidTypeList = [];
+        }
+    }
+
+    /**
+     * @method reset
+     */
+    reset () {
+        // could be reused by deserialize-dynamic
+        const used = this.uuidList;
+        if (used) {
+            this.uuidList!.length = 0;
+            this.uuidObjList!.length = 0;
+            this.uuidPropList!.length = 0;
+            this.uuidTypeList.length = 0;
+        }
+    }
+
+    /**
+     * @method push
+     * @param {Object} obj
+     * @param {String} propName
+     * @param {String} uuid
+     */
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    push (obj: object, propName: string, uuid: string, type?: string) {
+        this.uuidObjList!.push(obj);
+        this.uuidPropList!.push(propName);
+        this.uuidList!.push(uuid);
+        this.uuidTypeList.push(type || '');
+    }
+}
+Details.pool.get = function get () {
+    return this._get() || new Details();
+};
+
+type InputArchiveDetails = Details;
+
+type InputArchiveClassConstructor = new () => unknown;
+
+type InputArchiveClassFinder = {
+    // eslint-disable-next-line max-len
+    (id: string, serialized: unknown, owner?: unknown[] | Record<PropertyKey, unknown>, propName?: string): InputArchiveClassConstructor | undefined;
+
+    // eslint-disable-next-line max-len
+    onDereferenced?: (deserializedList: Array<Record<PropertyKey, unknown> | undefined>, id: number, object: Record<string, unknown> | unknown[], propName: string) => void;
+};
 
 class DeserializeNode {
     private _data: SerializeData;
@@ -112,29 +244,85 @@ class DeserializeNode {
     }
 
     popString (): string {
-        const ret = this._data.getString(this._offset);
-        this._offset += (ret.length * 2 + 4); // 4 is how many bytes of string.
+        const strBytes = this._data.getUint32(this._offset);
+        const ret = this._data.getString(this._offset + 4, strBytes);
+        this._offset += (strBytes + 1 + 4); // 4 is how many bytes of string.
         return ret;
     }
 }
 
 export class BinaryInputArchive implements IArchive {
-    private _currentNode: DeserializeNode;
+    private _currentNode!: DeserializeNode;
     private _isRoot = true;
-    private _objectFactory: IObjectFactory;
+    // private _objectFactory: IObjectFactory;
     // offset -> ISerializable
     private _deserializedObjIdMap = new Map<number, ISerializable>();
 
-    constructor (buffer: ArrayBuffer, objectFactory: IObjectFactory) {
-        this._currentNode = new DeserializeNode('root', buffer);
-        this._objectFactory = objectFactory;
+    private _borrowDetails = false;
+    private _details: Details | null = null;
+    private _classFinder: InputArchiveClassFinder | null = null;
+    private _reportMissingClass: ReportMissingClass | null = null;
+    private _currentOwner: any | null = null;
+
+    constructor () {
+
     }
 
-    public start (obj: ISerializable): void {
-        this.str(getClassId(obj), '__type__');
-        if (obj.serialize) {
-            obj.serialize(this);
+    public start (buffer: ArrayBuffer, details: Details | any, options?: IOptions | any): unknown {
+        this._currentNode = new DeserializeNode('root', buffer);
+        // this._objectFactory = objectFactory;
+
+        this._borrowDetails = !details;
+        this._details = details || Details.pool.get();
+
+        options = options || {};
+        this._classFinder = options.classFinder || js.getClassById;
+        const createAssetRefs = options.createAssetRefs;//cjh || sys.platform === Platform.EDITOR_CORE;
+        const customEnv = options.customEnv;
+        const ignoreEditorOnly = options.ignoreEditorOnly;
+        this._reportMissingClass = options.reportMissingClass ?? defaultReportMissingClass;
+
+        details.init();
+
+        legacyCC.game._isCloning = true;
+
+        const type: string = this._currentNode.popString();
+        const obj = this.createObjectByType(type);
+        if (obj) {
+            this._currentOwner = obj;
+            if (obj.serialize) {
+                obj.serialize(this);
+            } else if (obj.serializeInlineData) {
+                obj.serializeInlineData(this);
+            }
         }
+
+        legacyCC.game._isCloning = false;
+
+        return obj;
+    }
+
+    private createObjectByType (type: string): ISerializable | null {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        const klass = this._classFinder!(type, undefined, undefined, undefined);
+        if (!klass) {
+            const notReported = this._classFinder === js.getClassById;
+            if (notReported) {
+                this._reportMissingClass!(type);
+            }
+            return null;
+        }
+
+        const createObject = (constructor: InputArchiveClassConstructor) => {
+            // eslint-disable-next-line new-cap
+            const obj = new constructor() as Record<string, unknown>;
+            // if (globalIndex >= 0) {
+            // this._deserializedList[globalIndex] = obj;
+            // }
+            return obj;
+        };
+
+        return createObject(klass) as ISerializable;
     }
 
     public anyValue (data: any, name: string): any {
@@ -261,15 +449,14 @@ export class BinaryInputArchive implements IArchive {
             currentNode.offset = targetOffset;
         }
 
-        const type = currentNode.popString();
-
         if (!isInline) {
             currentNode.offset = targetOffset;
         } else {
             currentNode.offset = currentOffset;
         }
 
-        const ret = data || this._objectFactory.createObject(type) as ISerializable;
+        const type = currentNode.popString();
+        const ret = data || this.createObjectByType(type) as ISerializable;
         assert(ret);
 
         if (!isInline) {

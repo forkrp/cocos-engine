@@ -57,6 +57,10 @@ public:
 
 #ifndef SWIGCOCOS
     template <class T>
+    void serialize(T& data, const char* name);
+
+    // Used internally.
+    template <class T>
     void serializePrimitiveData(T& data);
 
     template <class T>
@@ -75,20 +79,10 @@ public:
     void serializeStdTuple(std::tuple<Args...>& data);
 
     template <class T>
-    void serialize(T& data, const char* name);
+    void serializeObject(T& data);
 
     template <class T>
     void onSerializingObjectPtr(T& data);
-
-    template <class T>
-    void onSerializingObjectIntrusivePtr(T& data);
-
-    template <class T>
-    void onSerializingObjectRef(T& data);
-
-    template <class T>
-    bool onStartSerializeObject(T& data);
-
     template <class T>
     void onFinishSerializeObject(T& data);
 #endif // SWIGCOCOS
@@ -163,6 +157,12 @@ public:
     inline void setCurrentNode(const rapidjson::Value* node) { _currentNode = node; }
 
 private:
+    template <class T>
+    void onSerializingObjectRef(T& data);
+
+    template <class T>
+    bool onStartSerializeObject(T& data);
+
     const rapidjson::Value* getValue(const rapidjson::Value* parentNode, const char* key);
     static const char* findTypeInJsonObject(const rapidjson::Value& jsonObj);
 
@@ -539,6 +539,22 @@ inline void JsonInputArchive::serialize(T& data, const char* name) {
     _currentNode = parentNode;
     _currentKey = oldKey;
     _currentOwner = oldOwner;
+}
+
+template <class T>
+inline void JsonInputArchive::serializeObject(T& data) {
+    if (!onStartSerializeObject(data)) {
+        return;
+    }
+
+    if constexpr (IsPtr<std::decay_t<T>>::value) {
+        if (data != nullptr) {
+            onSerializingObjectPtr(data);
+        }
+    } else {
+        onSerializingObjectRef(data);
+    }
+    onFinishSerializeObject(data);
 }
 
 template <class T>

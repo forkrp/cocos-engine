@@ -55,21 +55,25 @@ class SerializeNode {
     pushBoolean (value: boolean) {
         this._data.setUint8(this._offset, value ? 1 : 0);
         this._offset += 1;
+        assert(this._offset === this._data.byteLength);
     }
 
     pushInt8 (value: number) {
         this._data.setInt8(this._offset, value);
         this._offset += 1;
+        assert(this._offset === this._data.byteLength);
     }
 
     pushInt16 (value: number) {
         this._data.setInt16(this._offset, value);
         this._offset += 2;
+        assert(this._offset === this._data.byteLength);
     }
 
     pushInt32 (value: number) {
         this._data.setInt32(this._offset, value);
         this._offset += 4;
+        assert(this._offset === this._data.byteLength);
     }
 
     // pushInt64(value: number) {
@@ -80,16 +84,19 @@ class SerializeNode {
     pushUint8 (value: number) {
         this._data.setUint8(this._offset, value);
         this._offset += 1;
+        assert(this._offset === this._data.byteLength);
     }
 
     pushUint16 (value: number) {
         this._data.setUint16(this._offset, value);
         this._offset += 2;
+        assert(this._offset === this._data.byteLength);
     }
 
     pushUint32 (value: number) {
         this._data.setUint32(this._offset, value);
         this._offset += 4;
+        assert(this._offset === this._data.byteLength);
     }
 
     // pushUint64(value: number) {
@@ -100,16 +107,19 @@ class SerializeNode {
     pushFloat32 (value: number) {
         this._data.setFloat32(this._offset, value);
         this._offset += 4;
+        assert(this._offset === this._data.byteLength);
     }
 
     pushFloat64 (value: number) {
         this._data.setFloat64(this._offset, value);
         this._offset += 8;
+        assert(this._offset === this._data.byteLength);
     }
 
     pushString (value: string) {
-        this._data.setString(this._offset, value);
-        this._offset += (value.length * 2 + 4); // 4 is how many bytes of string.
+        const bytesWritten = this._data.setString(this._offset, value);
+        this._offset += bytesWritten;
+        assert(this._offset === this._data.byteLength);
     }
 }
 
@@ -201,7 +211,7 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    // public serializeUint64(data: number, name: string): number {
+    // public int64(data: number, name: string): number {
     //     this._currentNode.pushUint64(data);
     //     return data;
     // }
@@ -422,6 +432,8 @@ export class BinaryOutputArchive implements IArchive {
 
         if (!needInline) {
             assert(this._currentNode.offset === 0);
+            // Write __type__ above all.
+            this.str(getClassId(data), '__type__');
             if (data.serialize) {
                 data.serialize(this);
                 dependTargetInfo.__id__ = this._serializedList.length;
@@ -439,6 +451,8 @@ export class BinaryOutputArchive implements IArchive {
             // totalOffset += this._currentNode.offset;
             // console.log(`write inline data: ${totalOffset}`);
             this._currentNode.pushBoolean(true);
+            // Write __type__ above all.
+            this.str(getClassId(data), '__type__');
             data.serializeInlineData(this);
         }
 
