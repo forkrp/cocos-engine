@@ -73,9 +73,10 @@ void SerializationData::expandBufferIfNeeded(uint32_t byteOffset, uint32_t dataB
 }
 
 void SerializationData::set(uint32_t byteOffset, const std::string_view& value) {
+    assert(false);
 }
 
-std::string_view SerializationData::get(uint32_t byteOffset) {
+std::string_view SerializationData::getStringView(uint32_t byteOffset) {
     return "";
 }
 

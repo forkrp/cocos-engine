@@ -53,7 +53,7 @@ public:
 
     se::Value start(const std::string& rootJsonStr, ObjectFactory* factory);
 
-    inline const std::vector<AssetDependInfo>& getDepends() const { return _depends; }
+    inline const std::vector<AssetDependInfo>& getDepends() const { return _depends; } // TODO(cjh): Should not handle dependency in Serialization module
 
 #ifndef SWIGCOCOS
     template <class T>
@@ -199,7 +199,7 @@ private:
 
     ccstd::vector<AssetDependInfo> _depends;
 
-    se::Object* _currentOwner{nullptr};
+    se::Object* _currentOwner{nullptr}; // TODO(cjh): Remove _currentOwner after dependency code is removed from JsonInputArchive
     const char* _currentKey{nullptr};
 
     bool _isRoot{true};

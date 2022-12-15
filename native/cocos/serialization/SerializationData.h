@@ -68,7 +68,7 @@ public:
         }
     }
 
-    std::string_view get(uint32_t byteOffset);
+    std::string_view getStringView(uint32_t byteOffset);
 
 private:
     uint8_t* _buffer{nullptr};

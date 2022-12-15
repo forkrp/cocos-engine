@@ -24,3 +24,51 @@
  ****************************************************************************/
 
 #include "BinaryInputArchive.h"
+
+
+namespace cc {
+
+// TODO(cjh): Move to utils
+enum SerializeTag {
+    TAG_NONE = 0,
+    TAG_NUMBER,
+    TAG_BOOLEAN,
+    TAG_STRING,
+    TAG_SERIALIZABLE_OBJECT,
+    TAG_MAP,
+    TAG_ARRAY
+};
+
+std::pair<uint32_t, uint32_t> DeserializeNode::popDependTargetInfo() {
+    int32_t offset = popInt32();
+    int32_t size = popInt32();
+    return {offset, size};
+}
+
+int32_t DeserializeNode::popArrayTagAndReturnLength() {
+    int8_t tag = popInt8();
+    assert(tag == SerializeTag::TAG_ARRAY);
+    return popInt32();
+}
+
+void DeserializeNode::popMapTag() {
+    int8_t tag = popInt8();
+    assert(tag == SerializeTag::TAG_MAP);
+}
+
+// BinaryInputArchive
+
+BinaryInputArchive::BinaryInputArchive() {
+    
+}
+
+
+BinaryInputArchive::~BinaryInputArchive() {
+
+}
+
+se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory* factory) {
+    return {};
+}
+
+}

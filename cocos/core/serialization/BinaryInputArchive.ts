@@ -243,7 +243,7 @@ export class BinaryInputArchive implements IArchive {
         if (!isInline) {
             targetOffset = currentNode.popInt32();
 
-            if (targetOffset == -1) {
+            if (targetOffset === -1) {
                 // console.log(`return null, currentOffset: ${currentOffset-1}`);
                 currentNode.popInt32();
                 return null;
@@ -310,9 +310,9 @@ export class BinaryInputArchive implements IArchive {
     int32Array (data: number[], name: string): number[] {
         throw new Error('Method not implemented.');
     }
-    // serializeArrayInt64(data: number[], name: string): number[] {
-    //     throw new Error("Method not implemented.");
-    // }
+    int64Array (data: number[], name: string): number[] {
+        throw new Error('Method not implemented.');
+    }
     float32Array (data: number[], name: string): number[] {
         throw new Error('Method not implemented.');
     }
