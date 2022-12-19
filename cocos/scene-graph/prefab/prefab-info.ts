@@ -221,12 +221,12 @@ export class PrefabInfo implements ISerializable {
     // the most top node of this prefab in the scene
     @serializable
     @type(Node)
-    public root: Node | null | undefined = null;
+    public root?: Node;
 
     // reference to the prefab asset file.
     // In Editor, only asset._uuid is usable because asset will be changed.
     @serializable
-    public asset: Prefab | null | undefined = null;
+    public asset?: Prefab;
 
     // prefabInfo's id,unique in the asset.
     @serializable
@@ -236,16 +236,16 @@ export class PrefabInfo implements ISerializable {
     // Instance of a prefabAsset
     @serializable
     @type(PrefabInstance)
-    public instance: PrefabInstance | null | undefined = null;
+    public instance?: PrefabInstance;
 
     @serializable
     @type([TargetOverrideInfo])
-    public targetOverrides: TargetOverrideInfo[] = [];
+    public targetOverrides?: TargetOverrideInfo[];
 
     // record outMost prefabInstance nodes in descendants
     // collected when saving sceneAsset or prefabAsset
     @serializable
-    public nestedPrefabInstanceRoots: Node[] = [];
+    public nestedPrefabInstanceRoots?: Node[];
 
     public serialize (ar: IArchive): void {
         this.root = ar.serializableObj(this.root, 'root');
