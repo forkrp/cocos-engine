@@ -420,7 +420,7 @@ export class BinaryInputArchive implements IArchive {
         return data;
     }
 
-    serializableObj (data: ISerializable | null, name: string): ISerializable | null {
+    serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
         this._isRoot = false;
 
         const currentNode = this._currentNode;
@@ -513,7 +513,7 @@ export class BinaryInputArchive implements IArchive {
         throw new Error('Method not implemented.');
     }
 
-    serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
+    serializableObjArray (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
         let length = 0;
         const currentNode = this._currentNode;
         const tag = currentNode.popInt8();

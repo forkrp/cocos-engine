@@ -316,7 +316,7 @@ export class JsonInputArchive implements IArchive {
         return data;
     }
 
-    public serializableObj (data: ISerializable | null, name: string): ISerializable | null {
+    public serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
         this._isRoot = false;
 
         const jsonData: any = this._currentNode[name];
@@ -549,10 +549,14 @@ export class JsonInputArchive implements IArchive {
         return arr;
     }
 
-    public serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
+    public serializableObjArray (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
         const parentNode = this._currentNode;
+        const currentNode = parentNode[name];
+        if (currentNode === undefined) {
+            return undefined;
+        }
 
-        this._currentNode = parentNode[name];
+        this._currentNode = currentNode;
 
         let arr: (ISerializable | null)[];
         const dataArrayLength = (this._currentNode as any[]).length;

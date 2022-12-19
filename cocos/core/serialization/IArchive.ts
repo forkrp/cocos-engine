@@ -29,7 +29,7 @@ export interface IArchive {
     str(data: string, name: string): string;
 
     plainObj(data: any, name: string): any;
-    serializableObj(data: ISerializable | null | undefined, name: string): any;
+    serializableObj(data: ISerializable | undefined | null, name: string): any;
 
     booleanArray(data: boolean[], name: string): boolean[];
     //TODO: add int8, int16, uint8, uint16, uint32, uint64 support

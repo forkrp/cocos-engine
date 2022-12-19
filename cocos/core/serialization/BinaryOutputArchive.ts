@@ -260,7 +260,7 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    public serializableObj (data: ISerializable | null, name: string): ISerializable | null {
+    public serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
         if (data == null) {
             this._currentNode.pushDependTargetInfo();
             return data;
@@ -370,7 +370,7 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    public serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
+    public serializableObjArray (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
         if (data == null) {
             this._currentNode.pushInt8(SerializeTag.TAG_NULL);
             this.serializeNull(name);
