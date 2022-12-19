@@ -1,7 +1,7 @@
-/****************************************************************************
- Copyright (c) 2021 Xiamen Yaji Software Co., Ltd.
+/*
+ Copyright (c) 2022 Xiamen Yaji Software Co., Ltd.
 
- http://www.cocos.com
+ https://www.cocos.com/
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated engine source code (the "Software"), a limited,
@@ -21,41 +21,11 @@
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
-****************************************************************************/
-
-#pragma once
-
-#include <cstdint>
-#include "base/std/container/string.h"
-#include "base/std/optional.h"
-#include "core/TypedArray.h"
-namespace cc {
-
-using MeshWeightsType = ccstd::vector<float>;
-
-/**
- * @en Array views for index buffer
- * @zh 允许存储索引的数组视图
  */
-using IBArray = ccstd::variant<ccstd::monostate, Uint8Array, Uint16Array, Uint32Array>;
 
-template <typename T>
-T getIBArrayValue(const IBArray &arr, uint32_t idx) {
-#define IBARRAY_GET_VALUE(type)               \
-    do {                                      \
-        auto *p = ccstd::get_if<type>(&arr);  \
-        if (p != nullptr) {                   \
-            return static_cast<T>((*p)[idx]); \
-        }                                     \
-    } while (false)
+declare var nr:any;
 
-    IBARRAY_GET_VALUE(Uint16Array);
-    IBARRAY_GET_VALUE(Uint32Array);
-    IBARRAY_GET_VALUE(Uint8Array);
-
-#undef IBARRAY_GET_VALUE
-
-    return 0;
-}
-
-} // namespace cc
+import { legacyCC } from '../core/global-exports';
+export const RenderStage = nr.RenderStage;
+// Do not delete, for the class detection of editor
+legacyCC.RenderStage = RenderStage;

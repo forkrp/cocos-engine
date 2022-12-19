@@ -44,9 +44,7 @@ namespace cc {
 
 using IPropertyHandleInfo = std::tuple<ccstd::string, uint32_t, gfx::Type>;
 
-using IPropertyValueInternal = ccstd::variant<ccstd::vector<float>, ccstd::string>;
-using IPropertyValue = ccstd::optional<IPropertyValueInternal>;
-
+using IPropertyValue = ccstd::variant<ccstd::monostate, ccstd::vector<float>, ccstd::string>;
 
 using IPropertyEditorValueType = ccstd::variant<ccstd::monostate, ccstd::string, bool, float, ccstd::vector<float>>;
 using IPropertyEditorInfo = ccstd::unordered_map<ccstd::string, IPropertyEditorValueType>;
@@ -55,7 +53,7 @@ struct IPropertyInfo {
     int32_t type{0};                                 // auto-extracted from shader
     ccstd::optional<IPropertyHandleInfo> handleInfo; // auto-generated from 'target'
     ccstd::optional<ccstd::hash_t> samplerHash;      // auto-generated from 'sampler'
-    IPropertyValue value;                            // default value
+    ccstd::optional<IPropertyValue> value;           // default value
     ccstd::optional<bool> linear;                    // whether to convert the input to linear space first before applying
     IPropertyEditorInfo editor; // NOTE: used only by editor.
 
@@ -800,7 +798,7 @@ struct IShaderInfo {
     }
 };
 
-using IPreCompileInfoValueType = ccstd::variant<ccstd::vector<bool>, ccstd::vector<int32_t>, ccstd::vector<ccstd::string>>;
+using IPreCompileInfoValueType = ccstd::variant<ccstd::monostate, ccstd::vector<bool>, ccstd::vector<int32_t>, ccstd::vector<ccstd::string>>;
 using IPreCompileInfo = ccstd::unordered_map<ccstd::string, IPreCompileInfoValueType>;
 
 class EffectAsset final : public Asset {

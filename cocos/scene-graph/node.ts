@@ -1939,9 +1939,7 @@ export class Node extends CCObject implements ISchedulable, CustomSerializable {
             hasChangedFlags = cur.hasChangedFlags;
             if (cur.isValid && (cur._dirtyFlags & hasChangedFlags & dirtyBit) !== dirtyBit) {
                 cur._dirtyFlags |= dirtyBit;
-
                 cur.hasChangedFlags = hasChangedFlags | dirtyBit;
-                cur.emit(NodeEventType.ANCESTOR_TRANSFORM_CHANGED, dirtyBit);
 
                 children = cur._children;
                 l = children.length;

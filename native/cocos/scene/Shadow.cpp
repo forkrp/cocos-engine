@@ -88,7 +88,7 @@ void ShadowsInfo::setPlaneDirection(const Vec3 &val) {
 void ShadowsInfo::setPlaneHeight(float val) {
     _distance = val;
     if (_resource != nullptr) {
-        _resource->setDistance(-val);
+        _resource->setDistance(val);
     }
 }
 

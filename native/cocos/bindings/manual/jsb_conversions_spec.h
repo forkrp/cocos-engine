@@ -172,12 +172,21 @@ bool sevalue_to_native(const se::Value &from, ccstd::vector<cc::MacroRecord> *to
 bool sevalue_to_native(const se::Value &from, cc::MaterialProperty *to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
 
 inline bool sevalue_to_native(const se::Value &from, ccstd::string *to, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
-    if (!from.isNullOrUndefined()) {
+    if (from.isString()) {
         *to = from.toString();
-    } else {
-        to->clear();
+        return true;
     }
-    return true;
+    if (from.isNumber()) {
+        *to = from.toStringForce();
+        return true;
+    }
+    if (from.isNullOrUndefined()) {
+        to->clear();
+        return true;
+    }
+    CC_ABORTF("parmater '%s' is not a string nor number", from.toStringForce().c_str());
+    to->clear();
+    return false;
 }
 
 inline bool seval_to_std_string(const se::Value &from, ccstd::string *ret) { // NOLINT(readability-identifier-naming)
@@ -260,10 +269,10 @@ inline bool sevalue_to_native(const se::Value &from, double *to, se::Object * /*
     return true;
 }
 
-//inline bool sevalue_to_native(const se::Value & /*from*/, void * /*to*/, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
-//    CC_ABORT();                                                                               // void not supported
-//    return false;
-//}
+// inline bool sevalue_to_native(const se::Value & /*from*/, void * /*to*/, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
+//     CC_ABORT();                                                                               // void not supported
+//     return false;
+// }
 
 bool sevalue_to_native(const se::Value &from, cc::Data *to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
 
@@ -365,12 +374,11 @@ bool sevalue_to_native(const se::Value &from, cc::ValueMap *to, se::Object * /*c
 bool sevalue_to_native(const se::Value &from, ccstd::vector<bool> *to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
 
 bool sevalue_to_native(const se::Value &from, ccstd::vector<unsigned char> *to, se::Object * /*ctx*/);                   // NOLINT(readability-identifier-naming)
-bool sevalue_to_native(const se::Value &from, ccstd::variant<ccstd::vector<float>, ccstd::string> *to, se::Object *ctx); // NOLINT(readability-identifier-naming)
+bool sevalue_to_native(const se::Value &from, cc::IPropertyValue *to, se::Object *ctx); // NOLINT(readability-identifier-naming)
 inline bool sevalue_to_native(const se::Value & /*from*/, ccstd::monostate * /*to*/, se::Object * /*ctx*/) {             // NOLINT(readability-identifier-naming)
     // nothing todo
     return false;
 }
-bool sevalue_to_native(const se::Value &from, ccstd::variant<ccstd::monostate, cc::MaterialProperty, cc::MaterialPropertyList> *to, se::Object *ctx); // NOLINT(readability-identifier-naming)
 
 //////////////////////// scene info
 bool sevalue_to_native(const se::Value &from, cc::scene::FogInfo *, se::Object * /*ctx*/);     // NOLINT(readability-identifier-naming)
@@ -555,7 +563,7 @@ bool nativevalue_to_se(const cc::Rect &from, se::Value &to, se::Object *ctx); //
 bool nativevalue_to_se(const cc::gfx::Rect &from, se::Value &to, se::Object *ctx); // NOLINT(readability-identifier-naming)
 
 bool nativevalue_to_se(const cc::gfx::FormatInfo *from, se::Value &to, se::Object *ctx); // NOLINT(readability-identifier-naming
-    
+
 bool nativevalue_to_se(const cc::network::DownloadTask &from, se::Value &to, se::Object * /*ctx*/); // NOLINT(readability-identifier-naming)
 
 inline bool nativevalue_to_se(const ccstd::monostate & /*from*/, se::Value &to, se::Object * /*ctx*/) { // NOLINT(readability-identifier-naming)
