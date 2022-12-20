@@ -133,6 +133,7 @@ export function parse (task: Task) {
                         out.config = config;
                         out.uuid = info.uuid;
                         out.info = info;
+                        out.ext = item.ext || info?.extension || '.json';
                     }
                     break;
                 case '__isNative__':

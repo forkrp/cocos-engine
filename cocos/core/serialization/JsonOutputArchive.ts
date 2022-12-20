@@ -1,3 +1,4 @@
+import { legacyCC } from '../global-exports';
 import { getClassId } from '../utils/js-typed';
 import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
@@ -106,6 +107,10 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public uuid (data: string): string {
+        return this.str(data, '__uuid__');
+    }
+
     public plainObj (data: any, name: string): any {
         const parentNode = this._currentNode;
 
@@ -123,6 +128,9 @@ export class JsonOutputArchive implements IArchive {
     }
 
     public serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
+        const isRoot = this._isRoot;
+        this._isRoot = false;
+
         if (data == null) {
             this._currentNode[name] = null;
             return data;
@@ -136,7 +144,7 @@ export class JsonOutputArchive implements IArchive {
         } else {
             this._currentNode = {};
             const objId: IObjectId = { __id__: -1 };
-            const inlineData = checkISerializableObjectNeedInline(data, this._isRoot);
+            const inlineData = checkISerializableObjectNeedInline(data, isRoot);
             if (!inlineData) {
                 parentNode[name] = objId;
                 this._serializedObjIdMap.set(data, objId);
@@ -316,7 +324,12 @@ export class JsonOutputArchive implements IArchive {
             data.onBeforeSerialize();
         }
 
-        this._currentNode.__type__ = getClassId(data.constructor, false);
+        // eslint-disable-next-line no-prototype-builtins
+        if (inlineData && data.hasOwnProperty('_uuid')) {
+            this._currentNode.__expectedType__ = getClassId(data.constructor, false);
+        } else {
+            this._currentNode.__type__ = getClassId(data.constructor, false);
+        }
 
         if (!inlineData) {
             if (data.serialize) {
@@ -387,3 +400,5 @@ export class JsonOutputArchive implements IArchive {
         return this._isExporting;
     }
 }
+
+legacyCC.JsonOutputArchive = JsonOutputArchive;

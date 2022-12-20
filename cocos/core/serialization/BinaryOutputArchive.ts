@@ -3,6 +3,7 @@ import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
 import { SerializeData } from './SerializeData';
 import { getClassId } from '../utils/js-typed';
+import { legacyCC } from '../global-exports';
 
 interface IDependOwnerInfo {
     owner: SerializeNode,
@@ -142,6 +143,8 @@ function createDependTargetInfo (): IDependTargetInfo {
 }
 
 export class BinaryOutputArchive implements IArchive {
+    private _uuidStack: number[] = []; // value is -1 means no uuid dependence
+    private _uuidCount = 0;
     private _currentNode: SerializeNode;
     private _serializedList: SerializeNode[] = [];
     private _serializedObjIdMap = new Map<any, IDependTargetInfo>();
@@ -152,6 +155,9 @@ export class BinaryOutputArchive implements IArchive {
 
     constructor (isExporting = false) {
         this._isExporting = isExporting;
+        const uuidListNode = new SerializeNode('uuidList', null);
+        uuidListNode.pushUint32(0);
+        this._serializedList.push(uuidListNode);
         this._currentNode = new SerializeNode('root', null);
         this._serializedList.push(this._currentNode);
     }
@@ -231,6 +237,13 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public uuid (data: string): string {
+        this._uuidStack[this._uuidStack.length - 1] = this._uuidCount;
+        ++this._uuidCount;
+        this._serializedList[0].pushString(data);
+        return data;
+    }
+
     private getObjectElementCount (obj: any) {
         let count = 0;
         for (const key in obj) {
@@ -261,6 +274,9 @@ export class BinaryOutputArchive implements IArchive {
     }
 
     public serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
+        const isRoot = this._isRoot;
+        this._isRoot = false;
+
         if (data == null) {
             this._currentNode.pushDependTargetInfo();
             return data;
@@ -279,7 +295,7 @@ export class BinaryOutputArchive implements IArchive {
             parentNode.pushDependTargetInfo();
         } else {
             let dependTargetInfo;
-            const needInline = checkISerializableObjectNeedInline(data, this._isRoot);
+            const needInline = checkISerializableObjectNeedInline(data, isRoot);
             if (!needInline) {
                 this._currentNode = new SerializeNode(name, parentNode);
                 dependTargetInfo = createDependTargetInfo();
@@ -450,10 +466,24 @@ export class BinaryOutputArchive implements IArchive {
             // }
             // totalOffset += this._currentNode.offset;
             // console.log(`write inline data: ${totalOffset}`);
+            const currentUuidIndex = this._uuidStack.length;
+            this._uuidStack.push(-1);
             this._currentNode.pushBoolean(true);
+            const uuidOffset = this._currentNode.offset;
+            this._currentNode.pushInt32(-1); // no uuid by default
+            this._currentNode.pushUint32(0); // advance
+
             // Write __type__ above all.
             this.str(getClassId(data), '__type__');
             data.serializeInlineData(this);
+
+            const uuidIndex = this._uuidStack[currentUuidIndex];
+            if (uuidIndex !== -1) {
+                this._currentNode.data.setInt32(uuidOffset, uuidIndex);
+                const advance = this._currentNode.offset - uuidOffset - 8;
+                this._currentNode.data.setUint32(uuidOffset + 4, advance);
+            }
+            this._uuidStack.pop();
         }
 
         this._currentNode = oldCurrentNode;
@@ -494,7 +524,13 @@ export class BinaryOutputArchive implements IArchive {
         }
     }
 
-    dump () {
+    dump (): ArrayBuffer {
+        //TODO(cjh): add .cccb header info
+
+        // handle uuid list
+        const uuidNode = this._serializedList[0];
+        uuidNode.data.setUint32(0, this._uuidCount);
+        //
         let totalBytes = 0;
         this._serializedList.forEach((e: SerializeNode, index: number) => {
             assert(e.offset === e.data.byteLength);
@@ -546,3 +582,5 @@ export class BinaryOutputArchive implements IArchive {
         return this._isExporting;
     }
 }
+
+legacyCC.BinaryOutArchive = BinaryOutputArchive;

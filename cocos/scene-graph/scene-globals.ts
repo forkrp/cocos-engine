@@ -48,7 +48,7 @@ const _col = new Color();
 const _qt = new Quat();
 
 // Normalize HDR color
-const normalizeHDRColor = (color : Vec4) => {
+const normalizeHDRColor = (color: Vec4) => {
     const intensity = 1.0 / Math.max(Math.max(Math.max(color.x, color.y), color.z), 0.0001);
     if (intensity < 1.0) {
         color.x *= intensity;
@@ -66,7 +66,7 @@ export class AmbientInfo implements ISerializable {
      * @en The sky color in HDR mode
      * @zh HDR 模式下的天空光照色
      */
-    get skyColorHDR () : Readonly<Vec4> {
+    get skyColorHDR (): Readonly<Vec4> {
         return this._skyColorHDR;
     }
 
@@ -74,7 +74,7 @@ export class AmbientInfo implements ISerializable {
      * @en The ground color in HDR mode
      * @zh HDR 模式下的地面光照色
      */
-    get groundAlbedoHDR () : Readonly<Vec4> {
+    get groundAlbedoHDR (): Readonly<Vec4> {
         return this._groundAlbedoHDR;
     }
 
@@ -90,7 +90,7 @@ export class AmbientInfo implements ISerializable {
      * @en The sky color in LDR mode
      * @zh LDR 模式下的天空光照色
      */
-    get skyColorLDR () : Readonly<Vec4> {
+    get skyColorLDR (): Readonly<Vec4> {
         return this._skyColorLDR;
     }
 
@@ -98,7 +98,7 @@ export class AmbientInfo implements ISerializable {
      * @en The ground color in LDR mode
      * @zh LDR 模式下的地面光照色
      */
-    get groundAlbedoLDR () : Readonly<Vec4> {
+    get groundAlbedoLDR (): Readonly<Vec4> {
         return this._groundAlbedoLDR;
     }
 
@@ -446,7 +446,7 @@ export class SkyboxInfo implements ISerializable {
      * @en The optional diffusion convolution map used in tandem with IBL
      * @zh 使用的漫反射卷积图
      */
-    @visible(function (this : SkyboxInfo) {
+    @visible(function (this: SkyboxInfo) {
         if (this.useIBL && this.applyDiffuseMap) {
             return true;
         }
@@ -456,7 +456,7 @@ export class SkyboxInfo implements ISerializable {
     @readOnly
     @type(TextureCube)
     @displayOrder(100)
-    set diffuseMap (val : TextureCube | null) {
+    set diffuseMap (val: TextureCube | null) {
         const isHDR = (legacyCC.director.root as Root).pipeline.pipelineSceneData.isHDR;
         if (isHDR) {
             this._diffuseMapHDR = val;
@@ -481,7 +481,7 @@ export class SkyboxInfo implements ISerializable {
      * @en Convolutional map using environmental reflections
      * @zh 使用环境反射卷积图
      */
-    @visible(function (this : SkyboxInfo) {
+    @visible(function (this: SkyboxInfo) {
         if (this._resource?.reflectionMap) {
             return true;
         }
@@ -658,7 +658,7 @@ export class FogInfo implements ISerializable {
         if (this._resource) { this._resource.fogColor = this._fogColor; }
     }
 
-    get fogColor () : Readonly<Color> {
+    get fogColor (): Readonly<Color> {
         return this._fogColor;
     }
 
@@ -889,7 +889,7 @@ export class ShadowsInfo implements ISerializable {
         this._shadowColor.set(val);
         if (this._resource) { this._resource.shadowColor = val; }
     }
-    get shadowColor () : Readonly<Color> {
+    get shadowColor (): Readonly<Color> {
         return this._shadowColor;
     }
 
@@ -903,7 +903,7 @@ export class ShadowsInfo implements ISerializable {
         Vec3.copy(this._normal, val);
         if (this._resource) { this._resource.normal = val; }
     }
-    get planeDirection () : Readonly<Vec3> {
+    get planeDirection (): Readonly<Vec3> {
         return this._normal;
     }
 
@@ -1124,7 +1124,7 @@ export interface ILightProbeNode {
  * @zh 光照探针配置
  */
 @ccclass('cc.LightProbeInfo')
-export class LightProbeInfo {
+export class LightProbeInfo implements ISerializable {
     /**
      * @en GI multiplier
      * @zh GI乘数
@@ -1290,6 +1290,17 @@ export class LightProbeInfo {
     protected _nodes: ILightProbeNode[] = [];
     protected _scene: Scene | null = null;
     protected _resource: LightProbes | null = null;
+
+    public serialize (ar: IArchive) {
+        this._giScale = ar.float32(this._giScale, '_giScale');
+        this._giSamples = ar.uint32(this._giSamples, '_giSamples');
+        this._bounces = ar.uint32(this._bounces, '_bounces');
+        this._reduceRinging = ar.float32(this._reduceRinging, '_reduceRinging');
+        this._showProbe = ar.boolean(this._showProbe, '_showProbe');
+        this._showWireframe = ar.boolean(this._showWireframe, '_showWireframe');
+        this._showConvex = ar.boolean(this._showConvex, '_showConvex');
+        this._data = ar.serializableObj(this._data, '_data');
+    }
 
     public activate (scene: Scene, resource: LightProbes) {
         this._scene = scene;
@@ -1500,7 +1511,7 @@ export class SceneGlobals implements ISerializable {
     @editable
     @serializable
     public bakedWithStationaryMainLight = false;
-    
+
     serialize (ar: IArchive): void {
         this.ambient = ar.serializableObj(this.ambient, 'ambient');
         this.shadows = ar.serializableObj(this.shadows, 'shadows');
@@ -1508,7 +1519,7 @@ export class SceneGlobals implements ISerializable {
         this.fog = ar.serializableObj(this.fog, 'fog');
         this.octree = ar.serializableObj(this.octree, 'octree');
         this.lightProbeInfo = ar.serializableObj(this.lightProbeInfo, 'lightProbeInfo');
-        this.bakedWithStationaryMainLight = ar.serializableObj(this.bakedWithStationaryMainLight, 'bakedWithStationaryMainLight');
+        this.bakedWithStationaryMainLight = ar.boolean(this.bakedWithStationaryMainLight, 'bakedWithStationaryMainLight');
     }
 
     /**

@@ -28,7 +28,7 @@ import { Asset } from '../assets/asset';
 import { MissingScript } from '../../misc/missing-script';
 import { deserialize, Details } from '../../serialization/deserialize';
 import { error, js } from '../../core';
-// import { JsonInputArchive } from '../../core/serialization';
+import { JsonInputArchive, BinaryInputArchive } from '../../core/serialization';
 import { dependMap, nativeDependMap } from './depend-maps';
 import { decodeUuid } from './helper';
 
@@ -62,20 +62,34 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
 
     let asset: Asset;
     try {
-        if (window.jsb && ((Array.isArray(json) && json[0].__type__ === 'cc.SceneAsset')
-         || json.__type__ === 'cc.EffectAsset' || json.__type__ === 'cc.Material')) {
+        // if (window.jsb && ((Array.isArray(json) && json[0].__type__ === 'cc.SceneAsset')
+        //  || json.__type__ === 'cc.EffectAsset' || json.__type__ === 'cc.Material')) {
+        //     tdInfo.init(); //FIXME(cjh): init here?
+        //     const ar = new jsb.JsonInputArchive();
+        //     asset = ar.start(json, tdInfo, {
+        //         classFinder,
+        //         customEnv: options,
+        //     }) as Asset;
+
+        //     const depends = ar.getDepends();
+        //     for (const depend of depends) {
+        //         console.log(`==> Depends, owner:${depend.owner}, propName: ${depend.propName}`);
+        //         tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
+        //     }
+        // }
+        if (json instanceof ArrayBuffer) {
             tdInfo.init(); //FIXME(cjh): init here?
-            const ar = new jsb.JsonInputArchive();
+            const ar = new BinaryInputArchive();
             asset = ar.start(json, tdInfo, {
                 classFinder,
                 customEnv: options,
             }) as Asset;
 
-            const depends = ar.getDepends();
-            for (const depend of depends) {
-                console.log(`==> Depends, owner:${depend.owner}, propName: ${depend.propName}`);
-                tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
-            }
+            // TODO(cjh): const depends = ar.getDepends();
+            // for (const depend of depends) {
+            //     console.log(`==> Depends, owner:${depend.owner}, propName: ${depend.propName}`);
+            //     tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
+            // }
         } else {
             asset = deserialize(json, tdInfo, {
                 classFinder,

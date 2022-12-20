@@ -289,6 +289,10 @@ export class JsonInputArchive implements IArchive {
         return this._currentNode[name] as string;
     }
 
+    public uuid (data: string): string {
+        return this.str(data, '__uuid__');
+    }
+
     public plainObj (data: any, name: string): any {
         this._isRoot = false;
 
@@ -628,3 +632,5 @@ export class JsonInputArchive implements IArchive {
         return false;
     }
 }
+
+legacyCC.JsonInputArchive = JsonInputArchive;

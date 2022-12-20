@@ -129,9 +129,9 @@ void Scene::serialize(Archive &ar) {
     ar.serialize(_autoReleaseAssets, "autoReleaseAssets");
     CC_SERIALIZE(_globals);
 
-    if (!ar.isExporting()) { // TODO(cjh): Also needs to check editor keep uuid flag
-        CC_SERIALIZE(_id);
-    }
+//    if (!ar.isExporting()) { // TODO(cjh): Also needs to check editor keep uuid flag
+//        CC_SERIALIZE(_id);
+//    }
 }
 
 } // namespace cc

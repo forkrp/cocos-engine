@@ -22,7 +22,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
  */
-import { Mat3, EPSILON, Vec3, _decorator } from '../../core';
+import { Mat3, EPSILON, Vec3, _decorator, ISerializable, IArchive } from '../../core';
 
 const { ccclass, serializable } = _decorator;
 
@@ -37,7 +37,7 @@ const _p2 = new Vec3(0.0, 0.0, 0.0);
 const _cp = new Vec3(0.0, 0.0, 0.0);
 
 @ccclass('cc.Vertex')
-export class Vertex {
+export class Vertex implements ISerializable {
     @serializable
     public position = new Vec3(0, 0, 0);
     @serializable
@@ -47,6 +47,12 @@ export class Vertex {
 
     public constructor (pos: Vec3) {
         this.position.set(pos);
+    }
+
+    public serialize (ar: IArchive): void {
+        this.position = ar.serializableObj(this.position, 'position');
+        this.normal = ar.serializableObj(this.normal, 'normal');
+        this.coefficients = ar.serializableObjArray(this.coefficients, 'coefficients');
     }
 }
 
@@ -220,7 +226,7 @@ export class CircumSphere {
  */
 
 @ccclass('cc.Tetrahedron')
-export class Tetrahedron {
+export class Tetrahedron implements ISerializable {
     @serializable
     public invalid = false;
     @serializable
@@ -240,6 +246,15 @@ export class Tetrahedron {
     public offset = new Vec3(0.0, 0.0, 0.0); // only valid in outer cell
     @serializable
     public sphere = new CircumSphere(); // only valid in inner tetrahedron
+
+    public serialize (ar: IArchive): void {
+        this.invalid = ar.boolean(this.invalid, 'invalid');
+        this.vertex0 = ar.int32(this.vertex0, 'vertex0');
+        this.vertex1 = ar.int32(this.vertex1, 'vertex1');
+        this.vertex2 = ar.int32(this.vertex2, 'vertex2');
+        this.vertex3 = ar.int32(this.vertex3, 'vertex3');
+        this.neighbours = ar.int32Array(this.neighbours, 'neighbours');
+    }
 
     // inner tetrahedron or outer cell constructor
     public constructor (delaunay: Delaunay, v0: number, v1: number, v2: number, v3 = -1) {

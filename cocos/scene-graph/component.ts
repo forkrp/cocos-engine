@@ -653,9 +653,9 @@ class Component extends CCObject {
         this.node = ar.serializableObj(this.node, 'node');
         this._enabled = ar.boolean(this._enabled, '_enabled');
         this.__prefab = ar.serializableObj(this.__prefab, '__prefab');
-        if (!ar.isExporting()) { //TODO(cjh): online engine needs the id
-            this._id = ar.str(this._id, '_id');
-        }
+        // if (!ar.isExporting()) { //TODO(cjh): online engine needs the id
+        // this._id = ar.str(this._id, '_id');
+        // }
     }
 }
 

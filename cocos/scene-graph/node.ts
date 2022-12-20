@@ -2557,9 +2557,9 @@ export class Node extends CCObject implements ISchedulable, CustomSerializable {
         this._components = ar.serializableObjArray(this._components, '_components');
         this._prefab = ar.serializableObj(this._prefab, '_prefab');
 
-        if (!ar.isExporting()) {
-            this._id = ar.str(this._id, '_id');
-        }
+        // if (!ar.isExporting()) {
+        //     this._id = ar.str(this._id, '_id');
+        // }
     }
 }
 

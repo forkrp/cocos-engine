@@ -27,6 +27,7 @@ export interface IArchive {
     float64(data: number, name: string): number;
 
     str(data: string, name: string): string;
+    uuid(data: string): string; // TODO(cjh): Remove this
 
     plainObj(data: any, name: string): any;
     serializableObj(data: ISerializable | undefined | null, name: string): any;

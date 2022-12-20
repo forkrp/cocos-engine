@@ -1161,7 +1161,7 @@ class AnimationClipEvaluation {
     }
 
     private _exoticAnimationEvaluator: ExoticAnimationEvaluator | undefined;
-    private _trackEvalStatues:TrackEvalStatus[] = [];
+    private _trackEvalStatues: TrackEvalStatus[] = [];
     private _rootMotionEvaluation: RootMotionEvaluation | undefined = undefined;
 }
 

@@ -108,6 +108,16 @@ const downloadCCONB = (url: string, options: IDownloadParseOptions, onComplete: 
     });
 };
 
+const downloadCCCB = (url: string, options: IDownloadParseOptions, onComplete: CompleteCallback<ArrayBuffer>) => {
+    downloadArrayBuffer(url, options, (err, arrayBuffer: ArrayBuffer) => {
+        if (err) {
+            onComplete(err);
+            return;
+        }
+        onComplete(null, arrayBuffer);
+    });
+};
+
 const downloadText = (url: string, options: IDownloadParseOptions, onComplete: CompleteCallback) => {
     options.xhrResponseType = 'text';
     downloadFile(url, options, options.onFileProgress, onComplete);
@@ -267,6 +277,8 @@ export class Downloader {
 
         '.ccon': downloadCCON,
         '.cconb': downloadCCONB,
+
+        '.cccb': downloadCCCB,
 
         '.fnt': downloadText,
 

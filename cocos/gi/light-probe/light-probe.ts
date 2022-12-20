@@ -27,7 +27,7 @@ import { ccclass, serializable, type } from 'cc.decorator';
 import { Vertex, Tetrahedron, Delaunay } from './delaunay';
 import { PolynomialSolver } from './polynomial-solver';
 import { LightProbeInfo } from '../../scene-graph/scene-globals';
-import { Vec3, Vec4, cclegacy, EPSILON } from '../../core';
+import { Vec3, Vec4, cclegacy, EPSILON, ISerializable, IArchive } from '../../core';
 import { SH } from './sh';
 
 const _v1 = new Vec3(0.0, 0.0, 0.0);
@@ -48,7 +48,7 @@ const _vp1 = new Vec3(0.0, 0.0, 0.0);
 const _vp2 = new Vec3(0.0, 0.0, 0.0);
 
 @ccclass('cc.LightProbesData')
-export class LightProbesData {
+export class LightProbesData implements ISerializable {
     public get probes () {
         return this._probes;
     }
@@ -232,6 +232,11 @@ export class LightProbesData {
         const result = LightProbesData.getTriangleBarycentricCoord(_vp0, _vp1, _vp2, position);
 
         weights.set(result.x, result.y, result.z, 0.0);
+    }
+
+    public serialize (ar: IArchive): void {
+        this._probes = ar.serializableObjArray(this._probes, '_probes');
+        this._tetrahedrons = ar.serializableObjArray(this._tetrahedrons, '_tetrahedrons');
     }
 
     @serializable

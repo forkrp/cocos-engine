@@ -252,6 +252,7 @@ class DeserializeNode {
 }
 
 export class BinaryInputArchive implements IArchive {
+    private _uuidList: string[] = [];
     private _currentNode!: DeserializeNode;
     private _isRoot = true;
     // private _objectFactory: IObjectFactory;
@@ -285,6 +286,12 @@ export class BinaryInputArchive implements IArchive {
         details.init();
 
         legacyCC.game._isCloning = true;
+
+        const uuidCount = this._currentNode.popUint32();
+        for (let i = 0; i < uuidCount; ++i) {
+            const uuid = this._currentNode.popString();
+            this._uuidList.push(uuid);
+        }
 
         const type: string = this._currentNode.popString();
         const obj = this.createObjectByType(type);
@@ -403,10 +410,17 @@ export class BinaryInputArchive implements IArchive {
         return this._currentNode.popString();
     }
 
+    uuid (data: string): string {
+        return ''; // TODO(cjh): Isn't it used in deserialization?
+    }
+
     plainObj (data: any, name: string): any {
         this._isRoot = false;
 
         data = data || {};
+
+        const oldOwner = this._currentOwner;
+        this._currentOwner = data;
 
         const currentNode = this._currentNode;
         const elementCount = currentNode.popInt32();
@@ -417,6 +431,7 @@ export class BinaryInputArchive implements IArchive {
             data[key] = value;
         }
 
+        this._currentOwner = oldOwner;
         return data;
     }
 
@@ -447,17 +462,23 @@ export class BinaryInputArchive implements IArchive {
 
             // Reset currentNode to which we index
             currentNode.offset = targetOffset;
-        }
-
-        if (!isInline) {
-            currentNode.offset = targetOffset;
         } else {
-            currentNode.offset = currentOffset;
+            // FIXME(cjh): Should not depend on uuid logic in deserialization code.
+            const uuidIndex = currentNode.popInt32();
+            const advance = currentNode.popUint32();
+            if (uuidIndex !== -1) {
+                this._details!.push(this._currentOwner, name, this._uuidList[uuidIndex]);
+                currentNode.offset += advance;
+                return null;
+            }
         }
 
-        const type = currentNode.popString();
+        const type = currentNode.popString(); // Pop __type__
         const ret = data || this.createObjectByType(type) as ISerializable;
         assert(ret);
+
+        const oldOwner = this._currentOwner;
+        this._currentOwner = ret;
 
         if (!isInline) {
             this._deserializedObjIdMap.set(targetOffset, ret);
@@ -488,6 +509,8 @@ export class BinaryInputArchive implements IArchive {
         if (!isInline) {
             currentNode.offset = currentOffset + 8; // 8 is targetOffset + targetSize
         }
+
+        this._currentOwner = oldOwner;
         return ret;
     }
 
@@ -537,10 +560,14 @@ export class BinaryInputArchive implements IArchive {
             arr = new Array(length);
         }
 
+        const oldOwner = this._currentOwner;
+        this._currentOwner = arr;
+
         for (let i = 0, len = arr.length; i < len; ++i) {
             arr[i] = this.serializableObj(arr[i], `${i}`) as ISerializable;
         }
 
+        this._currentOwner = oldOwner;
         return arr;
     }
 
@@ -559,9 +586,14 @@ export class BinaryInputArchive implements IArchive {
             arr = new Array(length);
         }
 
+        const oldOwner = this._currentOwner;
+        this._currentOwner = arr;
+
         for (let i = 0, len = arr.length; i < len; ++i) {
             arr[i] = this._serializeInternal(arr[i], `${i}`);
         }
+
+        this._currentOwner = oldOwner;
 
         return arr;
     }
@@ -580,3 +612,5 @@ export class BinaryInputArchive implements IArchive {
         return false;
     }
 }
+
+legacyCC.BinaryInputArchive = BinaryInputArchive;

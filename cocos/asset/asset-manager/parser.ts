@@ -66,6 +66,7 @@ export class Parser {
 
         '.ccon': this.parseImport,
         '.cconb': this.parseImport,
+        '.cccb': this.parseImport,
     };
 
     public parseImage (file: HTMLImageElement | Blob, options: IDownloadParseOptions, onComplete: CompleteCallback<HTMLImageElement|ImageBitmap>) {
@@ -123,7 +124,7 @@ export class Parser {
         onComplete(err, result);
     }
 
-    public parseImport (file: Record<string, any> | CCON, options: IDownloadParseOptions, onComplete: CompleteCallback<Asset>) {
+    public parseImport (file: Record<string, any> | CCON | ArrayBuffer, options: IDownloadParseOptions, onComplete: CompleteCallback<Asset>) {
         if (!file) {
             onComplete(new Error(`The json file of asset ${options.__uuid__ as string} is empty or missing`));
             return;

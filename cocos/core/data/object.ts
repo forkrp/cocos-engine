@@ -394,9 +394,9 @@ class CCObject implements EditorExtendableObject, ISerializable {
     public serialize (ar: IArchive): void {
         this._name = ar.str(this._name, '_name');
         this._objFlags = ar.uint32(this._objFlags, '_objFlags');
-        if (EDITOR) {
-            this[editorExtrasTag] = ar.plainObj(this[editorExtrasTag], editorExtrasTag);
-        }
+        // TODO(cjh): if (EDITOR) {
+        // this[editorExtrasTag] = ar.plainObj(this[editorExtrasTag], editorExtrasTag);
+        // }
     }
 }
 

@@ -896,9 +896,9 @@ void Node::serialize(Archive &ar) {
     CC_SERIALIZE(_layer);
     CC_SERIALIZE(_euler);
 
-    if (!ar.isExporting()) { // TODO(cjh): Also needs to check editor keep uuid flag
-        CC_SERIALIZE(_id);
-    }
+//    if (!ar.isExporting()) { // TODO(cjh): Also needs to check editor keep uuid flag
+//        CC_SERIALIZE(_id);
+//    }
 }
 
 CC_IMPL_SERIALIZE(Node)

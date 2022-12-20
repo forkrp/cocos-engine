@@ -26,7 +26,7 @@
 import { ccclass, executeInEditMode, executionOrder, help, menu, tooltip, type, serializable } from 'cc.decorator';
 import { EDITOR, TEST } from 'internal:constants';
 import { Component } from '../scene-graph/component';
-import { Eventify, warnID, js, cclegacy } from '../core';
+import { Eventify, warnID, js, cclegacy, IArchive } from '../core';
 import { AnimationClip } from './animation-clip';
 import { AnimationState, EventType } from './animation-state';
 import { CrossFade } from './cross-fade';
@@ -161,6 +161,13 @@ export class Animation extends Eventify(Component) {
      * Whether if `crossFade()` or `play()` has been called before this component starts.
      */
     private _hasBeenPlayed = false;
+
+    public serialize (ar: IArchive): void {
+        super.serialize(ar);
+        this.playOnLoad = ar.boolean(this.playOnLoad, 'playOnLoad');
+        this._clips = ar.serializableObjArray(this._clips, '_clips');
+        this._defaultClip = ar.serializableObj(this._defaultClip, '_defaultClip');
+    }
 
     public onLoad () {
         this.clips = this._clips;

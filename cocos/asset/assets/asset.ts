@@ -312,7 +312,7 @@ export class Asset extends Eventify(CCObject) {
     }
 
     serializeInlineData (ar: IArchive): void {
-        this._uuid = ar.str(this._uuid, '__uuid__');
+        this._uuid = ar.uuid(this._uuid);
     }
 }
 
