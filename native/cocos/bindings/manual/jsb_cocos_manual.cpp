@@ -895,6 +895,32 @@ static bool JSB_JsonInputArchive_start(se::State& s) {
 }
 SE_BIND_FUNC(JSB_JsonInputArchive_start)
 
+static bool JSB_BinaryInputArchive_start(se::State& s) {
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+
+    if(argc < 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+
+    const auto &arg0 = args[0];
+    if (arg0.isObject() && arg0.toObject()->isArrayBuffer()) {
+        cc::ArrayBuffer::Ptr arrayBuffer;
+        sevalue_to_native(args[0], &arrayBuffer);
+        s.rval() = arg1->start(arrayBuffer, &myObjectFactory);
+        return true;
+    }
+
+    SE_REPORT_ERROR("Error processing arguments");
+    return false;
+}
+SE_BIND_FUNC(JSB_BinaryInputArchive_start)
+
 template <typename T>
 static bool bindAsExternalBuffer(se::State &s) {  // NOLINT
     auto *self = SE_THIS_OBJECT<T>(s);
@@ -948,6 +974,7 @@ bool register_all_cocos_manual(se::Object *obj) { // NOLINT(readability-identifi
     __jsb_cc_Quaternion_proto->defineFunction("underlyingData", _SE(js_cc_Quaternion_underlyingData));
 
     __jsb_cc_JsonInputArchive_proto->defineFunction("start", _SE(JSB_JsonInputArchive_start));
+    __jsb_cc_BinaryInputArchive_proto->defineFunction("start", _SE(JSB_BinaryInputArchive_start));
 
     register_plist_parser(obj);
     register_sys_localStorage(obj);

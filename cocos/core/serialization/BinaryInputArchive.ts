@@ -419,6 +419,8 @@ export class BinaryInputArchive implements IArchive {
         return ''; // TODO(cjh): Isn't it used in deserialization?
     }
 
+    // TODO(cjh): Add arrObj
+
     plainObj (data: any, name: string): any {
         this._isRoot = false;
 

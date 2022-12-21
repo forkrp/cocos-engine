@@ -54,15 +54,9 @@ enum SerializeTag {
     TAG_ARRAY
 };
 
-struct DeserializedObjectFlags {
-    bool isInline: 1;
-    bool isUUIDRef: 1;
-    uint8_t padding: 6;
-};
-
-union DeserializedObjectFlagsUnion {
-    uint8_t u8;
-    DeserializedObjectFlags flags;
+enum ObjectKindFlag {
+    OBJECT_KIND_FLAG_NULL = (1 << 0),
+    OBJECT_KIND_FLAG_INLINE = (1 << 1)
 };
 
 class DeserializeNode final {
@@ -128,8 +122,9 @@ public:
     }
 
     std::string_view popString() {
-        auto ret = _data.getStringView(_offset);
-        _offset += ret.length() + 4; // 4 is how many bytes of string.
+        auto strLength = _data.get<uint32_t>(_offset);
+        auto ret = _data.getString(_offset, strLength);
+        _offset += ret.length() + 1 + 4; // 4 is how many bytes of string.
         return ret;
     }
 
@@ -218,6 +213,12 @@ public:
         return data;
     }
 
+    se::Value& anyValue(se::Value& value, const char* name);
+    se::Value& plainObj(se::Value& value, const char* name);
+    se::Value& arrayObj(se::Value& value, const char* name);
+    se::Value& serializableObj(se::Value& value, const char* name);
+    se::Value& serializableObjArray(se::Value& value, const char* name);
+
 #ifndef SWIGCOCOS
     template <class T>
     void serializePrimitiveData(T& data);
@@ -257,9 +258,17 @@ public:
 #endif // SWIGCOCOS
 
 private:
+
+    std::string_view popString();
+
     template <class T>
     T getOrCreateNativeObject(se::Object*& outScriptObject);
     void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject);
+
+    void doSerializePlainObj(se::Value& value);
+    void doSerializeSerializableObj(se::Value& value);
+    void doSerializeArray(se::Value& value);
+    void doSerializeAny(se::Value& value);
 
     void serializeScriptObject(se::Object* obj);
     void serializeScriptObjectByNativePtr(const void* nativeObj);
@@ -283,13 +292,15 @@ private:
     ccstd::vector<const void*> _deserializedObjects;
 
     ccstd::vector<AssetDependInfo> _depends;
+    ccstd::vector<std::string_view> _uuidList;
+    ccstd::vector<std::string_view> _stringList;
 
     se::Object* _currentOwner{nullptr};
     const char* _currentKey{nullptr};
 
-    DeserializedObjectFlagsUnion _currentObjectFlags;
+    uint8_t _currentObjectFlags{0};
 
-    DeserializeNode* _currentNode{nullptr};
+    std::unique_ptr<DeserializeNode> _currentNode{nullptr};
     bool _isRoot{true};
 };
 
@@ -302,7 +313,7 @@ inline void BinaryInputArchive::serializePrimitiveData(T& data) {
 
 template <>
 inline void BinaryInputArchive::serializeString(ccstd::string& data) {
-    data = _currentNode->popString();
+    data = popString();
 }
 
 template <class T>
@@ -461,7 +472,14 @@ inline void BinaryInputArchive::serialize(T& data, const char* name) {
 template <class T>
 inline void BinaryInputArchive::serializeObject(T& data) {
     auto oldObjectFlags = _currentObjectFlags;
-    _currentObjectFlags.u8 = _currentNode->popUint8();
+    _currentObjectFlags = _currentNode->popUint8();
+
+    if (_currentObjectFlags & OBJECT_KIND_FLAG_NULL) {
+        if constexpr (IsPtr<std::decay_t<T>>::value) {
+            data = nullptr;
+        }
+        return;
+    }
 
     if (onStartSerializeObject(data)) {
         if constexpr (IsPtr<std::decay_t<T>>::value) {
@@ -493,17 +511,13 @@ inline void BinaryInputArchive::onSerializingObjectPtr(T& data) {
     _isRoot = false;
     if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value && has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
         if (isRoot) {
-            assert(!_currentObjectFlags.flags.isInline);
             data->serialize(*this);
         } else {
-            assert(_currentObjectFlags.flags.isInline);
             data->serializeInlineData(*this);
         }
     } else if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value) {
-        assert(!_currentObjectFlags.flags.isInline);
         data->serialize(*this);
     } else if constexpr (has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
-        assert(_currentObjectFlags.flags.isInline);
         data->serializeInlineData(*this);
     }
 
@@ -523,17 +537,13 @@ inline void BinaryInputArchive::onSerializingObjectRef(T& data) {
     _isRoot = false;
     if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value && has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
         if (isRoot) {
-            assert(!_currentObjectFlags.flags.isInline);
             data.serialize(*this);
         } else {
-            assert(_currentObjectFlags.flags.isInline);
             data.serializeInlineData(*this);
         }
     } else if constexpr (has_serialize<data_type, void(decltype(*this)&)>::value) {
-        assert(!_currentObjectFlags.flags.isInline);
         data.serialize(*this);
     } else if constexpr (has_serializeInlineData<data_type, void(decltype(*this)&)>::value) {
-        assert(_currentObjectFlags.flags.isInline);
         data.serializeInlineData(*this);
     } else {
         static_assert(std::is_void_v<T>, "CPP type doesn't have a serialize or serializeInlineData method");

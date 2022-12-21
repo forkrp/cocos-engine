@@ -57,7 +57,7 @@ public:
         _dataLength = std::max(byteOffset + (uint32_t)sizeof(T), _dataLength);
     }
 
-    void set(uint32_t byteOffset, const std::string_view& value);
+    void setString(uint32_t byteOffset, const std::string_view& value);
 
     template <typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value> >
     inline T get(uint32_t byteOffset) const {
@@ -68,7 +68,7 @@ public:
         }
     }
 
-    std::string_view getStringView(uint32_t byteOffset);
+    std::string_view getString(uint32_t byteOffset, uint32_t strLength);
 
 private:
     uint8_t* _buffer{nullptr};

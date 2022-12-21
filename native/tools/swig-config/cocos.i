@@ -56,6 +56,8 @@
 %ignore cc::JsonInputArchive::setCurrentNode;
 %ignore cc::JsonInputArchive::getCurrentNode;
 %ignore cc::AssetDependInfo::dereferenceCb;
+%ignore cc::BinaryInputArchive::start;
+%ignore cc::DeserializeNode;
 
 %rename("$ignore", regextarget=1, fullname=1) "cc::Vec2::.*[^2]$";
 %rename("$ignore", regextarget=1, fullname=1) "cc::Vec3::.*[^3]$";
@@ -227,4 +229,5 @@ namespace cc {
 
 %include "serialization/AssetDependInfo.h"
 %include "serialization/JsonInputArchive.h"
+%include "serialization/BinaryInputArchive.h"
 

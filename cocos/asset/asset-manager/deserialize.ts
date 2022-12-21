@@ -79,17 +79,25 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
         // }
         if (json instanceof ArrayBuffer) {
             tdInfo.init(); //FIXME(cjh): init here?
-            const ar = new BinaryInputArchive();
+            let ar;
+            if (window.jsb) {
+                ar = new jsb.BinaryInputArchive();
+            } else {
+                ar = new BinaryInputArchive();
+            }
             asset = ar.start(json, tdInfo, {
                 classFinder,
                 customEnv: options,
             }) as Asset;
 
-            // TODO(cjh): const depends = ar.getDepends();
-            // for (const depend of depends) {
-            //     console.log(`==> Depends, owner:${depend.owner}, propName: ${depend.propName}`);
-            //     tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
-            // }
+            if (window.jsb) {
+            // TODO(cjh):
+                const depends = ar.getDepends();
+                for (const depend of depends) {
+                    console.log(`==> Depends, owner:${depend.owner}, propName: ${depend.propName}`);
+                    tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
+                }
+            }
         } else {
             asset = deserialize(json, tdInfo, {
                 classFinder,

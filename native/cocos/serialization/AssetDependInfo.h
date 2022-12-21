@@ -29,6 +29,7 @@
 #include "base/std/variant.h"
 
 #include <functional>
+#include <string_view>
 
 namespace se {
 class Object;
@@ -42,7 +43,7 @@ struct AssetDependInfo final {
     AssetDereferenceCallback dereferenceCb{nullptr};
     se::Object* owner{nullptr};
     ccstd::string propName;
-    ccstd::string uuid;
+    std::string_view uuid;
     ccstd::string expectedType;
 
     void dereference(se::Object* obj, const ccstd::string& uuid);

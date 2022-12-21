@@ -911,8 +911,8 @@ protected:
 };
 
 template <>
-struct SerializationTrait<IPropertyValueInternal> : SerializationTraitBase<IPropertyValueInternal> {
-    static void serialize(IPropertyValueInternal &data, JsonInputArchive &ar) {
+struct SerializationTrait<IPropertyValue> : SerializationTraitBase<IPropertyValue> {
+    static void serialize(IPropertyValue &data, JsonInputArchive &ar) {
         const auto *currentNode = ar.getCurrentNode();
         if (currentNode == nullptr) {
             return;
@@ -931,7 +931,8 @@ struct SerializationTrait<IPropertyValueInternal> : SerializationTraitBase<IProp
         }
     }
 
-    static void serialize(MacroValue &data, BinaryInputArchive &ar) {
+    static void serialize(IPropertyValue &data, BinaryInputArchive &ar) {
+        assert(false);
     }
 };
 
@@ -968,7 +969,8 @@ struct SerializationTrait<IPreCompileInfoValueType> : SerializationTraitBase<IPr
         }
     }
 
-    static void serialize(MacroValue &data, BinaryInputArchive &ar) {
+    static void serialize(IPreCompileInfoValueType &data, BinaryInputArchive &ar) {
+        assert(false);
     }
 };
 

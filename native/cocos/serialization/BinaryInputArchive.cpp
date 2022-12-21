@@ -49,9 +49,6 @@ void DeserializeNode::popMapTag() {
 // BinaryInputArchive
 
 BinaryInputArchive::BinaryInputArchive() {
-    _currentObjectFlags.flags.isInline = false;
-    _currentObjectFlags.flags.isUUIDRef = false;
-    _currentObjectFlags.flags.padding = 0;
 }
 
 
@@ -60,7 +57,301 @@ BinaryInputArchive::~BinaryInputArchive() {
 }
 
 se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory* factory) {
-    return {};
+    assert(factory != nullptr);
+    _objectFactory = factory;
+    
+    _buffer = arrayBuffer;
+    _currentNode.reset(ccnew DeserializeNode("root", _buffer->getData(), _buffer->byteLength()));
+
+    _uuidList.reserve(5);
+    _stringList.reserve(32);
+
+    uint32_t uuidCount = _currentNode->popUint32();
+    for (uint32_t i = 0; i < uuidCount; ++i) {
+        auto uuid = _currentNode->popString();
+        _uuidList.emplace_back(std::move(uuid));
+    }
+
+    uint32_t stringCount = _currentNode->popUint32();
+    for (uint32_t i = 0; i < stringCount; ++i) {
+        auto str = _currentNode->popString();
+        _stringList.emplace_back(std::move(str));
+    }
+
+    _currentKey = nullptr;
+
+    auto type = popString();
+
+    se::Object* ret = _objectFactory->createScriptObject(type.data());
+    assert(ret);
+
+    ret->root(); // FIXME(cjh): How to unroot ?
+    _currentOwner = ret;
+
+    se::Value retVal;
+    retVal.setObject(ret, true);
+
+    ret->getPrivateObject()->serialize(*this);
+    return retVal;
+}
+
+se::Value& BinaryInputArchive::anyValue(se::Value& value, const char* name) {
+    auto tag = _currentNode->popInt8();
+
+    switch (tag) {
+        case TAG_NONE:
+            value.setNull();
+            break;
+        case TAG_BOOLEAN:
+            value.setBoolean(_currentNode->popBoolean());
+            break;
+        case TAG_MAP:
+            value = plainObj(value, name);
+            break;
+        case TAG_SERIALIZABLE_OBJECT:
+            value = serializableObj(value, name);
+            break;
+        case TAG_ARRAY:
+            arrayObj(value, name);
+            break;
+        case TAG_STRING:
+            value.setString(popString());
+            break;
+        case TAG_NUMBER:
+            value.setDouble(_currentNode->popFloat64());
+            break;
+        default:
+            break;
+    }
+
+    return value;
+}
+
+void BinaryInputArchive::doSerializePlainObj(se::Value& value) {
+    se::Object* seObj = nullptr;
+    bool needRelease = false;
+    if (value.isObject()) {
+        seObj = value.toObject();
+        seObj->root();
+        seObj->incRef();
+    } else {
+        seObj = se::Object::createPlainObject();
+        seObj->root();
+        needRelease = true;
+    }
+
+    _currentOwner = seObj;
+
+    int32_t elementCount = _currentNode->popInt32();
+    for (int32_t i = 0; i < elementCount; ++i) {
+        se::Object* oldOwner = _currentOwner;
+
+        _currentKey = popString().data();
+
+        se::Value seValue;
+        seValue = anyValue(seValue, _currentKey);
+        seObj->setProperty(_currentKey, seValue);
+
+        _currentOwner = oldOwner;
+    }
+
+    value.setObject(seObj);
+
+    if (needRelease) {
+        seObj->unroot();
+        seObj->decRef();
+    }
+}
+
+se::Value& BinaryInputArchive::plainObj(se::Value& value, const char* name) {
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
+    _currentKey = name;
+
+    doSerializePlainObj(value);
+
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
+    return value;
+}
+
+void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
+    auto* dependInfo = checkAssetDependInfo();
+    if (dependInfo != nullptr) {
+        return;
+    }
+
+    se::Object* scriptObject{nullptr};
+    void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject);
+    if (scriptObject != nullptr) {
+        _currentOwner = scriptObject;
+        if (obj != nullptr) {
+            if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), obj) == _deserializedObjects.cend()) {
+                scriptObject->getPrivateObject()->serialize(*this);
+            } else {
+                CC_LOG_DEBUG("serializableObj return from cache, scriptObject: %p", scriptObject);
+            }
+        } else {
+            serializeScriptObject(scriptObject);
+        }
+        value.setObject(scriptObject);
+    }
+}
+
+se::Value& BinaryInputArchive::serializableObj(se::Value& value, const char* name) {
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
+    _currentKey = name;
+
+    doSerializeSerializableObj(value);
+
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
+    return value;
+}
+
+void BinaryInputArchive::doSerializeArray(se::Value& value) {
+    uint32_t length = static_cast<uint32_t>(_currentNode->popInt32());
+    se::Object* seObj = nullptr;
+    bool needRelease = false;
+    if (value.isObject() && value.toObject()->isArray()) {
+        seObj = value.toObject();
+        seObj->root();
+        seObj->incRef();
+    } else {
+        seObj = se::Object::createArrayObject(length);
+        seObj->root(); // FIXME(cjh): How to unroot?
+        needRelease = true;
+    }
+
+    _currentOwner = seObj;
+    char keyTmp[12] = {0};
+
+    for (uint32_t i = 0; i < length; ++i) {
+        se::Object* oldOwner = _currentOwner;
+
+        snprintf(keyTmp, sizeof(keyTmp), "%u", i);
+        _currentKey = keyTmp;
+
+        se::Value seValue;
+        doSerializeAny(seValue);
+        seObj->setArrayElement(i, seValue);
+
+        _currentOwner = oldOwner;
+    }
+
+    value.setObject(seObj);
+
+    if (needRelease) {
+        seObj->unroot();
+        seObj->decRef();
+    }
+}
+
+se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char* name) {
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
+    _currentKey = name;
+    int32_t length = 0;
+
+    const auto tag = _currentNode->popInt8();
+    switch (tag) {
+        case TAG_NONE:
+            value.setNull();
+            return value;
+        case TAG_ARRAY:
+            length = _currentNode->popInt32();
+            break;
+        default:
+            assert(false);
+            value.setNull();
+            return value;
+            break;
+    }
+
+    se::Object* seObj = nullptr;
+    bool needRelease = false;
+    if (value.isObject() && value.toObject()->isArray()) {
+        seObj = value.toObject();
+        seObj->root();
+        seObj->incRef();
+    } else {
+        seObj = se::Object::createArrayObject(static_cast<uint32_t>(length));
+        seObj->root();
+        needRelease = true;
+    }
+
+    char keyTmp[12] = {0};
+    _currentOwner = seObj;
+
+    for (uint32_t i = 0; i < static_cast<uint32_t>(length); ++i) {
+        se::Object* oldOwner = _currentOwner;
+
+        snprintf(keyTmp, sizeof(keyTmp), "%u", i);
+        _currentKey = keyTmp;
+
+        se::Value seValue;
+        doSerializeSerializableObj(seValue);
+        seObj->setArrayElement(i, seValue);
+
+        _currentOwner = oldOwner;
+    }
+
+    value.setObject(seObj);
+    if (needRelease) {
+        seObj->unroot();
+        seObj->decRef();
+    }
+
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
+    return value;
+}
+
+se::Value& BinaryInputArchive::arrayObj(se::Value& value, const char* name) {
+    const char* oldKey = _currentKey;
+    auto* oldOwner = _currentOwner;
+
+    _currentKey = name;
+
+    doSerializeArray(value);
+
+    _currentKey = oldKey;
+    _currentOwner = oldOwner;
+    return value;
+}
+
+void BinaryInputArchive::doSerializeAny(se::Value& value) {
+    const auto tag = _currentNode->popInt8();
+
+    switch (tag) {
+        case TAG_NONE:
+            value.setNull();
+            break;
+        case TAG_BOOLEAN:
+            value.setBoolean(_currentNode->popBoolean());
+            break;
+        case TAG_MAP:
+            doSerializePlainObj(value);
+            break;
+        case TAG_SERIALIZABLE_OBJECT:
+            doSerializeSerializableObj(value);
+            break;
+        case TAG_ARRAY:
+            doSerializeArray(value);
+            break;
+        case TAG_STRING:
+            value.setString(popString());
+            break;
+        case TAG_NUMBER:
+            value.setDouble(_currentNode->popFloat64());
+            break;
+        default:
+            break;
+    }
 }
 
 void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
@@ -126,12 +417,8 @@ void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outS
             outScriptObject = info.scriptObj;
             return info.nativeObj;
         }
-    }
 
-    if (!isInline) {
         _currentNode->setOffset(targetOffset);
-    } else {
-        _currentNode->setOffset(currentOffset);
     }
 
     const char* type = _currentNode->popString().data();
@@ -198,27 +485,40 @@ void BinaryInputArchive::onAfterDeserializeScriptObjectByNativePtr(const void* n
 }
 
 AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
-    if (!_currentObjectFlags.flags.isUUIDRef) {
-        return nullptr;
+    assert(!(_currentObjectFlags & OBJECT_KIND_FLAG_NULL));
+    assert(_currentObjectFlags & OBJECT_KIND_FLAG_INLINE);
+
+    int32_t uuidAdvance = _currentNode->popInt32();
+    assert(uuidAdvance != -1);
+
+    if (uuidAdvance != -1) {
+        _currentNode->setOffset(_currentNode->getOffset() + uuidAdvance);
+        auto uuidIndex = _currentNode->popUint32();
+        assert(uuidIndex >= 0 && uuidIndex < _uuidList.size());
+
+        AssetDependInfo dependInfo;
+        dependInfo.uuid = _uuidList[uuidIndex];
+        dependInfo.owner = _currentOwner;
+        dependInfo.propName = _currentKey;
+
+        CC_LOG_DEBUG("Found __uuid__, owner: %p, current key: %s", _currentOwner, _currentKey);
+
+        _depends.emplace_back(std::move(dependInfo));
+        return &_depends.back();
     }
 
-    auto uuid = _currentNode->popString();
-    assert(!uuid.empty());
-
-    AssetDependInfo dependInfo;
-    dependInfo.uuid = uuid.data();
-    dependInfo.owner = _currentOwner;
-    dependInfo.propName = _currentKey;
-
-    CC_LOG_DEBUG("Found __uuid__, owner: %p, current key: %s", _currentOwner, _currentKey);
-
-    _depends.emplace_back(std::move(dependInfo));
-    return &_depends.back();
+    return nullptr;
 }
 
 /* static */
 void* BinaryInputArchive::seObjGetPrivateData(se::Object* obj) {
     return obj->getPrivateData();
+}
+
+std::string_view BinaryInputArchive::popString() {
+    auto index = _currentNode->popUint32();
+    assert(index >= 0 && index < _stringList.size());
+    return _stringList[index];
 }
 
 }

@@ -110,6 +110,7 @@ struct SerializationTrait<MacroValue> : SerializationTraitBase<MacroValue> {
     }
 
     static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+        assert(false);
     }
 };
 
@@ -171,7 +172,8 @@ struct SerializationTrait<MaterialProperty> : SerializationTraitBase<MaterialPro
         }
     }
 
-    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+    static void serialize(MaterialProperty& data, BinaryInputArchive& ar) {
+        assert(false);
     }
 };
 
@@ -194,7 +196,8 @@ struct SerializationTrait<MaterialPropertyVariant> : SerializationTraitBase<Mate
         }
     }
 
-    static void serialize(MacroValue& data, BinaryInputArchive& ar) {
+    static void serialize(MaterialPropertyVariant& data, BinaryInputArchive& ar) {
+        assert(false);
     }
 };
 

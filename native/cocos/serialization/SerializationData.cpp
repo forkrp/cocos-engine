@@ -72,12 +72,20 @@ void SerializationData::expandBufferIfNeeded(uint32_t byteOffset, uint32_t dataB
     }
 }
 
-void SerializationData::set(uint32_t byteOffset, const std::string_view& value) {
-    assert(false);
+void SerializationData::setString(uint32_t byteOffset, const std::string_view& value) {
+    uint32_t stringBytes = static_cast<uint32_t>(value.length()) + 1; // 1 is null-terminated
+    expandBufferIfNeeded(byteOffset, 4 + stringBytes);
+    set<uint32_t>(byteOffset, stringBytes);
+    memcpy(_buffer + byteOffset, value.data(), static_cast<size_t>(stringBytes));
+    _dataLength = std::max(byteOffset + 4 + stringBytes, _dataLength);
 }
 
-std::string_view SerializationData::getStringView(uint32_t byteOffset) {
-    return "";
+std::string_view SerializationData::getString(uint32_t byteOffset, uint32_t strLength) {
+    if (byteOffset >= 0 && byteOffset <= _dataLength) {
+        return std::string_view(reinterpret_cast<char*>(_buffer) + byteOffset, static_cast<size_t>(strLength));
+    } else {
+        assert(false);
+    }
 }
 
 } // namespace cc
