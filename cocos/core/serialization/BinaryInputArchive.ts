@@ -5,7 +5,7 @@ import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
 import { IObjectFactory } from './ObjectFactory';
 import { SerializeData } from './SerializeData';
-import { SerializeTag, assert } from './utils';
+import { SerializeTag, assert, ObjectKindFlag } from './utils';
 import { reportMissingClass as defaultReportMissingClass } from '../../serialization/report-missing-class';
 
 type Ctor<T> = new() => T;
@@ -161,11 +161,6 @@ class DeserializeNode {
 
     set offset (v: number) {
         this._offset = v;
-    }
-
-    popDependTargetInfo () {
-        // offset, size
-        return [this.popInt32(), this.popInt32()];
     }
 
     popArrayTag (): number {
@@ -348,9 +343,6 @@ export class BinaryInputArchive implements IArchive {
         const tag: number = currentNode.popInt8();
         switch (tag) {
         case SerializeTag.TAG_NULL:
-            currentNode.popBoolean();
-            currentNode.popInt32();
-            currentNode.popInt32();
             return null;
         case SerializeTag.TAG_NUMBER:
             return currentNode.popFloat64();
@@ -452,7 +444,14 @@ export class BinaryInputArchive implements IArchive {
         this._isRoot = false;
 
         const currentNode = this._currentNode;
-        const isInline = currentNode.popBoolean();
+
+        const objectFlag = currentNode.popUint8();
+        const isNull = objectFlag & ObjectKindFlag.NULL;
+        if (isNull) {
+            return null;
+        }
+        const isInline = objectFlag & ObjectKindFlag.INLINE;
+
         const currentOffset = currentNode.offset;
         let targetOffset = 0;
 
@@ -461,7 +460,9 @@ export class BinaryInputArchive implements IArchive {
 
             if (targetOffset === -1) {
                 // console.log(`return null, currentOffset: ${currentOffset-1}`);
-                currentNode.popInt32();
+                //cjh for debug only
+                // currentNode.popInt32(); // pop targetSize;
+                //
                 return null;
             }
 
@@ -469,7 +470,9 @@ export class BinaryInputArchive implements IArchive {
 
             const cached = this._deserializedObjIdMap.get(targetOffset);
             if (cached) {
-                currentNode.popInt32(); // pop targetSize;
+                //cjh for debug only
+                // currentNode.popInt32(); // pop targetSize;
+                //
                 return cached;
             }
 
@@ -477,11 +480,12 @@ export class BinaryInputArchive implements IArchive {
             currentNode.offset = targetOffset;
         } else {
             // FIXME(cjh): Should not depend on uuid logic in deserialization code.
-            const uuidIndex = currentNode.popInt32();
-            const advance = currentNode.popUint32();
-            if (uuidIndex !== -1) {
+            const uuidAdvance = currentNode.popInt32();
+            if (uuidAdvance !== -1) {
+                currentNode.offset += uuidAdvance;
+                const uuidIndex = currentNode.popUint32();
                 this._details!.push(this._currentOwner, name, this._uuidList[uuidIndex]);
-                currentNode.offset += advance;
+
                 return null;
             }
         }
@@ -520,7 +524,8 @@ export class BinaryInputArchive implements IArchive {
         }
 
         if (!isInline) {
-            currentNode.offset = currentOffset + 8; // 8 is targetOffset + targetSize
+            // currentNode.offset = currentOffset + 8; // 8 is targetOffset + targetSize, for debug only
+            currentNode.offset = currentOffset + 4;
         }
 
         this._currentOwner = oldOwner;
@@ -554,10 +559,6 @@ export class BinaryInputArchive implements IArchive {
         const currentNode = this._currentNode;
         const tag = currentNode.popInt8();
         if (tag === SerializeTag.TAG_NULL) {
-            //TODO:
-            currentNode.popBoolean();
-            currentNode.popInt32();
-            currentNode.popInt32();
             return null;
         } else if (tag === SerializeTag.TAG_ARRAY) {
             length = currentNode.popInt32();

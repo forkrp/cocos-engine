@@ -16,6 +16,11 @@ export enum SerializeTag {
     TAG_ARRAY
 }
 
+export enum ObjectKindFlag {
+    NULL = (1 << 0),
+    INLINE = (1 << 1)
+}
+
 export function checkISerializableObjectNeedInline (data: ISerializable, isRoot: boolean) {
     let inlineData = false;
     const serializeExist = !!data.serialize;

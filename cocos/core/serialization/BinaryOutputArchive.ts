@@ -1,4 +1,4 @@
-import { assert, checkISerializableObjectNeedInline, SerializeTag } from './utils';
+import { assert, checkISerializableObjectNeedInline, ObjectKindFlag, SerializeTag } from './utils';
 import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
 import { SerializeData } from './SerializeData';
@@ -15,13 +15,11 @@ interface IDependTargetInfo {
     targetSize: number,
     ownerInfoList: IDependOwnerInfo[]
 }
-
 class SerializeNode {
     private _data: SerializeData = new SerializeData();
     private _offset = 0;
     private _name = '';
     public _dependTargetInfoList: IDependTargetInfo[] = [];
-    public __index__ = -1;
     public offsetInBinary = 0;
     public _parentNode: SerializeNode | null = null;
 
@@ -42,10 +40,21 @@ class SerializeNode {
         return this._offset;
     }
 
+    pushObjectFlag (isNull: boolean, isInline: boolean) {
+        let flag = 0;
+        if (isNull) {
+            flag |= ObjectKindFlag.NULL;
+        }
+        if (isInline) {
+            flag |= ObjectKindFlag.INLINE;
+        }
+        this.pushUint8(flag);
+    }
+
     pushDependTargetInfo () {
-        this.pushBoolean(false); // whether is inline data
+        this.pushObjectFlag(false, false); // whether is null and inlined
         this.pushInt32(-1); // padding offset in the entire buffer
-        this.pushInt32(-1); // padding for targetSize
+        // this.pushInt32(-1); // padding for targetSize, for debug only
     }
 
     pushArrayTag (length: number) {
@@ -125,7 +134,6 @@ class SerializeNode {
 }
 
 interface IObjectStackElement {
-    __index__: number,
     parentNode: SerializeNode,
     serializedNode: SerializeNode,
     data: ISerializable,
@@ -299,7 +307,7 @@ export class BinaryOutputArchive implements IArchive {
         this._isRoot = false;
 
         if (data == null) {
-            this._currentNode.pushDependTargetInfo();
+            this._pushNull();
             return data;
         }
 
@@ -313,6 +321,7 @@ export class BinaryOutputArchive implements IArchive {
                 ownerKey: name,
                 ownerOffset: parentNode.offset,
             });
+            // need to push depend target info after ownerInfoList.push
             parentNode.pushDependTargetInfo();
         } else {
             let dependTargetInfo;
@@ -327,13 +336,13 @@ export class BinaryOutputArchive implements IArchive {
                     ownerKey: name,
                     ownerOffset: parentNode.offset,
                 });
+                // need to push depend target info after ownerInfoList.push
                 parentNode.pushDependTargetInfo();
                 this._currentNode._dependTargetInfoList.push(dependTargetInfo);
             }
 
             if (this._objectDepth > 0 && !needInline) {
                 this._objectStack.push({
-                    __index__: -1,
                     parentNode,
                     serializedNode: this._currentNode,
                     data,
@@ -410,7 +419,6 @@ export class BinaryOutputArchive implements IArchive {
     public serializableObjArray (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
         if (data == null) {
             this._currentNode.pushInt8(SerializeTag.TAG_NULL);
-            this.serializeNull(name);
             return data;
         }
 
@@ -429,7 +437,6 @@ export class BinaryOutputArchive implements IArchive {
     private _serializeInternal (data: any, name: string): any {
         if (data == null) {
             this._currentNode.pushInt8(SerializeTag.TAG_NULL);
-            this.serializeNull(name);
         } else if (typeof data === 'number') {
             this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
             this.serializeNumber(data, name);
@@ -475,7 +482,6 @@ export class BinaryOutputArchive implements IArchive {
                 data.serialize(this);
                 dependTargetInfo.__id__ = this._serializedList.length;
                 dependTargetInfo.targetSize = this._currentNode.offset;
-                serializedNode.__index__ = dependTargetInfo.__id__; // For debug only, need to be deleted.
                 this._serializedList.push(serializedNode);
             }
         } else if (data.serializeInlineData) {
@@ -489,10 +495,10 @@ export class BinaryOutputArchive implements IArchive {
             // console.log(`write inline data: ${totalOffset}`);
             const currentUuidIndex = this._uuidStack.length;
             this._uuidStack.push(-1);
-            this._currentNode.pushBoolean(true);
-            const uuidOffset = this._currentNode.offset;
-            this._currentNode.pushInt32(-1); // no uuid by default
-            this._currentNode.pushUint32(0); // advance
+
+            this._currentNode.pushObjectFlag(false, true);// mark data is null or inlined
+            const uuidOffsetPos = this._currentNode.offset;
+            this._currentNode.pushInt32(-1); // the advance to uuid info, -1 is a placeholder here, it means no uuid.
 
             // Write __type__ above all.
             this.str(getClassId(data), '__type__');
@@ -500,9 +506,8 @@ export class BinaryOutputArchive implements IArchive {
 
             const uuidIndex = this._uuidStack[currentUuidIndex];
             if (uuidIndex !== -1) {
-                this._currentNode.data.setInt32(uuidOffset, uuidIndex);
-                const advance = this._currentNode.offset - uuidOffset - 8;
-                this._currentNode.data.setUint32(uuidOffset + 4, advance);
+                this._currentNode.data.setInt32(uuidOffsetPos, this._currentNode.offset - uuidOffsetPos - 4);
+                this._currentNode.pushUint32(uuidIndex);
             }
             this._uuidStack.pop();
         }
@@ -531,8 +536,8 @@ export class BinaryOutputArchive implements IArchive {
         }
     }
 
-    private serializeNull (name: string) {
-        this._currentNode.pushDependTargetInfo();
+    private _pushNull () {
+        this._currentNode.pushObjectFlag(true, false); // whether is null and inlined
     }
 
     private serializeNumber (data: number, name: string) {
@@ -572,13 +577,18 @@ export class BinaryOutputArchive implements IArchive {
                 for (const ownerInfo of depend.ownerInfoList) {
                     const ownerData = ownerInfo.owner.data;
                     assert(ownerData.getInt32(ownerInfo.ownerOffset + 1) === -1);
-                    assert(ownerData.getInt32(ownerInfo.ownerOffset + 5) === -1);
+                    //cjh for debug only
+                    //  assert(ownerData.getInt32(ownerInfo.ownerOffset + 5) === -1);
+                    //
                     const ownerOffsetStartInBinary = ownerInfo.owner.offsetInBinary;
                     const ownerOffsetInBinary = ownerOffsetStartInBinary + ownerInfo.ownerOffset;
                     // eslint-disable-next-line max-len
-                    // console.log(`Update owner, key: ${ownerInfo.ownerKey}, ownerOffsetInBinary: ${ownerOffsetInBinary}, targetOffset: ${node.offsetInBinary}, targetSize: ${node.offset}`);
+                    console.log(`Update owner, key: ${ownerInfo.ownerKey}, ownerOffsetInBinary: ${ownerOffsetInBinary}, targetOffset: ${node.offsetInBinary}, targetSize: ${node.offset}`);
+
+                    // Update offset and targetSize which are pushed in pushDependTargetInfo
                     ownerData.setInt32(ownerInfo.ownerOffset + 1, node.offsetInBinary);
-                    ownerData.setInt32(ownerInfo.ownerOffset + 5, node.offset);
+                    //cjh for debug only
+                    // ownerData.setInt32(ownerInfo.ownerOffset + 5, node.offset);
                 }
             }
         });
