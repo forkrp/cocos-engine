@@ -253,6 +253,7 @@ class DeserializeNode {
 
 export class BinaryInputArchive implements IArchive {
     private _uuidList: string[] = [];
+    private _stringList: string[] = [];
     private _currentNode!: DeserializeNode;
     private _isRoot = true;
     // private _objectFactory: IObjectFactory;
@@ -293,7 +294,13 @@ export class BinaryInputArchive implements IArchive {
             this._uuidList.push(uuid);
         }
 
-        const type: string = this._currentNode.popString();
+        const stringCount = this._currentNode.popUint32();
+        for (let i = 0; i < stringCount; ++i) {
+            const str = this._currentNode.popString();
+            this._stringList.push(str);
+        }
+
+        const type: string = this._popString();
         const obj = this.createObjectByType(type);
         if (obj) {
             this._currentOwner = obj;
@@ -348,7 +355,7 @@ export class BinaryInputArchive implements IArchive {
         case SerializeTag.TAG_NUMBER:
             return currentNode.popFloat64();
         case SerializeTag.TAG_STRING:
-            return currentNode.popString();
+            return this._popString();
         case SerializeTag.TAG_BOOLEAN:
             return currentNode.popBoolean();
         case SerializeTag.TAG_ARRAY:
@@ -407,7 +414,13 @@ export class BinaryInputArchive implements IArchive {
     }
 
     str (data: string, name: string): string {
-        return this._currentNode.popString();
+        return this._popString();
+    }
+
+    private _popString (): string {
+        const index = this._currentNode.popUint32();
+        assert(index >= 0 && index < this._stringList.length);
+        return this._stringList[index];
     }
 
     uuid (data: string): string {
@@ -426,7 +439,7 @@ export class BinaryInputArchive implements IArchive {
         const elementCount = currentNode.popInt32();
 
         for (let i = 0; i < elementCount; ++i) {
-            const key = currentNode.popString();
+            const key = this._popString();
             const value = this._serializeInternal(null, key);
             data[key] = value;
         }
@@ -473,7 +486,7 @@ export class BinaryInputArchive implements IArchive {
             }
         }
 
-        const type = currentNode.popString(); // Pop __type__
+        const type = this._popString(); // Pop __type__
         const ret = data || this.createObjectByType(type) as ISerializable;
         assert(ret);
 

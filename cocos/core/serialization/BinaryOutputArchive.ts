@@ -145,6 +145,9 @@ function createDependTargetInfo (): IDependTargetInfo {
 export class BinaryOutputArchive implements IArchive {
     private _uuidStack: number[] = []; // value is -1 means no uuid dependence
     private _uuidCount = 0;
+    private _stringListNode: SerializeNode;
+    private _stringCount = 0;
+    private _stringList: string[] = [];
     private _currentNode: SerializeNode;
     private _serializedList: SerializeNode[] = [];
     private _serializedObjIdMap = new Map<any, IDependTargetInfo>();
@@ -158,6 +161,11 @@ export class BinaryOutputArchive implements IArchive {
         const uuidListNode = new SerializeNode('uuidList', null);
         uuidListNode.pushUint32(0);
         this._serializedList.push(uuidListNode);
+
+        this._stringListNode = new SerializeNode('stringList', null);
+        this._stringListNode.pushUint32(0);
+        this._serializedList.push(this._stringListNode);
+
         this._currentNode = new SerializeNode('root', null);
         this._serializedList.push(this._currentNode);
     }
@@ -197,7 +205,7 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    // public serializeInt64(data: number, name: string): number {
+    // public int64(data: number, name: string): number {
     //     this._currentNode.pushInt64(data);
     //     return data;
     // }
@@ -233,8 +241,21 @@ export class BinaryOutputArchive implements IArchive {
     }
 
     public str (data: string, name: string): string {
-        this._currentNode.pushString(data);
+        this._pushString(data);
         return data;
+    }
+
+    private _pushString (data: string): void {
+        // push index
+        const index = this._stringList.indexOf(data);
+        if (index === -1) {
+            this._currentNode.pushUint32(this._stringCount); // push index
+            ++this._stringCount;
+            this._stringList.push(data);
+            this._stringListNode.pushString(data);
+        } else {
+            this._currentNode.pushUint32(index);
+        }
     }
 
     public uuid (data: string): string {
@@ -266,7 +287,7 @@ export class BinaryOutputArchive implements IArchive {
             }
 
             const value = data[key];
-            this._currentNode.pushString(key);
+            this._pushString(key);
             this._serializeInternal(value, key);
         }
 
@@ -345,7 +366,7 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    // public serializeArrayInt64(data: number[], name: string): number[] {
+    // public int64Array(data: number[], name: string): number[] {
     //     this._currentNode.pushArrayTag(data.length);
     //     for (let i = 0; i < data.length; ++i) {
     //         this.serializeInt64(data[i], `${i}`);
@@ -530,6 +551,9 @@ export class BinaryOutputArchive implements IArchive {
         // handle uuid list
         const uuidNode = this._serializedList[0];
         uuidNode.data.setUint32(0, this._uuidCount);
+
+        // handle string list
+        this._stringListNode.data.setUint32(0, this._stringCount);
         //
         let totalBytes = 0;
         this._serializedList.forEach((e: SerializeNode, index: number) => {
