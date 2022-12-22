@@ -893,6 +893,7 @@ void Node::serialize(Archive &ar) {
     ar.serialize(_localRotation, "_lrot");
     ar.serialize(_localScale, "_lscale");
 
+    CC_SERIALIZE(_mobility);
     CC_SERIALIZE(_layer);
     CC_SERIALIZE(_euler);
 

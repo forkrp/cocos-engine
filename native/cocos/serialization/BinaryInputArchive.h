@@ -121,9 +121,9 @@ public:
         return popNumber<double>();
     }
 
-    std::string_view popString() {
+    inline std::string_view popString() {
         auto strLength = _data.get<uint32_t>(_offset);
-        auto ret = _data.getString(_offset, strLength);
+        auto ret = _data.getString(_offset + 4, strLength);
         _offset += ret.length() + 1 + 4; // 4 is how many bytes of string.
         return ret;
     }
@@ -135,6 +135,7 @@ public:
         return ret;
     }
 
+private:
     SerializationData _data;
     uint32_t _offset{0};
     ccstd::string _name;
@@ -322,10 +323,6 @@ inline void BinaryInputArchive::serializeStlLikeArray(T& data) {
     int32_t length{0};
     auto tag = _currentNode->popInt8();
     if (tag == SerializeTag::TAG_NONE) {
-        // TODO(cjh):
-        _currentNode->popBoolean();
-        _currentNode->popInt32();
-        _currentNode->popInt32();
         data.clear();
         return;
     } else if (tag == SerializeTag::TAG_ARRAY) {
@@ -591,6 +588,11 @@ inline bool BinaryInputArchive::onStartSerializeObject(T& data) {
             if (data != nullptr) {
                 data->setScriptObject(scriptObject);
             }
+        }
+    } else {
+        if (_currentObjectFlags & OBJECT_KIND_FLAG_INLINE) {
+            _currentNode->popInt32(); // Pop uuidAdvance
+            popString(); // Pop type string in data if it's inlined
         }
     }
 

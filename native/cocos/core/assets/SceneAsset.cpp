@@ -49,6 +49,7 @@ void SceneAsset::initDefault(const ccstd::optional<ccstd::string> &uuid) {
 
 template <class Archive>
 void SceneAsset::serialize(Archive &ar) {
+    Super::serialize(ar);
     ar.serialize(_scene, "scene");
     CC_LOG_DEBUG("==> SceneAsset: %p, scene: %p", this, _scene.get());
 }

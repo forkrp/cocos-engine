@@ -256,6 +256,16 @@ function downloadArrayBuffer (url, options, onComplete) {
     download(url, parseArrayBuffer, options, options.onFileProgress, onComplete);
 }
 
+const downloadCCCB = (url, options, onComplete) => {
+    downloadArrayBuffer(url, options, (err, arrayBuffer) => {
+        if (err) {
+            onComplete(err);
+            return;
+        }
+        onComplete(null, arrayBuffer);
+    });
+};
+
 function loadFont (url, options, onComplete) {
     const fontFamilyName = _getFontFamily(url);
 
@@ -326,6 +336,7 @@ downloader.register({
 
     '.ccon': downloadCCON,
     '.cconb': downloadCCONB,
+    '.cccb': downloadCCCB,
 
     // Video
     '.mp4': downloadAsset,

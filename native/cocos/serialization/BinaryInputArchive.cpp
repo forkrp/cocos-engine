@@ -29,6 +29,11 @@
 
 namespace cc {
 
+DeserializeNode::DeserializeNode(const ccstd::string &name, uint8_t *buffer, uint32_t bufferByteLength) {
+    _name = name;
+    _data.initWithBuffer(buffer, bufferByteLength);
+}
+
 std::pair<uint32_t, uint32_t> DeserializeNode::popDependTargetInfo() {
     int32_t offset = popInt32();
     int32_t size = popInt32();
@@ -177,8 +182,12 @@ se::Value& BinaryInputArchive::plainObj(se::Value& value, const char* name) {
 }
 
 void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
+    auto oldObjectFlags = _currentObjectFlags;
+    _currentObjectFlags = _currentNode->popUint8();
+
     auto* dependInfo = checkAssetDependInfo();
     if (dependInfo != nullptr) {
+        _currentObjectFlags = oldObjectFlags;
         return;
     }
 
@@ -197,6 +206,8 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
         }
         value.setObject(scriptObject);
     }
+
+    _currentObjectFlags = oldObjectFlags; // TODO(cjh): Use cpp stack for safety reset flags
 }
 
 se::Value& BinaryInputArchive::serializableObj(se::Value& value, const char* name) {
@@ -276,8 +287,6 @@ se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char
     bool needRelease = false;
     if (value.isObject() && value.toObject()->isArray()) {
         seObj = value.toObject();
-        seObj->root();
-        seObj->incRef();
     } else {
         seObj = se::Object::createArrayObject(static_cast<uint32_t>(length));
         seObj->root();
@@ -394,18 +403,12 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
 }
 
 void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject) {
-    bool isInline = _currentNode->popBoolean();
+    bool isInline = _currentObjectFlags & OBJECT_KIND_FLAG_INLINE;
     uint32_t currentOffset = _currentNode->getOffset();
     uint32_t targetOffset = 0;
 
     if (!isInline) {
         targetOffset = _currentNode->popInt32();
-        if (targetOffset == -1) {
-            // console.log(`return null, currentOffset: ${currentOffset-1}`);
-            _currentNode->popInt32(); // pop size
-            return nullptr;
-        }
-
         if (targetOffset < 0 || targetOffset >= _currentNode->getDataByteLength()) {
             return nullptr;
         }
@@ -421,7 +424,7 @@ void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outS
         _currentNode->setOffset(targetOffset);
     }
 
-    const char* type = _currentNode->popString().data();
+    const char* type = popString().data();
 
     void* obj = nullptr;
     if (_objectFactory->needCreateScriptObject(type)) {
@@ -486,25 +489,25 @@ void BinaryInputArchive::onAfterDeserializeScriptObjectByNativePtr(const void* n
 
 AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
     assert(!(_currentObjectFlags & OBJECT_KIND_FLAG_NULL));
-    assert(_currentObjectFlags & OBJECT_KIND_FLAG_INLINE);
+    if (_currentObjectFlags & OBJECT_KIND_FLAG_INLINE) {
+        int32_t uuidAdvance = _currentNode->popInt32();
+        assert(uuidAdvance != -1);
 
-    int32_t uuidAdvance = _currentNode->popInt32();
-    assert(uuidAdvance != -1);
+        if (uuidAdvance != -1) {
+            _currentNode->setOffset(_currentNode->getOffset() + uuidAdvance);
+            auto uuidIndex = _currentNode->popUint32();
+            assert(uuidIndex >= 0 && uuidIndex < _uuidList.size());
 
-    if (uuidAdvance != -1) {
-        _currentNode->setOffset(_currentNode->getOffset() + uuidAdvance);
-        auto uuidIndex = _currentNode->popUint32();
-        assert(uuidIndex >= 0 && uuidIndex < _uuidList.size());
+            AssetDependInfo dependInfo;
+            dependInfo.uuid = _uuidList[uuidIndex];
+            dependInfo.owner = _currentOwner;
+            dependInfo.propName = _currentKey;
 
-        AssetDependInfo dependInfo;
-        dependInfo.uuid = _uuidList[uuidIndex];
-        dependInfo.owner = _currentOwner;
-        dependInfo.propName = _currentKey;
+            CC_LOG_DEBUG("Found __uuid__, owner: %p, current key: %s", _currentOwner, _currentKey);
 
-        CC_LOG_DEBUG("Found __uuid__, owner: %p, current key: %s", _currentOwner, _currentKey);
-
-        _depends.emplace_back(std::move(dependInfo));
-        return &_depends.back();
+            _depends.emplace_back(std::move(dependInfo));
+            return &_depends.back();
+        }
     }
 
     return nullptr;
