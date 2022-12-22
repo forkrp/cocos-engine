@@ -182,6 +182,7 @@ namespace cc {
 %attribute(cc::CCObject, cc::CCObject::Flags, hideFlags, getHideFlags, setHideFlags);
 %attribute(cc::CCObject, bool, replicated, isReplicated, setReplicated);
 %attribute(cc::CCObject, bool, isValid, isValid);
+%attribute(cc::BinaryInputArchive, uint32_t, currentOffset, getCurrentOffset);
 
 // ----- Import Section ------
 // Brief: Import header files which are depended by 'Include Section'

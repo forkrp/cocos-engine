@@ -40,7 +40,7 @@ class GlobalDSManager;
 }
 namespace scene {
 
-enum class EnvironmentLightingType {
+enum class EnvironmentLightingType : uint8_t {
     /**
      * @zh
      * 半球漫反射

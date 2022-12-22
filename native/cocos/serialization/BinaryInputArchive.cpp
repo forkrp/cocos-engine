@@ -185,14 +185,25 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
     auto oldObjectFlags = _currentObjectFlags;
     _currentObjectFlags = _currentNode->popUint8();
 
+    if (_currentObjectFlags & OBJECT_KIND_FLAG_NULL) {
+        _currentObjectFlags = oldObjectFlags;
+        value.setNull();
+        return;
+    }
+
     auto* dependInfo = checkAssetDependInfo();
     if (dependInfo != nullptr) {
         _currentObjectFlags = oldObjectFlags;
+        value.setNull();
         return;
     }
 
     se::Object* scriptObject{nullptr};
-    void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject);
+    if (value.isObject()) {
+        scriptObject = value.toObject();
+    }
+    ccstd::optional<uint32_t> resetOffset;
+    void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject, resetOffset);
     if (scriptObject != nullptr) {
         _currentOwner = scriptObject;
         if (obj != nullptr) {
@@ -207,10 +218,16 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
         value.setObject(scriptObject);
     }
 
+    if (resetOffset.has_value()) {
+        _currentNode->setOffset(resetOffset.value());
+    }
     _currentObjectFlags = oldObjectFlags; // TODO(cjh): Use cpp stack for safety reset flags
 }
 
 se::Value& BinaryInputArchive::serializableObj(se::Value& value, const char* name) {
+    if (strcmp(name, "__prefab") == 0) {
+        int a = 0;
+    }
     const char* oldKey = _currentKey;
     auto* oldOwner = _currentOwner;
 
@@ -402,10 +419,15 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
     }
 }
 
-void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject) {
+void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset) {
+    if (_currentObjectFlags & OBJECT_KIND_FLAG_NULL) {
+        outScriptObject = nullptr;
+        return nullptr;
+    }
+
     bool isInline = _currentObjectFlags & OBJECT_KIND_FLAG_INLINE;
     uint32_t currentOffset = _currentNode->getOffset();
-    uint32_t targetOffset = 0;
+    int32_t targetOffset = 0;
 
     if (!isInline) {
         targetOffset = _currentNode->popInt32();
@@ -422,21 +444,26 @@ void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outS
         }
 
         _currentNode->setOffset(targetOffset);
+        resetOffset = currentOffset + 4;
     }
 
     const char* type = popString().data();
 
     void* obj = nullptr;
-    if (_objectFactory->needCreateScriptObject(type)) {
-        se::Object* seObj = _objectFactory->createScriptObject(type);
-        if (seObj != nullptr) {
-            seObj->root(); // FIXME(cjh): When to unroot it?
-            obj = seObj->getPrivateData();
+    if (outScriptObject == nullptr) {
+        if (_objectFactory->needCreateScriptObject(type)) {
+            se::Object* seObj = _objectFactory->createScriptObject(type);
+            if (seObj != nullptr) {
+                seObj->root(); // FIXME(cjh): When to unroot it?
+                obj = seObj->getPrivateData();
+            }
+            outScriptObject = seObj;
+        } else {
+            obj = _objectFactory->createNativeObject(type);
+            outScriptObject = nullptr;
         }
-        outScriptObject = seObj;
     } else {
-        obj = _objectFactory->createNativeObject(type);
-        outScriptObject = nullptr;
+        obj = outScriptObject->getPrivateData();
     }
 
     if (targetOffset > 0) {
@@ -488,11 +515,12 @@ void BinaryInputArchive::onAfterDeserializeScriptObjectByNativePtr(const void* n
 }
 
 AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
-    assert(!(_currentObjectFlags & OBJECT_KIND_FLAG_NULL));
+    if ((_currentObjectFlags & OBJECT_KIND_FLAG_NULL)) {
+        return nullptr;
+    }
+
     if (_currentObjectFlags & OBJECT_KIND_FLAG_INLINE) {
         int32_t uuidAdvance = _currentNode->popInt32();
-        assert(uuidAdvance != -1);
-
         if (uuidAdvance != -1) {
             _currentNode->setOffset(_currentNode->getOffset() + uuidAdvance);
             auto uuidIndex = _currentNode->popUint32();

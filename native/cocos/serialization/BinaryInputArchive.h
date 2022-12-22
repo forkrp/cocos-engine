@@ -214,6 +214,8 @@ public:
         return data;
     }
 
+    inline uint32_t getCurrentOffset() const { return _currentNode->getOffset(); }
+
     se::Value& anyValue(se::Value& value, const char* name);
     se::Value& plainObj(se::Value& value, const char* name);
     se::Value& arrayObj(se::Value& value, const char* name);
@@ -252,7 +254,7 @@ public:
     void onSerializingObjectRef(T& data);
 
     template <class T>
-    bool onStartSerializeObject(T& data);
+    bool onStartSerializeObject(T& data, ccstd::optional<uint32_t>& resetOffset);
 
     template <class T>
     void onFinishSerializeObject(T& data);
@@ -263,8 +265,8 @@ private:
     std::string_view popString();
 
     template <class T>
-    T getOrCreateNativeObject(se::Object*& outScriptObject);
-    void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject);
+    T getOrCreateNativeObject(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset);
+    void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset);
 
     void doSerializePlainObj(se::Value& value);
     void doSerializeSerializableObj(se::Value& value);
@@ -475,10 +477,12 @@ inline void BinaryInputArchive::serializeObject(T& data) {
         if constexpr (IsPtr<std::decay_t<T>>::value) {
             data = nullptr;
         }
+        _currentObjectFlags = oldObjectFlags;
         return;
     }
 
-    if (onStartSerializeObject(data)) {
+    ccstd::optional<uint32_t> resetOffset;
+    if (onStartSerializeObject(data, resetOffset)) {
         if constexpr (IsPtr<std::decay_t<T>>::value) {
             if (data != nullptr) {
                 onSerializingObjectPtr(data);
@@ -487,6 +491,10 @@ inline void BinaryInputArchive::serializeObject(T& data) {
             onSerializingObjectRef(data);
         }
         onFinishSerializeObject(data);
+    }
+
+    if (resetOffset.has_value()) {
+        _currentNode->setOffset(resetOffset.value());
     }
 
     _currentObjectFlags = oldObjectFlags;
@@ -555,7 +563,7 @@ inline void BinaryInputArchive::onSerializingObjectRef(T& data) {
 }
 
 template <class T>
-inline bool BinaryInputArchive::onStartSerializeObject(T& data) {
+inline bool BinaryInputArchive::onStartSerializeObject(T& data, ccstd::optional<uint32_t>& resetOffset) {
     se::Object* scriptObject{nullptr};
     if constexpr (IsPtr<T>::value) {
         using value_type = typename IsPtr<T>::type;
@@ -576,7 +584,7 @@ inline bool BinaryInputArchive::onStartSerializeObject(T& data) {
             }
         }
 
-        value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject);
+        value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject, resetOffset);
         data = obj;
         _currentOwner = scriptObject;
 
@@ -620,9 +628,9 @@ inline void BinaryInputArchive::onFinishSerializeObject(T& data) {
 }
 
 template <class T>
-inline T BinaryInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject) {
+inline T BinaryInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset) {
     //    static_assert(std::is_base_of<CCObject, T>::value, "Native object should be inherited from CCObject");
-    return reinterpret_cast<T>(getOrCreateNativeObjectReturnVoidPtr(outScriptObject));
+    return reinterpret_cast<T>(getOrCreateNativeObjectReturnVoidPtr(outScriptObject, resetOffset));
 }
 
 #endif // SWIGCOCOS

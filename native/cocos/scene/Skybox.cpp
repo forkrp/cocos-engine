@@ -51,6 +51,7 @@ template <class Archive>
 void SkyboxInfo::serialize(Archive &ar) {
     CC_SERIALIZE(_envLightingType);
     CC_SERIALIZE(_envmapHDR);
+    ar.serialize(_envmapHDR, "_envmap");
     CC_SERIALIZE(_envmapLDR);
     CC_SERIALIZE(_diffuseMapHDR);
     CC_SERIALIZE(_diffuseMapLDR);

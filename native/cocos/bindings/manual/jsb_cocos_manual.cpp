@@ -899,7 +899,7 @@ static bool JSB_BinaryInputArchive_start(se::State& s) {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) nullptr ;
 
     if(argc < 1) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
@@ -920,6 +920,31 @@ static bool JSB_BinaryInputArchive_start(se::State& s) {
     return false;
 }
 SE_BIND_FUNC(JSB_BinaryInputArchive_start)
+
+static bool JSB_CCObject_serialize(se::State& s) {
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::CCObject *arg1 = (cc::CCObject *) nullptr ;
+
+    if(argc < 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::CCObject>(s);
+    if (nullptr == arg1) return true;
+
+    const auto &arg0 = args[0];
+    if (arg0.isObject()) {
+        auto* archive = reinterpret_cast<cc::IArchive*>(arg0.toObject()->getPrivateData());
+//        cc::CCObject::serialize(*archive);
+        return true;
+    }
+
+    SE_REPORT_ERROR("Error processing arguments");
+    return false;
+}
+SE_BIND_FUNC(JSB_CCObject_serialize)
 
 template <typename T>
 static bool bindAsExternalBuffer(se::State &s) {  // NOLINT
@@ -975,6 +1000,8 @@ bool register_all_cocos_manual(se::Object *obj) { // NOLINT(readability-identifi
 
     __jsb_cc_JsonInputArchive_proto->defineFunction("start", _SE(JSB_JsonInputArchive_start));
     __jsb_cc_BinaryInputArchive_proto->defineFunction("start", _SE(JSB_BinaryInputArchive_start));
+
+//    __jsb_cc__CCObject_proto->defineFunction("serialize", _SE());
 
     register_plist_parser(obj);
     register_sys_localStorage(obj);
