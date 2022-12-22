@@ -910,8 +910,8 @@ static bool JSB_BinaryInputArchive_start(se::State& s) {
 
     const auto &arg0 = args[0];
     if (arg0.isObject() && arg0.toObject()->isArrayBuffer()) {
-        cc::ArrayBuffer::Ptr arrayBuffer;
-        sevalue_to_native(args[0], &arrayBuffer);
+        auto* arrayBuffer = ccnew cc::ArrayBuffer();
+        sevalue_to_native(args[0], arrayBuffer);
         s.rval() = arg1->start(arrayBuffer, &myObjectFactory);
         return true;
     }
