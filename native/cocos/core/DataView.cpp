@@ -24,12 +24,11 @@
  ****************************************************************************/
 
 #include "core/DataView.h"
+#include "core/ArrayBuffer.h"
 #include "base/TemplateUtils.h"
+#include "base/Macros.h"
 
 namespace cc {
-
-#include "base/Macros.h"
-#include "core/ArrayBuffer.h"
 
 ccstd::unordered_map<ccstd::string, DataView::ReaderVariant> DataView::intReaderMap{
     {"getUint8", &DataView::getUint8},

@@ -26,10 +26,14 @@
 #pragma once
 
 #include "base/Macros.h"
+#include "base/Ptr.h"
 #include "base/std/variant.h"
-#include "core/ArrayBuffer.h"
+#include "base/std/container/unordered_map.h"
+#include "base/std/container/string.h"
 
 namespace cc {
+
+class ArrayBuffer;
 
 class DataView final {
 public:
@@ -80,7 +84,7 @@ public:
     static ccstd::unordered_map<ccstd::string, IntWritter> intWritterMap;
 
 private:
-    ArrayBuffer::Ptr _buffer;
+    IntrusivePtr<ArrayBuffer> _buffer;
     uint8_t *_data{nullptr};
     uint32_t _byteOffset{0};
     uint32_t _byteEndPos{0};

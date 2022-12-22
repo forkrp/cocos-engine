@@ -25,6 +25,8 @@
 
 #include "3d/misc/Buffer.h"
 #include "base/std/variant.h"
+#include "base/Log.h"
+#include "core/ArrayBuffer.h"
 
 namespace cc {
 
