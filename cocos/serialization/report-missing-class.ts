@@ -1,5 +1,5 @@
 import { EDITOR } from 'internal:constants';
-import { errorID } from '../core';
+import { errorID } from '../core/platform/debug';
 
 /**
  *
