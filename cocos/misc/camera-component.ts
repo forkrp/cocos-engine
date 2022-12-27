@@ -38,7 +38,7 @@ import { Layers } from '../scene-graph/layers';
 import { TransformBit } from '../scene-graph/node-enum';
 import { RenderWindow } from '../render-scene/core/render-window';
 import { ClearFlagBit } from '../gfx';
-import { IArchive } from '../serialization';
+import { IArchive } from '../core/serialization';
 
 const _temp_vec3_1 = new Vec3();
 

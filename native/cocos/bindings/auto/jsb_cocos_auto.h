@@ -188,4 +188,9 @@ JSB_REGISTER_OBJECT_TYPE(cc::JsonInputArchive);
 extern se::Object *__jsb_cc_JsonInputArchive_proto; // NOLINT
 extern se::Class * __jsb_cc_JsonInputArchive_class; // NOLINT
 
+
+JSB_REGISTER_OBJECT_TYPE(cc::BinaryInputArchive);
+extern se::Object *__jsb_cc_BinaryInputArchive_proto; // NOLINT
+extern se::Class * __jsb_cc_BinaryInputArchive_class; // NOLINT
+
 // clang-format on

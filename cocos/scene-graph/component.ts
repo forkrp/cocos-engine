@@ -38,7 +38,7 @@ import { legacyCC } from '../core/global-exports';
 import { errorID, warnID, assertID } from '../core/platform/debug';
 import { CompPrefabInfo } from './prefab/prefab-info';
 import { EventHandler } from './component-event-handler';
-import { IArchive } from '../serialization';
+import { IArchive } from '../core/serialization';
 
 const idGenerator = new IDGenerator('Comp');
 const IsOnLoadCalled = CCObject.Flags.IsOnLoadCalled;

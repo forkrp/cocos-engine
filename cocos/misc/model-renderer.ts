@@ -28,7 +28,7 @@ import {
 } from 'cc.decorator';
 import { scene } from '../render-scene';
 import { Layers } from '../scene-graph/layers';
-import { IArchive } from '../serialization';
+import { IArchive } from '../core/serialization';
 import { Renderer } from './renderer';
 
 /**

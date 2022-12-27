@@ -41,7 +41,7 @@ import type { Scene } from './scene';
 import { PrefabInfo } from './prefab/prefab-info';
 import { NodeEventType } from './node-event';
 import { Event } from '../input/types';
-import { IArchive } from '../serialization';
+import { IArchive } from '../core/serialization';
 
 const Destroying = CCObject.Flags.Destroying;
 const DontDestroy = CCObject.Flags.DontDestroy;

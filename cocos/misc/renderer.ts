@@ -28,7 +28,7 @@ import { Material } from '../asset/assets/material';
 import { Component } from '../scene-graph';
 import { IMaterialInstanceInfo, MaterialInstance } from '../render-scene/core/material-instance';
 import { warnID, _decorator } from '../core';
-import { IArchive } from '../serialization';
+import { IArchive } from '../core/serialization';
 
 const _matInsInfo: IMaterialInstanceInfo = {
     parent: null!,

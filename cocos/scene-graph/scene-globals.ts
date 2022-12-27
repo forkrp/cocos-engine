@@ -39,7 +39,7 @@ import { warnID } from '../core/platform/debug';
 import { Material } from '../asset/assets/material';
 import { cclegacy } from '../core';
 import { Scene } from './scene';
-import { IArchive, ISerializable } from '../serialization';
+import { IArchive, ISerializable } from '../core/serialization';
 
 const _up = new Vec3(0, 1, 0);
 const _v3 = new Vec3();
@@ -242,12 +242,12 @@ export class AmbientInfo implements ISerializable {
     serialize (ar: IArchive): void {
         this._skyColorHDR = ar.serializableObj(this._skyColorHDR, '_skyColorHDR');
         this._skyColorHDR = ar.serializableObj(this._skyColorHDR, '_skyColor');
-        this._skyIllumHDR = ar.float64(this._skyIllumHDR, '_skyIllumHDR');
-        this._skyIllumHDR = ar.float64(this._skyIllumHDR, '_skyIllum');
+        this._skyIllumHDR = ar.float32(this._skyIllumHDR, '_skyIllumHDR');
+        this._skyIllumHDR = ar.float32(this._skyIllumHDR, '_skyIllum');
         this._groundAlbedoHDR = ar.serializableObj(this._groundAlbedoHDR, '_groundAlbedoHDR');
         this._groundAlbedoHDR = ar.serializableObj(this._groundAlbedoHDR, '_groundAlbedo');
         this._skyColorLDR = ar.serializableObj(this._skyColorLDR, '_skyColorLDR');
-        this._skyIllumLDR = ar.float64(this._skyIllumLDR, '_skyIllumLDR');
+        this._skyIllumLDR = ar.float32(this._skyIllumLDR, '_skyIllumLDR');
         this._groundAlbedoLDR = ar.serializableObj(this._groundAlbedoLDR, '_groundAlbedoLDR');
     }
 

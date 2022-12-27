@@ -34,7 +34,7 @@
 namespace cc {
 namespace scene {
 
-enum class FogType {
+enum class FogType : uint8_t {
     /**
      * @zh
      * 线性雾。

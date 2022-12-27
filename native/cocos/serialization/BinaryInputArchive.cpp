@@ -225,9 +225,6 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
 }
 
 se::Value& BinaryInputArchive::serializableObj(se::Value& value, const char* name) {
-    if (strcmp(name, "__prefab") == 0) {
-        int a = 0;
-    }
     const char* oldKey = _currentKey;
     auto* oldOwner = _currentOwner;
 
@@ -279,6 +276,9 @@ void BinaryInputArchive::doSerializeArray(se::Value& value) {
 }
 
 se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char* name) {
+    if (0 == strcmp("_materials", name)) {
+        int a = 0;
+    }
     const char* oldKey = _currentKey;
     auto* oldOwner = _currentOwner;
 
@@ -304,6 +304,8 @@ se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char
     bool needRelease = false;
     if (value.isObject() && value.toObject()->isArray()) {
         seObj = value.toObject();
+        seObj->root(); //TODO(cjh): how to unroot and decRef it?
+        seObj->incRef();
     } else {
         seObj = se::Object::createArrayObject(static_cast<uint32_t>(length));
         seObj->root();

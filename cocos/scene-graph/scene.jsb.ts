@@ -27,6 +27,7 @@ import { applyTargetOverrides, expandNestedPrefabInstanceNode } from "./prefab/u
 import { assert } from "../core/platform/debug";
 import { updateChildrenForDeserialize } from '../core/utils/jsb-utils';
 import { SceneGlobals } from './scene-globals';
+import { IArchive } from '../core/serialization';
 
 export const Scene = jsb.Scene;
 export type Scene = jsb.Scene;
@@ -130,6 +131,9 @@ sceneProto._activate = function (active: boolean) {
         }
     }
 };
+
+sceneProto.serialize = function(ar: IArchive) {
+}
 
 // handle meta data, it is generated automatically
 const SceneProto = Scene.prototype;

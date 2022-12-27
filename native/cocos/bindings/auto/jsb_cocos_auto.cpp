@@ -108,6 +108,9 @@
 #define cc_CCObject_isValid_get(self_) self_->isValid()
   
 
+#define cc_BinaryInputArchive_currentOffset_get(self_) self_->getCurrentOffset()
+  
+
 
 static bool js_cc_clampf(se::State& s)
 {
@@ -7728,6 +7731,811 @@ bool js_register_cc_JsonInputArchive(se::Object* obj) {
 }
 
 
+se::Class* __jsb_cc_BinaryInputArchive_class = nullptr;
+se::Object* __jsb_cc_BinaryInputArchive_proto = nullptr;
+SE_DECLARE_FINALIZE_FUNC(js_delete_cc_BinaryInputArchive) 
+
+static bool js_new_cc_BinaryInputArchive(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    
+    cc::BinaryInputArchive *result;
+    result = (cc::BinaryInputArchive *)new cc::BinaryInputArchive();
+    
+    
+    auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
+    s.thisObject()->setPrivateObject(ptr);
+    return true;
+}
+SE_BIND_CTOR(js_new_cc_BinaryInputArchive, __jsb_cc_BinaryInputArchive_class, js_delete_cc_BinaryInputArchive)
+
+static bool js_delete_cc_BinaryInputArchive(se::State& s)
+{
+    return true;
+}
+SE_BIND_FINALIZE_FUNC(js_delete_cc_BinaryInputArchive) 
+
+static bool js_cc_BinaryInputArchive_isReading(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    bool result;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (bool)((cc::BinaryInputArchive const *)arg1)->isReading();
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_isReading) 
+
+static bool js_cc_BinaryInputArchive_isWritting(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    bool result;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (bool)((cc::BinaryInputArchive const *)arg1)->isWritting();
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_isWritting) 
+
+static bool js_cc_BinaryInputArchive_isExporting(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    bool result;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (bool)((cc::BinaryInputArchive const *)arg1)->isExporting();
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_isExporting) 
+
+static bool js_cc_BinaryInputArchive_getDepends(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    std::vector< cc::AssetDependInfo > *result = 0 ;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = (std::vector< cc::AssetDependInfo > *) &((cc::BinaryInputArchive const *)arg1)->getDepends();
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_getDepends) 
+
+static bool js_cc_BinaryInputArchive_boolean(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    bool *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    bool temp2 ;
+    ccstd::string temp3 ;
+    bool result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (bool)(arg1)->boolean(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_boolean) 
+
+static bool js_cc_BinaryInputArchive_int8(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    int8_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int8_t temp2 ;
+    ccstd::string temp3 ;
+    int8_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int8(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_int8) 
+
+static bool js_cc_BinaryInputArchive_int16(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    int16_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int16_t temp2 ;
+    ccstd::string temp3 ;
+    int16_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int16(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_int16) 
+
+static bool js_cc_BinaryInputArchive_int32(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    int32_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int32_t temp2 ;
+    ccstd::string temp3 ;
+    int32_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int32(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_int32) 
+
+static bool js_cc_BinaryInputArchive_int64(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    int64_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    int64_t temp2 ;
+    ccstd::string temp3 ;
+    int64_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->int64(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_int64) 
+
+static bool js_cc_BinaryInputArchive_uint8(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    uint8_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint8_t temp2 ;
+    ccstd::string temp3 ;
+    uint8_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint8(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_uint8) 
+
+static bool js_cc_BinaryInputArchive_uint16(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    uint16_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint16_t temp2 ;
+    ccstd::string temp3 ;
+    uint16_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint16(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_uint16) 
+
+static bool js_cc_BinaryInputArchive_uint32(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    uint32_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint32_t temp2 ;
+    ccstd::string temp3 ;
+    uint32_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint32(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_uint32) 
+
+static bool js_cc_BinaryInputArchive_uint64(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    uint64_t *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    uint64_t temp2 ;
+    ccstd::string temp3 ;
+    uint64_t result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (arg1)->uint64(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_uint64) 
+
+static bool js_cc_BinaryInputArchive_float32(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    float *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    float temp2 ;
+    ccstd::string temp3 ;
+    float result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (float)(arg1)->float32(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_float32) 
+
+static bool js_cc_BinaryInputArchive_float64(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    double *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    double temp2 ;
+    ccstd::string temp3 ;
+    double result;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (double)(arg1)->float64(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_float64) 
+
+static bool js_cc_BinaryInputArchive_str(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    ccstd::string *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    ccstd::string temp2 ;
+    ccstd::string temp3 ;
+    ccstd::string *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (ccstd::string *) &(arg1)->str(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_str) 
+
+static bool js_cc_BinaryInputArchive_anyValue(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->anyValue(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_anyValue) 
+
+static bool js_cc_BinaryInputArchive_plainObj(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->plainObj(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_plainObj) 
+
+static bool js_cc_BinaryInputArchive_arrayObj(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->arrayObj(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_arrayObj) 
+
+static bool js_cc_BinaryInputArchive_serializableObj(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->serializableObj(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_serializableObj) 
+
+static bool js_cc_BinaryInputArchive_serializableObjArray(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    se::Value *arg2 = 0 ;
+    char *arg3 = (char *) NULL ;
+    se::Value temp2 ;
+    ccstd::string temp3 ;
+    se::Value *result = 0 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3);
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = (char *) temp3.c_str(); 
+    result = (se::Value *) &(arg1)->serializableObjArray(*arg2,(char const *)arg3);
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_serializableObjArray) 
+
+static bool js_cc_BinaryInputArchive_currentOffset_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::BinaryInputArchive *arg1 = (cc::BinaryInputArchive *) NULL ;
+    uint32_t result;
+    
+    arg1 = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == arg1) return true;
+    result = cc_BinaryInputArchive_currentOffset_get(arg1);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_BinaryInputArchive_currentOffset_get) 
+
+bool js_register_cc_BinaryInputArchive(se::Object* obj) {
+    auto* cls = se::Class::create("BinaryInputArchive", obj, nullptr, _SE(js_new_cc_BinaryInputArchive)); 
+    
+    cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
+    cls->defineProperty("currentOffset", _SE(js_cc_BinaryInputArchive_currentOffset_get), nullptr); 
+    
+    cls->defineFunction("isReading", _SE(js_cc_BinaryInputArchive_isReading)); 
+    cls->defineFunction("isWritting", _SE(js_cc_BinaryInputArchive_isWritting)); 
+    cls->defineFunction("isExporting", _SE(js_cc_BinaryInputArchive_isExporting)); 
+    cls->defineFunction("getDepends", _SE(js_cc_BinaryInputArchive_getDepends)); 
+    cls->defineFunction("boolean", _SE(js_cc_BinaryInputArchive_boolean)); 
+    cls->defineFunction("int8", _SE(js_cc_BinaryInputArchive_int8)); 
+    cls->defineFunction("int16", _SE(js_cc_BinaryInputArchive_int16)); 
+    cls->defineFunction("int32", _SE(js_cc_BinaryInputArchive_int32)); 
+    cls->defineFunction("int64", _SE(js_cc_BinaryInputArchive_int64)); 
+    cls->defineFunction("uint8", _SE(js_cc_BinaryInputArchive_uint8)); 
+    cls->defineFunction("uint16", _SE(js_cc_BinaryInputArchive_uint16)); 
+    cls->defineFunction("uint32", _SE(js_cc_BinaryInputArchive_uint32)); 
+    cls->defineFunction("uint64", _SE(js_cc_BinaryInputArchive_uint64)); 
+    cls->defineFunction("float32", _SE(js_cc_BinaryInputArchive_float32)); 
+    cls->defineFunction("float64", _SE(js_cc_BinaryInputArchive_float64)); 
+    cls->defineFunction("str", _SE(js_cc_BinaryInputArchive_str)); 
+    cls->defineFunction("anyValue", _SE(js_cc_BinaryInputArchive_anyValue)); 
+    cls->defineFunction("plainObj", _SE(js_cc_BinaryInputArchive_plainObj)); 
+    cls->defineFunction("arrayObj", _SE(js_cc_BinaryInputArchive_arrayObj)); 
+    cls->defineFunction("serializableObj", _SE(js_cc_BinaryInputArchive_serializableObj)); 
+    cls->defineFunction("serializableObjArray", _SE(js_cc_BinaryInputArchive_serializableObjArray)); 
+    
+    
+    
+    
+    cls->defineFinalizeFunction(_SE(js_delete_cc_BinaryInputArchive));
+    
+    
+    cls->install();
+    JSBClassType::registerClass<cc::BinaryInputArchive>(cls);
+    
+    __jsb_cc_BinaryInputArchive_proto = cls->getProto();
+    __jsb_cc_BinaryInputArchive_class = cls;
+    se::ScriptEngine::getInstance()->clearException();
+    return true;
+}
+
+
 
 
 bool register_all_engine(se::Object* obj) {
@@ -7768,6 +8576,7 @@ bool register_all_engine(se::Object* obj) {
 #endif // CC_USE_DEBUG_RENDERER
     js_register_cc_AssetDependInfo(ns); 
     js_register_cc_JsonInputArchive(ns); 
+    js_register_cc_BinaryInputArchive(ns); 
     
     /* Register global variables & global functions */
     

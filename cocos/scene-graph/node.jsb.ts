@@ -37,7 +37,7 @@ import { syncNodeValues } from "../core/utils/jsb-utils";
 import { property } from '../core/data/class-decorator';
 import { nodePolyfill } from './node-dev';
 import * as js from '../core/utils/js';
-import { IArchive } from '../serialization';
+import { IArchive } from '../core/serialization';
 
 const reserveContentsForAllSyncablePrefabTag = Symbol('ReserveContentsForAllSyncablePrefab');
 

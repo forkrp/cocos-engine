@@ -82,7 +82,7 @@ enum class ShadowSize {
  * @en The shadow type
  * @enum Shadows.ShadowType
  */
-enum class ShadowType {
+enum class ShadowType : uint8_t {
     /**
      * @zh 平面阴影。
      * @en Planar shadow
