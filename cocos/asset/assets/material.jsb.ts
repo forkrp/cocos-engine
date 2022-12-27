@@ -273,7 +273,7 @@ materialProto._ctor = function () {
 
 const oldOnLoaded = materialProto.onLoaded;
 materialProto.onLoaded = function () {
-    // this._propsInternal = this._props;
+    this._propsInternal = this._props;
     // Material::_props is serialized in cpp, so doesn't need to synchronize it here which will override the value in cpp.
     oldOnLoaded.call(this);
 };
