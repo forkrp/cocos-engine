@@ -37,13 +37,16 @@ export class SerializeData {
         const newDataSize = byteOffset + dataSize;
 
         if (newDataSize >= this._arrayBuffer.byteLength) {
-            const oldArrayBuffer = this._arrayBuffer;
-            const oldUint8Array = new Uint8Array(oldArrayBuffer);
+            const oldUint8Array = this._bufferView;
+            // Allocate a new arraybuffer
             this._arrayBuffer = new ArrayBuffer(Math.max(newDataSize + DEFAULT_ARRAY_BUFFER_SIZE, this._arrayBuffer.byteLength * 2));
-            const newUint8Array = new Uint8Array(this._arrayBuffer);
-            newUint8Array.set(oldUint8Array, 0);
+            // Reset bufferview
+            this._bufferView = new Uint8Array(this._arrayBuffer);
+            // Reset dataview
             this._dataView = new DataView(this._arrayBuffer);
-            console.log(`==> expandBuffer from ${oldUint8Array.byteLength} to ${newUint8Array.byteLength}`);
+            // Copy data from the old arraybuffer to the new one
+            this._bufferView.set(oldUint8Array, 0);
+            console.log(`==> expandBuffer from ${oldUint8Array.byteLength} to ${this._bufferView.byteLength}`);
         }
     }
 
