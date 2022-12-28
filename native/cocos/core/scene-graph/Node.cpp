@@ -50,6 +50,8 @@ const ccstd::string EMPTY_NODE_NAME;
 IDGenerator idGenerator("Node");
 } // namespace
 
+CC_IMPL_SERIALIZE(Node)
+
 Node::Node() : Node(EMPTY_NODE_NAME) {
 }
 
@@ -901,7 +903,5 @@ void Node::serialize(Archive &ar) {
 //        CC_SERIALIZE(_id);
 //    }
 }
-
-CC_IMPL_SERIALIZE(Node)
 
 } // namespace cc

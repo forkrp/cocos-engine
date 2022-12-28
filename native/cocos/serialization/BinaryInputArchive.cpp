@@ -210,7 +210,7 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
             if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), obj) == _deserializedObjects.cend()) {
                 scriptObject->getPrivateObject()->serialize(*this);
             } else {
-                CC_LOG_DEBUG("serializableObj return from cache, scriptObject: %p", scriptObject);
+//                CC_LOG_DEBUG("serializableObj return from cache, scriptObject: %p", scriptObject);
             }
         } else {
             serializeScriptObject(scriptObject);
@@ -532,8 +532,10 @@ AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
             dependInfo.uuid = _uuidList[uuidIndex];
             dependInfo.owner = _currentOwner;
             dependInfo.propName = _currentKey;
+            
+            assert(dependInfo.uuid.length() >= 36 && dependInfo.uuid[0] != '\0');
 
-            CC_LOG_DEBUG("Found __uuid__, owner: %p, current key: %s", _currentOwner, _currentKey);
+//            CC_LOG_DEBUG("Found __uuid__: %s, owner: %p, current key: %s", dependInfo.uuid.data(), _currentOwner, _currentKey);
 
             _depends.emplace_back(std::move(dependInfo));
             return &_depends.back();

@@ -83,9 +83,10 @@ void SerializationData::setString(uint32_t byteOffset, const std::string_view& v
 std::string_view SerializationData::getString(uint32_t byteOffset, uint32_t strLength) {
     if (byteOffset >= 0 && byteOffset <= _dataLength) {
         return std::string_view(reinterpret_cast<char*>(_buffer) + byteOffset, static_cast<size_t>(strLength));
-    } else {
-        assert(false);
     }
+    
+    assert(false);
+    return {};
 }
 
 } // namespace cc

@@ -31,20 +31,22 @@
 public:                                                                        \
     template <class Archive>                                                   \
     void serialize(Archive& ar);                                               \
+\
     void virtualSerialize(cc::JsonInputArchive& ar) override;                  \
     void virtualSerialize(cc::BinaryInputArchive& ar) override;                \
     void virtualOnBeforeSerialize() override;                                  \
-    void virtualOnAfterDeserialize() override;                                 \
-                                                                               \
-private:                                                                       \
-    inline void serializeInternal(cc::JsonInputArchive& ar) { serialize(ar); } \
-    inline void serializeInternal(cc::BinaryInputArchive& ar) { serialize(ar); }
+    void virtualOnAfterDeserialize() override;
+                                                                               
 
 #define CC_IMPL_SERIALIZE(__klass__)                                                       \
-    void __klass__::virtualSerialize(JsonInputArchive& ar) { __klass__::serialize(ar); }   \
-    void __klass__::virtualSerialize(BinaryInputArchive& ar) { __klass__::serialize(ar); } \
+    template void __klass__::serialize<cc::BinaryInputArchive>(cc::BinaryInputArchive& ar); \
+    template void __klass__::serialize<cc::JsonInputArchive>(cc::JsonInputArchive& ar); \
+\
+    void __klass__::virtualSerialize(cc::JsonInputArchive& ar) { __klass__::serialize(ar); }   \
+    void __klass__::virtualSerialize(cc::BinaryInputArchive& ar) { __klass__::serialize(ar); } \
     void __klass__::virtualOnBeforeSerialize() { __klass__::onBeforeSerialize(); }         \
     void __klass__::virtualOnAfterDeserialize() { __klass__::onAfterDeserialize(); }
+    
 
 namespace se {
 class Object;
