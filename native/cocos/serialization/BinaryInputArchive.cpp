@@ -203,7 +203,8 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
         scriptObject = value.toObject();
     }
     ccstd::optional<uint32_t> resetOffset;
-    void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject, resetOffset);
+    bool fromCache = false;
+    void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject, resetOffset, fromCache);
     if (scriptObject != nullptr) {
         _currentOwner = scriptObject;
         if (obj != nullptr) {
@@ -421,7 +422,8 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
     }
 }
 
-void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset) {
+void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset, bool& fromCache) {
+    fromCache = false;
     if (_currentObjectFlags & OBJECT_KIND_FLAG_NULL) {
         outScriptObject = nullptr;
         return nullptr;
@@ -442,6 +444,7 @@ void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outS
             const auto& info = cachedMapIter->second;
             assert(info.offset == targetOffset);
             outScriptObject = info.scriptObj;
+            fromCache = true;
             return info.nativeObj;
         }
 

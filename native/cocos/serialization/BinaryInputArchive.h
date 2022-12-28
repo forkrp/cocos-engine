@@ -265,8 +265,8 @@ private:
     std::string_view popString();
 
     template <class T>
-    T getOrCreateNativeObject(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset);
-    void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset);
+    T getOrCreateNativeObject(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset, bool& fromCache);
+    void* getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset, bool& fromCache);
 
     void doSerializePlainObj(se::Value& value);
     void doSerializeSerializableObj(se::Value& value);
@@ -584,7 +584,8 @@ inline bool BinaryInputArchive::onStartSerializeObject(T& data, ccstd::optional<
             }
         }
 
-        value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject, resetOffset);
+        bool fromCache = false;
+        value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject, resetOffset, fromCache);
         data = obj;
         _currentOwner = scriptObject;
 
@@ -592,10 +593,14 @@ inline bool BinaryInputArchive::onStartSerializeObject(T& data, ccstd::optional<
             dependInfo->owner = scriptObject; // FIXME(cjh): Weak refernce ? Need to root?
         }
 
-        if constexpr (has_setScriptObject<value_type, void(se::Object*)>::value) {
-            if (data != nullptr) {
-                data->setScriptObject(scriptObject);
+        if (!fromCache) {
+            if constexpr (has_setScriptObject<value_type, void(se::Object*)>::value) {
+                if (data != nullptr) {
+                    data->setScriptObject(scriptObject);
+                }
             }
+        } else {
+            return false; // If it's returned from cache, don't need to invoke onSerializingObjectPtr and onFinishSerializeObject
         }
     } else {
         if (_currentObjectFlags & OBJECT_KIND_FLAG_INLINE) {
@@ -628,9 +633,9 @@ inline void BinaryInputArchive::onFinishSerializeObject(T& data) {
 }
 
 template <class T>
-inline T BinaryInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset) {
+inline T BinaryInputArchive::getOrCreateNativeObject(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset, bool& fromCache) {
     //    static_assert(std::is_base_of<CCObject, T>::value, "Native object should be inherited from CCObject");
-    return reinterpret_cast<T>(getOrCreateNativeObjectReturnVoidPtr(outScriptObject, resetOffset));
+    return reinterpret_cast<T>(getOrCreateNativeObjectReturnVoidPtr(outScriptObject, resetOffset, fromCache));
 }
 
 #endif // SWIGCOCOS
