@@ -152,9 +152,8 @@ function createDependTargetInfo (): IDependTargetInfo {
 
 export class BinaryOutputArchive implements IArchive {
     private _uuidStack: number[] = []; // value is -1 means no uuid dependence
-    private _uuidCount = 0;
+    private _uuidList: string[] = [];
     private _stringListNode: SerializeNode;
-    private _stringCount = 0;
     private _stringList: string[] = [];
     private _currentNode: SerializeNode;
     private _serializedList: SerializeNode[] = [];
@@ -255,21 +254,24 @@ export class BinaryOutputArchive implements IArchive {
 
     private _pushString (data: string): void {
         // push index
-        const index = this._stringList.indexOf(data);
+        let index = this._stringList.indexOf(data);
         if (index === -1) {
-            this._currentNode.pushUint32(this._stringCount); // push index
-            ++this._stringCount;
+            index = this._stringList.length;
             this._stringList.push(data);
             this._stringListNode.pushString(data);
-        } else {
-            this._currentNode.pushUint32(index);
         }
+
+        this._currentNode.pushUint32(index); // push index
     }
 
     public uuid (data: string): string {
-        this._uuidStack[this._uuidStack.length - 1] = this._uuidCount;
-        ++this._uuidCount;
-        this._serializedList[0].pushString(data);
+        let index = this._uuidList.indexOf(data);
+        if (index === -1) {
+            index = this._uuidList.length;
+            this._uuidList.push(data);
+            this._serializedList[0].pushString(data);
+        }
+        this._uuidStack[this._uuidStack.length - 1] = index;
         return data;
     }
 
@@ -555,10 +557,10 @@ export class BinaryOutputArchive implements IArchive {
 
         // handle uuid list
         const uuidNode = this._serializedList[0];
-        uuidNode.data.setUint32(0, this._uuidCount);
+        uuidNode.data.setUint32(0, this._uuidList.length);
 
         // handle string list
-        this._stringListNode.data.setUint32(0, this._stringCount);
+        this._stringListNode.data.setUint32(0, this._stringList.length);
         //
         let totalBytes = 0;
         this._serializedList.forEach((e: SerializeNode, index: number) => {
