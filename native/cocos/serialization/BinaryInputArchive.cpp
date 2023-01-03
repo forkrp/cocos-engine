@@ -27,6 +27,8 @@
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
 
+static long long gScriptSerializeTime = 0;
+
 namespace cc {
 
 DeserializeNode::DeserializeNode(const ccstd::string &name, uint8_t *buffer, uint32_t bufferByteLength) {
@@ -58,10 +60,34 @@ BinaryInputArchive::BinaryInputArchive() {
 
 
 BinaryInputArchive::~BinaryInputArchive() {
+    if (_scriptArchive != nullptr) {
+        _scriptArchive->unroot();
+        _scriptArchive->decRef();
+        _scriptArchive = nullptr;
+    }
+    
+    if (_scriptDeserializedMap != nullptr) {
+        _scriptDeserializedMap->unroot();
+        _scriptDeserializedMap->decRef();
+        _scriptDeserializedMap = nullptr;
+    }
+}
 
+void BinaryInputArchive::setScriptArchive(se::Object* scriptArchive) {
+    _scriptArchive = scriptArchive;
+    _scriptArchive->root();
+    _scriptArchive->incRef();
+}
+
+void BinaryInputArchive::setScriptDeserializedMap(se::Object* deserializedMap) {
+    _scriptDeserializedMap = deserializedMap;
+    _scriptDeserializedMap->root();
+    _scriptDeserializedMap->incRef();
 }
 
 se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory* factory) {
+    auto prevTime = std::chrono::steady_clock::now();
+
     assert(factory != nullptr);
     _objectFactory = factory;
     
@@ -97,6 +123,13 @@ se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory*
     retVal.setObject(ret, true);
 
     ret->getPrivateObject()->serialize(*this);
+    
+    auto nowTime = std::chrono::steady_clock::now();
+    auto durationMS = (std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count()) / 1000000.0;
+    
+    CC_LOG_INFO("==> cjh BinaryInputArchive::start cost: %lf ms", durationMS);
+    CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms", gScriptSerializeTime / 1000000.0);
+    
     return retVal;
 }
 
@@ -384,10 +417,11 @@ void BinaryInputArchive::doSerializeAny(se::Value& value) {
 }
 
 void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
+    auto prevTime = std::chrono::steady_clock::now();
     if (obj == nullptr) {
         return;
     }
-
+    
     se::Value serializeVal;
     obj->getProperty("serialize", &serializeVal);
 
@@ -400,10 +434,18 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
         return;
     }
 
+    // Sync binary offset to JS
+    se::Value offsetVal;
+    offsetVal.setUint32(_currentNode->getOffset());
+    bool ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_setCurrentOffset", 1, &offsetVal);
+    assert(ok);
+    //
+    
     static se::ValueArray args;
     args.resize(1);
-    bool ok = nativevalue_to_se(this, args[0]);
-    assert(ok);
+//    bool ok = nativevalue_to_se(this, args[0]);
+//    assert(ok);
+    args[0].setObject(_scriptArchive);
 
     if (hasSerializeMethod && hasSerializeInlineDataMethod) {
         if (_isRoot) {
@@ -420,6 +462,15 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
             serializeInlineDataVal.toObject()->call(args, obj);
         }
     }
+    
+    offsetVal.setUndefined();
+    ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_getCurrentOffset", 0, nullptr, &offsetVal);
+    assert(ok);
+    _currentNode->setOffset(offsetVal.toUint32());
+    
+    auto nowTime = std::chrono::steady_clock::now();
+    auto durationNS = std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count();
+    gScriptSerializeTime += durationNS;
 }
 
 void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset, bool& fromCache) {
@@ -478,6 +529,9 @@ void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outS
         info.nativeObj = obj;
         info.scriptObj = outScriptObject;
         _deserializedObjIdMap[targetOffset] = info;
+        if (outScriptObject != nullptr) {
+            _scriptDeserializedMap->setMapElement(se::Value(targetOffset), se::Value(outScriptObject));
+        }
     }
     return obj;
 }

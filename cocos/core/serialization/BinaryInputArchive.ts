@@ -265,6 +265,10 @@ export class BinaryInputArchive implements IArchive {
 
     }
 
+    public get deserializedMap () {
+        return this._deserializedObjIdMap;
+    }
+
     public start (buffer: ArrayBuffer, details: Details | any, options?: IOptions | any): unknown {
         this._currentNode = new DeserializeNode('root', buffer);
         // this._objectFactory = objectFactory;
@@ -309,6 +313,45 @@ export class BinaryInputArchive implements IArchive {
         legacyCC.game._isCloning = false;
 
         return obj;
+    }
+
+    public initAndDontSerialize (buffer: ArrayBuffer, details: Details | any, options?: IOptions | any) {
+        this._currentNode = new DeserializeNode('root', buffer);
+        // this._objectFactory = objectFactory;
+
+        this._borrowDetails = !details;
+        this._details = details || Details.pool.get();
+
+        options = options || {};
+        this._classFinder = options.classFinder || js.getClassById;
+        const createAssetRefs = options.createAssetRefs;//cjh || sys.platform === Platform.EDITOR_CORE;
+        const customEnv = options.customEnv;
+        const ignoreEditorOnly = options.ignoreEditorOnly;
+        this._reportMissingClass = options.reportMissingClass ?? defaultReportMissingClass;
+
+        details.init();
+
+        const uuidCount = this._currentNode.popUint32();
+        for (let i = 0; i < uuidCount; ++i) {
+            const uuid = this._currentNode.popString();
+            this._uuidList.push(uuid);
+        }
+
+        const stringCount = this._currentNode.popUint32();
+        for (let i = 0; i < stringCount; ++i) {
+            const str = this._currentNode.popString();
+            this._stringList.push(str);
+        }
+    }
+
+    // Invoked by native
+    protected _setCurrentOffset (offset: number) {
+        this._currentNode.offset = offset;
+    }
+
+    // Invoked by native
+    protected _getCurrentOffset () {
+        return this._currentNode.offset;
     }
 
     private createObjectByType (type: string): ISerializable | null {

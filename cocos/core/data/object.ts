@@ -392,9 +392,9 @@ class CCObject implements EditorExtendableObject, ISerializable {
     }
 
     public serialize (ar: IArchive): void {
-        if (JSB) {
-            return; // CCObject is serialized or deserialized in C++, so don't need to do it again here.
-        }
+        // if (JSB) {
+        //     return; // CCObject is serialized or deserialized in C++, so don't need to do it again here.
+        // }
         this._name = ar.str(this._name, '_name');
         this._objFlags = ar.uint32(this._objFlags, '_objFlags');
         // TODO(cjh): if (EDITOR) {

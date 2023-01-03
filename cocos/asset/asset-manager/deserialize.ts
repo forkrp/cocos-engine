@@ -79,24 +79,43 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
         // }
         if (json instanceof ArrayBuffer) {
             tdInfo.init(); //FIXME(cjh): init here?
-            let ar;
-            if (window.jsb) {
-                ar = new jsb.BinaryInputArchive();
-            } else {
-                ar = new BinaryInputArchive();
-            }
-            asset = ar.start(json, tdInfo, {
-                classFinder,
-                customEnv: options,
-            }) as Asset;
 
             if (window.jsb) {
-            // TODO(cjh):
-                const depends = ar.getDepends();
+                const ar = new BinaryInputArchive();
+                ar.initAndDontSerialize(json, tdInfo, {
+                    classFinder,
+                    customEnv: options,
+                });
+
+                const jsbAr = new jsb.BinaryInputArchive();
+                jsbAr.setScriptArchive(ar);
+                jsbAr.setScriptDeserializedMap(ar.deserializedMap);
+
+                asset = jsbAr.start(json, tdInfo, {
+                    classFinder,
+                    customEnv: options,
+                }) as Asset;
+
+                // if (tdInfo.uuidList) {
+                //     for (const uuid of tdInfo.uuidList) {
+                //         if (uuid) {
+                //             console.log(`==> cjh, JS uuid deps: ${uuid}`);
+                //         }
+                //     }
+                // }
+
+                // TODO(cjh):
+                const depends = jsbAr.getDepends();
                 for (const depend of depends) {
-                    console.log(`==> Depends, owner:${depend.owner}, propName: ${depend.propName}`);
+                    console.log(`==> cjh, Depends, owner:${depend.owner}, propName: ${depend.propName}`);
                     tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
                 }
+            } else {
+                const ar = new BinaryInputArchive();
+                asset = ar.start(json, tdInfo, {
+                    classFinder,
+                    customEnv: options,
+                }) as Asset;
             }
         } else {
             asset = deserialize(json, tdInfo, {

@@ -151,6 +151,9 @@ public:
     bool isExporting() const { return false; }
 
     se::Value start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory* factory);
+    
+    void setScriptArchive(se::Object* scriptArchive);
+    void setScriptDeserializedMap(se::Object* deserializedMap);
 
     inline const std::vector<AssetDependInfo>& getDepends() const { return _depends; } // TODO(cjh): Should not handle dependency in Serialization module
 
@@ -283,6 +286,7 @@ private:
     static void* seObjGetPrivateData(se::Object* obj);
 
     ArrayBuffer::Ptr _buffer;
+    se::Object *_scriptArchive{nullptr};
     ObjectFactory* _objectFactory{nullptr};
     
     struct DeserializedInfo final {
@@ -292,6 +296,7 @@ private:
     };
 
     ccstd::unordered_map<int32_t, DeserializedInfo> _deserializedObjIdMap;
+    se::Object *_scriptDeserializedMap;
     ccstd::vector<const void*> _deserializedObjects;
 
     ccstd::vector<AssetDependInfo> _depends;
