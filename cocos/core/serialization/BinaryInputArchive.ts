@@ -331,17 +331,23 @@ export class BinaryInputArchive implements IArchive {
 
         details.init();
 
-        const uuidCount = this._currentNode.popUint32();
-        for (let i = 0; i < uuidCount; ++i) {
-            const uuid = this._currentNode.popString();
-            this._uuidList.push(uuid);
-        }
+        // const uuidCount = this._currentNode.popUint32();
+        // for (let i = 0; i < uuidCount; ++i) {
+        //     const uuid = this._currentNode.popString();
+        //     this._uuidList.push(uuid);
+        // }
 
-        const stringCount = this._currentNode.popUint32();
-        for (let i = 0; i < stringCount; ++i) {
-            const str = this._currentNode.popString();
-            this._stringList.push(str);
-        }
+        // const stringCount = this._currentNode.popUint32();
+        // for (let i = 0; i < stringCount; ++i) {
+        //     const str = this._currentNode.popString();
+        //     this._stringList.push(str);
+        // }
+    }
+
+    // Invoked by native
+    protected _setUuidAndStringList (uuidList: string[], stringList: string[]) {
+        this._uuidList = uuidList;
+        this._stringList = stringList;
     }
 
     // Invoked by native

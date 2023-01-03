@@ -108,6 +108,34 @@ se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory*
         auto str = _currentNode->popString();
         _stringList.emplace_back(std::move(str));
     }
+    
+    {
+        auto nowTime = std::chrono::steady_clock::now();
+        auto durationMS = (std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count()) / 1000000.0;
+        
+        CC_LOG_INFO("==> cjh BinaryInputArchive::init uuid stringlist cost: %lf ms", durationMS);
+    }
+    
+    {
+        se::Value args[2];
+        se::HandleObject uuidListObj{se::Object::createArrayObject(_uuidList.size())};
+        uint32_t i = 0;
+        for (const auto& uuid : _uuidList) {
+            uuidListObj->setArrayElement(i, se::Value(uuid.data()));
+            ++i;
+        }
+        args[0].setObject(uuidListObj);
+        
+        i = 0;
+        se::HandleObject stringListObj{se::Object::createArrayObject(_stringList.size())};
+        for (const auto& str : _stringList) {
+            stringListObj->setArrayElement(i, se::Value(str.data()));
+            ++i;
+        }
+        args[1].setObject(stringListObj);
+        
+        se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_setUuidAndStringList", 2, args);
+    }
 
     _currentKey = nullptr;
 
@@ -310,9 +338,6 @@ void BinaryInputArchive::doSerializeArray(se::Value& value) {
 }
 
 se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char* name) {
-    if (0 == strcmp("_materials", name)) {
-        int a = 0;
-    }
     const char* oldKey = _currentKey;
     auto* oldOwner = _currentOwner;
 
