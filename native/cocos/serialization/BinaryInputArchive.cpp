@@ -136,6 +136,13 @@ se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory*
         
         se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_setUuidAndStringList", 2, args);
     }
+    
+    {
+        auto nowTime = std::chrono::steady_clock::now();
+        auto durationMS = (std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count()) / 1000000.0;
+        
+        CC_LOG_INFO("==> cjh BinaryInputArchive::create uuid stringlist scriptobj cost: %lf ms", durationMS);
+    }
 
     _currentKey = nullptr;
 

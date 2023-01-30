@@ -2,7 +2,7 @@ import { legacyCC } from '../global-exports';
 import { getClassId } from '../utils/js-typed';
 import { IArchive } from './IArchive';
 import { ISerializable } from './ISerializable';
-import { checkISerializableObjectNeedInline } from './utils';
+import { checkISerializableObjectNeedInline, SerializeTag } from './utils';
 
 interface IObjectId {
     __id__: number
@@ -52,9 +52,23 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public booleanOptional (data: boolean | undefined, name: string): boolean | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.boolean(data, name);
+    }
+
     public int8 (data: number, name: string): number {
         this._currentNode[name] = data;
         return data;
+    }
+
+    public int8Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.int8(data, name);
     }
 
     public int16 (data: number, name: string): number {
@@ -62,14 +76,35 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public int16Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.int16(data, name);
+    }
+
     public int32 (data: number, name: string): number {
         this._currentNode[name] = data;
         return data;
     }
 
-    public serializeInt64 (data: number, name: string): number {
+    public int32Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.int32(data, name);
+    }
+
+    public int64 (data: number, name: string): number {
         this._currentNode[name] = data;
         return data;
+    }
+
+    public int64Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.int64(data, name);
     }
 
     public uint8 (data: number, name: string): number {
@@ -77,9 +112,23 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public uint8Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.uint8(data, name);
+    }
+
     public uint16 (data: number, name: string): number {
         this._currentNode[name] = data;
         return data;
+    }
+
+    public uint16Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.uint16(data, name);
     }
 
     public uint32 (data: number, name: string): number {
@@ -87,9 +136,23 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
-    public serializeUint64 (data: number, name: string): number {
+    public uint32Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.uint32(data, name);
+    }
+
+    public uint64 (data: number, name: string): number {
         this._currentNode[name] = data;
         return data;
+    }
+
+    public uint64Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.uint64(data, name);
     }
 
     public float32 (data: number, name: string): number {
@@ -97,9 +160,23 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public float32Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.float32(data, name);
+    }
+
     public float64 (data: number, name: string): number {
         this._currentNode[name] = data;
         return data;
+    }
+
+    public float64Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.float64(data, name);
     }
 
     public str (data: string, name: string): string {
@@ -107,11 +184,18 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public strOptional (data: string | undefined, name: string): string | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.str(data, name);
+    }
+
     public uuid (data: string): string {
         return this.str(data, '__uuid__');
     }
 
-    public plainObj (data: any, name: string): any {
+    public plainObj (data: Record<string, unknown>, name: string): Record<string, unknown> {
         const parentNode = this._currentNode;
 
         this._currentNode = {};
@@ -127,7 +211,30 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
-    public serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
+    public plainObjOptional (data: Record<string, unknown> | undefined, name: string): Record<string, unknown> | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.plainObj(data, name);
+    }
+
+    public plainObjWithCallback (data: Record<string, unknown>, name: string, cb: (value: any, key: string) => unknown): Record<string, unknown> {
+        const parentNode = this._currentNode;
+
+        this._currentNode = {};
+
+        for (const key in data) {
+            const value = data[key];
+            cb(value, key);
+        }
+
+        parentNode[name] = this._currentNode;
+
+        this._currentNode = parentNode;
+        return data;
+    }
+
+    public serializableObj (data: ISerializable | null, name: string): ISerializable | null {
         const isRoot = this._isRoot;
         this._isRoot = false;
 
@@ -170,6 +277,13 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public serializableObjOptional (data: ISerializable | null | undefined, name: string): ISerializable | null | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.serializableObj(data, name);
+    }
+
     public booleanArray (data: boolean[], name: string): boolean[] {
         const parentNode = this._currentNode;
         this._currentNode = new Array(data.length);
@@ -182,6 +296,13 @@ export class JsonOutputArchive implements IArchive {
 
         this._currentNode = parentNode;
         return data;
+    }
+
+    public booleanArrayOptional (data: boolean[] | undefined, name: string): boolean[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.booleanArray(data, name);
     }
 
     public int32Array (data: number[], name: string): number[] {
@@ -198,18 +319,32 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
-    public serializeArrayInt64 (data: number[], name: string): number[] {
+    public int32ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.int32Array(data, name);
+    }
+
+    public int64Array (data: number[], name: string): number[] {
         const parentNode = this._currentNode;
         this._currentNode = new Array(data.length);
 
         for (let i = 0; i < data.length; ++i) {
-            this.serializeInt64(data[i], `${i}`);
+            this.int64(data[i], `${i}`);
         }
 
         parentNode[name] = this._currentNode;
 
         this._currentNode = parentNode;
         return data;
+    }
+
+    public int64ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.int64Array(data, name);
     }
 
     public float32Array (data: number[], name: string): number[] {
@@ -226,6 +361,13 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public float32ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.float32Array(data, name);
+    }
+
     public float64Array (data: number[], name: string): number[] {
         const parentNode = this._currentNode;
         this._currentNode = new Array(data.length);
@@ -238,6 +380,13 @@ export class JsonOutputArchive implements IArchive {
 
         this._currentNode = parentNode;
         return data;
+    }
+
+    public float64ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.float64Array(data, name);
     }
 
     public strArray (data: string[], name: string): string[] {
@@ -254,7 +403,35 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
-    public plainObjArray (data: any[], name: string): any[] {
+    public strArrayOptional (data: string[] | undefined, name: string): string[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.strArray(data, name);
+    }
+
+    public arrayWithCallback (data: unknown[], name: string, cb: (owner: unknown[], i: number) => void): unknown[] {
+        const parentNode = this._currentNode;
+        this._currentNode = new Array(data.length);
+
+        for (let i = 0; i < data.length; ++i) {
+            cb(this._currentNode, i);
+        }
+
+        parentNode[name] = this._currentNode;
+
+        this._currentNode = parentNode;
+        return data;
+    }
+
+    public arrayWithCallbackOptional (data: unknown[] | undefined, name: string, cb: (owner: unknown[], i: number) => void): unknown[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.arrayWithCallback(data, name, cb);
+    }
+
+    public plainObjArray (data: Record<string, unknown>[], name: string): Record<string, unknown>[] {
         const parentNode = this._currentNode;
         this._currentNode = new Array(data.length);
 
@@ -268,8 +445,15 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public plainObjArrayOptional (data: Record<string, unknown>[] | undefined, name: string): Record<string, unknown>[] | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.plainObjArray(data, name);
+    }
+
     public serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
-        if (data == null) {
+        if (data === null) {
             this.serializeNull(name);
             return data;
         }
@@ -287,12 +471,26 @@ export class JsonOutputArchive implements IArchive {
         return data;
     }
 
+    public serializableObjArrayOptional (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
+        if (data === undefined) {
+            return data;
+        }
+        return this.serializableObjArray(data, name);
+    }
+
+    public optionalWithCallback (data: any, name: string, tag: number, cb: (data: any, name: string) => any): any {
+        if (data === undefined) {
+            return data;
+        }
+        return cb(data, name);
+    }
+
     public typedArray (data: any, name: string): any {
         throw new Error(`Not implemented yet`);
     }
 
     private _serializeInternal (data: any, name: string): any {
-        if (data == null) {
+        if (data === null) {
             this.serializeNull(name);
         } else if (typeof data === 'number') {
             this.serializeNumber(data, name);
@@ -388,6 +586,14 @@ export class JsonOutputArchive implements IArchive {
         return serializedObj;
     }
 
+    undefinedOptional (name: string): void {
+
+    }
+
+    getCurrentVariantType (name: string): number {
+        return SerializeTag.TAG_UNDEFINED;
+    }
+
     isReading (): boolean {
         return false;
     }
@@ -398,6 +604,10 @@ export class JsonOutputArchive implements IArchive {
 
     isExporting (): boolean {
         return this._isExporting;
+    }
+
+    isBinary (): boolean {
+        return false;
     }
 }
 

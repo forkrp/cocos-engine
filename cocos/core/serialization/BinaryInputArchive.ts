@@ -184,6 +184,17 @@ class DeserializeNode {
         return ret;
     }
 
+    isUndefined (): boolean {
+        const ret = this._data.getInt8(this._offset);
+        ++this._offset;
+        return ret === SerializeTag.TAG_UNDEFINED;
+    }
+
+    isNull (): boolean {
+        const ret = this._data.getInt8(this._offset);
+        return ret === SerializeTag.TAG_NULL;
+    }
+
     popInt16 (): number {
         const ret = this._data.getInt16(this._offset);
         this._offset += 2;
@@ -410,52 +421,140 @@ export class BinaryInputArchive implements IArchive {
         }
     }
 
+    getCurrentVariantType (name: string): number {
+        return this._currentNode.data.getUint8(this._currentNode.offset);
+    }
+
     boolean (data: boolean, name: string): boolean {
         return this._currentNode.popBoolean();
+    }
+
+    booleanOptional (data: boolean | undefined, name: string): boolean | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.boolean(data!, name);
     }
 
     int8 (data: number, name: string): number {
         return this._currentNode.popInt8();
     }
 
+    int8Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.int8(data!, name);
+    }
+
     int16 (data: number, name: string): number {
         return this._currentNode.popInt16();
+    }
+
+    int16Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.int16(data!, name);
     }
 
     int32 (data: number, name: string): number {
         return this._currentNode.popInt32();
     }
 
-    serializeInt64 (data: number, name: string): number {
+    int32Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.int32(data!, name);
+    }
+
+    int64 (data: number, name: string): number {
         throw new Error('Method not implemented.');
+    }
+
+    int64Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.int64(data!, name);
     }
 
     uint8 (data: number, name: string): number {
         return this._currentNode.popUint8();
     }
 
+    uint8Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.uint8(data!, name);
+    }
+
     uint16 (data: number, name: string): number {
         return this._currentNode.popUint16();
+    }
+
+    uint16Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.uint16(data!, name);
     }
 
     uint32 (data: number, name: string): number {
         return this._currentNode.popUint32();
     }
 
-    serializeUint64 (data: number, name: string): number {
+    uint32Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.uint32(data!, name);
+    }
+
+    uint64 (data: number, name: string): number {
         throw new Error('Method not implemented.');
+    }
+
+    uint64Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.uint64(data!, name);
     }
 
     float32 (data: number, name: string): number {
         return this._currentNode.popFloat32();
     }
 
+    float32Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.float32(data!, name);
+    }
+
     float64 (data: number, name: string): number {
         return this._currentNode.popFloat64();
     }
 
+    float64Optional (data: number | undefined, name: string): number | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.float64(data!, name);
+    }
+
     str (data: string, name: string): string {
         return this._popString();
+    }
+
+    strOptional (data: string | undefined, name: string): string | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.str(data!, name);
     }
 
     private _popString (): string {
@@ -470,7 +569,7 @@ export class BinaryInputArchive implements IArchive {
 
     // TODO(cjh): Add arrObj
 
-    plainObj (data: any, name: string): any {
+    plainObj (data: Record<string, unknown>, name: string): Record<string, unknown> {
         this._isRoot = false;
 
         data = data || {};
@@ -491,7 +590,35 @@ export class BinaryInputArchive implements IArchive {
         return data;
     }
 
-    serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
+    public plainObjWithCallback (data: Record<string, unknown>, name: string, cb: (value: any, key: string) => unknown): Record<string, unknown> {
+        this._isRoot = false;
+
+        data = data || {};
+
+        const oldOwner = this._currentOwner;
+        this._currentOwner = data;
+
+        const currentNode = this._currentNode;
+        const elementCount = currentNode.popInt32();
+
+        for (let i = 0; i < elementCount; ++i) {
+            const key = this._popString();
+            const value = cb(null, key);
+            data[key] = value;
+        }
+
+        this._currentOwner = oldOwner;
+        return data;
+    }
+
+    plainObjOptional (data: Record<string, unknown> | undefined, name: string): Record<string, unknown> | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.plainObj(data!, name);
+    }
+
+    serializableObj (data: ISerializable | null, name: string): ISerializable | null {
         this._isRoot = false;
 
         const currentNode = this._currentNode;
@@ -583,29 +710,145 @@ export class BinaryInputArchive implements IArchive {
         return ret;
     }
 
+    serializableObjOptional (data: ISerializable | null | undefined, name: string): ISerializable | null | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.serializableObj(data!, name);
+    }
+
     booleanArray (data: boolean[], name: string): boolean[] {
         throw new Error('Method not implemented.');
     }
+
+    booleanArrayOptional (data: boolean[] | undefined, name: string): boolean[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.booleanArray(data!, name);
+    }
+
     int32Array (data: number[], name: string): number[] {
         throw new Error('Method not implemented.');
     }
+
+    int32ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.int32Array(data!, name);
+    }
+
     int64Array (data: number[], name: string): number[] {
         throw new Error('Method not implemented.');
     }
-    float32Array (data: number[], name: string): number[] {
-        throw new Error('Method not implemented.');
+
+    int64ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.int64Array(data!, name);
     }
+
+    float32Array (data: number[], name: string): number[] {
+        let length = 0;//TODO(cjh): The code for handling array is similar, should unify it.
+        const currentNode = this._currentNode;
+        const tag = currentNode.popInt8();
+        if (tag === SerializeTag.TAG_NULL) {
+            return data;
+        } else if (tag === SerializeTag.TAG_ARRAY) {
+            length = currentNode.popInt32();
+        } else {
+            assert(false);
+        }
+
+        let arr: number[];
+        if (Array.isArray(data)) {
+            data.length = length;
+            arr = data;
+        } else {
+            arr = new Array(length);
+        }
+
+        const oldOwner = this._currentOwner;
+        this._currentOwner = arr;
+
+        for (let i = 0, len = arr.length; i < len; ++i) {
+            arr[i] = this.float32(arr[i], `${i}`);
+        }
+
+        this._currentOwner = oldOwner;
+        return arr;
+    }
+
+    float32ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.float32Array(data!, name);
+    }
+
     float64Array (data: number[], name: string): number[] {
         throw new Error('Method not implemented.');
     }
+
+    float64ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.float64Array(data!, name);
+    }
+
     strArray (data: string[], name: string): string[] {
         throw new Error('Method not implemented.');
     }
-    plainObjArray (data: unknown[], name: string): unknown[] {
-        throw new Error('Method not implemented.');
+
+    strArrayOptional (data: string[] | undefined, name: string): string[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.strArray(data!, name);
     }
 
-    serializableObjArray (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
+    plainObjArray (data: Record<string, unknown>[], name: string): Record<string, unknown>[] {
+        let length = 0;
+        const currentNode = this._currentNode;
+        const tag = currentNode.popInt8();
+        if (tag === SerializeTag.TAG_NULL) {
+            return data;
+        } else if (tag === SerializeTag.TAG_ARRAY) {
+            length = currentNode.popInt32();
+        } else {
+            assert(false);
+        }
+
+        let arr: Record<string, unknown>[];
+        if (Array.isArray(data)) {
+            data.length = length;
+            arr = data;
+        } else {
+            arr = new Array(length);
+        }
+
+        const oldOwner = this._currentOwner;
+        this._currentOwner = arr;
+
+        for (let i = 0, len = arr.length; i < len; ++i) {
+            arr[i] = this.plainObj(arr[i], `${i}`);
+        }
+
+        this._currentOwner = oldOwner;
+        return arr;
+    }
+
+    plainObjArrayOptional (data: Record<string, unknown>[] | undefined, name: string): Record<string, unknown>[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.plainObjArray(data!, name);
+    }
+
+    serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
         let length = 0;
         const currentNode = this._currentNode;
         const tag = currentNode.popInt8();
@@ -636,6 +879,58 @@ export class BinaryInputArchive implements IArchive {
         return arr;
     }
 
+    serializableObjArrayOptional (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.serializableObjArray(data!, name);
+    }
+
+    public arrayWithCallback (data: unknown[], name: string, cb: (owner: any[], i: number) => void): unknown[] {
+        let length = 0;
+        const currentNode = this._currentNode;
+        const tag = currentNode.popInt8();
+        if (tag === SerializeTag.TAG_NULL) {
+            return data;
+        } else if (tag === SerializeTag.TAG_ARRAY) {
+            length = currentNode.popInt32();
+        } else {
+            assert(false);
+        }
+
+        let arr: unknown[];
+        if (Array.isArray(data)) {
+            data.length = length;
+            arr = data;
+        } else {
+            arr = new Array(length);
+        }
+
+        const oldOwner = this._currentOwner;
+        this._currentOwner = arr;
+
+        for (let i = 0, len = arr.length; i < len; ++i) {
+            cb(arr, i);
+        }
+
+        this._currentOwner = oldOwner;
+        return arr;
+    }
+
+    public arrayWithCallbackOptional (data: unknown[] | undefined, name: string, cb: (owner: any[], i: number) => void): unknown[] | undefined {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return this.arrayWithCallback(data!, name, cb);
+    }
+
+    public optionalWithCallback (data: any, name: string, tag: number, cb: (data: any, name: string) => any): any {
+        if (this._currentNode.isUndefined()) {
+            return undefined;
+        }
+        return cb(data, name);
+    }
+
     typedArray (data: any, name: string) {
         throw new Error('Method not implemented.');
     }
@@ -663,6 +958,11 @@ export class BinaryInputArchive implements IArchive {
         return arr;
     }
 
+    undefinedOptional (name: string): void {
+        const ret = this._currentNode.popInt8();
+        assert(ret === SerializeTag.TAG_UNDEFINED);
+    }
+
     isReading (): boolean {
         return true;
     }
@@ -675,6 +975,10 @@ export class BinaryInputArchive implements IArchive {
 
     isExporting (): boolean {
         return false;
+    }
+
+    isBinary (): boolean {
+        return true;
     }
 }
 

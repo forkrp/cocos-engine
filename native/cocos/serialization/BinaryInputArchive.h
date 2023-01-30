@@ -45,7 +45,8 @@ namespace cc {
 
 // TODO(cjh): Move to utils
 enum SerializeTag {
-    TAG_NONE = 0,
+    TAG_UNDEFINED = 0,
+    TAG_NULL,
     TAG_NUMBER,
     TAG_BOOLEAN,
     TAG_STRING,
@@ -329,7 +330,7 @@ inline void BinaryInputArchive::serializeStlLikeArray(T& data) {
     using data_type = typename T::value_type;
     int32_t length{0};
     auto tag = _currentNode->popInt8();
-    if (tag == SerializeTag::TAG_NONE) {
+    if (tag == SerializeTag::TAG_NULL) {
         data.clear();
         return;
     } else if (tag == SerializeTag::TAG_ARRAY) {
@@ -413,7 +414,7 @@ void BinaryInputArchive::serializeStlLikeMap(T& data) {
 template <class T>
 inline void BinaryInputArchive::serializeOptional(ccstd::optional<T>& data) {
     auto tag = _currentNode->popInt8();
-    if (tag == SerializeTag::TAG_NONE) {
+    if (tag == SerializeTag::TAG_UNDEFINED) {
         return;
     }
 

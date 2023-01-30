@@ -62,6 +62,14 @@ class SerializeNode {
         this.pushInt32(length);
     }
 
+    pushUndefined () {
+        this.pushInt8(SerializeTag.TAG_UNDEFINED);
+    }
+
+    pushNull () {
+        this.pushInt8(SerializeTag.TAG_NULL);
+    }
+
     pushBoolean (value: boolean) {
         this._data.setUint8(this._offset, value ? 1 : 0);
         this._offset += 1;
@@ -197,9 +205,28 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public booleanOptional (data: boolean | undefined, name: string): boolean | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+
+        this._currentNode.pushInt8(SerializeTag.TAG_BOOLEAN);
+        return this.boolean(data, name);
+    }
+
     public int8 (data: number, name: string): number {
         this._currentNode.pushInt8(data);
         return data;
+    }
+
+    public int8Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.int8(data, name);
     }
 
     public int16 (data: number, name: string): number {
@@ -207,9 +234,27 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public int16Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.int16(data, name);
+    }
+
     public int32 (data: number, name: string): number {
         this._currentNode.pushInt32(data);
         return data;
+    }
+
+    public int32Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.int32(data, name);
     }
 
     // public int64(data: number, name: string): number {
@@ -222,14 +267,41 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public uint8Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.uint8(data, name);
+    }
+
     public uint16 (data: number, name: string): number {
         this._currentNode.pushUint16(data);
         return data;
     }
 
+    public uint16Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.uint16(data, name);
+    }
+
     public uint32 (data: number, name: string): number {
         this._currentNode.pushUint32(data);
         return data;
+    }
+
+    public uint32Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.uint32(data, name);
     }
 
     // public int64(data: number, name: string): number {
@@ -242,14 +314,41 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public float32Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.float32(data, name);
+    }
+
     public float64 (data: number, name: string): number {
         this._currentNode.pushFloat64(data);
         return data;
     }
 
+    public float64Optional (data: number | undefined, name: string): number | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.float64(data, name);
+    }
+
     public str (data: string, name: string): string {
         this._pushString(data);
         return data;
+    }
+
+    public strOptional (data: string | undefined, name: string): string | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_NUMBER);
+        return this.str(data, name);
     }
 
     private _pushString (data: string): void {
@@ -287,12 +386,11 @@ export class BinaryOutputArchive implements IArchive {
         return count;
     }
 
-    public plainObj (data: any, name: string): any {
+    public plainObj (data: Record<string, unknown>, name: string): Record<string, unknown> {
         this._currentNode.pushInt32(this.getObjectElementCount(data));
 
         for (const key in data) {
-            // eslint-disable-next-line no-prototype-builtins
-            if (!data.hasOwnProperty(key)) {
+            if (!Object.prototype.hasOwnProperty.call(data, key)) {
                 continue;
             }
 
@@ -304,11 +402,36 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    public serializableObj (data: ISerializable | undefined | null, name: string): ISerializable | undefined | null {
+    public plainObjOptional (data: Record<string, unknown> | undefined, name: string): Record<string, unknown> | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_MAP);
+        return this.plainObj(data, name);
+    }
+
+    public plainObjWithCallback (data: Record<string, unknown>, name: string, cb: (value: any, key: string) => unknown): Record<string, unknown> {
+        this._currentNode.pushInt32(this.getObjectElementCount(data));
+
+        for (const key in data) {
+            if (!Object.prototype.hasOwnProperty.call(data, key)) {
+                continue;
+            }
+
+            const value = data[key];
+            this._pushString(key);
+            cb(value, key);
+        }
+
+        return data;
+    }
+
+    public serializableObj (data: ISerializable | null, name: string): ISerializable | null {
         const isRoot = this._isRoot;
         this._isRoot = false;
 
-        if (data == null) {
+        if (data === null) {
             this._pushNull();
             return data;
         }
@@ -361,12 +484,30 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public serializableObjOptional (data: ISerializable | null | undefined, name: string): ISerializable | null | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_SERIALIZABLE_OBJECT);
+        return this.serializableObj(data, name);
+    }
+
     public booleanArray (data: boolean[], name: string): boolean[] {
         this._currentNode.pushArrayTag(data.length);
         for (let i = 0; i < data.length; ++i) {
             this.boolean(data[i], `${i}`);
         }
         return data;
+    }
+
+    public booleanArrayOptional (data: boolean[] | undefined, name: string): boolean[] | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.booleanArray(data, name);
     }
 
     public int32Array (data: number[], name: string): number[] {
@@ -377,11 +518,21 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public int32ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.int32Array(data, name);
+    }
+
     // public int64Array(data: number[], name: string): number[] {
     //     this._currentNode.pushArrayTag(data.length);
     //     for (let i = 0; i < data.length; ++i) {
     //         this.serializeInt64(data[i], `${i}`);
     //     }
+    // this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
     //     return data;
     // }
 
@@ -390,8 +541,16 @@ export class BinaryOutputArchive implements IArchive {
         for (let i = 0; i < data.length; ++i) {
             this.float32(data[i], `${i}`);
         }
-
         return data;
+    }
+
+    public float32ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.float32Array(data, name);
     }
 
     public float64Array (data: number[], name: string): number[] {
@@ -402,15 +561,51 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
+    public float64ArrayOptional (data: number[] | undefined, name: string): number[] | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.float64Array(data, name);
+    }
+
     public strArray (data: string[], name: string): string[] {
         this._currentNode.pushArrayTag(data.length);
         for (let i = 0; i < data.length; ++i) {
             this.str(data[i], `${i}`);
         }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
         return data;
     }
 
-    public plainObjArray (data: any[], name: string): any[] {
+    public strArrayOptional (data: string[] | undefined, name: string): string[] | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.strArray(data, name);
+    }
+
+    public arrayWithCallback (data: unknown[], name: string, cb: (owner: unknown[], i: number) => void): unknown[] {
+        this._currentNode.pushArrayTag(data.length);
+        for (let i = 0; i < data.length; ++i) {
+            cb(data, i);
+        }
+        return data;
+    }
+
+    public arrayWithCallbackOptional (data: unknown[] | undefined, name: string, cb: (owner: unknown[], i: number) => void): unknown[] | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.arrayWithCallback(data, name, cb);
+    }
+
+    public plainObjArray (data: Record<string, unknown>[], name: string): Record<string, unknown>[] {
         this._currentNode.pushArrayTag(data.length);
         for (let i = 0; i < data.length; ++i) {
             this.plainObj(data[i], `${i}`);
@@ -418,8 +613,17 @@ export class BinaryOutputArchive implements IArchive {
         return data;
     }
 
-    public serializableObjArray (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
-        if (data == null) {
+    public plainObjArrayOptional (data: Record<string, unknown>[] | undefined, name: string): Record<string, unknown>[] | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.plainObjArray(data, name);
+    }
+
+    public serializableObjArray (data: (ISerializable | null)[] | null, name: string): (ISerializable | null)[] | null {
+        if (data === null) {
             this._currentNode.pushInt8(SerializeTag.TAG_NULL);
             return data;
         }
@@ -430,6 +634,24 @@ export class BinaryOutputArchive implements IArchive {
             this.serializableObj(data[i], `${i}`);
         }
         return data;
+    }
+
+    public serializableObjArrayOptional (data: (ISerializable | null)[] | null | undefined, name: string): (ISerializable | null)[] | null | undefined {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(SerializeTag.TAG_ARRAY);
+        return this.serializableObjArray(data, name);
+    }
+
+    public optionalWithCallback (data: any, name: string, tag: number, cb: (data: any, name: string) => any): any {
+        if (data === undefined) {
+            this._currentNode.pushUndefined();
+            return data;
+        }
+        this._currentNode.pushInt8(tag);
+        return cb(data, name);
     }
 
     public typedArray (data: any, name: string): any {
@@ -607,6 +829,14 @@ export class BinaryOutputArchive implements IArchive {
         return buffer;
     }
 
+    undefinedOptional (name: string): void {
+        this._currentNode.pushInt8(SerializeTag.TAG_UNDEFINED);
+    }
+
+    getCurrentVariantType (name: string): number {
+        return SerializeTag.TAG_UNDEFINED;
+    }
+
     isReading (): boolean {
         return false;
     }
@@ -616,6 +846,10 @@ export class BinaryOutputArchive implements IArchive {
 
     isExporting (): boolean {
         return this._isExporting;
+    }
+
+    isBinary (): boolean {
+        return true;
     }
 }
 
