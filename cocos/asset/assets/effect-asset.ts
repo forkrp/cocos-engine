@@ -27,7 +27,7 @@ import { ccclass, serializable, editable, editorOnly } from 'cc.decorator';
 import { EDITOR } from 'internal:constants';
 import { Root } from '../../root';
 import { BlendState, DepthStencilState, RasterizerState,
-    DynamicStateFlags, PrimitiveMode, ShaderStageFlags, Type, Uniform, MemoryAccess, Format, deviceManager, ShaderInfo } from '../../gfx';
+    DynamicStateFlags, PrimitiveMode, ShaderStageFlags, Type, Uniform, MemoryAccess, Format, deviceManager, ShaderInfo, Color } from '../../gfx';
 import { RenderPassStage } from '../../rendering/define';
 import { MacroRecord } from '../../render-scene/core/pass-utils';
 import { programLib } from '../../render-scene/core/program-lib';
@@ -36,6 +36,8 @@ import { cclegacy, warnID } from '../../core';
 import { ProgramLibrary } from '../../rendering/custom/private';
 import { getCombinationDefines } from '../../render-scene/core/program-utils';
 import { IArchive } from '../../core/serialization';
+import { SerializeTag } from '../../core/serialization/utils';
+import { IPassInfoFull } from '../../render-scene';
 
 export declare namespace EffectAsset {
     export interface IPropertyInfo {
@@ -45,6 +47,7 @@ export declare namespace EffectAsset {
         value?: number[] | string; // default value
         linear?: boolean; // whether to convert the input to linear space first before applying
     }
+
     // Pass instance itself are compliant to IPassStates too
     export interface IPassStates {
         priority?: number;
@@ -180,6 +183,163 @@ export declare namespace EffectAsset {
     }
 }
 
+function serialize_IPropertyInfo (ar: IArchive, self: EffectAsset.IPropertyInfo) {
+    self.type = ar.int32(self.type, 'type');
+    serialize_IPropertyHandleInfo(ar, self);
+    self.samplerHash = ar.uint32Optional(self.samplerHash, 'samplerHash');
+    if (ar.isWritting()) {
+        if (Array.isArray(self.value)) {
+            ar.float32ArrayOptional(self.value, 'value');
+        } else if (typeof self.value === 'string') {
+            ar.strOptional(self.value, 'value');
+        } else {
+            ar.undefinedOptional('value');
+        }
+    } else if (ar.isReading()) {
+        const type = ar.getCurrentVariantType('value');
+        if (type === SerializeTag.TAG_ARRAY) {
+            self.value = ar.float32ArrayOptional(self.value as number[], 'value');
+        } else if (type === SerializeTag.TAG_STRING) {
+            self.value = ar.strOptional(self.value as string, 'value');
+        } else {
+            ar.undefinedOptional('value');
+        }
+    }
+    self.linear = ar.booleanOptional(self.linear, 'linear');
+}
+
+function serialize_IPropertyHandleInfo (ar: IArchive, self: EffectAsset.IPropertyInfo) {
+    self.handleInfo = ar.arrayWithCallbackOptional(self.handleInfo, 'handleInfo', (owner: any[], i: number) => {
+        switch (i) {
+        case 0:
+            owner[0] = ar.str(owner[0], '0');
+            break;
+        case 1:
+            owner[1] = ar.uint32(owner[1], '1');
+            break;
+        case 2:
+            owner[2] = ar.uint32(owner[2], '2');
+            break;
+        default:
+            break;
+        }
+    }) as [string, number, number] | undefined;
+}
+
+function serialize_gfx_Color (ar: IArchive, self: Color) {
+    if (ar.isReading() && self === undefined) {
+        self = new Color();
+    }
+
+    self.x = ar.float32(self.x, 'x');
+    self.y = ar.float32(self.y, 'y');
+    self.z = ar.float32(self.z, 'z');
+    self.w = ar.float32(self.w, 'w');
+
+    return self;
+}
+
+function serialize_BlendStateInfo (ar: IArchive, self: Record<string, any>) {
+    if (ar.isReading() && self === undefined) {
+        self = {};
+    }
+
+    self.isA2C = ar.booleanOptional(self.isA2C, 'isA2C');
+    self.isIndepend = ar.booleanOptional(self.isIndepend, 'isIndepend');
+    self.blendColor = ar.optionalWithCallback(self.blendColor, 'blendColor',
+        SerializeTag.TAG_MAP, (data, name: string) => serialize_gfx_Color(ar, data));
+    return self;
+}
+
+function serialize_DepthStencilStateInfo (ar: IArchive, self: Record<string, any>) {
+    if (ar.isReading() && self === undefined) {
+        self = {};
+    }
+
+    self.depthTest = ar.booleanOptional(self.depthTest, 'depthTest');
+    self.depthWrite = ar.booleanOptional(self.depthWrite, 'depthWrite');
+    self.stencilTestFront = ar.booleanOptional(self.stencilTestFront, 'stencilTestFront');
+    self.stencilTestBack = ar.booleanOptional(self.stencilTestBack, 'stencilTestBack');
+
+    self.depthFunc = ar.uint32Optional(self.depthFunc, 'depthFunc');
+    self.stencilFuncFront = ar.uint32Optional(self.stencilFuncFront, 'stencilFuncFront');
+    self.stencilReadMaskFront = ar.uint32Optional(self.stencilReadMaskFront, 'stencilReadMaskFront');
+    self.stencilWriteMaskFront = ar.uint32Optional(self.stencilWriteMaskFront, 'stencilWriteMaskFront');
+    self.stencilFailOpFront = ar.uint32Optional(self.stencilFailOpFront, 'stencilFailOpFront');
+    self.stencilZFailOpFront = ar.uint32Optional(self.stencilZFailOpFront, 'stencilZFailOpFront');
+    self.stencilPassOpFront = ar.uint32Optional(self.stencilPassOpFront, 'stencilPassOpFront');
+    self.stencilRefFront = ar.uint32Optional(self.stencilRefFront, 'stencilRefFront');
+
+    self.stencilFuncBack = ar.uint32Optional(self.stencilFuncBack, 'stencilFuncBack');
+    self.stencilReadMaskBack = ar.uint32Optional(self.stencilReadMaskBack, 'stencilReadMaskBack');
+    self.stencilWriteMaskBack = ar.uint32Optional(self.stencilWriteMaskBack, 'stencilWriteMaskBack');
+    self.stencilFailOpBack = ar.uint32Optional(self.stencilFailOpBack, 'stencilFailOpBack');
+    self.stencilZFailOpBack = ar.uint32Optional(self.stencilZFailOpBack, 'stencilZFailOpBack');
+    self.stencilPassOpBack = ar.uint32Optional(self.stencilPassOpBack, 'stencilPassOpBack');
+    self.stencilRefBack = ar.uint32Optional(self.stencilRefBack, 'stencilRefBack');
+
+    return self;
+}
+
+function serialize_RasterizerStateInfo (ar: IArchive, self: Record<string, any>) {
+    if (ar.isReading() && self === undefined) {
+        self = {};
+    }
+    self.isDiscard = ar.booleanOptional(self.isDiscard, 'isDiscard');
+    self.isFrontFaceCCW = ar.booleanOptional(self.isFrontFaceCCW, 'isFrontFaceCCW');
+    self.depthBiasEnabled = ar.booleanOptional(self.depthBiasEnabled, 'depthBiasEnabled');
+    self.isDepthClip = ar.booleanOptional(self.isDepthClip, 'isDepthClip');
+    self.isMultisample = ar.booleanOptional(self.isMultisample, 'isMultisample');
+    self.polygonMode = ar.uint32Optional(self.polygonMode, 'polygonMode');
+    self.shadeModel = ar.uint32Optional(self.shadeModel, 'shadeModel');
+    self.cullMode = ar.uint32Optional(self.cullMode, 'cullMode');
+    self.depthBias = ar.float32Optional(self.depthBias, 'depthBias');
+    self.depthBiasClamp = ar.float32Optional(self.depthBiasClamp, 'depthBiasClamp');
+    self.depthBiasSlop = ar.float32Optional(self.depthBiasSlop, 'depthBiasSlop');
+    self.lineWidth = ar.float32Optional(self.lineWidth, 'lineWidth');
+    return self;
+}
+
+function serialize_IPassInfoFull (ar: IArchive, self: IPassInfoFull) {
+    if (ar.isReading() && self === undefined) {
+        self = { program: '', passIndex: 0, defines: {} };
+    }
+    self.priority = ar.int32Optional(self.priority, 'priority');
+    self.primitive = ar.uint32Optional(self.primitive, 'primitive');
+    self.stage = ar.int32Optional(self.stage, 'stage');
+    self.rasterizerState = ar.optionalWithCallback(self.rasterizerState, 'rasterizerState', SerializeTag.TAG_MAP,
+        (data: Record<string, any>, name: string) => serialize_RasterizerStateInfo(ar, data));
+    self.depthStencilState = ar.optionalWithCallback(self.depthStencilState, 'depthStencilState', SerializeTag.TAG_MAP,
+        (data: Record<string, any>, name: string) => serialize_DepthStencilStateInfo(ar, data));
+
+    self.blendState = ar.optionalWithCallback(self.blendState, 'blendState', SerializeTag.TAG_MAP,
+        (data: Record<string, any>, name: string) => serialize_BlendStateInfo(ar, data));
+
+    self.dynamicStates = ar.uint32Optional(self.dynamicStates, 'dynamicStates');
+    self.phase = ar.strOptional(self.phase as (string | undefined), 'phase');
+    self.pass = ar.strOptional(self.pass, 'pass');
+
+    return self;
+}
+
+function serialize_IPassInfoArray (ar: IArchive, self: EffectAsset.ITechniqueInfo) {
+    self.passes = ar.arrayWithCallback(self.passes, 'passes', (owner: any[], i: number) => {
+        owner[i] = serialize_IPassInfoFull(ar, owner[i]);
+    }) as EffectAsset.IPassInfo[];
+    return self.passes;
+}
+
+function serialize_ITechniqueInfo (ar: IArchive, self: EffectAsset) {
+    self.techniques = ar.plainObjWithCallback(self.techniques as any, 'techniques', (value: any, key: string): unknown => {
+        if (key === 'name') {
+            return ar.strArrayOptional(value, key);
+        } else if (key === 'passes') {
+            return serialize_IPassInfoArray(ar, value);
+        }
+        return undefined;
+    }) as any;
+}
+
 const legacyBuiltinEffectNames = [
     'planar-shadow',
     'skybox',
@@ -299,9 +459,9 @@ export class EffectAsset extends Asset {
 
     serialize (ar: IArchive): void {
         super.serialize(ar);
-        this.techniques = ar.plainObj(this.techniques, 'techniques');
-        this.shaders = ar.plainObj(this.shaders, 'shaders');
-        this.combinations = ar.plainObj(this.combinations, 'combinations');
+        serialize_ITechniqueInfo(ar, this);
+        this.shaders = ar.plainObjArray(this.shaders as any, 'shaders');
+        this.combinations = ar.plainObjArray(this.combinations, 'combinations');
         this.hideInEditor = ar.boolean(this.hideInEditor, 'hideInEditor');
     }
 
