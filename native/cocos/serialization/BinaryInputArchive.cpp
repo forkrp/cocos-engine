@@ -172,8 +172,11 @@ se::Value& BinaryInputArchive::anyValue(se::Value& value, const char* name) {
     auto tag = _currentNode->popInt8();
 
     switch (tag) {
-        case TAG_NONE:
+        case TAG_NULL:
             value.setNull();
+            break;
+        case TAG_UNDEFINED:
+            value.setUndefined();
             break;
         case TAG_BOOLEAN:
             value.setBoolean(_currentNode->popBoolean());
@@ -353,8 +356,11 @@ se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char
 
     const auto tag = _currentNode->popInt8();
     switch (tag) {
-        case TAG_NONE:
+        case TAG_NULL:
             value.setNull();
+            return value;
+        case TAG_UNDEFINED:
+            value.setUndefined();
             return value;
         case TAG_ARRAY:
             length = _currentNode->popInt32();
@@ -363,7 +369,6 @@ se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char
             assert(false);
             value.setNull();
             return value;
-            break;
     }
 
     se::Object* seObj = nullptr;
@@ -422,8 +427,11 @@ void BinaryInputArchive::doSerializeAny(se::Value& value) {
     const auto tag = _currentNode->popInt8();
 
     switch (tag) {
-        case TAG_NONE:
+        case TAG_NULL:
             value.setNull();
+            break;
+        case TAG_UNDEFINED:
+            value.setUndefined();
             break;
         case TAG_BOOLEAN:
             value.setBoolean(_currentNode->popBoolean());
