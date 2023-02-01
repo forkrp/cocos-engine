@@ -1,18 +1,17 @@
 /****************************************************************************
- Copyright (c) 2021-2022 Xiamen Yaji Software Co., Ltd.
+ Copyright (c) 2021-2023 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos.com
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated engine source code (the "Software"), a limited,
- worldwide, royalty-free, non-assignable, revocable and non-exclusive license
- to use Cocos Creator solely to develop games on your target platforms. You shall
- not use Cocos Creator software for developing other software or tools that's
- used for developing games. You are not granted to publish, distribute,
- sublicense, and/or sell copies of Cocos Creator.
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ of the Software, and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
 
- The software or tools in this License Agreement are licensed, not sold.
- Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -277,10 +276,10 @@ public:
     inline const ccstd::vector<IBlockRef> &getBlocks() const { return _blocks; }
     inline ArrayBuffer *getRootBlock() { return _rootBlock; }
     inline bool isRootBufferDirty() const { return _rootBufferDirty; }
-    //NOTE: _setRootBufferDirty must contain a _ prefix to make bindings-generator work correctly.
-    // In ts engine, Pass has rootBufferDirty getter and without setter, but it contains a protected function named _setRootBufferDirty.
-    // If we remove _ prefix in C++, bindings-generator doesn't support to bind rootBufferDirty property as getter and ignore to bind setRootBufferDirty as setter at the same time.
-    // So let's keep the _ prefix temporarily.
+    // NOTE: _setRootBufferDirty must contain a _ prefix to make bindings-generator work correctly.
+    //  In ts engine, Pass has rootBufferDirty getter and without setter, but it contains a protected function named _setRootBufferDirty.
+    //  If we remove _ prefix in C++, bindings-generator doesn't support to bind rootBufferDirty property as getter and ignore to bind setRootBufferDirty as setter at the same time.
+    //  So let's keep the _ prefix temporarily.
     inline void _setRootBufferDirty(bool val) { _rootBufferDirty = val; } // NOLINT(readability-identifier-naming)
     // states
     inline pipeline::RenderPriority getPriority() const { return _priority; }
@@ -336,6 +335,8 @@ protected:
     pipeline::RenderPriority _priority{pipeline::RenderPriority::DEFAULT};
     pipeline::RenderPassStage _stage{pipeline::RenderPassStage::DEFAULT};
     uint32_t _phase{0};
+    uint32_t _passID{0xFFFFFFFF};
+    uint32_t _phaseID{0xFFFFFFFF};
     ccstd::string _phaseString;
     gfx::PrimitiveMode _primitive{gfx::PrimitiveMode::TRIANGLE_LIST};
     BatchingSchemes _batchingScheme{BatchingSchemes::NONE};
