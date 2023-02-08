@@ -76,12 +76,16 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
         //         tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
         //     }
         // }
-        if (json instanceof ArrayBuffer) {
+        if (json instanceof ArrayBuffer || json instanceof Uint8Array) {
             tdInfo.init(); //FIXME(cjh): init here?
+
+            if (json instanceof ArrayBuffer) {
+                json = new Uint8Array(json);
+            }
 
             if (window.jsb) {
                 const ar = new BinaryInputArchive();
-                ar.initAndDontSerialize(json, tdInfo, {
+                ar.initAndDontSerialize(json as Uint8Array, tdInfo, {
                     classFinder,
                     customEnv: options,
                 });
@@ -111,7 +115,7 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
                 }
             } else {
                 const ar = new BinaryInputArchive();
-                asset = ar.start(json, tdInfo, {
+                asset = ar.start(json as Uint8Array, tdInfo, {
                     classFinder,
                     customEnv: options,
                 }) as Asset;

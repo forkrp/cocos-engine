@@ -4,24 +4,18 @@ import { stringToUTF8Array, UTF8ArrayToString, lengthBytesUTF8 } from './string-
 const DEFAULT_ARRAY_BUFFER_SIZE = 1024;
 
 export class SerializeData {
-    private _arrayBuffer: ArrayBuffer;
     private _bufferView: Uint8Array;
     private _dataLength = 0;
     private _dataView: DataView;
 
-    constructor (arrayBuffer: ArrayBuffer | null = null) {
-        if (!arrayBuffer) {
-            this._arrayBuffer = new ArrayBuffer(DEFAULT_ARRAY_BUFFER_SIZE);
-        } else {
-            this._arrayBuffer = arrayBuffer;
-            this._dataLength = this._arrayBuffer.byteLength;
-        }
-        this._bufferView = new Uint8Array(this._arrayBuffer);
-        this._dataView = new DataView(this._arrayBuffer);
+    constructor (buffer: Uint8Array | null = null) {
+        this._bufferView = buffer || new Uint8Array(DEFAULT_ARRAY_BUFFER_SIZE);
+        this._dataLength = this._bufferView.length;
+        this._dataView = new DataView(this._bufferView.buffer, this._bufferView.byteOffset, this._bufferView.byteLength);
     }
 
-    public get buffer () {
-        return this._arrayBuffer;
+    public get bufferView (): Uint8Array {
+        return this._bufferView;
     }
 
     public get byteLength () {
@@ -36,14 +30,12 @@ export class SerializeData {
         assert(byteOffset >= 0);
         const newDataSize = byteOffset + dataSize;
 
-        if (newDataSize >= this._arrayBuffer.byteLength) {
-            const oldUint8Array = this._bufferView;
-            // Allocate a new arraybuffer
-            this._arrayBuffer = new ArrayBuffer(Math.max(newDataSize + DEFAULT_ARRAY_BUFFER_SIZE, this._arrayBuffer.byteLength * 2));
-            // Reset bufferview
-            this._bufferView = new Uint8Array(this._arrayBuffer);
+        if (newDataSize >= this.bufferView.length) {
+            const oldUint8Array = this.bufferView;
+            // Allocate a new buffer and reset buffer view
+            this._bufferView = new Uint8Array(Math.max(newDataSize + DEFAULT_ARRAY_BUFFER_SIZE, this.bufferView.length * 2));
             // Reset dataview
-            this._dataView = new DataView(this._arrayBuffer);
+            this._dataView = new DataView(this._bufferView.buffer);
             // Copy data from the old arraybuffer to the new one
             this._bufferView.set(oldUint8Array, 0);
             console.log(`==> expandBuffer from ${oldUint8Array.byteLength} to ${this._bufferView.byteLength}`);

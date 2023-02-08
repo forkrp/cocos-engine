@@ -822,7 +822,7 @@ export class BinaryOutputArchive implements IArchive {
         const view = new Uint8Array(buffer);
 
         this._serializedList.forEach((e: SerializeNode) => {
-            view.set(new Uint8Array(e.data.buffer, 0, e.data.byteLength), currentOffset);
+            view.set(e.data.bufferView, currentOffset);
             currentOffset += e.data.byteLength;
         });
 

@@ -142,9 +142,9 @@ class DeserializeNode {
     private _offset = 0;
     private _name = '';
 
-    constructor (name: string, arrayBuffer: ArrayBuffer) {
+    constructor (name: string, bufferView: Uint8Array) {
         this._name = name;
-        this._data = new SerializeData(arrayBuffer);
+        this._data = new SerializeData(bufferView);
     }
 
     get name () {
@@ -280,7 +280,7 @@ export class BinaryInputArchive implements IArchive {
         return this._deserializedObjIdMap;
     }
 
-    public start (buffer: ArrayBuffer, details: Details | any, options?: IOptions | any): unknown {
+    public start (buffer: Uint8Array, details: Details | any, options?: IOptions | any): unknown {
         this._currentNode = new DeserializeNode('root', buffer);
         // this._objectFactory = objectFactory;
 
@@ -326,8 +326,8 @@ export class BinaryInputArchive implements IArchive {
         return obj;
     }
 
-    public initAndDontSerialize (buffer: ArrayBuffer, details: Details | any, options?: IOptions | any) {
-        this._currentNode = new DeserializeNode('root', buffer);
+    public initAndDontSerialize (bufferView: Uint8Array, details: Details | any, options?: IOptions | any) {
+        this._currentNode = new DeserializeNode('root', bufferView);
         // this._objectFactory = objectFactory;
 
         this._borrowDetails = !details;
