@@ -910,6 +910,7 @@ protected:
     friend class BuiltinResMgr;
 };
 
+// TODO: If we support Reflection System for c++ class, these custom SerializationTrait could be avoided.
 template <>
 struct SerializationTrait<IPropertyValue> : SerializationTraitBase<IPropertyValue> {
     static void serialize(IPropertyValue &data, JsonInputArchive &ar) {
