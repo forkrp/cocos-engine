@@ -270,7 +270,8 @@ export class BinaryInputArchive implements IArchive {
     private _details: Details | null = null;
     private _classFinder: InputArchiveClassFinder | null = null;
     private _reportMissingClass: ReportMissingClass | null = null;
-    private _currentOwner: any | null = null;
+    private _currentOwner: any = null;
+    public jsbArchive: any = null;
 
     constructor () {
 
@@ -680,10 +681,14 @@ export class BinaryInputArchive implements IArchive {
         }
 
         let serializeMethod;
+        const serializeCppExist = !!(ret as any).serializeCpp;
         const serializeExist = !!ret.serialize;
-        const serializeInlineData = !!ret.serializeInlineData;
+        const serializeInlineDataExist = !!ret.serializeInlineData;
 
-        if (serializeExist && serializeInlineData) {
+        if (serializeCppExist) {
+            serializeMethod = (ret as any).serializeCpp;
+            this.jsbArchive.currentOffset = this._getCurrentOffset();
+        } else if (serializeExist && serializeInlineDataExist) {
             if (this._isRoot) {
                 serializeMethod = ret.serialize;
             } else {
@@ -691,7 +696,7 @@ export class BinaryInputArchive implements IArchive {
             }
         } else if (serializeExist) {
             serializeMethod = ret.serialize;
-        } else if (serializeInlineData) {
+        } else if (serializeInlineDataExist) {
             serializeMethod = ret.serializeInlineData;
         }
 

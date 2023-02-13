@@ -140,7 +140,13 @@ export function setProperties (uuid: string, asset: Asset, assetsMap: Record<str
                 }
                 missingAsset = true;
             } else {
-                depend.owner[depend.prop] = dependAsset.addRef();
+                dependAsset.addRef();
+                if (depend.owner.dereference) {
+                    depend.owner.dereference(dependAsset, depend.uuid);
+                } else {
+                    depend.owner[depend.prop] = dependAsset;
+                }
+
                 if (EDITOR) {
                     let reference = references!.get(dependAsset);
                     if (!reference || isScene(asset)) {

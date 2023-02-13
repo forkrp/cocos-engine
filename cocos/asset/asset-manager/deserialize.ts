@@ -93,6 +93,7 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
                 const jsbAr = new jsb.BinaryInputArchive();
                 jsbAr.setScriptArchive(ar);
                 jsbAr.setScriptDeserializedMap(ar.deserializedMap);
+                ar.jsbArchive = jsbAr;
 
                 asset = jsbAr.start(json, tdInfo, {
                     classFinder,
@@ -110,8 +111,12 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
                 // TODO(cjh):
                 const depends = jsbAr.getDepends();
                 for (const depend of depends) {
-                    console.log(`==> cjh, Depends, owner:${depend.owner}, propName: ${depend.propName}`);
-                    tdInfo.push(depend.owner, depend.propName, depend.uuid, depend.expectedType);
+                    // console.log(`==> cjh, Depends, owner:${depend.owner}, propName: ${depend.propName}, uuid: ${depend.uuid}`);
+                    let owner = depend.owner;
+                    if (!owner) {
+                        owner = depend;
+                    }
+                    tdInfo.push(owner, depend.propName, depend.uuid, depend.expectedType);
                 }
             } else {
                 const ar = new BinaryInputArchive();
