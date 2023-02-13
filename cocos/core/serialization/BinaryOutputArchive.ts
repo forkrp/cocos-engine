@@ -820,9 +820,10 @@ export class BinaryOutputArchive implements IArchive {
         currentOffset = 0;
         const buffer = new ArrayBuffer(totalBytes);
         const view = new Uint8Array(buffer);
-
         this._serializedList.forEach((e: SerializeNode) => {
-            view.set(e.data.bufferView, currentOffset);
+            const bufferView = e.data.bufferView;
+            const byteLength = e.data.byteLength;
+            view.set(new Uint8Array(bufferView.buffer, bufferView.byteOffset, byteLength), currentOffset);
             currentOffset += e.data.byteLength;
         });
 

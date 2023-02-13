@@ -688,19 +688,22 @@ export class BinaryInputArchive implements IArchive {
         if (serializeCppExist) {
             serializeMethod = (ret as any).serializeCpp;
             this.jsbArchive.currentOffset = this._getCurrentOffset();
-        } else if (serializeExist && serializeInlineDataExist) {
-            if (this._isRoot) {
+            serializeMethod.call(ret, this.jsbArchive);
+        } else {
+            if (serializeExist && serializeInlineDataExist) {
+                if (this._isRoot) {
+                    serializeMethod = ret.serialize;
+                } else {
+                    serializeMethod = ret.serializeInlineData;
+                }
+            } else if (serializeExist) {
                 serializeMethod = ret.serialize;
-            } else {
+            } else if (serializeInlineDataExist) {
                 serializeMethod = ret.serializeInlineData;
             }
-        } else if (serializeExist) {
-            serializeMethod = ret.serialize;
-        } else if (serializeInlineDataExist) {
-            serializeMethod = ret.serializeInlineData;
-        }
 
-        serializeMethod.call(ret, this);
+            serializeMethod.call(ret, this);
+        }
 
         if (ret.onAfterDeserialize) {
             ret.onAfterDeserialize();

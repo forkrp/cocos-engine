@@ -10,7 +10,7 @@ export class SerializeData {
 
     constructor (buffer: Uint8Array | null = null) {
         this._bufferView = buffer || new Uint8Array(DEFAULT_ARRAY_BUFFER_SIZE);
-        this._dataLength = this._bufferView.length;
+        this._dataLength = buffer ? buffer.length : 0;
         this._dataView = new DataView(this._bufferView.buffer, this._bufferView.byteOffset, this._bufferView.byteLength);
     }
 
