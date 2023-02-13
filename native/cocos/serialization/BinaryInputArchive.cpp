@@ -71,6 +71,8 @@ BinaryInputArchive::~BinaryInputArchive() {
         _scriptDeserializedMap->decRef();
         _scriptDeserializedMap = nullptr;
     }
+    
+    CC_SAFE_DELETE(_bufferView);
 }
 
 void BinaryInputArchive::setScriptArchive(se::Object* scriptArchive) {
@@ -85,14 +87,15 @@ void BinaryInputArchive::setScriptDeserializedMap(se::Object* deserializedMap) {
     _scriptDeserializedMap->incRef();
 }
 
-se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory* factory) {
+se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* factory) {
     auto prevTime = std::chrono::steady_clock::now();
 
     assert(factory != nullptr);
     _objectFactory = factory;
     
-    _buffer = arrayBuffer;
-    _currentNode.reset(ccnew DeserializeNode("root", _buffer->getData(), _buffer->byteLength()));
+    _bufferView = ccnew Uint8Array();
+    *_bufferView = std::move(bufferView);
+    _currentNode.reset(ccnew DeserializeNode("root", _bufferView->buffer()->getData() + _bufferView->byteOffset(), _bufferView->byteLength() - _bufferView->byteOffset()));
 
     _uuidList.reserve(5);
     _stringList.reserve(32);
@@ -164,6 +167,8 @@ se::Value BinaryInputArchive::start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory*
     
     CC_LOG_INFO("==> cjh BinaryInputArchive::start cost: %lf ms", durationMS);
     CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms", gScriptSerializeTime / 1000000.0);
+    
+//    printJSBInvoke();
     
     return retVal;
 }
@@ -624,11 +629,16 @@ AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
             _currentNode->setOffset(_currentNode->getOffset() + uuidAdvance);
             auto uuidIndex = _currentNode->popUint32();
             assert(uuidIndex >= 0 && uuidIndex < _uuidList.size());
+            assert(_currentKey != nullptr);
 
             AssetDependInfo dependInfo;
             dependInfo.uuid = _uuidList[uuidIndex];
             dependInfo.owner = _currentOwner;
             dependInfo.propName = _currentKey;
+            
+            if (dependInfo.uuid == "1263d74c-8167-4928-91a6-4e2672411f47@a804a") {
+                int a = 0;
+            }
             
             assert(dependInfo.uuid.length() >= 36 && dependInfo.uuid[0] != '\0');
 

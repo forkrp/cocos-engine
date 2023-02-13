@@ -454,7 +454,7 @@ public:
     void setPrivateObject(TypedPrivateObject<T>* data) {
         setPrivateObject(static_cast<PrivateObjectBase *>(data));
         if constexpr (std::is_base_of<HasJSThisObject, T>::value) {
-            data->get<T>()->bindJSThis(data->get<T>());
+            data->template get<T>()->bindJSThis(data->template get<T>());
         }
     }
     PrivateObjectBase *getPrivateObject() const;

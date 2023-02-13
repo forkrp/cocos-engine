@@ -10,6 +10,9 @@
 // mark  decltype of Model as jsb object
 #include "bindings/auto/jsb_scene_auto.h"
 
+#include "serialization/BinaryInputArchive.h"
+#include "serialization/JsonInputArchive.h"
+
 namespace cc {
 
 #if defined(MR_PROBE_EVENTS) || defined(MR_SCENE_GLOBAL)
@@ -24,6 +27,27 @@ namespace cc {
 #define MR_SCENE_GLOBAL() \
     getNode()->getScene()->getSceneGlobals()
 
+
+CC_IMPL_SERIALIZE(ModelBakeSettings)
+
+template <class Archive>
+void ModelBakeSettings::serialize(Archive &ar) {
+    CC_SERIALIZE(texture);
+    CC_SERIALIZE(uvParam);
+    CC_SERIALIZE(_bakeable);
+    CC_SERIALIZE(_castShadow);
+    CC_SERIALIZE(_receiveShadow);
+    ar.serialize(_receiveShadow, "_recieveShadow");
+    CC_SERIALIZE(_lightmapSize);
+    CC_SERIALIZE(_useLightProbe);
+    CC_SERIALIZE(_bakeToLightProbe);
+    CC_SERIALIZE(_reflectionProbeType);
+    CC_SERIALIZE(_bakeToReflectionProbe);
+    CC_SERIALIZE(_probeCubemap);
+}
+
+CC_IMPL_SERIALIZE(MeshRenderer)
+
 MeshRenderer::MeshRenderer() {
 
     bakeSettings = new ModelBakeSettings;
@@ -37,20 +61,33 @@ MeshRenderer::MeshRenderer() {
     }
 }
 
+template <class Archive>
+void MeshRenderer::serialize(Archive &ar) {
+    Super::serialize(ar);
+    CC_SERIALIZE(bakeSettings);
+    CC_SERIALIZE(_mesh);
+    CC_SERIALIZE(_shadowCastingMode);
+    CC_SERIALIZE(_shadowReceivingMode);
+    CC_SERIALIZE(_shadowBias);
+    CC_SERIALIZE(_shadowNormalBias);
+    CC_SERIALIZE(_enableMorph);
+}
+
+
 void MeshRenderer::onUpdateReceiveDirLight(uint32_t visibility, bool forceClose) {
     if (!_model) {
         return;
     }
-    if (forceClose) {
-        _model->setReceiveDirLight(false);
-        return;
-    }
-    auto *node = getNode();
-    if (node && ((visibility & node->getLayer()) == node->getLayer()) || (visibility & static_cast<uint32_t>(_model->getVisFlags()))) {
-        _model->setReceiveDirLight(true);
-    } else {
-        _model->setReceiveDirLight(false);
-    }
+//cjh    if (forceClose) {
+//        _model->setReceiveDirLight(false);
+//        return;
+//    }
+//    auto *node = getNode();
+//    if (node && ((visibility & node->getLayer()) == node->getLayer()) || (visibility & static_cast<uint32_t>(_model->getVisFlags()))) {
+//        _model->setReceiveDirLight(true);
+//    } else {
+//        _model->setReceiveDirLight(false);
+//    }
 }
 
 void MeshRenderer::onLoad() {
@@ -61,6 +98,7 @@ void MeshRenderer::onLoad() {
         _initSubMeshShapesWeights();
     }
     _watchMorphInMesh();
+    
     _updateModels();
     _updateCastShadow();
     _updateReceiveShadow();
@@ -69,6 +107,11 @@ void MeshRenderer::onLoad() {
     _updateUseLightProbe();
     _updateBakeToReflectionProbe();
     _updateUseReflectionProbe();
+    
+    if (_model) {
+        _model->setNeedUpdateMacroPatches(true);
+        _model->onMacroPatchesStateChanged();
+    }
 }
 
 // Redo, Undo, Prefab restore, etc.
@@ -84,6 +127,11 @@ void MeshRenderer::onRestore() {
     _updateUseLightProbe();
     _updateBakeToReflectionProbe();
     _updateUseReflectionProbe();
+    
+    if (_model) {
+        _model->setNeedUpdateMacroPatches(true);
+        _model->onMacroPatchesStateChanged();
+    }
 }
 
 void MeshRenderer::onEnable() {
@@ -106,6 +154,12 @@ void MeshRenderer::onEnable() {
     _updateUseReflectionProbe();
     _onUpdateLocalShadowBias();
     _updateUseLightProbe();
+    
+    if (_model) {
+        _model->setNeedUpdateMacroPatches(true);
+        _model->onMacroPatchesStateChanged();
+    }
+    
     _attachToScene();
 }
 
@@ -247,6 +301,7 @@ void MeshRenderer::_updateModels() {
     }
 
     if (_model) {
+        _model->setNeedUpdateMacroPatches(false);
         if (_mesh) {
             const auto &meshStruct = _mesh->getStruct();
             _model->createBoundingShape(meshStruct.minPosition, meshStruct.maxPosition);
@@ -254,11 +309,9 @@ void MeshRenderer::_updateModels() {
         // Initialize lighting map before model initializing
         // because the lighting map will influence the model's shader
         _model->initLightingmap(bakeSettings->texture, bakeSettings->uvParam);
-        _updateUseLightProbe();
         _updateModelParams();
         _onUpdateLightingmap();
         _onUpdateLocalShadowBias();
-        _updateUseReflectionProbe();
     }
 }
 
@@ -318,8 +371,8 @@ void MeshRenderer::_attachToScene() {
     if (_model->getScene()) {
         _detachFromScene();
     }
-    CC_LOG_DEBUG("%s: address of model : %p, submodel: %p", getName().c_str(),  _model.get(),
-                 _model && _model->getSubModels().size() > 0 ? _model->getSubModels()[0].get() : nullptr);
+//    CC_LOG_DEBUG("%s: address of model : %p, submodel: %p", getName().c_str(),  _model.get(),
+//                 _model && _model->getSubModels().size() > 0 ? _model->getSubModels()[0].get() : nullptr);
     renderScene->addModel(_model);
 }
 void MeshRenderer::_detachFromScene() {

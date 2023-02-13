@@ -129,8 +129,12 @@ public:
 
     inline void setNode(Node *node) { _node = node; }
     inline void setReceiveShadow(bool value) {
-        _receiveShadow = value;
-        onMacroPatchesStateChanged();
+        if (_receiveShadow != value) {
+            _receiveShadow = value;
+            if (_needUpdateMacroPatches) {
+                onMacroPatchesStateChanged();
+            }
+        }
     }
     inline void setShadowBias(float bias) { _shadowBias.x = bias; }
     inline void setShadowNormalBias(float normalBias) { _shadowBias.y = normalBias; }
@@ -152,8 +156,12 @@ public:
     inline bool isEnabled() const { return _enabled; }
     inline bool getUseLightProbe() const { return _useLightProbe; }
     inline void setUseLightProbe(bool val) {
-        _useLightProbe = val;
-        onMacroPatchesStateChanged();
+        if (_useLightProbe != val) {
+            _useLightProbe = val;
+            if (_needUpdateMacroPatches) {
+                onMacroPatchesStateChanged();
+            }
+        }
     }
     inline bool getBakeToReflectionProbe() const { return _bakeToReflectionProbe; }
     inline void setBakeToReflectionProbe(bool val) {
@@ -198,6 +206,9 @@ public:
     inline void setModelBounds(geometry::AABB *bounds) { _modelBounds = bounds; }
     inline bool isModelImplementedInJS() const { return (_type != Type::DEFAULT && _type != Type::SKINNING && _type != Type::BAKED_SKINNING); };
 
+    inline void setNeedUpdateMacroPatches(bool v) { _needUpdateMacroPatches = v; }
+    inline bool isNeedUpdateMacroPatches() const { return _needUpdateMacroPatches; }
+    
 protected:
     static SubModel *createSubModel();
 
@@ -243,6 +254,7 @@ protected:
     bool _worldBoundsDirty{true};
     // For JS
     bool _isCalledFromJS{false};
+    bool _needUpdateMacroPatches{true};
 
     Vec4 _shadowBias;
     Vec4 _lightmapUVParam;

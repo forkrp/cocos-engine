@@ -147,8 +147,8 @@ function defineAsProp(proto, attr, dft) {
     });
 }
 
-defineAsProp(MeshRendererProto, 'node', null);
-defineAsProp(MeshRendererProto, '_enabled', true);
+// defineAsProp(MeshRendererProto, 'node', null);
+// defineAsProp(MeshRendererProto, '_enabled', true);
 defineAsProp(MeshRendererProto, '__prefab', null);
 
 const idGenerator = new IDGenerator('CompNative');
@@ -156,29 +156,29 @@ const idGenerator = new IDGenerator('CompNative');
 
 MeshRendererProto._ctor = function () {
     this._id = idGenerator.getNewId();
-    this._materialsTmp  = [];
+    // this._materialsTmp  = [];
 }
 {
-    const oldOnEnable = MeshRendererProto.onEnable;
-    MeshRendererProto.onEnable = function () {
-        this._materialsJS = this._materials;
-        oldOnEnable.call(this);
-    };
-    const oldOnLoad = MeshRendererProto.onLoad;
-    MeshRendererProto.onLoad = function () {
-        this._materialsJS = this._materials;
-        oldOnLoad.call(this);
-    };
+    // const oldOnEnable = MeshRendererProto.onEnable;
+    // MeshRendererProto.onEnable = function () {
+    //     this._materialsJS = this._materials;
+    //     oldOnEnable.call(this);
+    // };
+    // const oldOnLoad = MeshRendererProto.onLoad;
+    // MeshRendererProto.onLoad = function () {
+    //     this._materialsJS = this._materials;
+    //     oldOnLoad.call(this);
+    // };
 
-    Object.defineProperty(MeshRendererProto, '_materials', {
-        get() {
-            return this._materialsTmp;
-        },
-        set(arr) {
-            this._materialsTmp = arr;
-            this._materialsJS = arr;
-        }
-    })
+    // Object.defineProperty(MeshRendererProto, '_materials', {
+    //     get() {
+    //         return this._materialsTmp;
+    //     },
+    //     set(arr) {
+    //         this._materialsTmp = arr;
+    //         this._materialsJS = arr;
+    //     }
+    // })
 }
 
 {
@@ -258,18 +258,19 @@ serializable(MeshRendererProto, '_visFlags', () => 0); // inherited from cc.Mode
     type(Material)(MeshRendererProto, Key, desc);
 }
 // inherited from cc.Renderer
-function fixMaterials(proto: any) {
-    const oldMaterial = Object.getOwnPropertyDescriptor(proto, 'material')!;
-    Object.defineProperty(proto, 'materialUnderlying',  oldMaterial);
-    Object.defineProperty(proto, 'material', {
-        get() {return this.materialUnderlying;},
-        set(mat) {
-            this._materialsTmp[0] = mat;
-            this.materialUnderlying = mat;
-        }
-    });
-}
-fixMaterials(jsb.Renderer.prototype);
+// function fixMaterials(proto: any) {
+//     const oldMaterial = Object.getOwnPropertyDescriptor(proto, 'material')!;
+//     Object.defineProperty(proto, 'materialUnderlying',  oldMaterial);
+//     Object.defineProperty(proto, 'material', {
+//         get() {return this.materialUnderlying;},
+//         set(mat) {
+//             this._materialsTmp[0] = mat;
+//             this.materialUnderlying = mat;
+//         }
+//     });
+// }
+// fixMaterials(jsb.Renderer.prototype);
+
 type([Material])(MeshRendererProto, '_materials', () => []);
 // inherited from cc.Component
 serializable(MeshRendererProto, 'node', () => null);

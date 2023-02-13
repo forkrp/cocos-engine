@@ -67,6 +67,7 @@ public:                                                    \
 
 class ComponentProxy : public CCObject, public se::HasJSThisObject {
 public:
+    CC_DECLARE_SERIALIZE()
     COMPONENT_BASE_EXECUTION_ORDER(ComponentProxy, 0)
 
     using Super = CCObject;
@@ -101,12 +102,13 @@ public:
     * log(comp.enabled);
     * ```
     */
-    virtual inline bool isEnabled() const {
-        return getJSProperty<bool>("enabled");
+    inline bool isEnabled() const {
+        return _enabled;
     }
 
-    virtual void setEnabled(bool value) {
-        setJSProperty("enabled", value);
+    //TODO(cjh):
+    inline void setEnabled(bool value) {
+        _enabled = value;
     }
 
     /**
@@ -119,9 +121,7 @@ public:
     * log(comp.enabledInHierarchy);
     * ```
     */
-    bool isEnabledInHierarchy() const {
-        return getJSProperty<bool>("enabledInHierarchy");
-    }
+    bool isEnabledInHierarchy() const;
 
     /**
      * @en Returns a value which used to indicate the onLoad get called or not.
@@ -137,16 +137,12 @@ public:
         return hasFlag(_objFlags, CCObject::Flags::IS_ON_LOAD_CALLED);
     }
 
-    virtual Node *getNode() const {
-        if (!_nodeCache) {
-            _nodeCache = getJSProperty<Node *>("node");
-        }
-        return _nodeCache;
+    inline Node *getNode() const {
+        return _node;
     }
 
-    virtual void setNode(Node *node) {
-        _nodeCache = node;
-        setJSProperty("node", node);
+    inline void setNode(Node *node) {
+        _node = node;
     }
 
     virtual CCObject::Flags getObjFlags() {
@@ -302,7 +298,8 @@ public:
     virtual void onLostFocusInEditor() {}
 
 private:
-    mutable Node *_nodeCache{nullptr};
+    Node *_node{nullptr};
+    bool _enabled{true}; // TODO: need to shared memory with JS
     mutable scene::RenderScene *_renderSceneCache{nullptr};
 };
 

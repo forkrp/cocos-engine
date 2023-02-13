@@ -23,7 +23,10 @@ namespace cc {
        } while (false)
 
 class Renderer : public ComponentProxy {
+    CC_DECLARE_SERIALIZE()
 public:
+    using Super = ComponentProxy;
+    
     template <typename M>
     using PtrVector = ccstd::vector<IntrusivePtr<M>>;
 

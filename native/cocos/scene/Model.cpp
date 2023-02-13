@@ -421,6 +421,8 @@ ccstd::vector<IMacroPatch> Model::getMacroPatches(index_t subModelIndex) {
     }
 
     ccstd::vector<IMacroPatch> patches;
+    patches.reserve(4);
+
     if (_receiveShadow) {
         for (const auto &patch : SHADOW_MAP_PATCHES) {
             patches.push_back(patch);
@@ -620,11 +622,15 @@ void Model::setInstancedAttribute(const ccstd::string &name, const float *value,
     }
 }
 void Model::setReflectionProbeType(int32_t val) {
-    _reflectionProbeType = val;
-    for (const auto &subModel : _subModels) {
-        subModel->setReflectionProbeType(val);
+    if (_reflectionProbeType != val) {
+        _reflectionProbeType = val;
+        for (const auto &subModel : _subModels) {
+            subModel->setReflectionProbeType(val);
+        }
+        if (_needUpdateMacroPatches) {
+            onMacroPatchesStateChanged();
+        }
     }
-    onMacroPatchesStateChanged();
 }
 
 } // namespace scene

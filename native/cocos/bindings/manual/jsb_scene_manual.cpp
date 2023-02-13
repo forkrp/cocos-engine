@@ -795,6 +795,34 @@ static bool js_assets_MaterialInstance_registerListeners(se::State &s) // NOLINT
 }
 SE_BIND_FUNC(js_assets_MaterialInstance_registerListeners) // NOLINT(readability-identifier-naming)
 
+static bool js_cc_ComponentProxy_serialize(se::State &s) // NOLINT(readability-identifier-naming)
+{
+    auto *cobj = SE_THIS_OBJECT<cc::ComponentProxy>(s);
+    SE_PRECONDITION2(cobj, false, "Invalid Native Object");
+
+    const auto& args = s.args();
+    const size_t argc = args.size();
+    
+    if (argc > 0 && args[0].isObject()) {
+        auto* archiveObj = args[0].toObject();
+        se::Value jsbArchiveVal;
+        if (archiveObj->getProperty("jsbArchive", &jsbArchiveVal) && jsbArchiveVal.isObject()) {
+            auto *ar = static_cast<cc::BinaryInputArchive*>(jsbArchiveVal.toObject()->getPrivateData());
+            auto *oldOwner = ar->getCurrentOwner();
+            ar->setCurrentOwner(s.thisObject());
+            if (auto* renderer = dynamic_cast<cc::MeshRenderer*>(cobj)) {
+                renderer->serialize(*ar);
+            }
+            ar->setCurrentOwner(oldOwner);
+            return true;
+        }
+    }
+
+    
+    return false;
+}
+SE_BIND_FUNC(js_cc_ComponentProxy_serialize) // NOLINT(readability-identifier-naming)
+
 bool register_all_scene_manual(se::Object *obj) // NOLINT(readability-identifier-naming)
 {
     // Get the ns
@@ -866,6 +894,8 @@ bool register_all_scene_manual(se::Object *obj) // NOLINT(readability-identifier
 
     __jsb_cc_scene_Model_proto->defineFunction("_registerListeners", _SE(js_Model_registerListeners));
     __jsb_cc_MaterialInstance_proto->defineFunction("_registerListeners", _SE(js_assets_MaterialInstance_registerListeners));
+    
+    __jsb_cc_ComponentProxy_proto->defineFunction("serializeCpp", _SE(js_cc_ComponentProxy_serialize));
 
     return true;
 }

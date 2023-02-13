@@ -908,10 +908,10 @@ static bool JSB_BinaryInputArchive_start(se::State& s) {
     if (nullptr == arg1) return true;
 
     const auto &arg0 = args[0];
-    if (arg0.isObject() && arg0.toObject()->isArrayBuffer()) {
-        auto* arrayBuffer = ccnew cc::ArrayBuffer();
-        sevalue_to_native(args[0], arrayBuffer);
-        s.rval() = arg1->start(arrayBuffer, &myObjectFactory);
+    if (arg0.isObject() && arg0.toObject()->isTypedArray() && arg0.toObject()->getTypedArrayType() == se::Object::TypedArrayType::UINT8) {
+        cc::Uint8Array bufferView;
+        sevalue_to_native(args[0], &bufferView);
+        s.rval() = arg1->start(std::move(bufferView), &myObjectFactory);
         return true;
     }
 

@@ -32,7 +32,6 @@
 #include "SerializationTrait.h"
 #include "base/Ptr.h"
 #include "core/data/Object.h"
-#include "core/ArrayBuffer.h"
 #include "SerializationData.h"
 
 #include "base/std/container/vector.h"
@@ -142,6 +141,9 @@ private:
     ccstd::string _name;
 };
 
+template <typename T>
+class TypedArrayTemp;
+
 class BinaryInputArchive final : public IArchive {
 public:
     BinaryInputArchive();
@@ -151,10 +153,12 @@ public:
     bool isWritting() const { return false; }
     bool isExporting() const { return false; }
 
-    se::Value start(ArrayBuffer::Ptr arrayBuffer, ObjectFactory* factory);
+    se::Value start(TypedArrayTemp<uint8_t> &&bufferView, ObjectFactory* factory);
     
     void setScriptArchive(se::Object* scriptArchive);
     void setScriptDeserializedMap(se::Object* deserializedMap);
+    inline void setCurrentOwner(se::Object *owner) { _currentOwner = owner; }
+    inline se::Object *getCurrentOwner() { return _currentOwner; }
 
     inline const std::vector<AssetDependInfo>& getDepends() const { return _depends; } // TODO(cjh): Should not handle dependency in Serialization module
 
@@ -219,6 +223,7 @@ public:
     }
 
     inline uint32_t getCurrentOffset() const { return _currentNode->getOffset(); }
+    inline void setCurrentOffset(uint32_t offset) { _currentNode->setOffset(offset); }
 
     se::Value& anyValue(se::Value& value, const char* name);
     se::Value& plainObj(se::Value& value, const char* name);
@@ -286,7 +291,7 @@ private:
     AssetDependInfo* checkAssetDependInfo();
     static void* seObjGetPrivateData(se::Object* obj);
 
-    ArrayBuffer::Ptr _buffer;
+    TypedArrayTemp<uint8_t> *_bufferView;
     se::Object *_scriptArchive{nullptr};
     ObjectFactory* _objectFactory{nullptr};
     

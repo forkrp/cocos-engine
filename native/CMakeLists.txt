@@ -1456,6 +1456,14 @@ cocos_source_files(
                  cocos/scene/ReflectionProbeManager.h
 )
 
+##### misc
+cocos_source_files(
+    cocos/misc/Renderer.h
+    cocos/misc/Renderer.cpp
+    cocos/misc/ModelRenderer.h
+    cocos/misc/ModelRenderer.cpp
+)
+
 ##### primitive
 cocos_source_files(
     cocos/primitive/Box.cpp
@@ -2040,6 +2048,8 @@ cocos_source_files(
     cocos/core/scene-graph/Scene.h
     cocos/core/scene-graph/SceneGlobals.cpp
     cocos/core/scene-graph/SceneGlobals.h
+    cocos/core/scene-graph/ComponentProxy.h
+    cocos/core/scene-graph/ComponentProxy.cpp
     cocos/core/scene-graph/SceneGraphModuleHeader.h
 
     cocos/core/utils/IDGenerator.cpp

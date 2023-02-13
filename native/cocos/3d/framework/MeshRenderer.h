@@ -1,3 +1,5 @@
+
+
 #pragma once
 
 #include <cstdint>
@@ -17,7 +19,7 @@ namespace cc {
  * @en Shadow projection mode.
  * @zh 阴影投射方式。
  */
-enum class ModelShadowCastingMode {
+enum class ModelShadowCastingMode : uint8_t {
     /**
      * @en Disable shadow projection.
      * @zh 不投射阴影。
@@ -34,7 +36,7 @@ enum class ModelShadowCastingMode {
  * @en Shadow receive mode.
  * @zh 阴影接收方式。
  */
-enum class ModelShadowReceivingMode {
+enum class ModelShadowReceivingMode: uint8_t {
     /**
      * @en Disable shadow receiving.
      * @zh 不接收阴影。
@@ -51,7 +53,7 @@ enum class ModelShadowReceivingMode {
  * @en Reflection probe type
  * @zh 反射探针类型。
  */
-enum class ReflectionProbeType {
+enum class ReflectionProbeType : uint8_t {
     /**
      * @en Use the default skybox.
      * @zh 使用默认天空盒
@@ -73,7 +75,7 @@ enum class ReflectionProbeType {
  * @en Model's bake settings.
  * @zh 模型烘焙设置
  */
-class ModelBakeSettings final: public RefCounted {
+class ModelBakeSettings final: public RefCounted, public ISerializable {
     IMPL_EVENT_TARGET(ModelBakeSettings)
     DECLARE_TARGET_EVENT_BEGIN(ModelBakeSettings)
     /**
@@ -94,14 +96,15 @@ class ModelBakeSettings final: public RefCounted {
      */
     TARGET_EVENT_ARG0(BAKE_TO_REFLECTION_PROBE_CHANGED); // = 'bake_to_reflection_probe_changed';
     DECLARE_TARGET_EVENT_END()
-
+    
+    CC_DECLARE_SERIALIZE()
 public:
     IntrusivePtr<Texture2D> texture;
     Vec4 uvParam;
     bool _bakeable = false;
     bool _castShadow = false;
     bool _receiveShadow = false;
-    int32_t _lightmapSize = 64;
+    uint16_t _lightmapSize = 64;
 
     bool _useLightProbe = false;
     bool _bakeToLightProbe = true;
@@ -214,6 +217,7 @@ public:
 };
 
 class MeshRenderer : public ModelRenderer {
+    CC_DECLARE_SERIALIZE()
 public:
     using Super = ModelRenderer;
     /**

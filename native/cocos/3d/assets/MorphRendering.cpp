@@ -638,9 +638,11 @@ public:
         }
         const auto &subMeshMorph = subMeshMorphOpt.value();
 
-        ccstd::vector<scene::IMacroPatch> patches{
-            {"CC_USE_MORPH", true},
-            {"CC_MORPH_TARGET_COUNT", static_cast<int32_t>(subMeshMorph.targets.size())}};
+        ccstd::vector<scene::IMacroPatch> patches;
+        patches.reserve(5);
+        
+        patches.emplace_back(scene::IMacroPatch{"CC_USE_MORPH", true});
+        patches.emplace_back(scene::IMacroPatch{"CC_MORPH_TARGET_COUNT", static_cast<int32_t>(subMeshMorph.targets.size())});
 
         auto posIter = std::find(subMeshMorph.attributes.begin(), subMeshMorph.attributes.end(), gfx::ATTR_NAME_POSITION);
         if (posIter != subMeshMorph.attributes.end()) {

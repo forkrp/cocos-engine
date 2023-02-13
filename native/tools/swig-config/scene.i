@@ -147,8 +147,8 @@ using namespace cc;
 %ignore cc::ComponentProxy::setEnabled; 
 %ignore cc::ComponentProxy::isEnabledInHierarchy; 
 %ignore cc::ComponentProxy::isOnLoadCalled; 
-%ignore cc::ComponentProxy::getNode; 
-%ignore cc::ComponentProxy::setNode; 
+// %ignore cc::ComponentProxy::getNode; 
+// %ignore cc::ComponentProxy::setNode; 
 %ignore cc::ComponentProxy::getObjFlags; 
 %ignore cc::ComponentProxy::setObjFlags; 
 %ignore cc::ComponentProxy::_getRenderScene; 
@@ -216,7 +216,7 @@ using namespace cc;
 %rename(setMaterial) cc::Renderer::_setMaterial;
 %rename(getMaterialInstance) cc::Renderer::_getMaterialInstance;
 %rename(setMaterialInstance) cc::Renderer::_setMaterialInstance;
-%rename(_materialsJS) cc::Renderer::_materials;
+// %rename(_materialsJS) cc::Renderer::_materials;
 
 %rename(_getChildren) cc::Node::getChildren;
 %rename(_getPositionForJS) cc::Node::getPosition;
@@ -608,6 +608,8 @@ using namespace cc;
 
 %attribute(cc::SceneGlobals, bool, bakedWithStationaryMainLight, getBakedWithStationaryMainLight, setBakedWithStationaryMainLight);
 
+%attribute(cc::ComponentProxy, cc::Node*, node, getNode, setNode);
+%attribute(cc::ComponentProxy, bool, _enabled, isEnabled, setEnabled);
 
 // ----- Import Section ------
 // Brief: Import header files which are depended by 'Include Section'
