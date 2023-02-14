@@ -35,6 +35,11 @@
 #include "SerializationData.h"
 
 #include "base/std/container/vector.h"
+#include "math/Vec3.h"
+#include "math/Vec4.h"
+#include "math/Quaternion.h"
+
+#include <stack>
 
 namespace se {
 class Value;
@@ -134,6 +139,13 @@ public:
         _offset += sizeof(T);
         return ret;
     }
+    
+    template <typename T, uint32_t totalBytes>
+    T* popMemory() {
+        T* ret = _data.getPointer<T, totalBytes>(_offset);
+        _offset += totalBytes;
+        return ret;
+    }
 
 private:
     SerializationData _data;
@@ -157,8 +169,9 @@ public:
     
     void setScriptArchive(se::Object* scriptArchive);
     void setScriptDeserializedMap(se::Object* deserializedMap);
-    inline void setCurrentOwner(se::Object *owner) { _currentOwner = owner; }
-    inline se::Object *getCurrentOwner() { return _currentOwner; }
+
+    inline void setCurrentOwner(se::Object *owner) { _currentPropertyInfo._currentOwner = owner; }
+    inline se::Object *getCurrentOwner() { return _currentPropertyInfo._currentOwner; }
 
     inline const std::vector<AssetDependInfo>& getDepends() const { return _depends; } // TODO(cjh): Should not handle dependency in Serialization module
 
@@ -234,6 +247,9 @@ public:
 #ifndef SWIGCOCOS
     template <class T>
     void serializePrimitiveData(T& data);
+    
+    template <class T, uint32_t count>
+    void serializePrimitiveDataWithCount(T* data);
 
     template <class T>
     void serializeString(T& data);
@@ -287,12 +303,33 @@ private:
 
     void onAfterDeserializeScriptObject(se::Object* obj);
     void onAfterDeserializeScriptObjectByNativePtr(const void* nativeObj);
+    
+    
+    inline const char* getCurrentKey() const {
+        return _currentPropertyInfo._currentKey;
+    }
+    
+    inline int32_t getCurrentKeyInteger() const {
+        return _currentPropertyInfo._currentKeyInteger;
+    }
+    
+    inline void setCurrentKey(const char* key) {
+        _currentPropertyInfo._currentKey = key;
+        _currentPropertyInfo._currentKeyInteger = -1;
+    }
+    
+    inline void setCurrentKey(int32_t key) {
+        _currentPropertyInfo._currentKeyInteger = key;
+        _currentPropertyInfo._currentKey = nullptr;
+    }
 
     AssetDependInfo* checkAssetDependInfo();
     static void* seObjGetPrivateData(se::Object* obj);
 
     TypedArrayTemp<uint8_t> *_bufferView;
     se::Object *_scriptArchive{nullptr};
+    se::Object *_setCurrentOffsetFunc{nullptr};
+    se::Object *_getCurrentOffsetFunc{nullptr};
     ObjectFactory* _objectFactory{nullptr};
     
     struct DeserializedInfo final {
@@ -302,16 +339,38 @@ private:
     };
 
     ccstd::unordered_map<int32_t, DeserializedInfo> _deserializedObjIdMap;
-    se::Object *_scriptDeserializedMap;
+    se::Object *_scriptDeserializedMap{nullptr};
     ccstd::vector<const void*> _deserializedObjects;
 
     ccstd::vector<AssetDependInfo> _depends;
     ccstd::vector<std::string_view> _uuidList;
     ccstd::vector<std::string_view> _stringList;
 
-    se::Object* _currentOwner{nullptr};
-    const char* _currentKey{nullptr};
-
+    struct PropertyInfo {
+        se::Object* _currentOwner{nullptr};
+        const char* _currentKey{nullptr};
+        int32_t _currentKeyInteger{-1};
+    };
+    
+    using PropertyStack = std::stack<PropertyInfo>;
+    
+    class AutoSaveRestorePropertyInfo final {
+    public:
+        AutoSaveRestorePropertyInfo(BinaryInputArchive* archive): _archive(archive) {
+            _archive->_propertyStack.push(_archive->_currentPropertyInfo);
+        }
+        ~AutoSaveRestorePropertyInfo() {
+            _archive->_currentPropertyInfo = _archive->_propertyStack.top();
+            _archive->_propertyStack.pop();
+        }
+    private:
+        BinaryInputArchive* _archive;
+        CC_DISALLOW_COPY_MOVE_ASSIGN(AutoSaveRestorePropertyInfo)
+    };
+    
+    PropertyStack _propertyStack;
+    PropertyInfo _currentPropertyInfo;
+    
     uint8_t _currentObjectFlags{0};
 
     std::unique_ptr<DeserializeNode> _currentNode{nullptr};
@@ -323,6 +382,13 @@ private:
 template <class T>
 inline void BinaryInputArchive::serializePrimitiveData(T& data) {
     data = _currentNode->popNumber<T>();
+}
+
+template <class T, uint32_t count>
+inline void BinaryInputArchive::serializePrimitiveDataWithCount(T* data) {
+    static constexpr uint32_t TOTAL_BYTES = sizeof(T) * count;
+    T* src = _currentNode->popMemory<T, TOTAL_BYTES>();
+    memcpy(data, src, TOTAL_BYTES);
 }
 
 template <>
@@ -343,19 +409,15 @@ inline void BinaryInputArchive::serializeStlLikeArray(T& data) {
     } else {
         assert(false);
     }
+    
+    AutoSaveRestorePropertyInfo autoSaveRestore(this);
 
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
-
-    _currentOwner = nullptr; // Stl container should not be a script owner.
+    setCurrentOwner(nullptr); // Stl container should not be a script owner.
 
     SerializationTrait<T>::resizeStlLikeArray(data, length);
 
-    char keyTmp[12] = {0};
-
     for (int32_t i = 0; i < length; ++i) {
-        snprintf(keyTmp, sizeof(keyTmp), "%u", i);
-        _currentKey = keyTmp;
+        setCurrentKey(i);
 
         if constexpr (std::is_same_v<bool, data_type>) {
             data_type v{};
@@ -365,9 +427,6 @@ inline void BinaryInputArchive::serializeStlLikeArray(T& data) {
             SerializationTrait<data_type>::serialize(data[i], *this);
         }
     }
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
 }
 
 template <class T>
@@ -381,27 +440,23 @@ void BinaryInputArchive::serializeStlLikeMap(T& data) {
         return;
     }
 
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
+    AutoSaveRestorePropertyInfo autoSaveRestore(this);
 
-    _currentOwner = nullptr; // Stl container should not be a script owner.
+    setCurrentOwner(nullptr); // Stl container should not be a script owner.
 
     int32_t elementCount = _currentNode->popInt32();
     SerializationTrait<T>::reserveStlLikeMap(data, elementCount);
 
-    char keyTmp[12] = {0};
-
     for (int32_t i = 0; i < elementCount; ++i) {
-        _currentKey = nullptr; // FIXME(cjh): Should be nullptr for key itself?
+        setCurrentOwner(nullptr); // FIXME(cjh): Should be nullptr for key itself?
 
         key_type key{};
         SerializationTrait<key_type>::serialize(key, *this);
 
         if constexpr (std::numeric_limits<key_type>::is_integer) {
-            snprintf(keyTmp, sizeof(keyTmp), "%d", static_cast<int32_t>(key));
-            _currentKey = keyTmp;
+            setCurrentKey(static_cast<int32_t>(key));
         } else if constexpr (std::is_same_v<std::decay_t<key_type>, ccstd::string>) {
-            _currentKey = key.c_str();
+            setCurrentKey(key.c_str());
         } else {
             static_assert(std::is_same_v<key_type, void>, "Not supported key type");
         }
@@ -411,9 +466,6 @@ void BinaryInputArchive::serializeStlLikeMap(T& data) {
 
         data[key] = value;
     }
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
 }
 
 template <class T>
@@ -448,11 +500,10 @@ inline void BinaryInputArchive::serializeStdTuple(std::tuple<Args...>& data) {
         return;
     }
 
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
+    AutoSaveRestorePropertyInfo autoSaveRestore(this);
 
-    _currentOwner = nullptr; // Stl container should not be a script owner.
-    _currentKey = nullptr;
+    setCurrentOwner(nullptr);
+    setCurrentKey(nullptr);
 
     int32_t len = _currentNode->popInt32();
     assert(len == ARG_N);
@@ -461,22 +512,14 @@ inline void BinaryInputArchive::serializeStdTuple(std::tuple<Args...>& data) {
         using data_type = std::decay_t<decltype(item)>;
         SerializationTrait<data_type>::serialize(item, *this);
     });
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
 }
 
 template <class T>
 inline void BinaryInputArchive::serialize(T& data, const char* name) {
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
-
-    _currentKey = name;
+    AutoSaveRestorePropertyInfo autoSaveRestore(this);
+    setCurrentKey(name);
     
     SerializationTrait<T>::serialize(data, *this);
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
 }
 
 template <class T>
@@ -538,10 +581,12 @@ inline void BinaryInputArchive::onSerializingObjectPtr(T& data) {
     }
 
     // Serialize JS object
-    if constexpr (has_getScriptObject<data_type, void(se::Object*)>::value) {
+    if constexpr (has_getScriptObject<data_type, se::Object*()>::value) {
         se::Object* scriptObject = data->getScriptObject();
         serializeScriptObject(scriptObject);
-    } else {
+    } else if constexpr (!std::is_same_v<Vec3, data_type>
+                         && !std::is_same_v<Vec4, data_type>
+                         && !std::is_same_v<Quaternion, data_type>){
         serializeScriptObjectByNativePtr(data);
     }
 }
@@ -565,10 +610,13 @@ inline void BinaryInputArchive::onSerializingObjectRef(T& data) {
         static_assert(std::is_void_v<T>, "CPP type doesn't have a serialize or serializeInlineData method");
     }
 
+    // Serialize JS object
     if constexpr (has_getScriptObject<data_type, se::Object*()>::value) {
         se::Object* scriptObject = data.getScriptObject();
         serializeScriptObject(scriptObject);
-    } else {
+    } else if constexpr (!std::is_same_v<Vec3, data_type>
+                         && !std::is_same_v<Vec4, data_type>
+                         && !std::is_same_v<Quaternion, data_type>){
         serializeScriptObjectByNativePtr(&data);
     }
 }
@@ -598,7 +646,7 @@ inline bool BinaryInputArchive::onStartSerializeObject(T& data, ccstd::optional<
         bool fromCache = false;
         value_type* obj = getOrCreateNativeObject<value_type*>(scriptObject, resetOffset, fromCache);
         data = obj;
-        _currentOwner = scriptObject;
+        setCurrentOwner(scriptObject);
 
         if (dependInfo != nullptr) {
             dependInfo->owner = scriptObject; // FIXME(cjh): Weak refernce ? Need to root?

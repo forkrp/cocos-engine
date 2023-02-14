@@ -58,6 +58,9 @@ public:
 #ifndef SWIGCOCOS
     template <class T>
     void serialize(T& data, const char* name);
+    
+    template <class T, uint32_t count>
+    void serializePrimitiveDataWithCount(T* data);
 
     // Used internally.
     template <class T>
@@ -206,6 +209,11 @@ private:
 };
 
 #ifndef SWIGCOCOS
+
+template <class T, uint32_t count>
+inline void JsonInputArchive::serializePrimitiveDataWithCount(T* data) {
+    assert(false); //TODO(cjh):
+}
 
 template <>
 inline void JsonInputArchive::serializePrimitiveData(bool& data) {

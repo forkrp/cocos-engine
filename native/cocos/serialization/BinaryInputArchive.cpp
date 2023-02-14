@@ -29,7 +29,17 @@
 
 static long long gScriptSerializeTime = 0;
 
+extern uint32_t gOnMacroPatchesStateChangedCount;
+
 namespace cc {
+
+struct ScriptSerializeMethods {
+    se::Object *serialize{nullptr};
+    se::Object *serializeInlineData{nullptr};
+    se::Object *onAfterDeserialize{nullptr};
+};
+
+static ccstd::unordered_map<const char*, ScriptSerializeMethods> gScriptMethods;
 
 DeserializeNode::DeserializeNode(const ccstd::string &name, uint8_t *buffer, uint32_t bufferByteLength) {
     _name = name;
@@ -56,6 +66,7 @@ void DeserializeNode::popMapTag() {
 // BinaryInputArchive
 
 BinaryInputArchive::BinaryInputArchive() {
+    _depends.reserve(8020);
 }
 
 
@@ -79,6 +90,22 @@ void BinaryInputArchive::setScriptArchive(se::Object* scriptArchive) {
     _scriptArchive = scriptArchive;
     _scriptArchive->root();
     _scriptArchive->incRef();
+
+    {
+        se::Value setCurrentOffsetVal;
+        _scriptArchive->getProperty("_setCurrentOffset", &setCurrentOffsetVal);
+        _setCurrentOffsetFunc = setCurrentOffsetVal.toObject();
+        _setCurrentOffsetFunc->root();
+        _setCurrentOffsetFunc->incRef();
+    }
+    
+    {
+        se::Value getCurrentOffsetVal;
+        _scriptArchive->getProperty("_getCurrentOffset", &getCurrentOffsetVal);
+        _getCurrentOffsetFunc = getCurrentOffsetVal.toObject();
+        _getCurrentOffsetFunc->root();
+        _getCurrentOffsetFunc->incRef();
+    }
 }
 
 void BinaryInputArchive::setScriptDeserializedMap(se::Object* deserializedMap) {
@@ -88,6 +115,7 @@ void BinaryInputArchive::setScriptDeserializedMap(se::Object* deserializedMap) {
 }
 
 se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* factory) {
+    gOnMacroPatchesStateChangedCount = 0;
     auto prevTime = std::chrono::steady_clock::now();
 
     assert(factory != nullptr);
@@ -147,7 +175,7 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
         CC_LOG_INFO("==> cjh BinaryInputArchive::create uuid stringlist scriptobj cost: %lf ms", durationMS);
     }
 
-    _currentKey = nullptr;
+    setCurrentKey(nullptr);
 
     auto type = popString();
 
@@ -155,7 +183,7 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
     assert(ret);
 
     ret->root(); // FIXME(cjh): How to unroot ?
-    _currentOwner = ret;
+    setCurrentOwner(ret);
 
     se::Value retVal;
     retVal.setObject(ret, true);
@@ -166,7 +194,8 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
     auto durationMS = (std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count()) / 1000000.0;
     
     CC_LOG_INFO("==> cjh BinaryInputArchive::start cost: %lf ms", durationMS);
-    CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms", gScriptSerializeTime / 1000000.0);
+    CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms, gOnMacroPatchesStateChangedCount: %u", gScriptSerializeTime / 1000000.0, gOnMacroPatchesStateChangedCount);
+    CC_LOG_INFO("==> cjh mapping size: %u", (uint32_t)se::NativePtrToObjectMap::size());
     
 //    printJSBInvoke();
     
@@ -221,19 +250,17 @@ void BinaryInputArchive::doSerializePlainObj(se::Value& value) {
         needRelease = true;
     }
 
-    _currentOwner = seObj;
+    setCurrentOwner(seObj);
 
     int32_t elementCount = _currentNode->popInt32();
     for (int32_t i = 0; i < elementCount; ++i) {
-        se::Object* oldOwner = _currentOwner;
+        AutoSaveRestorePropertyInfo asr(this);
 
-        _currentKey = popString().data();
+        setCurrentKey(popString().data());
 
         se::Value seValue;
-        seValue = anyValue(seValue, _currentKey);
-        seObj->setProperty(_currentKey, seValue);
-
-        _currentOwner = oldOwner;
+        seValue = anyValue(seValue, getCurrentKey());
+        seObj->setProperty(getCurrentKey(), seValue);
     }
 
     value.setObject(seObj);
@@ -245,15 +272,11 @@ void BinaryInputArchive::doSerializePlainObj(se::Value& value) {
 }
 
 se::Value& BinaryInputArchive::plainObj(se::Value& value, const char* name) {
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
+    AutoSaveRestorePropertyInfo asr(this);
 
-    _currentKey = name;
+    setCurrentKey(name);
 
     doSerializePlainObj(value);
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
     return value;
 }
 
@@ -282,7 +305,7 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
     bool fromCache = false;
     void* obj = getOrCreateNativeObjectReturnVoidPtr(scriptObject, resetOffset, fromCache);
     if (scriptObject != nullptr) {
-        _currentOwner = scriptObject;
+        setCurrentOwner(scriptObject);
         if (obj != nullptr) {
             if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), obj) == _deserializedObjects.cend()) {
                 scriptObject->getPrivateObject()->serialize(*this);
@@ -302,15 +325,11 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
 }
 
 se::Value& BinaryInputArchive::serializableObj(se::Value& value, const char* name) {
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
+    AutoSaveRestorePropertyInfo asr(this);
 
-    _currentKey = name;
+    setCurrentKey(name);
 
     doSerializeSerializableObj(value);
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
     return value;
 }
 
@@ -328,20 +347,15 @@ void BinaryInputArchive::doSerializeArray(se::Value& value) {
         needRelease = true;
     }
 
-    _currentOwner = seObj;
-    char keyTmp[12] = {0};
+    setCurrentOwner(seObj);
 
     for (uint32_t i = 0; i < length; ++i) {
-        se::Object* oldOwner = _currentOwner;
-
-        snprintf(keyTmp, sizeof(keyTmp), "%u", i);
-        _currentKey = keyTmp;
+        AutoSaveRestorePropertyInfo asr(this);
+        setCurrentKey(i);
 
         se::Value seValue;
         doSerializeAny(seValue);
         seObj->setArrayElement(i, seValue);
-
-        _currentOwner = oldOwner;
     }
 
     value.setObject(seObj);
@@ -353,10 +367,9 @@ void BinaryInputArchive::doSerializeArray(se::Value& value) {
 }
 
 se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char* name) {
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
+    AutoSaveRestorePropertyInfo asr(this);
 
-    _currentKey = name;
+    setCurrentKey(name);
     int32_t length = 0;
 
     const auto tag = _currentNode->popInt8();
@@ -388,20 +401,15 @@ se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char
         needRelease = true;
     }
 
-    char keyTmp[12] = {0};
-    _currentOwner = seObj;
+    setCurrentOwner(seObj);
 
     for (uint32_t i = 0; i < static_cast<uint32_t>(length); ++i) {
-        se::Object* oldOwner = _currentOwner;
-
-        snprintf(keyTmp, sizeof(keyTmp), "%u", i);
-        _currentKey = keyTmp;
-
+        AutoSaveRestorePropertyInfo asr2(this);
+        
+        setCurrentKey(i);
         se::Value seValue;
         doSerializeSerializableObj(seValue);
         seObj->setArrayElement(i, seValue);
-
-        _currentOwner = oldOwner;
     }
 
     value.setObject(seObj);
@@ -409,22 +417,15 @@ se::Value& BinaryInputArchive::serializableObjArray(se::Value& value, const char
         seObj->unroot();
         seObj->decRef();
     }
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
     return value;
 }
 
 se::Value& BinaryInputArchive::arrayObj(se::Value& value, const char* name) {
-    const char* oldKey = _currentKey;
-    auto* oldOwner = _currentOwner;
+    AutoSaveRestorePropertyInfo asr(this);
 
-    _currentKey = name;
+    setCurrentKey(name);
 
     doSerializeArray(value);
-
-    _currentKey = oldKey;
-    _currentOwner = oldOwner;
     return value;
 }
 
@@ -467,14 +468,43 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
         return;
     }
     
+    assert(obj->_getClass() != nullptr);
+    
+    const char *clsName = obj->_getClass()->getName();
+    assert(clsName != nullptr);
     se::Value serializeVal;
-    obj->getProperty("serialize", &serializeVal);
-
     se::Value serializeInlineDataVal;
-    obj->getProperty("serializeInlineData", &serializeInlineDataVal);
+    
+    auto iter = gScriptMethods.find(clsName);
+    if (iter == gScriptMethods.end()) {
+        ScriptSerializeMethods methods;
+        if (obj->_getClass()->getProto()->getProperty("serialize", &serializeVal, true)
+            && serializeVal.isObject() && serializeVal.toObject()->isFunction()) {
+            methods.serialize = serializeVal.toObject();
+            methods.serialize->root();
+            methods.serialize->incRef();//TODO: release
+        }
+        
+        if (obj->_getClass()->getProto()->getProperty("serializeInlineData", &serializeInlineDataVal, true)
+            && serializeInlineDataVal.isObject() && serializeInlineDataVal.toObject()->isFunction()) {
+            methods.serializeInlineData = serializeInlineDataVal.toObject();
+            methods.serializeInlineData->root();
+            methods.serializeInlineData->incRef();//TODO: release
+        }
+        
+        gScriptMethods.emplace(clsName, std::move(methods));
+    } else {
+        if (iter->second.serialize) {
+            serializeVal.setObject(iter->second.serialize);
+        }
+        
+        if (iter->second.serializeInlineData) {
+            serializeInlineDataVal.setObject(iter->second.serializeInlineData);
+        }
+    }
 
-    bool hasSerializeMethod = serializeVal.isObject() && serializeVal.toObject()->isFunction();
-    bool hasSerializeInlineDataMethod = serializeInlineDataVal.isObject() && serializeInlineDataVal.toObject()->isFunction();
+    bool hasSerializeMethod = serializeVal.isObject();
+    bool hasSerializeInlineDataMethod = serializeInlineDataVal.isObject();
     if (!hasSerializeMethod && !hasSerializeInlineDataMethod) {
         return;
     }
@@ -482,7 +512,13 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
     // Sync binary offset to JS
     se::Value offsetVal;
     offsetVal.setUint32(_currentNode->getOffset());
-    bool ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_setCurrentOffset", 1, &offsetVal);
+
+    static se::ValueArray offsetArgs;
+    offsetArgs.resize(1);
+    offsetArgs[0] = offsetVal;
+    
+    bool ok = _setCurrentOffsetFunc->call(offsetArgs, _scriptArchive);
+//    bool ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_setCurrentOffset", 1, &offsetVal);
     assert(ok);
     //
     
@@ -509,7 +545,9 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
     }
     
     offsetVal.setUndefined();
-    ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_getCurrentOffset", 0, nullptr, &offsetVal);
+    
+    ok = _getCurrentOffsetFunc->call(offsetArgs, _scriptArchive, &offsetVal);
+//    ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_getCurrentOffset", 0, nullptr, &offsetVal);
     assert(ok);
     _currentNode->setOffset(offsetVal.toUint32());
     
@@ -594,9 +632,23 @@ void BinaryInputArchive::onAfterDeserializeScriptObject(se::Object* obj) {
     }
 
     se::Value onAfterDeserializeVal;
-    obj->getProperty("onAfterDeserialize", &onAfterDeserializeVal);
+    auto *cls = obj->_getClass();
+    assert(cls != nullptr);
+    auto iter = gScriptMethods.find(cls->getName());
+    assert(iter != gScriptMethods.end());
+    
+    if (iter->second.onAfterDeserialize == nullptr) {
+        if (cls->getProto()->getProperty("onAfterDeserialize", &onAfterDeserializeVal, true)
+            && onAfterDeserializeVal.isObject() && onAfterDeserializeVal.toObject()->isFunction()) {
+            onAfterDeserializeVal.toObject()->root();
+            onAfterDeserializeVal.toObject()->incRef();
+            iter->second.onAfterDeserialize = onAfterDeserializeVal.toObject();
+        }
+    } else {
+        onAfterDeserializeVal.setObject(iter->second.onAfterDeserialize);
+    }
 
-    bool hasOnAfterDeserializeMethod = onAfterDeserializeVal.isObject() && onAfterDeserializeVal.toObject()->isFunction();
+    bool hasOnAfterDeserializeMethod = onAfterDeserializeVal.isObject();
     if (!hasOnAfterDeserializeMethod) {
         return;
     }
@@ -629,17 +681,18 @@ AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
             _currentNode->setOffset(_currentNode->getOffset() + uuidAdvance);
             auto uuidIndex = _currentNode->popUint32();
             assert(uuidIndex >= 0 && uuidIndex < _uuidList.size());
-            assert(_currentKey != nullptr);
+            assert(getCurrentKey() != nullptr || getCurrentKeyInteger() != -1);
+            assert(!(getCurrentKey() == nullptr && getCurrentKeyInteger() == -1));
 
             AssetDependInfo dependInfo;
             dependInfo.uuid = _uuidList[uuidIndex];
-            dependInfo.owner = _currentOwner;
-            dependInfo.propName = _currentKey;
-            
-            if (dependInfo.uuid == "1263d74c-8167-4928-91a6-4e2672411f47@a804a") {
-                int a = 0;
+            dependInfo.owner = getCurrentOwner();
+            if (getCurrentKeyInteger() > -1) {
+                dependInfo.setPropName(getCurrentKeyInteger());
+            } else {
+                dependInfo.setPropName(getCurrentKey());
             }
-            
+
             assert(dependInfo.uuid.length() >= 36 && dependInfo.uuid[0] != '\0');
 
 //            CC_LOG_DEBUG("Found __uuid__: %s, owner: %p, current key: %s", dependInfo.uuid.data(), _currentOwner, _currentKey);

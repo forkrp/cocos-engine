@@ -67,6 +67,15 @@ public:
         assert(false);
         return {};
     }
+    
+    template <typename T, uint32_t totalBytes, typename = std::enable_if_t<std::is_arithmetic<T>::value> >
+    inline T* getPointer(uint32_t byteOffset) const {
+        if (byteOffset >= 0 && byteOffset + totalBytes <= _dataLength) {
+            return reinterpret_cast<T*>(&_buffer[byteOffset]);
+        }
+        assert(false);
+        return {};
+    }
 
     std::string_view getString(uint32_t byteOffset, uint32_t strLength);
 

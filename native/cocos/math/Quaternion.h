@@ -401,10 +401,11 @@ public:
 
     template <class Archive>
     void serializeInlineData(Archive &ar) {
-        ar.serialize(x, "x");
-        ar.serialize(y, "y");
-        ar.serialize(z, "z");
-        ar.serialize(w, "w");
+        ar.template serializePrimitiveDataWithCount<float, 4>(&x);
+//        ar.serialize(x, "x");
+//        ar.serialize(y, "y");
+//        ar.serialize(z, "z");
+//        ar.serialize(w, "w");
     }
 
     /** equals to Quaternion(0,0,0, 0) */
