@@ -111,6 +111,8 @@ namespace cc {
 %ignore JSBNativeDataHolder::getData;
 %ignore JSBNativeDataHolder::setData;
 
+%ignore AssetDependInfo::setPropName;
+
 }
 
 
@@ -183,6 +185,7 @@ namespace cc {
 %attribute(cc::CCObject, bool, replicated, isReplicated, setReplicated);
 %attribute(cc::CCObject, bool, isValid, isValid);
 %attribute(cc::BinaryInputArchive, uint32_t, currentOffset, getCurrentOffset, setCurrentOffset);
+%attribute(cc::AssetDependInfo, cc::AssetDependInfo::PropNameType&, propName, getPropName);
 
 // ----- Import Section ------
 // Brief: Import header files which are depended by 'Include Section'
