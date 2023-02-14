@@ -344,7 +344,7 @@ native_ptr_to_seval(T &v_ref, se::Value *ret, bool *isReturnCachedValue = nullpt
             cc_tmp_set_private_data(obj, v);
 
             se::Value property;
-            if (obj->getProperty("_ctor", &property)) {
+            if (obj->getProperty("_ctor", &property, true)) {
                 property.toObject()->call(se::EmptyValueArray, obj);
             }
 
@@ -383,7 +383,7 @@ bool native_ptr_to_seval(T *vp, se::Class *cls, se::Value *ret, bool *isReturnCa
             cc_tmp_set_private_data(obj, v);
 
             se::Value property;
-            if (obj->getProperty("_ctor", &property)) {
+            if (obj->getProperty("_ctor", &property, true)) {
                 property.toObject()->call(se::EmptyValueArray, obj);
             }
 
@@ -1012,6 +1012,7 @@ bool sevalue_to_native(const se::Value &from, ccstd::optional<T> *to, se::Object
     }
     return ret;
 }
+
 //////////////////////  shoter form
 template <typename T>
 inline bool sevalue_to_native(const se::Value &from, T &&to) { // NOLINT(readability-identifier-naming)

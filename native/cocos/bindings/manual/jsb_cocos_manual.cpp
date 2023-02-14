@@ -834,7 +834,7 @@ public:
                 type += 3;
             }
 
-            if (!__jsbObj->getProperty(type, &ctor)) {
+            if (!__jsbObj->getProperty(type, &ctor, true)) {
                 return nullptr;
             }
             assert(ctor.isObject() && ctor.toObject()->isFunction());
@@ -842,13 +842,14 @@ public:
             scriptObj = se::Object::createObjectWithConstructor(ctor.toObject());
         } else {
             se::Value createObjFunc;
-            if (!__jsbObj->getProperty("createScriptObjectByType", &createObjFunc)) {
+            if (!__jsbObj->getProperty("createScriptObjectByType", &createObjFunc, true)) {
                 return nullptr;
             }
 
             assert(createObjFunc.isObject() && createObjFunc.toObject()->isFunction());
-            se::ValueArray args;
-            args.emplace_back(se::Value(type));
+            static se::ValueArray args;
+            args.resize(1);
+            args[0] = se::Value(type);
             se::Value scriptVal;
             createObjFunc.toObject()->call(args, nullptr, &scriptVal);
             if (scriptVal.isObject()) {

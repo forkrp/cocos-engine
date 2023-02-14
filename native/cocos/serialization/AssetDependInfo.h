@@ -42,11 +42,18 @@ using AssetDereferenceCallback = std::function<void(se::Object*, const ccstd::st
 struct AssetDependInfo final {
     AssetDereferenceCallback dereferenceCb{nullptr};
     se::Object* owner{nullptr};
-    ccstd::string propName;
+    
     std::string_view uuid;
     ccstd::string expectedType;
 
     void dereference(se::Object* obj, const ccstd::string& uuid);
+    
+    using PropNameType = ccstd::variant<ccstd::string, int32_t>;
+    const PropNameType& getPropName() const { return _propName; }
+    void setPropName(PropNameType&& propName) { _propName = std::move(propName); }
+
+private:
+    ccstd::variant<ccstd::string, int32_t> _propName;
 };
 
 } // namespace cc

@@ -804,21 +804,16 @@ static bool js_cc_ComponentProxy_serialize(se::State &s) // NOLINT(readability-i
     const size_t argc = args.size();
     
     if (argc > 0 && args[0].isObject()) {
-        auto* archiveObj = args[0].toObject();
-        se::Value jsbArchiveVal;
-        if (archiveObj->getProperty("jsbArchive", &jsbArchiveVal) && jsbArchiveVal.isObject()) {
-            auto *ar = static_cast<cc::BinaryInputArchive*>(jsbArchiveVal.toObject()->getPrivateData());
-            auto *oldOwner = ar->getCurrentOwner();
-            ar->setCurrentOwner(s.thisObject());
-            if (auto* renderer = dynamic_cast<cc::MeshRenderer*>(cobj)) {
-                renderer->serialize(*ar);
-            }
-            ar->setCurrentOwner(oldOwner);
-            return true;
+        auto *ar = static_cast<cc::BinaryInputArchive*>(args[0].toObject()->getPrivateData());
+        auto *oldOwner = ar->getCurrentOwner();
+        ar->setCurrentOwner(s.thisObject());
+        if (auto* renderer = dynamic_cast<cc::MeshRenderer*>(cobj)) {
+            renderer->serialize(*ar);
         }
+        ar->setCurrentOwner(oldOwner);
+        return true;
     }
 
-    
     return false;
 }
 SE_BIND_FUNC(js_cc_ComponentProxy_serialize) // NOLINT(readability-identifier-naming)
