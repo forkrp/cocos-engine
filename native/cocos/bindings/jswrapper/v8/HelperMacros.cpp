@@ -131,7 +131,7 @@ SE_HOT void jsbConstructorWrapper(const v8::FunctionCallbackInfo<v8::Value> &v8a
     }
     
     se::Value property;
-    if (thisObject->getProperty("_ctor", &property)) {
+    if (thisObject->getProperty("_ctor", &property, true)) {
         property.toObject()->call(args, thisObject);
     }
 }
