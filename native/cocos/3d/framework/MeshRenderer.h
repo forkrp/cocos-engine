@@ -113,6 +113,10 @@ public:
     bool _bakeToReflectionProbe = true;
     IntrusivePtr<TextureCube> _probeCubemap;
     IntrusivePtr<gfx::Texture> _probePlanarmap;
+    
+    inline void setScriptObject(se::Object *obj) { _seObj = obj; }
+    inline se::Object *getScriptObject() const { return _seObj; }
+    se::Object *_seObj{nullptr};
 
     /**
      * @en Whether the model is static and bake-able with light map.
