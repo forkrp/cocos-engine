@@ -39,6 +39,8 @@
 #include "math/Vec4.h"
 #include "math/Quaternion.h"
 
+#include "bindings/utils/BindingUtils.h"
+
 #include <stack>
 
 namespace se {
@@ -151,6 +153,8 @@ private:
     SerializationData _data;
     uint32_t _offset{0};
     ccstd::string _name;
+    
+    friend class BinaryInputArchive;
 };
 
 template <typename T>
@@ -237,6 +241,8 @@ public:
 
     inline uint32_t getCurrentOffset() const { return _currentNode->getOffset(); }
     inline void setCurrentOffset(uint32_t offset) { _currentNode->setOffset(offset); }
+    
+    inline se::Object *_getSharedArrayBufferObject() const { return _sharedMemoryActor.getSharedArrayBufferObject(); } // NOLINT
 
     se::Value& anyValue(se::Value& value, const char* name);
     se::Value& plainObj(se::Value& value, const char* name);
@@ -328,8 +334,6 @@ private:
 
     TypedArrayTemp<uint8_t> *_bufferView;
     se::Object *_scriptArchive{nullptr};
-    se::Object *_setCurrentOffsetFunc{nullptr};
-    se::Object *_getCurrentOffsetFunc{nullptr};
     ObjectFactory* _objectFactory{nullptr};
     
     struct DeserializedInfo final {
@@ -340,7 +344,6 @@ private:
 
     ccstd::unordered_map<int32_t, DeserializedInfo> _deserializedObjIdMap;
     se::Object *_scriptDeserializedMap{nullptr};
-    ccstd::vector<const void*> _deserializedObjects;
 
     ccstd::vector<AssetDependInfo> _depends;
     ccstd::vector<std::string_view> _uuidList;
@@ -370,10 +373,11 @@ private:
     
     PropertyStack _propertyStack;
     PropertyInfo _currentPropertyInfo;
-    
-    uint8_t _currentObjectFlags{0};
 
     std::unique_ptr<DeserializeNode> _currentNode{nullptr};
+    bindings::NativeMemorySharedToScriptActor _sharedMemoryActor;
+    
+    uint8_t _currentObjectFlags{0};
     bool _isRoot{true};
 };
 
@@ -558,12 +562,12 @@ template <class T>
 inline void BinaryInputArchive::onSerializingObjectPtr(T& data) {
     using data_type = std::remove_const_t<typename IsPtr<T>::type>;
     // Return directly since the object has already been deserialized.
-    auto iter = std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), data);
-    if (iter != _deserializedObjects.cend()) {
-        data = reinterpret_cast<data_type*>(const_cast<void*>(*iter));
-        return;
-    }
-    _deserializedObjects.emplace_back(data);
+//cjh    auto iter = _deserializedObjects.find(data);
+//    if (iter != _deserializedObjects.cend()) {
+//        data = reinterpret_cast<data_type*>(const_cast<void*>(*iter));
+//        return;
+//    }
+//    _deserializedObjects.emplace(data);
 
     // Serialize CPP object
     bool isRoot = _isRoot;

@@ -90,22 +90,6 @@ void BinaryInputArchive::setScriptArchive(se::Object* scriptArchive) {
     _scriptArchive = scriptArchive;
     _scriptArchive->root();
     _scriptArchive->incRef();
-
-    {
-        se::Value setCurrentOffsetVal;
-        _scriptArchive->getProperty("_setCurrentOffset", &setCurrentOffsetVal);
-        _setCurrentOffsetFunc = setCurrentOffsetVal.toObject();
-        _setCurrentOffsetFunc->root();
-        _setCurrentOffsetFunc->incRef();
-    }
-    
-    {
-        se::Value getCurrentOffsetVal;
-        _scriptArchive->getProperty("_getCurrentOffset", &getCurrentOffsetVal);
-        _getCurrentOffsetFunc = getCurrentOffsetVal.toObject();
-        _getCurrentOffsetFunc->root();
-        _getCurrentOffsetFunc->incRef();
-    }
 }
 
 void BinaryInputArchive::setScriptDeserializedMap(se::Object* deserializedMap) {
@@ -115,6 +99,7 @@ void BinaryInputArchive::setScriptDeserializedMap(se::Object* deserializedMap) {
 }
 
 se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* factory) {
+    clearRecordJSBInvoke();
     gOnMacroPatchesStateChangedCount = 0;
     auto prevTime = std::chrono::steady_clock::now();
 
@@ -124,6 +109,8 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
     _bufferView = ccnew Uint8Array();
     *_bufferView = std::move(bufferView);
     _currentNode.reset(ccnew DeserializeNode("root", _bufferView->buffer()->getData() + _bufferView->byteOffset(), _bufferView->byteLength() - _bufferView->byteOffset()));
+    
+    _sharedMemoryActor.initialize(&_currentNode->_offset, sizeof(_currentNode->_offset));
 
     _uuidList.reserve(5);
     _stringList.reserve(32);
@@ -188,7 +175,17 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
     se::Value retVal;
     retVal.setObject(ret, true);
 
+    se::Value onBeforeDeserializeVal;
+    if (_scriptArchive->getProperty("_onBeforeDeserialize", &onBeforeDeserializeVal, true)) {
+        onBeforeDeserializeVal.toObject()->call(se::EmptyValueArray, _scriptArchive);
+    }
+    
     ret->getPrivateObject()->serialize(*this);
+    
+    se::Value onAfterDeserialize;
+    if (_scriptArchive->getProperty("_onAfterDeserialize", &onAfterDeserialize, true)) {
+        onAfterDeserialize.toObject()->call(se::EmptyValueArray, _scriptArchive);
+    }
     
     auto nowTime = std::chrono::steady_clock::now();
     auto durationMS = (std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count()) / 1000000.0;
@@ -197,7 +194,18 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
     CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms, gOnMacroPatchesStateChangedCount: %u", gScriptSerializeTime / 1000000.0, gOnMacroPatchesStateChangedCount);
     CC_LOG_INFO("==> cjh mapping size: %u", (uint32_t)se::NativePtrToObjectMap::size());
     
-//    printJSBInvoke();
+    printJSBInvoke();
+    clearRecordJSBInvoke();
+    
+    // Reset
+    _deserializedObjIdMap.clear();
+    _uuidList.clear();
+    _uuidList.shrink_to_fit();
+    _stringList.clear();
+    _stringList.shrink_to_fit();
+    _currentNode.reset();
+    
+    assert(_propertyStack.empty());
     
     return retVal;
 }
@@ -307,11 +315,12 @@ void BinaryInputArchive::doSerializeSerializableObj(se::Value& value) {
     if (scriptObject != nullptr) {
         setCurrentOwner(scriptObject);
         if (obj != nullptr) {
-            if (std::find(_deserializedObjects.cbegin(), _deserializedObjects.cend(), obj) == _deserializedObjects.cend()) {
-                scriptObject->getPrivateObject()->serialize(*this);
-            } else {
+            assert(false);
+//cjh            if (_deserializedObjects.find(obj) == _deserializedObjects.cend()) {
+//                scriptObject->getPrivateObject()->serialize(*this);
+//            } else {
 //                CC_LOG_DEBUG("serializableObj return from cache, scriptObject: %p", scriptObject);
-            }
+//            }
         } else {
             serializeScriptObject(scriptObject);
         }
@@ -509,23 +518,8 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
         return;
     }
 
-    // Sync binary offset to JS
-    se::Value offsetVal;
-    offsetVal.setUint32(_currentNode->getOffset());
-
-    static se::ValueArray offsetArgs;
-    offsetArgs.resize(1);
-    offsetArgs[0] = offsetVal;
-    
-    bool ok = _setCurrentOffsetFunc->call(offsetArgs, _scriptArchive);
-//    bool ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_setCurrentOffset", 1, &offsetVal);
-    assert(ok);
-    //
-    
     static se::ValueArray args;
     args.resize(1);
-//    bool ok = nativevalue_to_se(this, args[0]);
-//    assert(ok);
     args[0].setObject(_scriptArchive);
 
     if (hasSerializeMethod && hasSerializeInlineDataMethod) {
@@ -543,14 +537,7 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
             serializeInlineDataVal.toObject()->call(args, obj);
         }
     }
-    
-    offsetVal.setUndefined();
-    
-    ok = _getCurrentOffsetFunc->call(offsetArgs, _scriptArchive, &offsetVal);
-//    ok = se::ScriptEngine::getInstance()->callFunction(_scriptArchive, "_getCurrentOffset", 0, nullptr, &offsetVal);
-    assert(ok);
-    _currentNode->setOffset(offsetVal.toUint32());
-    
+       
     auto nowTime = std::chrono::steady_clock::now();
     auto durationNS = std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count();
     gScriptSerializeTime += durationNS;
@@ -685,15 +672,13 @@ AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
             assert(!(getCurrentKey() == nullptr && getCurrentKeyInteger() == -1));
 
             AssetDependInfo dependInfo;
-            dependInfo.uuid = _uuidList[uuidIndex];
+            dependInfo.uuidIndex = uuidIndex;
             dependInfo.owner = getCurrentOwner();
             if (getCurrentKeyInteger() > -1) {
                 dependInfo.setPropName(getCurrentKeyInteger());
             } else {
                 dependInfo.setPropName(getCurrentKey());
             }
-
-            assert(dependInfo.uuid.length() >= 36 && dependInfo.uuid[0] != '\0');
 
 //            CC_LOG_DEBUG("Found __uuid__: %s, owner: %p, current key: %s", dependInfo.uuid.data(), _currentOwner, _currentKey);
 
