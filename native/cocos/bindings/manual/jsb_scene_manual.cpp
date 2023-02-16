@@ -848,7 +848,7 @@ static bool js_cc_ComponentProxy_serialize(se::State &s) // NOLINT(readability-i
         auto *ar = static_cast<cc::BinaryInputArchive*>(args[0].toObject()->getPrivateData());
         auto *oldOwner = ar->getCurrentOwner();
         ar->setCurrentOwner(s.thisObject());
-        if (auto* renderer = dynamic_cast<cc::MeshRenderer*>(cobj)) {
+        if (auto* renderer = static_cast<cc::MeshRenderer*>(cobj)) {
             renderer->serialize(*ar);
         }
         ar->setCurrentOwner(oldOwner);
