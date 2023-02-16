@@ -138,6 +138,7 @@ using namespace cc;
 %ignore cc::Node::getWorldMatrix;
 %ignore cc::Node::getWorldRS;
 %ignore cc::Node::getWorldRT;
+%ignore cc::Node::_getSharedArrayBufferObject;
 
 %ignore cc::ComponentProxy::getExecutionOrder; 
 %ignore cc::ComponentProxy::getName; 

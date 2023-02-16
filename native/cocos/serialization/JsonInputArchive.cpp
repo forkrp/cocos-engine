@@ -535,7 +535,7 @@ AssetDependInfo* JsonInputArchive::checkAssetDependInfo() {
     if (iter != _currentNode->MemberEnd()) {
         assert(iter->value.IsString());
         AssetDependInfo dependInfo;
-        dependInfo.uuid = iter->value.GetString();
+        dependInfo.setUuid(iter->value.GetString());
         dependInfo.owner = _currentOwner;
         dependInfo.setPropName(_currentKey);
         iter = _currentNode->FindMember("__expectedType__");
