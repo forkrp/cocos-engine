@@ -1301,10 +1301,28 @@ nodeProto.serialize = function(ar: IArchive) {
 
 nodeProto.onAfterDeserialize = function() {
     this._children = this._getChildren();
-    this._lpos = this._getPositionForJS();
-    this._lrot = this._getRotationForJS();
-    this._lscale = this._getScaleForJS();
-    this._euler = this._getEulerForJS();
+
+    this._syncLocalTransformFromNative();
+    const lpos = this._lpos;
+    lpos.x = _tempFloatArray[0];
+    lpos.y = _tempFloatArray[1];
+    lpos.z = _tempFloatArray[2];
+
+    const lrot = this._lrot;
+    lrot.x = _tempFloatArray[3];
+    lrot.y = _tempFloatArray[4];
+    lrot.z = _tempFloatArray[5];
+    lrot.w = _tempFloatArray[6];
+
+    const lscale = this._lscale;
+    lscale.x = _tempFloatArray[7];
+    lscale.y = _tempFloatArray[8];
+    lscale.z = _tempFloatArray[9];
+
+    const euler = this._euler;
+    euler.x = _tempFloatArray[10];
+    euler.y = _tempFloatArray[11];
+    euler.z = _tempFloatArray[12];
 };
 
 //

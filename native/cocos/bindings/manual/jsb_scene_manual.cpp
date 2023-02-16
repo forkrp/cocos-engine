@@ -51,6 +51,12 @@ public:
         _data[1] = p.y;
         _data[2] = p.z;
     }
+    
+    inline void writeVec3(const cc::Vec3 &p, uint32_t startIndex) {
+        _data[startIndex] = p.x;
+        _data[startIndex + 1] = p.y;
+        _data[startIndex + 2] = p.z;
+    }
 
     inline cc::Vec3 readVec3() const {
         return cc::Vec3{_data[0], _data[1], _data[2]};
@@ -61,6 +67,13 @@ public:
         _data[1] = p.y;
         _data[2] = p.z;
         _data[3] = p.w;
+    }
+    
+    inline void writeQuaternion(const cc::Quaternion &p, uint32_t startIndex) {
+        _data[startIndex] = p.x;
+        _data[startIndex+1] = p.y;
+        _data[startIndex+2] = p.z;
+        _data[startIndex+3] = p.w;
     }
 
     inline cc::Quaternion readQuaternion() const {
@@ -588,6 +601,22 @@ static bool js_scene_Node_inverseTransformPoint(void *nativeObject) // NOLINT(re
 }
 SE_BIND_FUNC_FAST(js_scene_Node_inverseTransformPoint)
 
+static bool js_scene_Node_syncLocalTransformFromNative(void *nativeObject) // NOLINT(readability-identifier-naming)
+{
+    auto *cobj = reinterpret_cast<cc::Node *>(nativeObject);
+    const auto& lpos = cobj->getPosition();
+    const auto& lrot = cobj->getRotation();
+    const auto& lscale = cobj->getScale();
+    const auto& euler = cobj->getEulerAngles();
+    
+    tempFloatArray.writeVec3(lpos, 0);
+    tempFloatArray.writeQuaternion(lrot, 3);
+    tempFloatArray.writeVec3(lscale, 7);
+    tempFloatArray.writeVec3(euler, 10);
+    return true;
+}
+SE_BIND_FUNC_FAST(js_scene_Node_syncLocalTransformFromNative)
+
 static bool js_scene_Pass_blocks_getter(se::State &s) { // NOLINT(readability-identifier-naming)
     auto *cobj = SE_THIS_OBJECT<cc::scene::Pass>(s);
     SE_PRECONDITION2(cobj, false, "Invalid Native Object");
@@ -851,6 +880,7 @@ bool register_all_scene_manual(se::Object *obj) // NOLINT(readability-identifier
     __jsb_cc_Node_proto->defineFunction("_registerOnChildRemoved", _SE(js_scene_Node_registerOnChildRemoved));
     __jsb_cc_Node_proto->defineFunction("_registerOnChildAdded", _SE(js_scene_Node_registerOnChildAdded));
     __jsb_cc_Node_proto->defineFunction("_registerOnSiblingOrderChanged", _SE(js_scene_Node_registerOnSiblingOrderChanged));
+    __jsb_cc_Node_proto->defineFunction("_syncLocalTransformFromNative", _SE(js_scene_Node_syncLocalTransformFromNative));
 
     se::Value jsbVal;
     obj->getProperty("jsb", &jsbVal);
