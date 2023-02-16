@@ -584,7 +584,7 @@ public:
     bool onPreDestroy() override;
     bool onPreDestroyBase();
 
-    std::function<void(index_t)> onSiblingIndexChanged{nullptr};
+    std::function<void(Node*, index_t)> onSiblingIndexChanged{nullptr};
     // For deserialization
     ccstd::string _id;
     Node *_parent{nullptr};

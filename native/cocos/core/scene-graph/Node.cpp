@@ -371,7 +371,7 @@ void Node::setSiblingIndex(index_t index) {
         }
         _parent->updateSiblingIndex();
         if (onSiblingIndexChanged != nullptr) {
-            onSiblingIndexChanged(index);
+            onSiblingIndexChanged(this, index);
         }
     }
 }
