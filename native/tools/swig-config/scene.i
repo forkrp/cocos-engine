@@ -139,6 +139,7 @@ using namespace cc;
 %ignore cc::Node::getWorldRS;
 %ignore cc::Node::getWorldRT;
 %ignore cc::Node::_getSharedArrayBufferObject;
+%ignore cc::Node::getChildren;
 
 %ignore cc::ComponentProxy::getExecutionOrder; 
 %ignore cc::ComponentProxy::getName; 
@@ -219,7 +220,7 @@ using namespace cc;
 %rename(setMaterialInstance) cc::Renderer::_setMaterialInstance;
 // %rename(_materialsJS) cc::Renderer::_materials;
 
-%rename(_getChildren) cc::Node::getChildren;
+// %rename(_getChildren) cc::Node::getChildren;
 %rename(_getPositionForJS) cc::Node::getPosition;
 %rename(_getRotationForJS) cc::Node::getRotation;
 %rename(_getScaleForJS) cc::Node::getScale;

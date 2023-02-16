@@ -1293,9 +1293,7 @@ nodeProto.serialize = function(ar: IArchive) {
 }
 
 nodeProto.onAfterDeserialize = function() {
-    this._children = this._getChildren();
-
-    this._syncLocalTransformFromNative();
+    this._syncFromNative();
     const lpos = this._lpos;
     lpos.x = _tempFloatArray[0];
     lpos.y = _tempFloatArray[1];

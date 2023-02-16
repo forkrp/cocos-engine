@@ -613,9 +613,38 @@ static bool js_scene_Node_inverseTransformPoint(void *nativeObject) // NOLINT(re
 }
 SE_BIND_FUNC_FAST(js_scene_Node_inverseTransformPoint)
 
-static bool js_scene_Node_syncLocalTransformFromNative(void *nativeObject) // NOLINT(readability-identifier-naming)
+static bool js_cc_Node_syncChildren(cc::Node *cobj)
+{
+    const auto& children = cobj->getChildren();
+    if (children.empty()) {
+        return true;
+    }
+
+    bool ok = false;
+    auto *thisObject = cobj->getScriptObject();
+    
+    se::Value childrenVal;
+    ok = thisObject->getProperty("_children", &childrenVal, true) && childrenVal.isObject();
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+
+    auto *childrenObj = childrenVal.toObject();
+    ok = childrenObj->setProperty("length", se::Value(static_cast<uint32_t>(children.size())));
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    uint32_t i = 0;
+    for (const auto &child : children) {
+        childrenObj->setArrayElement(i, se::Value(child->getScriptObject()));
+        ++i;
+    }
+    
+    return true;
+}
+
+static bool js_scene_Node_syncFromNative(void *nativeObject) // NOLINT(readability-identifier-naming)
 {
     auto *cobj = reinterpret_cast<cc::Node *>(nativeObject);
+    js_cc_Node_syncChildren(cobj);
+    
     const auto& lpos = cobj->getPosition();
     const auto& lrot = cobj->getRotation();
     const auto& lscale = cobj->getScale();
@@ -627,7 +656,7 @@ static bool js_scene_Node_syncLocalTransformFromNative(void *nativeObject) // NO
     tempFloatArray.writeVec3(euler, 10);
     return true;
 }
-SE_BIND_FUNC_FAST(js_scene_Node_syncLocalTransformFromNative)
+SE_BIND_FUNC_FAST(js_scene_Node_syncFromNative)
 
 static bool js_scene_Pass_blocks_getter(se::State &s) { // NOLINT(readability-identifier-naming)
     auto *cobj = SE_THIS_OBJECT<cc::scene::Pass>(s);
@@ -890,7 +919,7 @@ bool register_all_scene_manual(se::Object *obj) // NOLINT(readability-identifier
     __jsb_cc_Node_proto->defineFunction("_registerOnMobilityChanged", _SE(js_scene_Node_registerOnMobilityChanged));
     __jsb_cc_Node_proto->defineFunction("_registerOnLayerChanged", _SE(js_scene_Node_registerOnLayerChanged));
     __jsb_cc_Node_proto->defineFunction("_registerOnSiblingOrderChanged", _SE(js_scene_Node_registerOnSiblingOrderChanged));
-    __jsb_cc_Node_proto->defineFunction("_syncLocalTransformFromNative", _SE(js_scene_Node_syncLocalTransformFromNative));
+    __jsb_cc_Node_proto->defineFunction("_syncFromNative", _SE(js_scene_Node_syncFromNative));
 
     se::Value jsbVal;
     obj->getProperty("jsb", &jsbVal);
