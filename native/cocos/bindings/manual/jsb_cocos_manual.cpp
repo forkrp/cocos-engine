@@ -776,6 +776,7 @@ ccstd::vector<ccstd::string> scriptObjectTypeList = {
     "cc.FogInfo",
     "cc.OctreeInfo",
     "cc.Node",
+    "cc.MeshRenderer"
 };
 
 class MyObjectFactory : public cc::ObjectFactory {
