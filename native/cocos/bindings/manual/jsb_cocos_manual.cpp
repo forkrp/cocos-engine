@@ -33,6 +33,7 @@
 #include "application/ApplicationManager.h"
 #include "platform/interfaces/modules/ISystemWindowManager.h"
 #include "storage/local-storage/LocalStorage.h"
+#include "3d/framework/MeshRenderer.h"
 
 extern se::Object *__jsb_cc_FileUtils_proto; // NOLINT(readability-redundant-declaration, readability-identifier-naming)
 
@@ -792,6 +793,10 @@ public:
 //        if (0 == strcmp(type, "MyAsset")) {
 //            return true;
 //        }
+        
+        if (0 == strcmp(type, "cc.ModelBakeSettings")) {
+            return false;
+        }
 
         return true;
 //        auto iter = std::find(scriptObjectTypeList.begin(), scriptObjectTypeList.end(), type);
@@ -821,7 +826,10 @@ public:
 //            return new MyAsset();
 //        }
 //
-        CC_LOG_INFO("==> createNativeObject, %s not found", type);
+//        CC_LOG_INFO("==> createNativeObject, %s not found", type);
+        if (0 == strcmp(type, "cc.ModelBakeSettings")) {
+            return ccnew cc::ModelBakeSettings();
+        }
         return nullptr;
     }
 
