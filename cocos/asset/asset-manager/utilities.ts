@@ -142,7 +142,7 @@ export function setProperties (uuid: string, asset: Asset, assetsMap: Record<str
             } else {
                 dependAsset.addRef();
                 if (depend.owner.dereference) {
-                    depend.owner.dereference(dependAsset, depend.uuid);
+                    depend.owner.dereference(dependAsset);
                 } else {
                     depend.owner[depend.prop] = dependAsset;
                 }

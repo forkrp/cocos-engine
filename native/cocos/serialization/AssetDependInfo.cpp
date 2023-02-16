@@ -27,9 +27,9 @@
 
 namespace cc {
 
-void AssetDependInfo::dereference(se::Object* obj, const ccstd::string& uuid) {
+void AssetDependInfo::dereference(se::Object* obj) {
     if (dereferenceCb) {
-        dereferenceCb(obj, uuid);
+        dereferenceCb(obj);
     }
 }
 

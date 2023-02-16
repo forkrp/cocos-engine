@@ -631,9 +631,11 @@ inline bool BinaryInputArchive::onStartSerializeObject(T& data, ccstd::optional<
         if constexpr (has_setUuid<value_type, void(const ccstd::string&)>::value) {
             dependInfo = checkAssetDependInfo();
             if (dependInfo != nullptr) {
-                dependInfo->dereferenceCb = [&data](se::Object* seDataObj, const ccstd::string& uuid) {
+                dependInfo->dereferenceCb = [&data](se::Object* seDataObj) {
                     data = reinterpret_cast<value_type*>(seObjGetPrivateData(seDataObj));
-                    data->setUuid(uuid);
+                    // uuid has already been set when an asset was deserialized.
+                    // So no need to update it here again.
+//                    data->setUuid(uuid);
 
                     if constexpr (has_setScriptObject<value_type, void(se::Object*)>::value) {
                         data->setScriptObject(seDataObj);

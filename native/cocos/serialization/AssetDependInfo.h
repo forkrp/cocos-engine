@@ -37,23 +37,26 @@ class Object;
 
 namespace cc {
 
-using AssetDereferenceCallback = std::function<void(se::Object*, const ccstd::string& /*uuid*/)>;
+using AssetDereferenceCallback = std::function<void(se::Object*)>;
 
 struct AssetDependInfo final {
     AssetDereferenceCallback dereferenceCb{nullptr};
     se::Object* owner{nullptr};
     
-    std::string_view uuid;
-    ccstd::string expectedType;
+    uint32_t uuidIndex{0};
+    ccstd::string expectedType; //TODO(cjh): Whether need this?
 
-    void dereference(se::Object* obj, const ccstd::string& uuid);
+    void dereference(se::Object* obj);
+    inline void setUuid(const ccstd::string & uuid) { _uuid = uuid; }
+    inline const ccstd::string &getUuid() const { return _uuid; }
     
     using PropNameType = ccstd::variant<ccstd::string, int32_t>;
-    const PropNameType& getPropName() const { return _propName; }
-    void setPropName(PropNameType&& propName) { _propName = std::move(propName); }
+    inline const PropNameType& getPropName() const { return _propName; }
+    inline void setPropName(PropNameType&& propName) { _propName = std::move(propName); }
 
 private:
     ccstd::variant<ccstd::string, int32_t> _propName;
+    ccstd::string _uuid;
 };
 
 } // namespace cc
