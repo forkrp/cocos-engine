@@ -344,7 +344,23 @@ native_ptr_to_seval(T &v_ref, se::Value *ret, bool *isReturnCachedValue = nullpt
             cc_tmp_set_private_data(obj, v);
 
             se::Value property;
-            if (obj->getProperty("_ctor", &property, true)) {
+            bool foundCtor = false;
+            if (!cls->_getCtor().has_value()) {
+                foundCtor = obj->getProperty("_ctor", &property, true);
+                if (foundCtor) {
+                    cls->_setCtor(property.toObject());
+                } else {
+                    cls->_setCtor(nullptr);
+                }
+            } else {
+                auto *ctorObj = cls->_getCtor().value();
+                if (ctorObj != nullptr) {
+                    property.setObject(ctorObj);
+                    foundCtor = true;
+                }
+            }
+            
+            if (foundCtor) {
                 property.toObject()->call(se::EmptyValueArray, obj);
             }
 
@@ -383,7 +399,23 @@ bool native_ptr_to_seval(T *vp, se::Class *cls, se::Value *ret, bool *isReturnCa
             cc_tmp_set_private_data(obj, v);
 
             se::Value property;
-            if (obj->getProperty("_ctor", &property, true)) {
+            bool foundCtor = false;
+            if (!cls->_getCtor().has_value()) {
+                foundCtor = obj->getProperty("_ctor", &property, true);
+                if (foundCtor) {
+                    cls->_setCtor(property.toObject());
+                } else {
+                    cls->_setCtor(nullptr);
+                }
+            } else {
+                auto *ctorObj = cls->_getCtor().value();
+                if (ctorObj != nullptr) {
+                    property.setObject(ctorObj);
+                    foundCtor = true;
+                }
+            }
+            
+            if (foundCtor) {
                 property.toObject()->call(se::EmptyValueArray, obj);
             }
 
