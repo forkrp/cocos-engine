@@ -239,9 +239,7 @@ const REGISTERED_EVENT_MASK_TRANSFORM_CHANGED = (1 << 0);
 const REGISTERED_EVENT_MASK_PARENT_CHANGED = (1 << 1);
 const REGISTERED_EVENT_MASK_MOBILITY_CHANGED = (1 << 2);
 const REGISTERED_EVENT_MASK_LAYER_CHANGED = (1 << 3);
-const REGISTERED_EVENT_MASK_CHILD_REMOVED_CHANGED = (1 << 4);
-const REGISTERED_EVENT_MASK_CHILD_ADDED_CHANGED = (1 << 5);
-const REGISTERED_EVENT_MASK_SIBLING_ORDER_CHANGED_CHANGED = (1 << 6);
+const REGISTERED_EVENT_MASK_SIBLING_ORDER_CHANGED_CHANGED = (1 << 4);
 
 nodeProto.on = function (type, callback, target, useCapture: any = false) {
     switch (type) {
@@ -268,18 +266,6 @@ nodeProto.on = function (type, callback, target, useCapture: any = false) {
             if (!(this._registeredNodeEventTypeMask & REGISTERED_EVENT_MASK_LAYER_CHANGED)) {
                 this._registerOnLayerChanged();
                 this._registeredNodeEventTypeMask |= REGISTERED_EVENT_MASK_LAYER_CHANGED;
-            }
-            break;
-        case NodeEventType.CHILD_REMOVED:
-            if (!(this._registeredNodeEventTypeMask & REGISTERED_EVENT_MASK_CHILD_REMOVED_CHANGED)) {
-                this._registerOnChildRemoved();
-                this._registeredNodeEventTypeMask |= REGISTERED_EVENT_MASK_CHILD_REMOVED_CHANGED;
-            }
-            break;
-        case NodeEventType.CHILD_ADDED:
-            if (!(this._registeredNodeEventTypeMask & REGISTERED_EVENT_MASK_CHILD_ADDED_CHANGED)) {
-                this._registerOnChildAdded();
-                this._registeredNodeEventTypeMask |= REGISTERED_EVENT_MASK_CHILD_ADDED_CHANGED;
             }
             break;
         case NodeEventType.SIBLING_ORDER_CHANGED:
@@ -432,10 +418,17 @@ nodeProto._onLayerChanged = function (layer) {
 };
 
 nodeProto._onChildRemoved = function (child) {
+    const removeAt = this._children.indexOf(child);
+    if (removeAt < 0) {
+        errorID(1633);
+        return;
+    }
+    this._children.splice(removeAt, 1);
     this.emit(NodeEventType.CHILD_REMOVED, child);
 };
 
 nodeProto._onChildAdded = function (child) {
+    this._children.push(child);
     this.emit(NodeEventType.CHILD_ADDED, child);
 };
 
@@ -1325,6 +1318,20 @@ nodeProto.onAfterDeserialize = function() {
     euler.z = _tempFloatArray[12];
 };
 
+nodeProto._onSiblingIndexChanged = function (index) {
+    const siblings = this._parent._children;
+    index = index !== -1 ? index : siblings.length - 1;
+    const oldIndex = siblings.indexOf(this);
+    if (index !== oldIndex) {
+        siblings.splice(oldIndex, 1);
+        if (index < siblings.length) {
+            siblings.splice(index, 0, this);
+        } else {
+            siblings.push(this);
+        }
+    }
+}
+
 //
 nodeProto._ctor = function (name?: string) {
     this.__nativeRefs = {};
@@ -1337,7 +1344,7 @@ nodeProto._ctor = function (name?: string) {
     this._eventProcessor = new legacyCC.NodeEventProcessor(this);
     this._uiProps = new NodeUIProperties(this);
 
-    const sharedArrayBuffer = this._getSharedArrayBufferObject();
+    const sharedArrayBuffer = this._initAndReturnSharedBuffer();
     // Uint32Array with 3 elements: eventMask, layer, dirtyFlags
     this._sharedUint32Arr = new Uint32Array(sharedArrayBuffer, 0, 3);
     // Int32Array with 1 element: siblingIndex
@@ -1352,8 +1359,6 @@ nodeProto._ctor = function (name?: string) {
     // record scene's id when set this node as persist node
     this._originalSceneId = '';
 
-    this._registerListeners();
-
     this._children = [];
     // this._isChildrenRedefined = false;
 
@@ -1363,33 +1368,6 @@ nodeProto._ctor = function (name?: string) {
     this._euler = new Vec3();
 
     this._registeredNodeEventTypeMask = 0;
-
-    this.on(NodeEventType.CHILD_ADDED, (child) => {
-        this._children.push(child);
-    });
-
-    this.on(NodeEventType.CHILD_REMOVED, (child) => {
-        const removeAt = this._children.indexOf(child);
-        if (removeAt < 0) {
-            errorID(1633);
-            return;
-        }
-        this._children.splice(removeAt, 1);
-    });
-
-    this._onSiblingIndexChanged = function (index) {
-        const siblings = this._parent._children;
-        index = index !== -1 ? index : siblings.length - 1;
-        const oldIndex = siblings.indexOf(this);
-        if (index !== oldIndex) {
-            siblings.splice(oldIndex, 1);
-            if (index < siblings.length) {
-                siblings.splice(index, 0, this);
-            } else {
-                siblings.push(this);
-            }
-        }
-    }
 };
 
 // handle meta data, it is generated automatically

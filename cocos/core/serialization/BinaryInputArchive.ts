@@ -1,3 +1,4 @@
+import { JSB } from 'internal:constants';
 import { legacyCC } from '../global-exports';
 import { js } from '../utils/js';
 import { getClassId } from '../utils/js-typed';
@@ -139,12 +140,17 @@ type InputArchiveClassFinder = {
 
 class DeserializeNode {
     private _data: SerializeData;
-    private _offset = 0;
+    private declare _offsetVal: number;
+    private declare _offsetUint32Array: Uint32Array;
     private _name = '';
 
-    constructor (name: string, bufferView: Uint8Array) {
+    constructor (name: string, bufferView: Uint8Array, sharedOffset?: Uint32Array) {
         this._name = name;
         this._data = new SerializeData(bufferView);
+        if (JSB && sharedOffset) {
+            this._offsetUint32Array = sharedOffset;
+        }
+        this._offsetVal = 0;
     }
 
     get name () {
@@ -156,11 +162,19 @@ class DeserializeNode {
     }
 
     get offset () {
-        return this._offset;
+        if (JSB) {
+            return this._offsetUint32Array[0];
+        } else {
+            return this._offsetVal;
+        }
     }
 
     set offset (v: number) {
-        this._offset = v;
+        if (JSB) {
+            this._offsetUint32Array[0] = v;
+        } else {
+            this._offsetVal = v;
+        }
     }
 
     popArrayTag (): number {
@@ -173,37 +187,68 @@ class DeserializeNode {
     }
 
     popBoolean (): boolean {
-        const ret = !!this._data.getUint8(this._offset);
-        this._offset += 1;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = !!this._data.getUint8(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 1;
+        } else {
+            this._offsetVal = offset + 1;
+        }
         return ret;
     }
 
     popInt8 (): number {
-        const ret = this._data.getInt8(this._offset);
-        this._offset += 1;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getInt8(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 1;
+        } else {
+            this._offsetVal = offset + 1;
+        }
         return ret;
     }
 
     isUndefined (): boolean {
-        const ret = this._data.getInt8(this._offset);
-        ++this._offset;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getInt8(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 1;
+        } else {
+            this._offsetVal = offset + 1;
+        }
         return ret === SerializeTag.TAG_UNDEFINED;
     }
 
     isNull (): boolean {
-        const ret = this._data.getInt8(this._offset);
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getInt8(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 1;
+        } else {
+            this._offsetVal = offset + 1;
+        }
         return ret === SerializeTag.TAG_NULL;
     }
 
     popInt16 (): number {
-        const ret = this._data.getInt16(this._offset);
-        this._offset += 2;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getInt16(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 2;
+        } else {
+            this._offsetVal = offset + 2;
+        }
         return ret;
     }
 
     popInt32 (): number {
-        const ret = this._data.getInt32(this._offset);
-        this._offset += 4;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getInt32(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 4;
+        } else {
+            this._offsetVal = offset + 4;
+        }
         return ret;
     }
 
@@ -214,20 +259,35 @@ class DeserializeNode {
     // }
 
     popUint8 (): number {
-        const ret = this._data.getUint8(this._offset);
-        this._offset += 1;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getUint8(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 1;
+        } else {
+            this._offsetVal = offset + 1;
+        }
         return ret;
     }
 
     popUint16 (): number {
-        const ret = this._data.getUint16(this._offset);
-        this._offset += 2;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getUint16(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 2;
+        } else {
+            this._offsetVal = offset + 2;
+        }
         return ret;
     }
 
     popUint32 (): number {
-        const ret = this._data.getUint32(this._offset);
-        this._offset += 4;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getUint32(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 4;
+        } else {
+            this._offsetVal = offset + 4;
+        }
         return ret;
     }
 
@@ -238,21 +298,37 @@ class DeserializeNode {
     // }
 
     popFloat32 (): number {
-        const ret = this._data.getFloat32(this._offset);
-        this._offset += 4;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getFloat32(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 4;
+        } else {
+            this._offsetVal = offset + 4;
+        }
         return ret;
     }
 
     popFloat64 (): number {
-        const ret = this._data.getFloat64(this._offset);
-        this._offset += 8;
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const ret = this._data.getFloat64(offset);
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + 8;
+        } else {
+            this._offsetVal = offset + 8;
+        }
         return ret;
     }
 
     popString (): string {
-        const strBytes = this._data.getUint32(this._offset);
-        const ret = this._data.getString(this._offset + 4, strBytes);
-        this._offset += (strBytes + 1 + 4); // 4 is how many bytes of string.
+        const offset = JSB ? this._offsetUint32Array[0] : this._offsetVal;
+        const strBytes = this._data.getUint32(offset);
+        const ret = this._data.getString(offset + 4, strBytes);
+        const advance = (strBytes + 1 + 4); // 4 is how many bytes of string.
+        if (JSB) {
+            this._offsetUint32Array[0] = offset + advance;
+        } else {
+            this._offsetVal = offset + advance;
+        }
         return ret;
     }
 }
@@ -272,6 +348,8 @@ export class BinaryInputArchive implements IArchive {
     private _reportMissingClass: ReportMissingClass | null = null;
     private _currentOwner: any = null;
     public jsbArchive: any = null;
+    public declare _onBeforeDeserialize: () => void;
+    public declare _onAfterDeserialize: () => void;
 
     constructor () {
 
@@ -327,8 +405,12 @@ export class BinaryInputArchive implements IArchive {
         return obj;
     }
 
-    public initAndDontSerialize (bufferView: Uint8Array, details: Details | any, options?: IOptions | any) {
-        this._currentNode = new DeserializeNode('root', bufferView);
+    get uuidList () {
+        return this._uuidList;
+    }
+
+    public initAndDontSerialize (sharedOffset: Uint32Array, bufferView: Uint8Array, details: Details | any, options?: IOptions | any) {
+        this._currentNode = new DeserializeNode('root', bufferView, sharedOffset);
         // this._objectFactory = objectFactory;
 
         this._borrowDetails = !details;
@@ -687,7 +769,6 @@ export class BinaryInputArchive implements IArchive {
 
         if (serializeCppExist) {
             serializeMethod = (ret as any).serializeCpp;
-            this.jsbArchive.currentOffset = this._getCurrentOffset();
             serializeMethod.call(ret, this.jsbArchive);
         } else {
             if (serializeExist && serializeInlineDataExist) {
