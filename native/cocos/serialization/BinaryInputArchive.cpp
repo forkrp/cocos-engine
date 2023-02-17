@@ -29,8 +29,6 @@
 
 static long long gScriptSerializeTime = 0;
 
-extern uint32_t gOnMacroPatchesStateChangedCount;
-
 namespace cc {
 
 struct ScriptSerializeMethods {
@@ -100,7 +98,6 @@ void BinaryInputArchive::setScriptDeserializedMap(se::Object* deserializedMap) {
 
 se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* factory) {
     clearRecordJSBInvoke();
-    gOnMacroPatchesStateChangedCount = 0;
     auto prevTime = std::chrono::steady_clock::now();
 
     assert(factory != nullptr);
@@ -191,7 +188,7 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
     auto durationMS = (std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count()) / 1000000.0;
     
     CC_LOG_INFO("==> cjh BinaryInputArchive::start cost: %lf ms", durationMS);
-    CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms, gOnMacroPatchesStateChangedCount: %u", gScriptSerializeTime / 1000000.0, gOnMacroPatchesStateChangedCount);
+    CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms", gScriptSerializeTime / 1000000.0);
     CC_LOG_INFO("==> cjh mapping size: %u", (uint32_t)se::NativePtrToObjectMap::size());
     
     printJSBInvoke();
