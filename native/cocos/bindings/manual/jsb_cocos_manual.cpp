@@ -838,17 +838,25 @@ public:
         se::Object* scriptObj{};
         auto iter = std::find(scriptObjectTypeList.begin(), scriptObjectTypeList.end(), type);
         if (iter != scriptObjectTypeList.end()) {
-            se::Value ctor;
+            
             if (memcmp(type, "cc.", 3) == 0) {
                 type += 3;
             }
-
-            if (!__jsbObj->getProperty(type, &ctor, true)) {
-                return nullptr;
+            
+            se::Value ctor;
+            se::Object *constructorObj{nullptr};
+            auto iter = _constructorMap.find(type);
+            if (iter == _constructorMap.end()) {
+                if (!__jsbObj->getProperty(type, &ctor, true)) {
+                    return nullptr;
+                }
+                assert(ctor.isObject() && ctor.toObject()->isFunction());
+                constructorObj = ctor.toObject();
+                _constructorMap.emplace(type, ctor);
+            } else {
+                constructorObj = iter->second.toObject();
             }
-            assert(ctor.isObject() && ctor.toObject()->isFunction());
-
-            scriptObj = se::Object::createObjectWithConstructor(ctor.toObject());
+            scriptObj = se::Object::createObjectWithConstructor(constructorObj);
         } else {
             se::Value createObjFunc;
             if (!__jsbObj->getProperty("createScriptObjectByType", &createObjFunc, true)) {
@@ -869,6 +877,9 @@ public:
 
         return scriptObj;
     }
+    
+private:
+    ccstd::unordered_map<const char*, se::Value> _constructorMap;
 };
 
 MyObjectFactory myObjectFactory;
