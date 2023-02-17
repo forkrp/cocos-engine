@@ -432,16 +432,6 @@ nodeProto._onChildAdded = function (child) {
     this.emit(NodeEventType.CHILD_ADDED, child);
 };
 
-nodeProto._onNodeDestroyed = function () {
-    this.emit(NodeEventType.NODE_DESTROYED, this);
-    // destroy children
-    const children = this._children;
-    for (let i = 0; i < children.length; ++i) {
-        // destroy immediate so its _onPreDestroy can be called
-        children[i]._destroyImmediate();
-    }
-};
-
 const oldPreDestroy = nodeProto._onPreDestroy;
 nodeProto._onPreDestroy = function _onPreDestroy () {
     const ret = oldPreDestroy.call(this);

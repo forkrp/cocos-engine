@@ -325,14 +325,6 @@ static bool js_scene_Node_registerListeners(cc::Node *cobj) // NOLINT(readabilit
     NODE_DISPATCH_EVENT_TO_JS(cc::Node::RemovePersistRootNode, _onRemovePersistRootNode);
     NODE_DISPATCH_EVENT_TO_JS(cc::Node::DestroyComponents, _onDestroyComponents);
 
-    cobj->on<cc::Node::NodeDestroyed>(
-        +[](cc::Node *emitter) {
-            se::AutoHandleScope scope;
-            se::Value nodeVal;
-            nativevalue_to_se(emitter, nodeVal);
-            se::ScriptEngine::getInstance()->callFunction(nodeVal.toObject(), "_onNodeDestroyed", 1, &nodeVal);
-        });
-
     cobj->onSiblingIndexChanged = +[](cc::Node *emitter, index_t newIndex) {
         se::Object *jsObject = emitter->getScriptObject() != nullptr ? emitter->getScriptObject() : se::NativePtrToObjectMap::findFirst(emitter);
         

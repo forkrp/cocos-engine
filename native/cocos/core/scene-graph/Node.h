@@ -75,7 +75,6 @@ class Node : public CCObject {
     TARGET_EVENT_ARG1(ChildAdded, Node *)
     TARGET_EVENT_ARG1(ChildRemoved, Node *)
     TARGET_EVENT_ARG1(ParentChanged, Node *)
-    TARGET_EVENT_ARG0(NodeDestroyed)
     TARGET_EVENT_ARG0(MobilityChanged)
     TARGET_EVENT_ARG1(LayerChanged, uint32_t)
     TARGET_EVENT_ARG0(SiblingOrderChanged)
