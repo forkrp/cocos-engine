@@ -235,11 +235,21 @@ public:
      */
     using ShadowReceivingMode = ModelShadowReceivingMode;
 
+    inline void setBakeSettings(const Ptr<ModelBakeSettings> &v) { _bakeSettings = v; }
+    inline const Ptr<ModelBakeSettings> & getBakeSettings() const {
+        if (_bakeSettings == nullptr) {
+            _bakeSettings = ccnew ModelBakeSettings();
+        }
+        return _bakeSettings;
+    }
+    
+private:
     /**
      * @en The settings for GI baking, it was called lightmapSettings before
      * @zh 全局光照烘焙的配置，以前名称为lightmapSettings
      */
-    Ptr<ModelBakeSettings> bakeSettings;
+    mutable Ptr<ModelBakeSettings> _bakeSettings;
+public:
 
     ShadowCastingMode _shadowCastingMode{ShadowCastingMode::OFF};
 

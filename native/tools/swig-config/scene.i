@@ -349,6 +349,7 @@ using namespace cc;
 %attribute(cc::MeshRenderer, cc::MeshRenderer::ShadowReceivingMode, receiveShadow, getReceiveShadow, setReceiveShadow);
 %attribute(cc::MeshRenderer, cc::Mesh*, mesh, getMesh, setMesh);
 %attribute(cc::MeshRenderer, cc::scene::Model*, model, getModel);
+%attribute(cc::MeshRenderer, cc::IntrusivePtr<cc::ModelBakeSettings>, bakeSettings, getBakeSettings, setBakeSettings);
 %attribute(cc::MeshRenderer, bool, enableMorph, isEnableMorph, setEnableMorph);
 
 

@@ -49,22 +49,22 @@ void ModelBakeSettings::serialize(Archive &ar) {
 CC_IMPL_SERIALIZE(MeshRenderer)
 
 MeshRenderer::MeshRenderer() {
-
-    bakeSettings = new ModelBakeSettings;
-    se::AutoHandleScope scope;
-    se::Value settings = se::accessor::globalPath("cc.settings");
-    se::Value highQualityMode = se::accessor::invoke(settings, "querySettings", "rendering", "highQualityMode");
-    if (!highQualityMode.isNullOrUndefined()) {
-        _shadowCastingMode = ShadowCastingMode::ON;
-        bakeSettings->setCastShadow(true);
-        bakeSettings->setReceiveShadow(true);
-    }
+//TODO(cjh):
+//    bakeSettings = new ModelBakeSettings;
+//    se::AutoHandleScope scope;
+//    se::Value settings = se::accessor::globalPath("cc.settings");
+//    se::Value highQualityMode = se::accessor::invoke(settings, "querySettings", "rendering", "highQualityMode");
+//    if (!highQualityMode.isNullOrUndefined()) {
+//        _shadowCastingMode = ShadowCastingMode::ON;
+//        bakeSettings->setCastShadow(true);
+//        bakeSettings->setReceiveShadow(true);
+//    }
 }
 
 template <class Archive>
 void MeshRenderer::serialize(Archive &ar) {
     Super::serialize(ar);
-    CC_SERIALIZE(bakeSettings);
+    ar.serialize(_bakeSettings, "bakeSettings");
     CC_SERIALIZE(_mesh);
     CC_SERIALIZE(_shadowCastingMode);
     CC_SERIALIZE(_shadowReceivingMode);
@@ -91,6 +91,8 @@ void MeshRenderer::onUpdateReceiveDirLight(uint32_t visibility, bool forceClose)
 }
 
 void MeshRenderer::onLoad() {
+    getBakeSettings(); //TODO(cjh):
+    
     if (_mesh) {
         _mesh->initialize();
     }
@@ -139,7 +141,7 @@ void MeshRenderer::onEnable() {
     _nodeMobiChangeEv = getNode()->on<Node::MobilityChanged>([&](cc::Node * /*emitter*/) { onMobilityChanged(); });
 
 #define BK_BIND(ev, cb) \
-    bakeSettings->on<ModelBakeSettings::ev>([&](ModelBakeSettings * /*emitter*/) { cb(); })
+    _bakeSettings->on<ModelBakeSettings::ev>([&](ModelBakeSettings * /*emitter*/) { cb(); })
     MR_PROBE_EVENTS(BK_BIND)
 #undef BAKE_BIND
 
@@ -169,7 +171,7 @@ void MeshRenderer::onDisable() {
     }
     getNode()->off<Node::MobilityChanged>(_nodeMobiChangeEv);
 #define BK_UNBIND(ev, cb) \
-    bakeSettings->off<ModelBakeSettings::ev>()
+    _bakeSettings->off<ModelBakeSettings::ev>()
     MR_PROBE_EVENTS(BK_UNBIND)
 #undef BAKE_BIND
 }
@@ -236,21 +238,21 @@ void MeshRenderer::setInstancedAttribute(const char *name, const ccstd::vector<f
 
 // NOLINTNEXTLINE
 void MeshRenderer::_updateLightmap(Texture2D *lightmap, float uOff, float vOff, float scale, float lum) {
-    bakeSettings->texture = lightmap;
-    bakeSettings->uvParam.x = uOff;
-    bakeSettings->uvParam.y = vOff;
-    bakeSettings->uvParam.z = scale;
-    bakeSettings->uvParam.w = lum;
+    _bakeSettings->texture = lightmap;
+    _bakeSettings->uvParam.x = uOff;
+    _bakeSettings->uvParam.y = vOff;
+    _bakeSettings->uvParam.z = scale;
+    _bakeSettings->uvParam.w = lum;
     _onUpdateLightingmap();
 }
 
 void MeshRenderer::updateProbeCubemap(TextureCube *cubeMap, bool useDefaultTexture) {
-    if (bakeSettings->_probeCubemap && bakeSettings->_probeCubemap == cubeMap) {
+    if (_bakeSettings->_probeCubemap && _bakeSettings->_probeCubemap == cubeMap) {
         return;
     }
-    bakeSettings->_probeCubemap = cubeMap;
+    _bakeSettings->_probeCubemap = cubeMap;
     if (_model) {
-        auto &cubeMap = bakeSettings->_probeCubemap;
+        auto &cubeMap = _bakeSettings->_probeCubemap;
         if (!cubeMap && getNode()->getScene() && !useDefaultTexture) {
             cubeMap = MR_SCENE_GLOBAL()->getSkyboxInfo()->getEnvmap();
         }
@@ -259,26 +261,26 @@ void MeshRenderer::updateProbeCubemap(TextureCube *cubeMap, bool useDefaultTextu
 }
 
 void MeshRenderer::updateProbePlanarMap(gfx::Texture *planarMap) {
-    if (bakeSettings->_probePlanarmap == planarMap) {
+    if (_bakeSettings->_probePlanarmap == planarMap) {
         return;
     }
-    bakeSettings->_probePlanarmap = planarMap;
+    _bakeSettings->_probePlanarmap = planarMap;
     if (_model) {
-        _model->updateReflectionProbePlanarMap(bakeSettings->_probePlanarmap);
+        _model->updateReflectionProbePlanarMap(_bakeSettings->_probePlanarmap);
     }
 }
 
 void MeshRenderer::_updateReflectionProbeTexture() {
     if (!_model) return;
-    if (bakeSettings->getReflectionProbe() == ReflectionProbeType::BAKED_CUBEMAP) {
-        auto &cubeMap = bakeSettings->_probeCubemap;
+    if (_bakeSettings->getReflectionProbe() == ReflectionProbeType::BAKED_CUBEMAP) {
+        auto &cubeMap = _bakeSettings->_probeCubemap;
         if (!cubeMap && getNode()->getScene()) {
             cubeMap = MR_SCENE_GLOBAL()->getSkyboxInfo()->getEnvmap();
         }
         _model->updateReflectionProbeCubemap(cubeMap);
         _model->updateReflectionProbePlanarMap(nullptr);
-    } else if (bakeSettings->getReflectionProbe() == ReflectionProbeType::PLANAR_REFLECTION) {
-        _model->updateReflectionProbePlanarMap(bakeSettings->_probePlanarmap);
+    } else if (_bakeSettings->getReflectionProbe() == ReflectionProbeType::PLANAR_REFLECTION) {
+        _model->updateReflectionProbePlanarMap(_bakeSettings->_probePlanarmap);
         _model->updateReflectionProbeCubemap(nullptr);
     } else {
         _model->updateReflectionProbeCubemap(nullptr);
@@ -308,7 +310,7 @@ void MeshRenderer::_updateModels() {
         }
         // Initialize lighting map before model initializing
         // because the lighting map will influence the model's shader
-        _model->initLightingmap(bakeSettings->texture, bakeSettings->uvParam);
+        _model->initLightingmap(_bakeSettings->texture, _bakeSettings->uvParam);
         _updateModelParams();
         _onUpdateLightingmap();
         _onUpdateLocalShadowBias();
@@ -409,15 +411,15 @@ void MeshRenderer::_updateModelParams() {
 
 void MeshRenderer::_onUpdateLightingmap() {
     if (_model) {
-        _model->updateLightingmap(bakeSettings->texture, bakeSettings->uvParam);
+        _model->updateLightingmap(_bakeSettings->texture, _bakeSettings->uvParam);
     }
 
     setInstancedAttribute("a_lightingMapUVParam",
                           {
-                              bakeSettings->uvParam.x,
-                              bakeSettings->uvParam.y,
-                              bakeSettings->uvParam.z,
-                              bakeSettings->uvParam.w,
+        _bakeSettings->uvParam.x,
+        _bakeSettings->uvParam.y,
+        _bakeSettings->uvParam.z,
+        _bakeSettings->uvParam.w,
                           });
 }
 
@@ -520,10 +522,10 @@ void MeshRenderer::onUseLightProbeChanged() {
 
 void MeshRenderer::onReflectionProbeChanged() {
     _updateUseReflectionProbe();
-    if (bakeSettings->getReflectionProbe() == ReflectionProbeType::BAKED_CUBEMAP) {
+    if (_bakeSettings->getReflectionProbe() == ReflectionProbeType::BAKED_CUBEMAP) {
         // TODO(PatriceJiang): should call scene::ReflectionProbeManager::getInstance()
         se::accessor::invokeGlobal("cc.internal.reflectionProbeManager", "updateUseCubeModels", _model);
-    } else if (bakeSettings->getReflectionProbe() == ReflectionProbeType::PLANAR_REFLECTION) {
+    } else if (_bakeSettings->getReflectionProbe() == ReflectionProbeType::PLANAR_REFLECTION) {
         se::accessor::invokeGlobal("cc.internal.reflectionProbeManager", "updateUsePlanarModels", _model);
     }
 }
@@ -535,7 +537,7 @@ void MeshRenderer::onBakeToReflectionProbeChanged() {
 void MeshRenderer::_updateUseLightProbe() {
     if (!_model) return;
     const auto *node = getNode();
-    if (_mesh && node && node->getMobility() == MobilityMode::Movable && bakeSettings->isUseLightProbe()) {
+    if (_mesh && node && node->getMobility() == MobilityMode::Movable && _bakeSettings->isUseLightProbe()) {
         _model->setUseLightProbe(true);
     } else {
         _model->setUseLightProbe(false);
@@ -559,7 +561,7 @@ bool MeshRenderer::_isBatchingEnabled() {
 
 void MeshRenderer::_updateUseReflectionProbe() {
     if (!_model) return;
-    _model->setReflectionProbeType(static_cast<int>(bakeSettings->getReflectionProbe()));
+    _model->setReflectionProbeType(static_cast<int>(_bakeSettings->getReflectionProbe()));
     _updateReflectionProbeTexture();
 }
 
@@ -567,7 +569,7 @@ void MeshRenderer::_updateBakeToReflectionProbe() {
     if (!_model) {
         return;
     }
-    _model->setBakeToReflectionProbe(bakeSettings->isBakeToReflectionProbe());
+    _model->setBakeToReflectionProbe(_bakeSettings->isBakeToReflectionProbe());
 }
 
 void MeshRenderer::_watchMorphInMesh() {
