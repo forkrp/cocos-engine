@@ -45,7 +45,7 @@ struct AssetDependInfo final : public RefCounted {
     se::Object* owner{nullptr};
     
     uint32_t uuidIndex{0};
-    ccstd::string expectedType; //TODO(cjh): Whether need this?
+//    ccstd::string expectedType; //TODO(cjh): Whether need this?
 
     void dereference(se::Object* obj);
     inline void setUuid(const ccstd::string & uuid) { _uuid = uuid; }

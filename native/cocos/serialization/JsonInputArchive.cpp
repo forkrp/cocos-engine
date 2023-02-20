@@ -541,7 +541,7 @@ AssetDependInfo* JsonInputArchive::checkAssetDependInfo() {
         iter = _currentNode->FindMember("__expectedType__");
         if (iter != _currentNode->MemberEnd()) {
             assert(iter->value.IsString());
-            dependInfo.expectedType = iter->value.GetString();
+//TODO(cjh):            dependInfo.expectedType = iter->value.GetString();
         }
 
         CC_LOG_DEBUG("Found __uuid__, owner: %p, current key: %s", _currentOwner, _currentKey);
