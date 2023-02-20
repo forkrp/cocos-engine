@@ -34,7 +34,7 @@ import { Layers } from './layers';
 import { editorExtrasTag, SerializationContext, SerializationOutput, serializeTag } from '../core/data';
 import { _tempFloatArray, fillMat4WithTempFloatArray } from './utils.jsb';
 import { getClassByName, isChildClassOf } from '../core/utils/js-typed';
-import { syncNodeValues } from "../core/utils/jsb-utils";
+// import { syncNodeValues } from "../core/utils/jsb-utils";
 import { property } from '../core/data/class-decorator';
 import { nodePolyfill } from './node-dev';
 import * as js from '../core/utils/js';
@@ -1201,7 +1201,8 @@ nodeProto._onBatchCreated = function (dontSyncChildPrefab: boolean) {
     }
 
     // Sync node _lpos, _lrot, _lscale to native
-    syncNodeValues(this);
+    //TODO(cjh): new serialization only supports scene, prefab also needs to be done.
+    // syncNodeValues(this);
 };
 
 nodeProto._onSceneUpdated = function (scene) {
