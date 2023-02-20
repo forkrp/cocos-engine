@@ -639,8 +639,14 @@ void BinaryInputArchive::onAfterDeserializeScriptObject(se::Object* obj) {
 
     static se::ValueArray args;
     args.resize(1);
-    bool ok = nativevalue_to_se(this, args[0]);
-    assert(ok);
+    
+    if (_thisObject == nullptr) {
+        bool ok = nativevalue_to_se(this, args[0]);
+        assert(ok);
+        _thisObject = args[0].toObject();
+    } else {
+        args[0].setObject(_thisObject);
+    }
 
     if (hasOnAfterDeserializeMethod) {
         onAfterDeserializeVal.toObject()->call(args, obj);
