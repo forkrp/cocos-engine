@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include "base/RefCounted.h"
 #include "base/std/container/string.h"
 #include "base/std/variant.h"
 
@@ -39,7 +40,7 @@ namespace cc {
 
 using AssetDereferenceCallback = std::function<void(se::Object*)>;
 
-struct AssetDependInfo final {
+struct AssetDependInfo final : public RefCounted {
     AssetDereferenceCallback dereferenceCb{nullptr};
     se::Object* owner{nullptr};
     

@@ -177,7 +177,7 @@ public:
     inline void setCurrentOwner(se::Object *owner) { _currentPropertyInfo._currentOwner = owner; }
     inline se::Object *getCurrentOwner() { return _currentPropertyInfo._currentOwner; }
 
-    inline const std::vector<AssetDependInfo>& getDepends() const { return _depends; } // TODO(cjh): Should not handle dependency in Serialization module
+    inline const std::vector<cc::IntrusivePtr<AssetDependInfo>>& getDepends() const { return _depends; } // TODO(cjh): Should not handle dependency in Serialization module
 
     inline bool boolean(bool& data, const char* name) {
         serialize(data, name);
@@ -345,7 +345,7 @@ private:
     ccstd::unordered_map<int32_t, DeserializedInfo> _deserializedObjIdMap;
     se::Object *_scriptDeserializedMap{nullptr};
 
-    ccstd::vector<AssetDependInfo> _depends;
+    ccstd::vector<cc::IntrusivePtr<AssetDependInfo>> _depends;
     ccstd::vector<std::string_view> _uuidList;
     ccstd::vector<std::string_view> _stringList;
 

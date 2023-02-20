@@ -648,9 +648,9 @@ void BinaryInputArchive::onAfterDeserializeScriptObject(se::Object* obj) {
 }
 
 void BinaryInputArchive::onAfterDeserializeScriptObjectByNativePtr(const void* nativeObj) {
-    auto iter = se::NativePtrToObjectMap::find(const_cast<void*>(nativeObj));
-    if (iter != se::NativePtrToObjectMap::end()) {
-        onAfterDeserializeScriptObject(iter->second);
+    auto *scriptObj = se::NativePtrToObjectMap::findFirst(const_cast<void*>(nativeObj));
+    if (scriptObj != nullptr) {
+        onAfterDeserializeScriptObject(scriptObj);
     }
 }
 
@@ -668,19 +668,19 @@ AssetDependInfo* BinaryInputArchive::checkAssetDependInfo() {
             assert(getCurrentKey() != nullptr || getCurrentKeyInteger() != -1);
             assert(!(getCurrentKey() == nullptr && getCurrentKeyInteger() == -1));
 
-            AssetDependInfo dependInfo;
-            dependInfo.uuidIndex = uuidIndex;
-            dependInfo.owner = getCurrentOwner();
+            auto *dependInfo = ccnew AssetDependInfo();
+            dependInfo->uuidIndex = uuidIndex;
+            dependInfo->owner = getCurrentOwner();
             if (getCurrentKeyInteger() > -1) {
-                dependInfo.setPropName(getCurrentKeyInteger());
+                dependInfo->setPropName(getCurrentKeyInteger());
             } else {
-                dependInfo.setPropName(getCurrentKey());
+                dependInfo->setPropName(getCurrentKey());
             }
 
 //            CC_LOG_DEBUG("Found __uuid__: %s, owner: %p, current key: %s", dependInfo.uuid.data(), _currentOwner, _currentKey);
 
             _depends.emplace_back(std::move(dependInfo));
-            return &_depends.back();
+            return _depends.back().get();
         }
     }
 
