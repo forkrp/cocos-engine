@@ -51,6 +51,8 @@
 #include "math/Math.h"
 #include "renderer/gfx-base/states/GFXSampler.h"
 
+#include "serialization/HasMemberFunction.h"
+
 #define SE_PRECONDITION2_VOID(condition, ...)                                                                   \
     do {                                                                                                        \
         if (!(condition)) {                                                                                     \
@@ -380,6 +382,16 @@ bool native_ptr_to_seval(T *vp, se::Class *cls, se::Value *ret, bool *isReturnCa
     if (v == nullptr) {
         ret->setNull();
         return true;
+    }
+    
+    if constexpr (has_getScriptObject<DecayT, se::Object*()>::value) {
+        if (v->getScriptObject() != nullptr) {
+            if (isReturnCachedValue != nullptr) {
+                *isReturnCachedValue = true;
+            }
+            ret->setObject(v->getScriptObject());
+            return true;
+        }
     }
 
     se::NativePtrToObjectMap::filter(v, cls)
