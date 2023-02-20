@@ -941,6 +941,32 @@ static bool JSB_BinaryInputArchive_start(se::State& s) {
 }
 SE_BIND_FUNC(JSB_BinaryInputArchive_start)
 
+static bool js_cc_BinaryInputArchive_getDepends(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::BinaryInputArchive *cobj = SE_THIS_OBJECT<cc::BinaryInputArchive>(s);
+    if (nullptr == cobj) return true;
+    const auto &dependList = cobj->getDepends();
+    
+    se::HandleObject array(se::Object::createArrayObject(dependList.size()));
+    for (auto i = 0; i < dependList.size(); i++) {
+        auto *dependObj = se::Object::createObjectWithClass(__jsb_cc_AssetDependInfo_class);
+        dependObj->root();
+        
+        auto *privateObj = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(dependList[i].get());
+        // NOTE: The returned object contains a `dereference` method which is invoked from JS to C++.
+        // So there is no need to create the C++ to JS mapping, this will be able to improve some performance.
+        dependObj->setPrivateObject(privateObj, false);
+        array->setArrayElement(i, se::Value(dependObj));
+        dependObj->unroot();
+    }
+    s.rval().setObject(array);
+    return true;
+}
+SE_BIND_FUNC(js_cc_BinaryInputArchive_getDepends)
+
 static bool JSB_CCObject_serialize(se::State& s) {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
@@ -1019,6 +1045,7 @@ bool register_all_cocos_manual(se::Object *obj) { // NOLINT(readability-identifi
 
     __jsb_cc_JsonInputArchive_proto->defineFunction("start", _SE(JSB_JsonInputArchive_start));
     __jsb_cc_BinaryInputArchive_proto->defineFunction("start", _SE(JSB_BinaryInputArchive_start));
+    __jsb_cc_BinaryInputArchive_proto->defineFunction("getDepends", _SE(js_cc_BinaryInputArchive_getDepends));
 
 //    __jsb_cc__CCObject_proto->defineFunction("serialize", _SE());
 

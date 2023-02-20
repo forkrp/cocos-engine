@@ -669,7 +669,7 @@ bool Object::getArrayBufferData(uint8_t **ptr, size_t *length) const {
     return true;
 }
 
-void Object::setPrivateObject(PrivateObjectBase *data) {
+void Object::setPrivateObject(PrivateObjectBase *data, bool toCreateMapping/* = true*/) {
     CC_ASSERT_NULL(_privateObject);
     #if CC_DEBUG
     // CC_ASSERT(!NativePtrToObjectMap::contains(data->getRaw()));
@@ -690,7 +690,9 @@ void Object::setPrivateObject(PrivateObjectBase *data) {
 
     if (data != nullptr) {
         _privateData = data->getRaw();
-        NativePtrToObjectMap::emplace(_privateData, this);
+        if (toCreateMapping) {
+            NativePtrToObjectMap::emplace(_privateData, this);
+        }
     } else {
         _privateData = nullptr;
     }

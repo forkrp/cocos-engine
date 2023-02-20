@@ -448,7 +448,7 @@ public:
      */
     ValueArray getAllElementsInSet() const;
 
-    void setPrivateObject(PrivateObjectBase *data);
+    void setPrivateObject(PrivateObjectBase *data, bool toCreateMapping = true);
 
     template<typename T>
     void setPrivateObject(TypedPrivateObject<T>* data) {
