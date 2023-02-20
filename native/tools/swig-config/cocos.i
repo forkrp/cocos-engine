@@ -57,6 +57,7 @@
 %ignore cc::JsonInputArchive::getCurrentNode;
 %ignore cc::AssetDependInfo::dereferenceCb;
 %ignore cc::BinaryInputArchive::start;
+%ignore cc::BinaryInputArchive::getDepends;
 %ignore cc::DeserializeNode;
 
 %rename("$ignore", regextarget=1, fullname=1) "cc::Vec2::.*[^2]$";
