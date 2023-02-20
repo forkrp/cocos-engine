@@ -81,7 +81,6 @@ class Node : public CCObject {
     TARGET_EVENT_ARG0(ActiveInHierarchyChanged)
     TARGET_EVENT_ARG0(Reattach)
     TARGET_EVENT_ARG0(RemovePersistRootNode)
-    TARGET_EVENT_ARG0(DestroyComponents)
     TARGET_EVENT_ARG0(UITransformDirty)
     TARGET_EVENT_ARG1(ActiveNode, bool)
     TARGET_EVENT_ARG1(BatchCreated, bool)

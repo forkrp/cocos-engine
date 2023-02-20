@@ -324,13 +324,14 @@ static bool js_scene_Node_registerListeners(cc::Node *cobj) // NOLINT(readabilit
         });
 
     registerOnActiveNode(cobj);
-    registerOnBatchCreated(cobj);
+    // NOTE: Node.prototype._onBatchCreated was implemented in TS and invoked in scene.jsb.ts (Scene.prototype._load),
+    // so don't need to register the listener here.
+    // registerOnBatchCreated(cobj);
     registerOnChildAdded(cobj);
     registerOnChildRemoved(cobj);
 
     NODE_DISPATCH_EVENT_TO_JS(cc::Node::Reattach, _onReAttach);
     NODE_DISPATCH_EVENT_TO_JS(cc::Node::RemovePersistRootNode, _onRemovePersistRootNode);
-    NODE_DISPATCH_EVENT_TO_JS(cc::Node::DestroyComponents, _onDestroyComponents);
 
     cobj->onSiblingIndexChanged = +[](cc::Node *emitter, index_t newIndex) {
         DEFINE_JS_OBJECT_IN_EVENT_CALLBACK(emitter)
