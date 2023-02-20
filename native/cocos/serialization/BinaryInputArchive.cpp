@@ -27,8 +27,6 @@
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
 
-static long long gScriptSerializeTime = 0;
-
 namespace cc {
 
 struct ScriptSerializeMethods {
@@ -64,7 +62,7 @@ void DeserializeNode::popMapTag() {
 // BinaryInputArchive
 
 BinaryInputArchive::BinaryInputArchive() {
-    _depends.reserve(8020);
+    _depends.reserve(8020); // FIXME(cjh): Don't hardcode here.
 }
 
 
@@ -188,7 +186,6 @@ se::Value BinaryInputArchive::start(Uint8Array &&bufferView, ObjectFactory* fact
     auto durationMS = (std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count()) / 1000000.0;
     
     CC_LOG_INFO("==> cjh BinaryInputArchive::start cost: %lf ms", durationMS);
-    CC_LOG_INFO("==> cjh gScriptSerializeTime: %lf ms", gScriptSerializeTime / 1000000.0);
     CC_LOG_INFO("==> cjh mapping size: %u", (uint32_t)se::NativePtrToObjectMap::size());
     
     printJSBInvoke();
@@ -469,7 +466,6 @@ void BinaryInputArchive::doSerializeAny(se::Value& value) {
 }
 
 void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
-    auto prevTime = std::chrono::steady_clock::now();
     if (obj == nullptr) {
         return;
     }
@@ -534,10 +530,6 @@ void BinaryInputArchive::serializeScriptObject(se::Object* obj) {
             serializeInlineDataVal.toObject()->call(args, obj);
         }
     }
-       
-    auto nowTime = std::chrono::steady_clock::now();
-    auto durationNS = std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - prevTime).count();
-    gScriptSerializeTime += durationNS;
 }
 
 void* BinaryInputArchive::getOrCreateNativeObjectReturnVoidPtr(se::Object*& outScriptObject, ccstd::optional<uint32_t>& resetOffset, bool& fromCache) {
