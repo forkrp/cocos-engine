@@ -74,23 +74,6 @@ public:
 
     ~ComponentProxy() override = default;
 
-    virtual const std::string &getName() const { return _name; }
-    void setName(const std::string &value) { _name = value; }
-
-    /**
-     * @en The uuid for editor.
-     * @zh 组件的 uuid，用于编辑器。
-     * @readOnly
-     * @example
-     * ```ts
-     * import { log } from 'cc';
-     * log(comp.uuid);
-     * ```
-    //  */
-    virtual std::string getUuid() const {
-        return getJSProperty<std::string>("uuid");
-    }
-
     /**
     * @en Indicates whether this component is enabled or not.
     * @zh 表示该组件自身是否启用。

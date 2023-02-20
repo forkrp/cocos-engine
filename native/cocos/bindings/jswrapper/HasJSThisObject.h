@@ -9,8 +9,8 @@ namespace se {
 class Object;
 class HasJSThisObject {
 public:
-    se::Object *getJSThis() const;
-    void bindJSThis(void *);
+    inline se::Object *getJSThis() const { return _thisObject; }
+    inline void bindJSThis(se::Object* thisObject) { _thisObject = thisObject; }
 
     template <typename T>
     T getJSProperty(const char *key) const;
