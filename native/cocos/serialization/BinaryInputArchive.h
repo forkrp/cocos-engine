@@ -334,6 +334,7 @@ private:
 
     TypedArrayTemp<uint8_t> *_bufferView;
     se::Object *_scriptArchive{nullptr};
+    se::Object *_thisObject{nullptr};
     ObjectFactory* _objectFactory{nullptr};
     
     struct DeserializedInfo final {
