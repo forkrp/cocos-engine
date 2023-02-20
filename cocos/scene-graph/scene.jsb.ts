@@ -26,7 +26,7 @@ import { legacyCC } from '../core/global-exports';
 import { Node } from './node';
 import { applyTargetOverrides, expandNestedPrefabInstanceNode } from "./prefab/utils";
 import { assert } from "../core/platform/debug";
-import { updateChildrenForDeserialize } from '../core/utils/jsb-utils';
+// import { updateChildrenForDeserialize } from '../core/utils/jsb-utils';
 import { SceneGlobals } from './scene-globals';
 import { IArchive } from '../core/serialization';
 
@@ -113,7 +113,8 @@ sceneProto._load = function () {
         this._onBatchCreated(EDITOR && this._prefabSyncedInLiveReload);
         this._inited = true;
     }
-    updateChildrenForDeserialize(this);
+    //NOTE: new serialization doesn't need this, children is serialized in c++.
+    // updateChildrenForDeserialize(this);
     oldLoad.call(this);
 };
 
