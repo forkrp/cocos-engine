@@ -370,9 +370,7 @@ void Node::setSiblingIndex(index_t index) {
             siblings.emplace_back(this);
         }
         _parent->updateSiblingIndex();
-        if (onSiblingIndexChanged != nullptr) {
-            onSiblingIndexChanged(this, index);
-        }
+        emit<SiblingIndexChanged>(index);
     }
 }
 

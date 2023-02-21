@@ -78,6 +78,7 @@ class Node : public CCObject {
     TARGET_EVENT_ARG0(MobilityChanged)
     TARGET_EVENT_ARG1(LayerChanged, uint32_t)
     TARGET_EVENT_ARG0(SiblingOrderChanged)
+    TARGET_EVENT_ARG1(SiblingIndexChanged, index_t)
     TARGET_EVENT_ARG0(ActiveInHierarchyChanged)
     TARGET_EVENT_ARG0(Reattach)
     TARGET_EVENT_ARG0(RemovePersistRootNode)
@@ -582,7 +583,6 @@ public:
     bool onPreDestroy() override;
     bool onPreDestroyBase();
 
-    std::function<void(Node*, index_t)> onSiblingIndexChanged{nullptr};
     // For deserialization
     ccstd::string _id;
     Node *_parent{nullptr};

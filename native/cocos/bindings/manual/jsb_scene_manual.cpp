@@ -333,14 +333,14 @@ static bool js_scene_Node_registerListeners(cc::Node *cobj) // NOLINT(readabilit
     NODE_DISPATCH_EVENT_TO_JS(cc::Node::Reattach, _onReAttach);
     NODE_DISPATCH_EVENT_TO_JS(cc::Node::RemovePersistRootNode, _onRemovePersistRootNode);
 
-    cobj->onSiblingIndexChanged = +[](cc::Node *emitter, index_t newIndex) {
+    cobj->on<cc::Node::SiblingIndexChanged>(+[](cc::Node *emitter, index_t newIndex) {
         DEFINE_JS_OBJECT_IN_EVENT_CALLBACK(emitter)
         
         se::AutoHandleScope hs;
         se::Value arg0;
         nativevalue_to_se(newIndex, arg0);
         se::ScriptEngine::getInstance()->callFunction(jsObject, "_onSiblingIndexChanged", 1, &arg0);
-    };
+    });
 
     cobj->on<cc::Node::SceneUpdated>(
         +[](cc::Node * emitter, cc::Scene *scene) {
