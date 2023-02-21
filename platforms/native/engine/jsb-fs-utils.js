@@ -175,23 +175,28 @@ var fsUtils = {
     },
 
     readJson (filePath, onComplete) {
-        const jsonObj = fs.parseJson(filePath);
-        let err = null;
-        if (!jsonObj) {
-            err = new Error(`Read json file failed: path: ${filePath}`);
-            cc.warn(err.message);
-        }
-        onComplete && onComplete(err, jsonObj);
+        fsUtils.readFile(filePath, 'utf8', (err, text) => {
+            let out = null;
+            if (!err) {
+                try {
+                    out = JSON.parse(text);
+                } catch (e) {
+                    cc.warn(`Read json failed: path: ${filePath} message: ${e.message}`);
+                    err = new Error(e.message);
+                }
+            }
+            onComplete && onComplete(err, out);
+        });
     },
 
-    readJsonSync (filePath) {
-        const jsonObj = fs.parseJson(filePath);
-        let err = null;
-        if (!jsonObj) {
-            err = new Error(`Read json file failed: path: ${filePath}`);
-            cc.warn(err.message);
+    readJsonSync (path) {
+        try {
+            const str = fs.getStringFromFile(path);
+            return JSON.parse(str);
+        } catch (e) {
+            cc.warn(`Read json failed: path: ${path} message: ${e.message}`);
+            return new Error(e.message);
         }
-        return jsonObj;
     },
 
     makeDirSync (path, recursive) {

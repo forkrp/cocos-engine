@@ -637,33 +637,6 @@ static bool js_engine_FileUtils_listFilesRecursively(se::State &s) { // NOLINT(r
 }
 SE_BIND_FUNC(js_engine_FileUtils_listFilesRecursively) // NOLINT(readability-identifier-naming)
 
-static bool js_engine_FileUtils_parseJson(se::State &s) { // NOLINT(readability-identifier-naming)
-    auto *cobj = static_cast<cc::FileUtils *>(s.nativeThisObject());
-    SE_PRECONDITION2(cobj, false, "Invalid Native Object");
-    const auto &args = s.args();
-    size_t argc = args.size();
-    CC_UNUSED bool ok = true;
-    if (argc < 1) {
-        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
-        return false;
-    }
-
-    ccstd::string filePath;
-    ok = sevalue_to_native(args[0], &filePath);
-    SE_PRECONDITION2(ok, false, "Error processing arguments");
-
-    ccstd::string fileContent = cc::FileUtils::getInstance()->getStringFromFile(filePath);
-    if (fileContent.empty()) {
-        SE_REPORT_ERROR("[ERROR] file (%s) is empty!", filePath.c_str());
-        return false;
-    }
-    
-    se::HandleObject jsonObj(se::Object::createJSONObject(fileContent));
-    s.rval().setObject(jsonObj);
-    return true;
-}
-SE_BIND_FUNC(js_engine_FileUtils_parseJson) // NOLINT(readability-identifier-naming)
-
 static bool js_se_setExceptionCallback(se::State &s) { // NOLINT(readability-identifier-naming)
     const auto &args = s.args();
     if (args.size() != 1 || !args[0].isObject() || !args[0].toObject()->isFunction()) {
@@ -702,7 +675,6 @@ SE_BIND_FUNC(js_se_setExceptionCallback) // NOLINT(readability-identifier-naming
 
 static bool register_filetuils_ext(se::Object * /*obj*/) { // NOLINT(readability-identifier-naming)
     __jsb_cc_FileUtils_proto->defineFunction("listFilesRecursively", _SE(js_engine_FileUtils_listFilesRecursively));
-    __jsb_cc_FileUtils_proto->defineFunction("parseJson", _SE(js_engine_FileUtils_parseJson));
     return true;
 }
 
