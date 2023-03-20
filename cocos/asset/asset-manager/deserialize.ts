@@ -84,6 +84,7 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
             }
 
             if (window.jsb) {
+                const oldTime = performance.now();
                 const ar = new BinaryInputArchive();
                 ar._onBeforeDeserialize = () => {
                     const sharedOffset = new Uint32Array(jsbAr._getSharedArrayBufferObject());
@@ -93,6 +94,7 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
                     });
                 };
                 const jsbAr = new jsb.BinaryInputArchive();
+
                 jsbAr.setScriptArchive(ar);
                 jsbAr.setScriptDeserializedMap(ar.deserializedMap);
                 ar.jsbArchive = jsbAr;
@@ -112,6 +114,8 @@ export default function deserializeAsset (json: Record<string, any>, options: Re
 
                 // TODO(cjh):
                 const depends = jsbAr.getDepends();
+                const nowTime = performance.now();
+                console.log(`==> cjh bin deserialize: ${nowTime - oldTime}`);
                 const uuidList = ar.uuidList;
                 for (const depend of depends) {
                     // console.log(`==> cjh, Depends, owner:${depend.owner}, propName: ${depend.propName}, uuid: ${depend.uuid}`);
