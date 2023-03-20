@@ -466,8 +466,11 @@ export class Director extends EventTarget {
             this.emit(Director.EVENT_BEFORE_SCENE_LOADING, sceneName);
             this._loadingScene = sceneName;
             console.time(`LoadScene ${sceneName}`);
+            const oldTime = performance.now();
             bundle.loadScene(sceneName, (err, scene) => {
                 console.timeEnd(`LoadScene ${sceneName}`);
+                const nowTime = performance.now();
+                console.log(`==> cjh load scene cost: ${nowTime - oldTime}ms`);
                 this._loadingScene = '';
                 if (err) {
                     error(err);
