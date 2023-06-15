@@ -2282,6 +2282,31 @@ static bool js_cc_Node_isActive(se::State& s)
 }
 SE_BIND_FUNC(js_cc_Node_isActive) 
 
+static bool js_cc_Node_getChildren(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::Node *arg1 = (cc::Node *) NULL ;
+    ccstd::vector< cc::IntrusivePtr< cc::Node > > *result = 0 ;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::Node>(s);
+    if (nullptr == arg1) return true;
+    result = (ccstd::vector< cc::IntrusivePtr< cc::Node > > *) &((cc::Node const *)arg1)->getChildren();
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_Node_getChildren) 
+
 static bool js_cc_Node_getParent(se::State& s)
 {
     CC_UNUSED bool ok = true;
@@ -2697,6 +2722,105 @@ static bool js_cc_Node_getPathInHierarchy(se::State& s)
 }
 SE_BIND_FUNC(js_cc_Node_getPathInHierarchy) 
 
+static bool js_cc_Node__oldSetPosition__SWIG_0(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    cc::Node *arg1 = (cc::Node *) NULL ;
+    cc::Vec3 *arg2 = 0 ;
+    cc::Vec3 temp2 ;
+    
+    arg1 = SE_THIS_OBJECT<cc::Node>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    (arg1)->setPosition((cc::Vec3 const &)*arg2);
+    
+    
+    return true;
+}
+
+static bool js_cc_Node__oldSetPosition__SWIG_1(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    cc::Node *arg1 = (cc::Node *) NULL ;
+    float arg2 ;
+    float arg3 ;
+    
+    arg1 = SE_THIS_OBJECT<cc::Node>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    ok &= sevalue_to_native(args[1], &arg3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    (arg1)->setPosition(arg2,arg3);
+    
+    
+    return true;
+}
+
+static bool js_cc_Node__oldSetPosition__SWIG_2(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    cc::Node *arg1 = (cc::Node *) NULL ;
+    float arg2 ;
+    float arg3 ;
+    float arg4 ;
+    
+    arg1 = SE_THIS_OBJECT<cc::Node>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    ok &= sevalue_to_native(args[1], &arg3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    ok &= sevalue_to_native(args[2], &arg4, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    (arg1)->setPosition(arg2,arg3,arg4);
+    
+    
+    return true;
+}
+
+static bool js_cc_Node__oldSetPosition(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    
+    
+    if (argc == 1) {
+        ok = js_cc_Node__oldSetPosition__SWIG_0(s);
+        if (ok) {
+            return true; 
+        }
+    } 
+    if (argc == 2) {
+        ok = js_cc_Node__oldSetPosition__SWIG_1(s);
+        if (ok) {
+            return true; 
+        }
+    } 
+    if (argc == 3) {
+        ok = js_cc_Node__oldSetPosition__SWIG_2(s);
+        if (ok) {
+            return true; 
+        }
+    } 
+    SE_REPORT_ERROR("wrong number of arguments: %d", (int)argc);
+    return false;
+}
+SE_BIND_FUNC(js_cc_Node__oldSetPosition) 
+
 static bool js_cc_Node_setPositionInternal__SWIG_0(se::State& s)
 {
     CC_UNUSED bool ok = true;
@@ -2808,6 +2932,31 @@ static bool js_cc_Node_setPositionForJS(se::State& s)
     return true;
 }
 SE_BIND_FUNC(js_cc_Node_setPositionForJS) 
+
+static bool js_cc_Node__oldGetPosition(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::Node *arg1 = (cc::Node *) NULL ;
+    cc::Vec3 *result = 0 ;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::Node>(s);
+    if (nullptr == arg1) return true;
+    result = (cc::Vec3 *) &((cc::Node const *)arg1)->getPosition();
+    
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_Node__oldGetPosition) 
 
 static bool js_cc_Node_setRotationInternal(se::State& s)
 {
@@ -3950,6 +4099,7 @@ bool js_register_cc_Node(se::Object* obj) {
     cls->defineFunction("setActive", _SE(js_cc_Node_setActive)); 
     cls->defineFunction("setSiblingIndex", _SE(js_cc_Node_setSiblingIndex)); 
     cls->defineFunction("isActive", _SE(js_cc_Node_isActive)); 
+    cls->defineFunction("getChildren", _SE(js_cc_Node_getChildren)); 
     cls->defineFunction("getParent", _SE(js_cc_Node_getParent)); 
     cls->defineFunction("getChildByUuid", _SE(js_cc_Node_getChildByUuid)); 
     cls->defineFunction("getChildByName", _SE(js_cc_Node_getChildByName)); 
@@ -3962,8 +4112,10 @@ bool js_register_cc_Node(se::Object* obj) {
     cls->defineFunction("pauseSystemEvents", _SE(js_cc_Node_pauseSystemEvents)); 
     cls->defineFunction("resumeSystemEvents", _SE(js_cc_Node_resumeSystemEvents)); 
     cls->defineFunction("getPathInHierarchy", _SE(js_cc_Node_getPathInHierarchy)); 
+    cls->defineFunction("_oldSetPosition", _SE(js_cc_Node__oldSetPosition)); 
     cls->defineFunction("setPositionInternal", _SE(js_cc_Node_setPositionInternal)); 
     cls->defineFunction("setPositionForJS", _SE(js_cc_Node_setPositionForJS)); 
+    cls->defineFunction("_oldGetPosition", _SE(js_cc_Node__oldGetPosition)); 
     cls->defineFunction("setRotationInternal", _SE(js_cc_Node_setRotationInternal)); 
     cls->defineFunction("setRotationForJS", _SE(js_cc_Node_setRotationForJS)); 
     cls->defineFunction("setEulerAngles", _SE(js_cc_Node_setEulerAngles)); 

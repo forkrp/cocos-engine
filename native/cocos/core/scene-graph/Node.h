@@ -249,6 +249,7 @@ public:
     inline void setPosition(const Vec3 &pos) { setPosition(pos.x, pos.y, pos.z); }
     inline void setPosition(float x, float y) { setPosition(x, y, _localPosition.z); }
     inline void setPosition(float x, float y, float z) { setPositionInternal(x, y, z, false); }
+    inline void oldSetPositionForTest(float x, float y, float z) { setPositionInternal(x, y, z, false); }
     inline void setPositionInternal(float x, float y, bool calledFromJS) { setPositionInternal(x, y, _localPosition.z, calledFromJS); }
     void setPositionInternal(float x, float y, float z, bool calledFromJS);
     // It is invoked after deserialization. It only sets position value, not triggers other logic.

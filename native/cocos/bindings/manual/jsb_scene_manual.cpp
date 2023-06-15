@@ -829,6 +829,72 @@ static bool js_assets_MaterialInstance_registerListeners(se::State &s) // NOLINT
 }
 SE_BIND_FUNC(js_assets_MaterialInstance_registerListeners) // NOLINT(readability-identifier-naming)
 
+static bool js_cc_Node__oldSetPositionForTest__SWIG_2(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    cc::Node *arg1 = (cc::Node *) NULL ;
+    float arg2 ;
+    float arg3 ;
+    float arg4 ;
+    
+    arg1 = SE_THIS_OBJECT<cc::Node>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    ok &= sevalue_to_native(args[1], &arg3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    ok &= sevalue_to_native(args[2], &arg4, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    (arg1)->setPosition(arg2,arg3,arg4);
+    
+    
+    return true;
+}
+
+#define MY_TEST_SE_BIND_FUNC(funcName)                                                    \
+    void funcName##Registry(const v8::FunctionCallbackInfo<v8::Value> &_v8args) { \
+        JsbInvokeScope(#funcName);                                                \
+        jsbFunctionWrapperForTest(_v8args, funcName, #funcName);                         \
+    }
+
+SE_HOT void jsbFunctionWrapperForTest(const v8::FunctionCallbackInfo<v8::Value> &v8args, se_function_ptr func, const char *funcName) {
+    bool ret = false;
+    v8::Isolate *isolate = v8args.GetIsolate();
+    v8::HandleScope scope(isolate);
+    bool needDeleteValueArray{false};
+    se::ValueArray args;
+    args.resize(v8args.Length());
+    se::internal::jsToSeArgs(v8args, args);
+    se::Object *thisObject = se::internal::getPrivate(isolate, v8args.This());
+    se::State state(thisObject, args);
+    ret = func(state);
+    if (!ret) {
+        SE_LOGE("[ERROR] Failed to invoke %s\n", funcName);
+    }
+    se::internal::setReturnValue(state.rval(), v8args);
+}
+
+static bool js_cc_Node__oldSetPositionForTest(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    
+    if (argc == 3) {
+        ok = js_cc_Node__oldSetPositionForTest__SWIG_2(s);
+        if (ok) {
+            return true;
+        }
+    }
+    SE_REPORT_ERROR("wrong number of arguments: %d", (int)argc);
+    return false;
+}
+MY_TEST_SE_BIND_FUNC(js_cc_Node__oldSetPositionForTest)
+
 bool register_all_scene_manual(se::Object *obj) // NOLINT(readability-identifier-naming)
 {
     // Get the ns
@@ -871,6 +937,8 @@ bool register_all_scene_manual(se::Object *obj) // NOLINT(readability-identifier
 
     nodeVal.toObject()->defineFunction("_setTempFloatArray", _SE(js_scene_Node_setTempFloatArray));
 
+    __jsb_cc_Node_proto->defineFunction("_setPositionTempArgVector", _SE(js_cc_Node__oldSetPositionForTest));
+    
     __jsb_cc_Node_proto->defineFunction("_setPosition", _SE(js_scene_Node_setPosition));
     __jsb_cc_Node_proto->defineFunction("_setScale", _SE(js_scene_Node_setScale));
     __jsb_cc_Node_proto->defineFunction("_setRotation", _SE(js_scene_Node_setRotation));
