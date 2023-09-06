@@ -60,9 +60,13 @@ export class AsyncDelegate<T extends (...args: any) => (Promise<void> | void) = 
      * @en The callback to add, and will be invoked when this delegate is dispatching.
      * @zh 要添加的回调，并将在该委托调度时被调用。
      */
-    public add (callback: T): void {
+    public add (callback: T, atFront: boolean = false): void {
         if (!this._delegates.includes(callback)) {
-            this._delegates.push(callback);
+            if (atFront) {
+                this._delegates.unshift(callback);
+            } else {
+                this._delegates.push(callback);
+            }
         }
     }
 

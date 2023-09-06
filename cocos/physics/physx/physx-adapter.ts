@@ -45,6 +45,7 @@ import { Node } from '../../scene-graph';
 import { Director, director, game } from '../../game';
 import { degreesToRadians } from '../../core/utils/misc';
 import { PhysXCharacterController } from './character-controllers/physx-character-controller';
+import spine from '../../spine/lib/spine-core';
 
 export let PX = {} as any;
 const globalThis = cclegacy._global;
@@ -107,7 +108,7 @@ function initASM (physxAsmFactory): any {
 function initWASM (physxWasmFactory, physxWasmUrl): any {
     globalThis.PhysX = globalThis.PHYSX ? globalThis.PHYSX : physxWasmFactory;
     if (globalThis.PhysX != null) {
-        return globalThis.PhysX({
+ /*       return globalThis.PhysX({
             instantiateWasm (
                 importObject: WebAssembly.Imports,
                 receiveInstance: (instance: WebAssembly.Instance, module: WebAssembly.Module) => void,
@@ -118,10 +119,23 @@ function initWASM (physxWasmFactory, physxWasmUrl): any {
             },
         }).then((Instance: any): void => {
             if (!EDITOR && !TEST) console.debug('[PHYSICS]:', `${USE_EXTERNAL_PHYSX ? 'External' : 'Internal'} PhysX wasm libs loaded.`);
-            initAdaptWrapper(Instance);
-            initConfigAndCacheObject(Instance);
-            PX = Instance;
-        }, (reason: any): void => { console.error('[PHYSICS]:', `PhysX wasm load failed: ${reason}`); });
+*/
+        return new Promise<void>((resolve, reject): void => {
+            PX._timer_id = setInterval(()=>{
+                if (spine && spine.wasmUtil && spine.wasmUtil.wasm) {
+                    const Instance = spine.wasmUtil.wasm;
+                    initAdaptWrapper(Instance);
+                    initConfigAndCacheObject(Instance);
+                    // Object.assign(PX, Instance);
+                    console.log(`cjh init 111 physx successfully ...`);
+                    clearInterval(PX._timer_id);
+                    PX = Instance;
+                    resolve();
+                }
+            }, 10);
+        });
+
+//       }, (reason: any): void => { console.error('[PHYSICS]:', `PhysX wasm load failed: ${reason}`); });
     } else {
         if (!EDITOR && !TEST) console.error('[PHYSICS]:', 'Failed to load PhysX wasm libs, package may be not found.');
         return new Promise<void>((resolve, reject): void => {
@@ -438,7 +452,7 @@ export function createTriangleMesh (vertices: Float32Array | number[], indices: 
         for (let i = 0; i < l; i += 3) {
             vArr.push_back({ x: vertices[i], y: vertices[i + 1], z: vertices[i + 2] });
         }
-        const iArr = new PX.PxU16Vector();
+        const iArr = new PX.VectorUnsignedShort();//cjh PxU16Vector();
         for (let i = 0; i < l2; i += 3) {
             iArr.push_back(indices[i]); iArr.push_back(indices[i + 1]); iArr.push_back(indices[i + 2]);
         }

@@ -43,6 +43,7 @@ const registerList: any[] = [];
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 function initWasm (wasmFactory, wasmUrl): Promise<void> {
+    console.log(`cjh spine initWasm ...`)
     return new Promise<void>((resolve, reject) => {
         const errorMessage = (err: any): string => `[Spine]: Spine wasm load failed: ${err}`;
         wasmFactory({
@@ -54,6 +55,7 @@ function initWasm (wasmFactory, wasmUrl): Promise<void> {
                 }).catch((err) => reject(errorMessage(err)));
             },
         }).then((Instance: any) => {
+            console.log(`cjh spine initWasm succeed ...`)
             wasmInstance = Instance;
             registerList.forEach((cb) => {
                 cb(wasmInstance);
@@ -121,7 +123,7 @@ export function waitForSpineWasmInstantiation (): Promise<void> {
 }
 
 if (!JSB) {
-    game.onPostInfrastructureInitDelegate.add(waitForSpineWasmInstantiation);
+    game.onPostInfrastructureInitDelegate.add(waitForSpineWasmInstantiation, true);
     registerList.push(overrideSpineDefine);
 }
 export const SPINE_WASM = 1;

@@ -107,6 +107,7 @@ function overrideDefineArrayFunction (prototype: any, getPropVector: any, name: 
 }
 
 function overrideClass (wasm): void {
+    console.log(`cjh overrideClass .... wasm: ${wasm}`);
     spine.wasmUtil = wasm.SpineWasmUtil;
     spine.wasmUtil.wasm = wasm;
     spine.wasmUtil.spineWasmInit();
