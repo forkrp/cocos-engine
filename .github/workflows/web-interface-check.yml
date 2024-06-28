@@ -3,9 +3,6 @@ name: <Web> Interface check
 #on: push
 on: [pull_request]
 
-permissions:
-  pull-requests: write
-
 # github.head_ref is only defined on pull_request events
 concurrency:
   group: ${{ github.workflow }}-${{ github.actor }}-${{ github.head_ref || github.run_id }}
@@ -16,6 +13,8 @@ jobs:
     if: 
       (! contains(github.event.pull_request.body, '[X] does not change any runtime related code or build configuration'))
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/setup-node@v2
         with:
