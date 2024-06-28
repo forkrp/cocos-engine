@@ -1,7 +1,7 @@
 name: <Web> Interface check
 
 #on: push
-on: [pull_request_target]
+on: [pull_request]
 
 # github.head_ref is only defined on pull_request events
 concurrency:
