@@ -149,6 +149,10 @@ export class Tween<T extends object = any> {
         return this;
     }
 
+    foo (): void {
+        //
+    }
+
     /**
      * @en Return a new Tween instance which reverses all actions in the current tween.
      * @zh 返回新的缓动实例，其会翻转当前缓动中的所有动作。
