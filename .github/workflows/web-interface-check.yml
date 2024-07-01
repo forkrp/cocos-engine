@@ -53,9 +53,11 @@ jobs:
         with:
           ref: 'refs/pull/${{ github.event.pull_request.number }}/merge' # Don't check out the head commit, checkout the "merge commit" instead
           path: './engine-HEAD'
+
       - run: |
           "EXT_VERSION_HEAD=$(node ./engine-HEAD/.github/workflows/get-native-external-version.js)" >> $env:GITHUB_ENV
         shell: pwsh
+
       - uses: actions/checkout@v4
         name: Download external
         with:
@@ -83,6 +85,10 @@ jobs:
           cat ./interface-diff.txt
           node ./.github/workflows/interface-check-report.js
 
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: ./engine/interface-diff.txt
+
       - name: Write PR number to file
         uses: actions/github-script@v5
         with:
@@ -93,9 +99,9 @@ jobs:
       - name: Upload PR number artifact
         uses: actions/upload-artifact@v2
         with:
-          name: interface-check-pr.txt
+          name: pr.txt
           path: |
-            interface-check-pr.txt
+            pr.txt
 
       - name: Upload interface diff artifact
         uses: actions/upload-artifact@v2
