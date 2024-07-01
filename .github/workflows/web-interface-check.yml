@@ -53,9 +53,11 @@ jobs:
         with:
           ref: 'refs/pull/${{ github.event.pull_request.number }}/merge' # Don't check out the head commit, checkout the "merge commit" instead
           path: './engine-HEAD'
+
       - run: |
           "EXT_VERSION_HEAD=$(node ./engine-HEAD/.github/workflows/get-native-external-version.js)" >> $env:GITHUB_ENV
         shell: pwsh
+
       - uses: actions/checkout@v4
         name: Download external
         with:
@@ -69,7 +71,7 @@ jobs:
         run: |
           npm install
 
-      - uses: LouisBrunner/diff-action@v0.1.2
+      - uses: LouisBrunner/diff-action@v2.0.0
         with:
           old: ./engine/bin/.declarations/cc.d.ts
           new: ./engine-HEAD/bin/.declarations/cc.d.ts
@@ -84,21 +86,21 @@ jobs:
           node ./.github/workflows/interface-check-report.js
 
       - name: Write PR number to file
-        uses: actions/github-script@v5
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            fs.writeFileSync('pr.txt', process.env.PR_NUMBER);
+            fs.writeFileSync('interface-check-pr.txt', process.env.PR_NUMBER);
 
       - name: Upload PR number artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: interface-check-pr.txt
           path: |
             interface-check-pr.txt
 
       - name: Upload interface diff artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: interface-diff.txt
           path: |
