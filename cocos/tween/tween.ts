@@ -157,6 +157,10 @@ export class Tween<T extends object = any> {
         //
     }
 
+    bar2 (): void {
+        //
+    }
+
     zoo (): void {
         
     }
