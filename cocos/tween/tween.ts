@@ -153,21 +153,6 @@ export class Tween<T extends object = any> {
         //
     }
 
-    bar (): void {
-        //
-    }
-
-    bar2 (): void {
-        //
-    }
-
-    zoo (): void {
-        
-    }
-
-    zoo2 (): void {
-        
-    }
 
     /**
      * @en Return a new Tween instance which reverses all actions in the current tween.
