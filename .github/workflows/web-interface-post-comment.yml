@@ -26,7 +26,7 @@ jobs:
           ls -R ./artifacts
           
       - name: Set PR environment variable
-        uses: actions/github-script@v4
+        uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
@@ -37,4 +37,5 @@ jobs:
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ env.PR_NUMBER }}
+          edit-mode: replace
           body-path: './artifacts/interface-diff.txt'
