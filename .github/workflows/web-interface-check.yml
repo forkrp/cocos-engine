@@ -1,6 +1,5 @@
 name: <Web> Interface check
 
-#on: push
 on: [pull_request]
 
 # github.head_ref is only defined on pull_request events
@@ -19,11 +18,11 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: '18.x'
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Base Ref
         with:
           repository: ${{ github.event.pull_request.base.repo.full_name }}
@@ -32,7 +31,7 @@ jobs:
       - run: |
           "EXT_VERSION=$(node ./engine/.github/workflows/get-native-external-version.js)" >> $env:GITHUB_ENV
         shell: pwsh
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Download external
         with:
           repository: cocos/cocos-engine-external
@@ -49,7 +48,7 @@ jobs:
         run: |
           npm cache clean --force
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Checkout Head Ref
         with:
           ref: 'refs/pull/${{ github.event.pull_request.number }}/merge' # Don't check out the head commit, checkout the "merge commit" instead
@@ -57,7 +56,7 @@ jobs:
       - run: |
           "EXT_VERSION_HEAD=$(node ./engine-HEAD/.github/workflows/get-native-external-version.js)" >> $env:GITHUB_ENV
         shell: pwsh
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         name: Download external
         with:
           repository: cocos/cocos-engine-external
@@ -84,10 +83,6 @@ jobs:
           cat ./interface-diff.txt
           node ./.github/workflows/interface-check-report.js
 
-      # - uses: marocchino/sticky-pull-request-comment@v2
-      #   with:
-      #     path: ./engine/interface-diff.txt
-
       - name: Write PR number to file
         uses: actions/github-script@v5
         with:
@@ -98,9 +93,9 @@ jobs:
       - name: Upload PR number artifact
         uses: actions/upload-artifact@v2
         with:
-          name: pr.txt
+          name: interface-check-pr.txt
           path: |
-            pr.txt
+            interface-check-pr.txt
 
       - name: Upload interface diff artifact
         uses: actions/upload-artifact@v2

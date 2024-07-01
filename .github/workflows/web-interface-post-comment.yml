@@ -30,7 +30,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const pr = Number(fs.readFileSync('./artifacts/pr.txt', 'utf8'));
+            const pr = Number(fs.readFileSync('./artifacts/interface-check-pr.txt', 'utf8'));
             core.exportVariable('PR_NUMBER', pr);
 
       - name: Update Comment
