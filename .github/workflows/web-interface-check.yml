@@ -85,10 +85,6 @@ jobs:
           cat ./interface-diff.txt
           node ./.github/workflows/interface-check-report.js
 
-      - uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          path: ./engine/interface-diff.txt
-
       - name: Write PR number to file
         uses: actions/github-script@v7
         with:
