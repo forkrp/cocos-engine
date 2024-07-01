@@ -13,25 +13,28 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifacts  
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RUN_ID: ${{ github.event.workflow_run.id }}
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          merge-multiple: true
+          path: ./artifacts
+
+      - name: Display structure of downloaded files
         run: |
-          gh run download -R "${{ github.repository }}" --name "pr.txt" "$RUN_ID"
-          gh run download -R "${{ github.repository }}" --name "interface-diff.txt" "$RUN_ID"
-          [ -L interface-diff.txt ] && exit 1
+          ls -R ./artifacts
           
       - name: Set PR environment variable
         uses: actions/github-script@v4
         with:
           script: |
             const fs = require('fs');
-            const pr = Number(fs.readFileSync('pr.txt', 'utf8'));
+            const pr = Number(fs.readFileSync('./artifacts/pr.txt', 'utf8'));
             core.exportVariable('PR_NUMBER', pr);
 
       - name: Update Comment
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ env.PR_NUMBER }}
-          body-path: 'interface-diff.txt'
+          body-path: './artifacts/interface-diff.txt'
