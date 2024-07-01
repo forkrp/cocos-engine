@@ -8,6 +8,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.actor }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
+env:
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+
 jobs:
   interface_check:
     if: 
@@ -81,6 +84,27 @@ jobs:
           cat ./interface-diff.txt
           node ./.github/workflows/interface-check-report.js
 
-      - uses: marocchino/sticky-pull-request-comment@v2
+      # - uses: marocchino/sticky-pull-request-comment@v2
+      #   with:
+      #     path: ./engine/interface-diff.txt
+
+      - name: Write PR number to file
+        uses: actions/github-script@v5
         with:
-          path: ./engine/interface-diff.txt
+          script: |
+            const fs = require('fs');
+            fs.writeFileSync('pr.txt', process.env.PR_NUMBER);
+
+      - name: Upload PR number artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: pr.txt
+          path: |
+            pr.txt
+
+      - name: Upload interface diff artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: interface-diff.txt
+          path: |
+            ./engine/interface-diff.txt
